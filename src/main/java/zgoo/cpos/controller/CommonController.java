@@ -15,7 +15,7 @@ public class CommonController {
     @GetMapping(value = "/dashboard")
     public String showDashboard(Model model) {
         log.info("Dashboard Home");
-        // 필요한 data를 model에 추가
+        // 필요한 data를 model에 추가 !!
 
         return "pages/dashboard";
     }
