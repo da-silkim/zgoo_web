@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DAEV</title>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+
+    <!-- Popper.js, Bootstrap.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.8/umd/popper.min.js" integrity="sha512-TPh2Oxlg1zp+kz3nFA0C5vVC6leG/6mm1z9+mA81MI5eaUVqasPLO8Cuk4gMF4gUfP5etR73rgU/8PNMsSesoQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+    <script type="module" src="/js/data.js"></script>
+    <script type="text/javascript" src="/js/common.js"></script>
+    <script type="text/javascript" src="/js/map.js"></script>
+    
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=2627a1d15418d5bd6f92dfadded8a675&libraries=services"></script>
+
+    <link rel="stylesheet" href="/css/common.css">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="shortcut icon" href="/img/favicon_dongah.ico?v=1" id="faviconHref" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />  
+
+</head>
+<body>
+    <!-- body-content start -->
+    <div class="body-content">
+        <!-- top-nav start -->
+        <div class="top-nav">
+            <div>
+                <a href="../dashboard.html">
+                    <img src="/img/dongah-white.png" alt="logo" class="dashboard-logo">
+                </a>
+                <span class="lang-content">
+                    <a href="../login/login_page.html" id="login-content" style="text-decoration: none;">
+                        <span class="me-4" style="color: white; font-size: 18px;">Sign In<i class="fa-solid fa-right-to-bracket ms-3"></i></span>
+                    </a>
+                </span>
+            </div>
+        </div>
+        <!-- top-nav end -->
+        
+        <!-- side-nav start -->
+        <div class="side-nav">
+            <div class="side-nav-detail">
+                <ul>
+                    <li class="nav-menu list-hover">
+                        <a href="../dashboard.html">
+                            <span class="nav-list"><i class="fa-solid fa-chart-line font-ico"></i><span class="nav-list-txt">대시보드</span></span>
+                        </a>
+                    </li>
+                    <li class="nav-menu list-hover">
+                        <a href="./map.html">
+                            <span class="nav-list"><i class="fa-solid fa-map font-ico"></i><span class="nav-list-txt">지도</span></span>
+                        </a>
+                    </li>
+                    <li class="nav-menu">
+                        <span class="nav-list"><i class="fa-solid fa-user-tie font-ico"></i><span class="nav-list-txt">회원관리</span><i class="fa-solid fa-chevron-down font-ico-arrow"></i></span>
+                        <ul class="nav-list-detail">
+                            <li class="nav-list list-hover">
+                                <a href="../member/member_list.html">회원 리스트</a>
+                            </li>
+                            <li class="nav-list list-hover">
+                                <a href="../member/member_authentication.html">회원 인증 내역</a>
+                            </li> 
+                        </ul>
+                    </li>
+                    <li class="nav-menu">
+                        <span class="nav-list"><i class="fa-solid fa-charging-station font-ico"></i><span class="nav-list-txt">충전소 관리</span><i class="fa-solid fa-chevron-down font-ico-arrow"></i></span>
+                        <ul class="nav-list-detail">
+                            <li class="nav-list list-hover">
+                                <a href="../charge/charge_station_list.html">충전소 리스트</a>
+                            </li>
+                        </ul>
+                    </li>                    
+                    <li class="nav-menu">
+                        <span class="nav-list"><i class="fa-solid fa-plug font-ico"></i><span class="nav-list-txt">충전기 관리</span><i class="fa-solid fa-chevron-down font-ico-arrow"></i></span>
+                        <ul class="nav-list-detail">
+                            <li class="nav-list list-hover">
+                                <a href="../charge/charger_list.html">충전기 리스트</a>
+                            </li>
+                        </ul>
+                    </li>                    
+                    <li class="nav-menu">
+                        <span class="nav-list"><i class="fa-solid fa-battery-full"></i><span class="nav-list-txt">충전현황</span><i class="fa-solid fa-chevron-down font-ico-arrow"></i></span>
+                        <ul class="nav-list-detail">
+                            <li class="nav-list list-hover">
+                                <a href="../charge/charge_real_time_list.html">실시간 충전 리스트</a>
+                            </li> 
+                        </ul>
+                    </li>
+                    <li class="nav-menu">
+                        <span class="nav-list"><i class="fa-solid fa-gear font-ico"></i><span class="nav-list-txt">시스템</span><i class="fa-solid fa-chevron-down font-ico-arrow"></i></span>
+                        <ul class="nav-list-detail">
+                            <li class="nav-list list-hover">
+                                <a href="../system/model_management.html">모델관리</a>
+                            </li>
+                            <li class="nav-list list-hover">
+                                <a href="../system/code_management.html">공통코드 관리</a>
+                            </li>
+                            <li class="nav-list list-hover">
+                                <a href="../system/user_management.html">사용자 관리</a>
+                            </li>
+                            <li class="nav-list list-hover">
+                                <a href="../system/notice_management.html">공지사항 관리</a>
+                            </li>
+                            <li class="nav-list list-hover">
+                                <a href="../system/authority_management.html">메뉴접근권한 관리</a>
+                            </li>
+                            <li class="nav-list list-hover">
+                                <a href="#">에러코드 관리</a>
+                            </li>
+                            <li class="nav-list list-hover">
+                                <a href="#">요금제 관리</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="nav-menu">
+                        <span class="nav-list"><i class="fa-solid fa-wrench font-ico"></i><span class="nav-list-txt">유지보수</span><i class="fa-solid fa-chevron-down font-ico-arrow"></i></span>
+                        <ul class="nav-list-detail">
+                            <li class="nav-list list-hover">
+                                <a href="../maintenance/error_management.html">장애관리</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="nav-menu">
+                        <span class="nav-list"><i class="fa-solid fa-satellite-dish"></i><span class="nav-list-txt">제어</span><i class="fa-solid fa-chevron-down font-ico-arrow"></i></span>
+                        <ul class="nav-list-detail">
+                            <li class="nav-list list-hover">
+                                <a href="../control/cp_control.html">충전기 제어</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="nav-menu">
+                        <span class="nav-list"><i class="fa-solid fa-headset"></i><span class="nav-list-txt">고객센터</span><i class="fa-solid fa-chevron-down font-ico-arrow"></i></span>
+                        <ul class="nav-list-detail">
+                            <li class="nav-list list-hover">
+                                <a href="../customer/voc.html">1:1 문의</a>
+                            </li>
+                            <li class="nav-list list-hover">
+                                <a href="../customer/faq.html">FAQ 관리</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="nav-menu">
+                        <span class="nav-list"><i class="fa-solid fa-clipboard-list font-ico"></i><span class="nav-list-txt">이력</span><i class="fa-solid fa-chevron-down font-ico-arrow"></i></span>
+                        <ul class="nav-list-detail">
+                            <li class="nav-list list-hover">
+                                <a href="#">충전이력</a>
+                            </li>
+                            <li class="nav-list list-hover">
+                                <a href="#">결제이력</a>
+                            </li> 
+                            <li class="nav-list list-hover">
+                                <a href="#">통신이력</a>
+                            </li> 
+                            <li class="nav-list list-hover">
+                                <a href="#">에러이력</a>
+                            </li> 
+                        </ul>
+                    </li>
+                    <li class="nav-menu">
+                        <span class="nav-list"><i class="fa-solid fa-receipt"></i><span class="nav-list-txt">정산</span><i class="fa-solid fa-chevron-down font-ico-arrow"></i></span>
+                        <ul class="nav-list-detail">
+                            <li class="nav-list list-hover">
+                                <a href="#">매출정산</a>
+                            </li>
+                            <li class="nav-list list-hover">
+                                <a href="#">매입관리</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="nav-menu">
+                        <span class="nav-list"><i class="fa-solid fa-chart-simple"></i><span class="nav-list-txt">통계</span><i class="fa-solid fa-chevron-down font-ico-arrow"></i></span>
+                        <ul class="nav-list-detail">
+                            <li class="nav-list list-hover">
+                                <a href="#">매출통계</a>
+                            </li>
+                            <li class="nav-list list-hover">
+                                <a href="#">이용률 통계</a>
+                            </li>
+                            <li class="nav-list list-hover">
+                                <a href="#">충전량 통계</a>
+                            </li>
+                            <li class="nav-list list-hover">
+                                <a href="#">장애율 통계</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="nav-menu">
+                        <span class="nav-list"><i class="fa-solid fa-building"></i><span class="nav-list-txt">업체관리</span><i class="fa-solid fa-chevron-down font-ico-arrow"></i></span>
+                        <ul class="nav-list-detail">
+                            <li class="nav-list list-hover">
+                                <a href="../biz/biz_management.html">사업자 관리</a>
+                            </li>
+                            <li class="nav-list list-hover">
+                                <a href="../biz/corporation_management.html">법인 관리</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="nav-menu">
+                        <span class="nav-list"><i class="fa-solid fa-microchip font-ico"></i><span class="nav-list-txt">펌웨어</span><i class="fa-solid fa-chevron-down font-ico-arrow"></i></span>
+                        <ul class="nav-list-detail">
+                            <li class="nav-list list-hover">
+                                <a href="#">펌웨어 버전관리</a>
+                            </li>
+                            <li class="nav-list list-hover">
+                                <a href="#">펌웨어 업데이트</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="nav-menu list-hover">
+                        <a href="#">
+                            <span class="nav-list"><i class="fa-regular fa-clock"></i><span class="nav-list-txt">예약</span></span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <!-- side-nav end -->
+
+        <!-- contents start -->
+        <div class="main-content d-flex flex-column" style="height: 100vh;">
+            <!-- card:1 start -->
+            <div class="card flex-grow-1 d-flex flex-column">
+                <!-- card body:1 start -->
+                <div class="card-body d-flex flex-column">
+                    <div class="content-title mb-4 fw-bolder" style="font-size: 20px;">
+                        <i class="fa-solid fa-map font-ico me-2"></i>지도
+                    </div>
+                    <!-- card:2 start -->
+                    <div class="card card-shadow flex-grow-1 d-flex position-relative">
+                        <!-- kakao map: start -->
+                        <div class="card-body d-flex flex-column" style="overflow: auto;" id="map"></div>
+                        <!-- kakao map: end -->
+                        <!-- search area: start -->
+                        <div class="position-absolute d-flex" style="top: 10px; left: 10px; width: 300px; height: 40px; z-index: 10;">
+                            <div class="position-relative" style="width: 100%;">
+                                <input type="text" id="searchBox" class="form-control" placeholder="충전소 이름을 입력하세요." style="width: 100%; padding-right: 40px;">
+                                <button id="searchBtn" class="position-absolute" style="right: 10px; top: 50%; transform: translateY(-50%); border: none; background-color: transparent;">
+                                    <i class="bi bi-search"></i>
+                                </button>
+                            </div>
+                            <div id="autocompleteList" class="autocomplete-items"></div>
+                        </div>
+                        <!-- search area: end -->
+                        <!-- 현재 위치 버튼 -->
+                        <button id="currentLocationBtn" class="position-absolute" style="bottom: 20px; right: 20px; z-index: 10; border: none; background-color: transparent;">
+                            <img src="../../img/now_pos.png" style="width: 50px;">
+                        </button>
+                    </div>
+                    <!-- card:2 end -->
+                </div>
+                <!-- card body:1 end -->
+            </div>
+            <!-- card:1 end -->
+        </div>
+        <!-- contents end -->
+    </div>
+    <!-- body-content end -->
+</body>
+</html>

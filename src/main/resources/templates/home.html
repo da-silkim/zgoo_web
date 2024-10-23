@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{testlayout/default_layout}">
+
+
+<body>
+    <!-- The content for this specific page -->
+    <div layout:fragment="content">
+        <div class="jumbotron">
+            <p>사업자 관리</p>
+            <p class="lead">
+                <a class="btn btn-secondary btn-lg" href="/company/new" role="button">사업자 등록</a>
+                <a class="btn btn-secondary btn-lg" href="/company/list" role="button">사업자 목록</a>
+            </p>
+        </div>
+    </div>
+</body>
+
+</html>

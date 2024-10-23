@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+
+<!-- Include the header -->
+<th:block th:replace="~{fragments/header :: header}"></th:block>
+<br>
+
+<body>
+    <th:block th:replace="~{fragments/bheader :: bheader}"></th:block>
+    <!-- Main content area where each page will inject its own content -->
+    <div class="container">
+        <div layout:fragment="content">
+            <!-- This is where the content will be injected -->
+        </div>
+    </div>
+
+    <br>
+    <!-- Include the footer -->
+
+    <th:block th:replace="~{fragments/footer :: footer}"></th:block>
+
+</body>
+
+
+
+</html>

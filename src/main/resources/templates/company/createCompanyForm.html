@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{testlayout/default_layout}">
+
+<style>
+    .fieldError {
+        border-color: #bd2130;
+    }
+</style>
+
+<body>
+    <div layout:fragment="content">
+        <p>사업자 등록</p>
+        <form role="form" action="/company/new" th:object="${companyRegDto}" method="post">
+            <div class="form-group">
+                <label th:for="companyName">사업자명</label>
+                <input type="text" th:field="*{companyName}" class="form-control" placeholder="사업자명을 입력하세요" th:class="${#fields.hasErrors('companyName')}? 'form-control
+       fieldError' : 'form-control'">
+                <p th:if="${#fields.hasErrors('companyName')}" th:errors="*{companyName}">Incorrect date</p>
+            </div>
+            <div class="form-group">
+                <label th:for="companyType">사업자유형</label>
+                <select th:field="*{companyType}">
+                    <option th:value="'CP'" th:text="위탁운영사"></option>
+                    <option th:value="'OP'" th:text="충전사업자"></option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label th:for="companyLv">사업자레벨</label>
+                <select th:field="*{companyLv}" id="companyLv">
+                    <option th:value="'ROOT'" th:text="ROOT"></option>
+                    <option th:value="'TOP'" th:text="상위사업자"></option>
+                    <option th:value="'MID'" th:text="하위사업자"></option>
+                    <option th:value="'LOW'" th:text="최하위사업자"></option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label th:for="bizNum">사업자등록번호</label>
+                <input type="text" th:field="*{bizNum}" class="form-control" placeholder="사업자등록번호를 입력하세요">
+            </div>
+            <div class="form-group">
+                <label th:for="bizType">사업자구분</label>
+                <select th:field="*{bizType}">
+                    <option th:value="'PB'" th:text="개인"></option>
+                    <option th:value="'CB'" th:text="법인"></option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label th:for="bizKind">업종</label>
+                <select th:field="*{bizKind}">
+                    <option th:value="'1'" th:text="농업"></option>
+                    <option th:value="'2'" th:text="광업"></option>
+                    <option th:value="'3'" th:text="제조업"></option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label th:for="ceoName">대표자명</label>
+                <input type="text" th:field="*{ceoName}" class="form-control" placeholder="대표자명을 입력하세요">
+            </div>
+            <div class="form-group">
+                <label th:for="headPhone">대표전화</label>
+                <input type="text" th:field="*{headPhone}" class="form-control" placeholder="대표전화를 입력하세요">
+            </div>
+            <div class="form-group">
+                <label th:for="zipcode">우편번호</label>
+                <input type="text" th:field="*{zipcode}" class="form-control" placeholder="우편번호를 입력하세요">
+            </div>
+            <div class="form-group">
+                <label th:for="address">주소</label>
+                <input type="text" th:field="*{address}" class="form-control" placeholder="주소를 입력하세요">
+            </div>
+            <div class="form-group">
+                <label th:for="addressDetail">상세주소</label>
+                <input type="text" th:field="*{addressDetail}" class="form-control" placeholder="상세주소를 입력하세요">
+            </div>
+            <div class="form-group">
+                <label th:for="staffName">담당자</label>
+                <input type="text" th:field="*{staffName}" class="form-control" placeholder="담당자명을 입력하세요">
+            </div>
+            <div class="form-group">
+                <label th:for="staffEmail">E-mail</label>
+                <input type="text" th:field="*{staffEmail}" class="form-control" placeholder="담당자 이메일을 입력하세요">
+            </div>
+            <div class="form-group">
+                <label th:for="staffTel">전화번호</label>
+                <input type="text" th:field="*{staffTel}" class="form-control" placeholder="담당자 전화번호를 입력하세요">
+            </div>
+            <div class="form-group">
+                <label th:for="staffPhone">휴대전화</label>
+                <input type="text" th:field="*{staffPhone}" class="form-control" placeholder="담당자 휴대전화번호를 입력하세요">
+            </div>
+            <div class="form-group">
+                <label th:for="consignmentPayment">결제위탁구분</label>
+                <select th:field="*{consignmentPayment}">
+                    <option th:value="'C'" th:text="위탁"></option>
+                    <option th:value="'S'" th:text="자체"></option>
+                </select>
+            </div>
+            <!--companyRelationship-->
+            <p>사업자 관계 정보</p>
+            <div class="form-group">
+                <label th:for="parentId">상위사업자</label>
+                <select th:field="*{parentId}" id="parentId">
+                    <option th:value="*{null}" th:text="'해당없음'" selected="selected"></option>
+                </select>
+            </div>
+
+            <script th:inline="javascript">
+                // cTopList와 cMidList는 서버에서 가져온 데이터입니다.
+                var topList = /*[[${topList}]]*/[];
+                console.log("toplist: " + topList);
+                var midList = /*[[${midList}]]*/[];
+                console.log("midlist: " + midList);
+
+                document.getElementById("companyLv").addEventListener("change", function () {
+                    var companyLv = this.value;
+                    var parentIdSelect = document.getElementById("parentId");
+
+                    // 기존 옵션 초기화
+                    parentIdSelect.innerHTML = '<option value="">해당없음</option>';
+
+                    if (companyLv === 'MID') {
+                        console.log("MID Selected");
+
+                        if (topList && topList.length > 0) {
+                            topList.forEach(function (item) {
+                                var option = document.createElement("option");
+                                option.value = item.companyId;
+                                option.textContent = item.companyName;
+                                parentIdSelect.appendChild(option);
+                            });
+                        } else {
+                            // topList 비어있을 경우
+                            var option = document.createElement("option");
+                            option.value = "";
+                            option.textContent = "상위사업자가 없습니다.";
+                            parentIdSelect.appendChild(option);
+                        }
+                    } else if (companyLv === 'LOW') {
+                        console.log("LOW Selected");
+
+                        if (midList && midList.length > 0) {
+                            midList.forEach(function (item) {
+                                var option = document.createElement("option");
+                                option.value = item.companyId;
+                                option.textContent = item.companyName;
+                                parentIdSelect.appendChild(option);
+                            });
+                        } else {
+                            // midList 비어있을 경우
+                            var option = document.createElement("option");
+                            option.value = "";
+                            option.textContent = "하위사업자가 없습니다.";
+                            parentIdSelect.appendChild(option);
+                        }
+                    } else {
+                        console.log("해당없음");
+                    }
+                });
+            </script>
+
+
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+        <br />
+        <!-- <script src="/js/checkCompanyLv.js"></script> -->
+    </div>
+</body>
+
+</html>
