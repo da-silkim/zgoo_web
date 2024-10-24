@@ -94,7 +94,7 @@ document.addEventListener('DOMContentLoaded', function(){
 
     // treemap chart
     // B43F3F ED9455 686D76
-    ctx =  document.getElementById("tree-chart").getContext('2d');
+    var ctx =  document.getElementById("treeChart").getContext('2d');
     var DATA = [
         {
             what: '대기',
@@ -123,7 +123,7 @@ document.addEventListener('DOMContentLoaded', function(){
         },
     ];
     
-    var treemapChart =  new Chart(ctx, {
+    let treemapChart =  new Chart(ctx, {
         type: 'treemap',
         data: {
             datasets: [{

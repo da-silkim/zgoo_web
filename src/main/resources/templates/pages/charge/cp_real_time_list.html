@@ -1,0 +1,97 @@
+<html layout:decorate="~{fragments/layout}">
+<div layout:fragment="content" class="main-content">
+    <!-- card:1 start -->
+    <div class="card">
+        <!-- card body:1 start -->
+        <div class="card-body">
+            <div class="content-title mb-4 fw-bolder"><i class="fa-solid fa-battery-full me-2"></i>충전현황 > 실시간 충전기 리스트</div>
+            <!-- card:2 start -->
+            <div class="card card-shadow">
+                <!-- card body:2 start -->
+                <div class="card-body">
+                    <div class="card-title"><span class="card-title-bar"></span><span>검색조건</span></div>
+                    <!-- form start -->
+                    <form class="position-relative">
+                        <!-- row:1 start -->
+                        <div class="row mb-3 row-cols-2 row-cols-lg-3 g-2">
+                            <div class="col d-flex align-items-center">
+                                <label for="business" class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">운영자</label>
+                                <select id="business" class="mx-3 form-control">
+                                    <option value='%'>(선택)</option>
+                                    <option value="">test1</option> 
+                                </select>
+                            </div>
+                            <div class="col d-flex align-items-center">
+                                <label for="saerchOp" class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">검색조건</label>
+                                <select id="saerchOp" class="ms-3 form-control w-40">
+                                    <option value='%'>(선택)</option>
+                                    <option value="">test1</option> 
+                                </select>
+                                <input type="text" name="" id="" class="mx-3 form-control" placeholder="" autocomplete="off">
+                            </div>
+                            <div class="col d-flex align-items-center">
+                                <span class="flex-shrink-0 col-form-label font-weight-bold mr-3p text-right w-25">충전시작일시</span>
+                                <input type="date" min="1970-01-01" max="2199-12-31" name="fromDate" id="fromDate" class="mx-3 form-control">
+                                <span class="flex-shrink-0 col-form-label font-weight-bold">~</span>
+                                <input type="date" min="1970-01-01" max="2199-12-31" name="toDate" id="toDate" class="mx-3 form-control">
+                            </div>
+                        </div>
+                        <!-- row:1 end -->
+                        <div class="search-btn">
+                            <button type="button" class="btn btn-outline-grey me-2" data-bs-dismiss="modal"><i class="bi bi-search me-2"></i>검색</button>
+                            <button type="button" class="btn btn-outline-grey me-2" data-bs-dismiss="modal"><i class="bi bi-arrow-repeat me-2"></i>초기화</button>
+                        </div>
+                    </form>
+                </div>
+                <!-- card body:2 end -->
+            </div>
+            <!-- card:2 end -->
+            <!-- card:3 start -->
+            <div class="card card-shadow mt-4">
+                <!-- card body:3 start -->
+                <div class="card-body">
+                    <div class="position-relative">
+                        <button class="btn btn-excel" onclick="excelDownload()">엑셀다운로드</button>
+                        <span class="position-absolute" style="right: 0; bottom: 0;">
+                            <span id="page-info"></span>
+                            <select class="mx-3 page-select" id="" name="">
+                                <option value='%'>10개</option>
+                                <option value="">30개</option>
+                                <option value="">50개</option>
+                            </select>
+                        </span>
+                    </div>
+                    <div class="w-100 table-responsive" >
+                        <table class="table text-center mt-3 table-bg table-hover">
+                            <thead>
+                                <tr class="table-border-top">
+                                    <th scope="col">사업자</th>
+                                    <th scope="col">충전소명</th>
+                                    <th scope="col">충전기명</th>
+                                    <th scope="col">충전기ID</th>
+                                    <th scope="col">충전기 구분</th>
+                                    <th scope="col">커넥터ID</th>
+                                    <th scope="col">충전시작일시</th>
+                                    <th scope="col">회원명</th>
+                                    <th scope="col">회원카드번호</th>
+                                    <th scope="col">충전량(kWh)</th>
+                                    <th scope="col">남은시간</th>
+                                    <th scope="col">SOC</th>
+                                </tr>
+                            </thead>
+                            <tbody id="pageList"></tbody>
+                        </table>                                
+                    </div>
+                    <div class="text-center">
+                        <ul class="pagination" id="paging"></ul>
+                    </div>
+                </div>
+                <!-- card body:3 end -->
+            </div>
+            <!-- card:3 end -->
+        </div>
+        <!-- card body:1 end -->
+    </div>
+    <!-- card:1 end -->
+</div>
+</html>

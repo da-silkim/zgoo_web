@@ -1,0 +1,39 @@
+<html layout:decorate="~{fragments/layout}">
+<div layout:fragment="content" class="main-content d-flex flex-column vh-100">
+    <!-- card:1 start -->
+    <div class="card flex-grow-1 d-flex flex-column">
+        <!-- card body:1 start -->
+        <div class="card-body d-flex flex-column">
+            <div class="content-title mb-4 fw-bolder">
+                <i class="fa-solid fa-map font-ico me-2"></i>지도
+            </div>
+            <!-- card:2 start -->
+            <div class="card card-shadow flex-grow-1 d-flex position-relative">
+                <!-- kakao map: start -->
+                <div class="card-body d-flex flex-column" style="overflow: auto;" id="map"></div>
+                <!-- kakao map: end -->
+                <!-- search area: start -->
+                <div class="position-absolute d-flex" style="top: 10px; left: 10px; width: 300px; height: 40px; z-index: 10;">
+                    <div class="position-relative" style="width: 100%;">
+                        <input type="text" id="searchBox" class="form-control" placeholder="충전소 이름을 입력하세요." style="width: 100%; padding-right: 40px;">
+                        <button id="searchBtn" class="position-absolute" style="right: 10px; top: 50%; transform: translateY(-50%); border: none; background-color: transparent;">
+                            <i class="bi bi-search"></i>
+                        </button>
+                    </div>
+                    <div id="autocompleteList" class="autocomplete-items"></div>
+                </div>
+                <!-- search area: end -->
+                <!-- 현재 위치 버튼 -->
+                <button id="currentLocationBtn" class="position-absolute" style="bottom: 20px; right: 20px; z-index: 10; border: none; background-color: transparent;">
+                    <img src="/img/now_pos.png" style="width: 50px;">
+                </button>
+            </div>
+            <!-- card:2 end -->
+        </div>
+        <!-- card body:1 end -->
+    </div>
+    <!-- card:1 end -->
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=2627a1d15418d5bd6f92dfadded8a675&libraries=services"></script>
+    <script type="text/javascript" th:src="@{/js/map.js}"></script>
+</div>
+</html>

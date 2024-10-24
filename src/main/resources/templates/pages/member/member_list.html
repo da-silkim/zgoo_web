@@ -1,0 +1,331 @@
+<html layout:decorate="~{fragments/layout}">
+<div layout:fragment="content" class="main-content">
+    <!-- card:1 start -->
+    <div class="card">
+        <!-- card body:1 start -->
+        <div class="card-body">
+            <div class="content-title mb-4 fw-bolder"><i class="fa-solid fa-user-tie font-ico me-2"></i>회원관리 > 회원 리스트</div>
+            <!-- card:2 start -->
+            <div class="card card-shadow">
+                <!-- card body:2 start -->
+                <div class="card-body">
+                    <div class="card-title"><span class="card-title-bar"></span><span>검색조건</span></div>
+                    <!-- form start -->
+                    <form class="position-relative">
+                    <!-- row:1 start -->
+                    <div class="row mb-3 row-cols-2 row-cols-lg-3 g-2">
+                        <div class="col d-flex align-items-center">
+                            <label for="business" class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">사업자</label>
+                            <select id="business" class="mx-3 form-control">
+                                <option value='%'>(선택)</option>
+                                <option value="">test1</option>
+                            </select>
+                        </div>
+                        <div class="col d-flex align-items-center">
+                            <label for="memberCardNum" class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">회원카드번호</label>
+                            <input type="text" name="memberCardNum" id="memberCardNum" class="mx-3 form-control" placeholder="회원카드번호를 입력해주세요." autocomplete="off">
+                        </div>
+                        <div class="col d-flex align-items-center">
+                            <label for="userName" class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">사용자명</label>
+                            <input type="text" name="userName" id="userName" class="mx-3 form-control" placeholder="사용자명을 입력해주세요." autocomplete="off">
+                        </div>
+                    </div>
+                    <div class="search-btn">
+                        <button type="button" class="btn btn-outline-grey me-2" data-bs-dismiss="modal"><i class="bi bi-search me-2"></i>검색</button>
+                        <button type="button" class="btn btn-outline-grey me-2" data-bs-dismiss="modal"><i class="bi bi-arrow-repeat me-2"></i>초기화</button>
+                    </div>
+                    <!-- row:1 end -->
+                    </form>
+                </div>
+                <!-- card body:2 end -->
+            </div>
+            <!-- card:2 end -->
+            <!-- card:3 start -->
+            <div class="card card-shadow mt-4">
+                <!-- card body:3 start -->
+                <div class="card-body">
+                    <div class="position-relative">
+                        <button class="btn btn-data-add" data-bs-toggle="modal" data-bs-target="#dataAddModal"><i class="bi bi-plus-square me-2"></i>등록</button>
+                        <button class="btn btn-data-edit" id="editBtn" disabled><i class="fa-regular fa-pen-to-square me-2"></i>수정</button>
+                        <button class="btn btn-data-delete" id="deleteBtn" disabled><i class="bi bi-trash me-2"></i>삭제</button>
+                        <button class="btn btn-excel" onclick="excelDownload()">엑셀다운로드</button>
+                        <span class="position-absolute" style="right: 0; bottom: 0;">
+                            <span id="page-info"></span>
+                            <select class="mx-3 page-select" id="" name="">
+                                <option value='%'>10개</option>
+                                <option value="">test1</option> 
+                                <option value="">test2</option> 
+                            </select>
+                        </span>
+                    </div>
+                    <div class="w-100 table-responsive">
+                        <table class="table text-center mt-3 table-bg table-hover">
+                            <thead>
+                                <tr class="table-border-top">
+                                    <th scope="col"></th>
+                                    <th scope="col">사업자</th>
+                                    <th scope="col">회원번호</th>
+                                    <th scope="col">사용자명</th>
+                                    <th scope="col">사용자ID</th>
+                                    <th scope="col">회원카드번호</th>
+                                    <th scope="col">휴대전화</th>
+                                    <th scope="col">이메일</th>
+                                    <th scope="col">개인/법인</th>
+                                    <th scope="col">차량번호</th>
+                                    <th scope="col">가입일자</th>
+                                </tr>
+                            </thead>
+                            <tbody id="pageList"></tbody>
+                        </table>                                
+                    </div>
+                    <div class="text-center">
+                        <ul class="pagination" id="paging"></ul>
+                    </div>
+                </div>
+                <!-- card body:3 end -->
+            </div>
+            <!-- card:3 end -->
+        </div>
+        <!-- card body:1 end -->
+    </div>
+    <!-- card:1 end -->
+
+    <!-- Add Modal start -->
+    <div class="modal fade" id="dataAddModal" tabindex="-1" aria-labelledby="dataAddModalLabel">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width: 60vw; height: 90vh;"> <!-- height: 90vh; -->
+            <div class="modal-content mh-100 overflow-y-auto scrollbar">
+                <form>
+                <!-- modal body start -->
+                <div class="modal-body">
+                    <!-- 모달 내용 -->
+                    <div class="modal-title mb-2"><span class="modal-title-bar"></span><span>회원 정보</span></div>
+                    <!-- table:1 start -->
+                    <table class="table table-bg-v table-fixed w-100 text-center align-middle">
+                        <tbody>
+                            <tr class="table-border-top">
+                                <th class="w-20">사업자명<b class="required-data">*</b></th>
+                                <td class="w-30">
+                                    <select id="businessName" class="form-control" required>
+                                        <option value='%'>(선택)</option>
+                                        <option value="">test1</option>
+                                        <option value="">test2</option>
+                                    </select>
+                                </td>
+                                <th class="w-20">사업자구분<b class="required-data">*</b></th>
+                                <td class="w-30">
+                                    <select id="businessType" class="form-control" required>
+                                        <option value='%'>(선택)</option>
+                                        <option value="">test1</option>
+                                        <option value="">test2</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="w-20">이름<b class="required-data">*</b></th>
+                                <td class="w-30">
+                                    <input type="text" name="userName" id="userName" class="form-control" placeholder="홍길동" autocomplete="off" required>
+                                </td>
+                                <th class="w-20">휴대전화<b class="required-data">*</b></th>
+                                <td class="w-30">
+                                    <input type="number" name="phoneNum" id="phoneNum" class="form-control" maxlength="11" placeholder="휴대전화번호를 입력해주세요." autocomplete="off" required>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="w-20">사용자ID<b class="required-data">*</b></th>
+                                <td class="w-30">
+                                    <input type="text" name="userID" id="userID" class="form-control" placeholder="" required disabled>
+                                </td>
+                                <th class="w-20">회원카드번호<b class="required-data">*</b></th>
+                                <td class="w-30">
+                                    <div class="mb-2 display-input-btn">
+                                        <input type="number" name="memberCardNum" id="memberCardNum" class="form-control" placeholder="회원카드번호를 입력해주세요." required>
+                                        <button class="btn btn-outline-grey flex-btn" id="duplicateBtn">중복체크</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="w-20">이메일<b class="required-data">*</b></th>
+                                <td class="w-30">
+                                    <input type="email" name="email" id="email" class="form-control" placeholder="이메일을 입력해주세요." autocomplete="off" required>
+                                </td>
+                                <th class="w-20">생년월일<b class="required-data">*</b></th>
+                                <td class="w-30">
+                                    <input type="date" min="1970-01-01" max="2199-12-31" name="dateNum" id="dateNum" class="form-control" required>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="w-20">주소<b class="required-data">*</b></th>
+                                <td class="w-30" colspan="3">
+                                    <div class="address-container mb-2 display-input-btn">
+                                        <input type="text" name="postCode" id="postCode" class="form-control w-25" placeholder="" disabled>
+                                        <button class="btn btn-outline-grey flex-btn" id="postBtn" onclick="postSearch()">주소 검색</button>
+                                    </div>
+                                    <input type="text" name="address" id="address" class="form-control mb-2" placeholder="" autocomplete="off" disabled>
+                                    <input type="text" name="addressDetail" id="addressDetail" class="form-control" placeholder="상세 주소" autocomplete="off">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="w-20" scope="row">회원상태<b class="required-data">*</b></th>
+                                <td class="w-30">
+                                    <select id="userState" class="form-control" required>
+                                        <option value='%'>(선택)</option>
+                                        <option value="">정상회원</option>
+                                        <option value="">탈퇴</option>
+                                        <option value="">휴먼</option> 
+                                    </select>
+                                </td>
+                                <td colspan="2"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <!-- table:1 end -->
+                    <!-- table:2 start -->
+                    <div class="modal-title mb-2"><span class="modal-title-bar"></span><span>법인 정보</span></div>
+                    <table class="table table-bg-v table-fixed w-100 text-center align-middle">
+                        <tbody>
+                            <tr class="table-border-top">
+                                <th class="w-20">법인명<b class="required-data">*</b></th>
+                                <td class="w-30">
+                                    <input type="text" name="userName" id="userName" class="form-control" placeholder="" autocomplete="off" required disabled>
+                                </td>
+                                <th class="w-20">사업자번호<b class="required-data">*</b></th>
+                                <td class="w-30">
+                                    <input type="number" name="phoneNum" id="phoneNum" class="form-control" maxlength="11" placeholder="사업자번호를 입력해주세요." autocomplete="off" required disabled>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="w-20">결제카드 등록여부<b class="required-data">*</b></th>
+                                <td class="w-30">
+                                    <input type="text" name="userName" id="userName" class="form-control" placeholder="" autocomplete="off" required disabled>
+                                </td>
+                                <th class="w-20">토큰키 등록여부<b class="required-data">*</b></th>
+                                <td class="w-30">
+                                    <input type="text" name="tokenYN" id="tokenYN" class="form-control" maxlength="11" placeholder="" autocomplete="off" required disabled>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <!-- table:2 end -->
+                    <!-- table:2 start -->
+                    <div class="modal-title mb-2"><span class="modal-title-bar"></span><span>차량 정보</span></div>
+                    <table class="table table-bg table-fixed w-100 text-center align-middle">
+                        <thead>
+                            <tr class="table-border-top">
+                                <th scope="col" class="w-20">개인/법인</th>
+                                <th scope="col" class="w-25">차량번호</th>
+                                <th scope="col" class="w-25">차량모델</th>
+                                <th scope="col" class="w-30">등록일시</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>법인</td>
+                                <td>123가 1234</td>
+                                <td>IONIC6</td>
+                                <td>2024-01-01 12:10:00</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <!-- table:2 end -->
+                    <!-- table:3 start -->
+                    <div class="modal-title mb-2"><span class="modal-title-bar"></span><span>결제 카드</span></div>
+                    <table class="table table-bg table-hover table-fixed w-100 text-center align-middle">
+                        <thead>
+                            <tr class="table-border-top">
+                                <th scope="col" class="w-20">카드사</th>
+                                <th scope="col" class="w-25">카드번호</th>
+                                <th scope="col" class="w-30">TID</th>
+                                <th scope="col" class="w-25">등록일시</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>하나</td>
+                                <td>1111222233334444</td>
+                                <td>123456789123456789</td>
+                                <td>2024-01-01 12:10:00</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <!-- table:3 end -->
+                    <!-- table:4 start -->
+                    <div class="modal-title mb-2"><span class="modal-title-bar"></span><span>약관정보</span></div>
+                    <table class="table table-bg table-hover table-fixed w-100 text-center align-middle">
+                        <thead>
+                            <tr class="table-border-top">
+                                <th scope="col" class="w-20">구분</th>
+                                <th scope="col" class="w-40">약관내용</th>
+                                <th scope="col" class="w-40">동의여부</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>필수</td>
+                                <td>개인정보 활용동의서</td>
+                                <td>
+                                    <input type="radio" name="privateCheck" id="privateY" class="mx-3" value="1" checked>
+                                    <label for="privateY">동의</label>
+                                    <input type="radio" name="privateCheck" id="privateN" class="mx-3" value="0">
+                                    <label for="privateN">미동의</label>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>필수</td>
+                                <td>멤버십 서비스 이용약관</td>
+                                <td>
+                                    <input type="radio" name="memServiceCheck" id="memServiceY" class="mx-3" value="1" checked>
+                                    <label for="memServiceY">동의</label>
+                                    <input type="radio" name="memServiceCheck" id="memServiceN" class="mx-3" value="0">
+                                    <label for="memServiceN">미동의</label>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>선택</td>
+                                <td>마케팅 수신 동의</td>
+                                <td>
+                                    <input type="radio" name="marketingCheck" id="marketingY" class="mx-3" value="1" checked>
+                                    <label for="marketingY">동의</label>
+                                    <input type="radio" name="marketingCheck" id="marketingN" class="mx-3" value="0">
+                                    <label for="marketingN">미동의</label>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>선택</td>
+                                <td>이메일 수신 동의</td>
+                                <td>
+                                    <input type="radio" name="emailCheck" id="emailY" class="mx-3" value="1" checked>
+                                    <label for="emailY">동의</label>
+                                    <input type="radio" name="emailCheck" id="emailN" class="mx-3" value="0">
+                                    <label for="emailN">미동의</label>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>선택</td>
+                                <td>SMS 수신 동의</td>
+                                <td>
+                                    <input type="radio" name="smsCheck" id="smsY" class="mx-3" value="1" checked>
+                                    <label for="smsY">동의</label>
+                                    <input type="radio" name="smsCheck" id="smsN" class="mx-3" value="0">
+                                    <label for="smsN">미동의</label>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <!-- table:4 end -->
+                    </div>
+                    <!-- modal body end -->
+                    <div class="modal-footer justify-content-center border-top-none">
+                        <button type="button" class="btn btn-outline-grey me-2" data-bs-dismiss="modal">취소</button>
+                        <button type="submit" class="btn btn-data-add">등록</button>
+                    </div>
+                </form>                      
+            </div>
+            <!-- modal content end -->
+        </div>
+        <!-- modal dialog end -->
+    </div>
+    <!-- Add Modal end -->
+    <script type="text/javascript" th:src="@{/js/pagingtest.js}"></script>
+    <script type="text/javascript" th:src="@{/js/table.js}"></script>
+</div>
+</html>

@@ -1,0 +1,12 @@
+<div th:fragment="headerFragment" class="top-nav">
+    <div>
+        <a th:href="@{/dashboard}">
+            <img th:src="@{/img/dongah_white.png}" alt="logo" class="dashboard-logo">
+        </a>
+        <span class="lang-content">
+            <a th:href="@{/}" id="loginContainer">
+                <span class="me-4" id="login">Sign In<i class="fa-solid fa-right-to-bracket ms-3"></i></span>
+            </a>
+        </span>
+    </div>
+</div>
