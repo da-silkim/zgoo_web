@@ -1,7 +1,7 @@
 // charts
 document.addEventListener('DOMContentLoaded', function(){
     // doughnt chart
-    var ctx =  document.getElementById("doughnut-chart").getContext('2d');
+    var ctx =  document.getElementById("doughnutChart").getContext('2d');
     var doughnutChart =  new Chart(ctx, {
         type: 'doughnut',
         data: {
@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', function(){
     });
 
     // bar chart
-    ctx =  document.getElementById("bar-chart").getContext('2d');
+    ctx =  document.getElementById("barChart").getContext('2d');
     var barChart = new Chart(ctx, {
         type: 'bar',
         data: {
@@ -171,7 +171,7 @@ document.addEventListener('DOMContentLoaded', function(){
     });
 
     // pie chart
-    var ctx =  document.getElementById("pie-chart").getContext('2d');
+    var ctx =  document.getElementById("pieChart").getContext('2d');
     // const DATA_COUNT = 5;
     // const NUMBER_CFG = {count: DATA_COUNT, min: 0, max: 100};
     const Utils = {

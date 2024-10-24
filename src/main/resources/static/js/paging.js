@@ -18,30 +18,6 @@ const totalPage = Math.ceil(totalCount / pageSize);  // 총 페이지 수
 document.addEventListener('DOMContentLoaded', () => {
     setPageHtml();
     setList();
-
-    // document.getElementById('deleteBtn').addEventListener('click', () => {
-    //     const checkedBox = document.querySelector('input[type="checkbox"]:checked'); // 단일 선택을 가정
-    
-    //     if (checkedBox) {
-    //         // 사용자에게 삭제 여부 확인
-    //         const isConfirmed = confirm('정말로 이 항목을 삭제하시겠습니까?');
-            
-    //         if (isConfirmed) {
-    //             const idx = parseInt(checkedBox.getAttribute('data-index')); // 체크된 항목의 data-index 값 추출
-    //             list.splice(idx, 1); // 데이터 배열에서 해당 인덱스 삭제
-                
-    //             showList(1, list.length); // 변경된 리스트 렌더링
-                
-    //             // 버튼 비활성화
-    //             document.getElementById('deleteBtn').disabled = true;
-    //             document.getElementById('editBtn').disabled = true;
-    //         }
-    //     } else {
-    //         alert('삭제할 항목을 선택하세요.');
-    //     }
-    // });
-    
-
 });
 
 function setPageHtml() {
@@ -111,16 +87,6 @@ function setList(page){
 function showList(startPage, endPage){
     let html = "";
     for(let i = (startPage - 1) ; i < endPage; i++) {
-        // let company = list[i].company;
-        // let membershipNum = list[i].membershipNum;
-        // let userName = list[i].userName;
-        // let userID = list[i].userID;
-        // let membershipCard = list[i].membershipCard;
-        // let phoneNum = list[i].phoneNum;
-        // let email = list[i].email;
-        // let type = list[i].type;
-        // let carNum = list[i].carNum;
-        // let regDate = list[i].regDate;
         html += `<tr id="charge-user-${i}">
                     <th scope="row"><input type="checkbox" data-index="${i}"></th>
                     <td>${list[i].company}</td>
