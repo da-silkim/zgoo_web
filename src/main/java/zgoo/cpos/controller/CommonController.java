@@ -1,11 +1,7 @@
 package zgoo.cpos.controller;
 
-import java.util.List;
-
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import jakarta.validation.Valid;
@@ -20,35 +16,7 @@ import zgoo.cpos.service.CodeService;
 @RequiredArgsConstructor
 public class CommonController {
 
-    private final CodeService commonCdService;
-
-    @GetMapping(value = "/dashboard")
-    public String showDashboard(Model model) {
-        log.info("Dashboard Home");
-        // 필요한 data를 model에 추가 !!!
-
-        return "pages/dashboard";
-    }
-
-    @GetMapping("/code_management/list")
-    public String showCommonCodeList(Model model) {
-        log.info("==== code management page(list) ======");
-
-        // group code 등록폼 전달
-        model.addAttribute("grpcodeDto", new GrpCodeDto());
-        // commoncode 등록폼 전달
-        model.addAttribute("commonCdDto", new CommonCdDto());
-
-        // 그룹코드 조회
-        List<GrpCodeDto> gcdlist = commonCdService.findGrpCodeAll();
-        model.addAttribute("gcdlist", gcdlist);
-
-        // 공통코드 조회
-        List<CommonCdDto> ccdlist = commonCdService.findCommonCodeAll();
-        model.addAttribute("ccdlist", ccdlist);
-
-        return "pages/system/code_management";
-    }
+    private final CodeService codeService;
 
     @PostMapping("/code_management/grpcode/new")
     public String createGrpCode(@Valid GrpCodeDto dto, BindingResult result) {
@@ -61,7 +29,7 @@ public class CommonController {
 
         log.info("groupcode_dto >> {}", dto.toString());
 
-        commonCdService.saveGrpCode(dto);
+        codeService.saveGrpCode(dto);
 
         return "redirect:/code_management/list";
     }
@@ -82,7 +50,7 @@ public class CommonController {
         // GrpCode grpCode = commonCdService.findGrpOne(dto.getId().getGrpCode());
         // log.info("grpcode_find : {}", grpCode);
 
-        commonCdService.saveCommonCode(dto);
+        codeService.saveCommonCode(dto);
 
         return "redirect:/code_management/list";
     }
