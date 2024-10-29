@@ -8,14 +8,14 @@ import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.ToString;
 
 @Embeddable
 @EqualsAndHashCode(onlyExplicitlyIncluded = false)
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-@Setter
+@ToString
 public class CommonCodeKey implements Serializable {
 
     private String grpCode;

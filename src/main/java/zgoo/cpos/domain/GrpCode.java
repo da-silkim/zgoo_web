@@ -6,6 +6,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,7 +15,9 @@ import lombok.ToString;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 @ToString
+@Builder
 public class GrpCode {
     @Id
     @Column(name = "grp_code", length = 20)
@@ -35,15 +38,16 @@ public class GrpCode {
     @Column(name = "mod_dt")
     private LocalDateTime modDt;
 
-    @Builder
-    protected GrpCode(String grpCode, String grpcdName, String regUserId, LocalDateTime regDt, String modUserId,
-            LocalDateTime modDt) {
-        this.grpCode = grpCode;
-        this.grpcdName = grpcdName;
-        this.regUserId = regUserId;
-        this.regDt = regDt;
-        this.modUserId = modUserId;
-        this.modDt = modDt;
-    }
+    // @Builder
+    // protected GrpCode(String grpCode, String grpcdName, String regUserId,
+    // LocalDateTime regDt, String modUserId,
+    // LocalDateTime modDt) {
+    // this.grpCode = grpCode;
+    // this.grpcdName = grpcdName;
+    // this.regUserId = regUserId;
+    // this.regDt = regDt;
+    // this.modUserId = modUserId;
+    // this.modDt = modDt;
+    // }
 
 }

@@ -2,9 +2,6 @@ package zgoo.cpos.domain;
 
 import java.time.LocalDateTime;
 
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
@@ -13,6 +10,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,6 +21,8 @@ import zgoo.cpos.type.CommonCodeKey;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @ToString
 @Getter
+@Builder
+@AllArgsConstructor
 public class CommonCode {
 
     @EmbeddedId
@@ -46,13 +46,11 @@ public class CommonCode {
     @Column(name = "reg_user_id", length = 20)
     private String regUserId;
 
-    @CreatedDate
     private LocalDateTime regDt;
 
     @Column(name = "mod_user_id", length = 20)
     private String modUserId;
 
-    @LastModifiedDate
     private LocalDateTime modDt;
 
     @JoinColumn(name = "grp_code")
@@ -60,21 +58,8 @@ public class CommonCode {
     @ManyToOne(fetch = FetchType.LAZY)
     private GrpCode group;
 
-    @Builder
-    protected CommonCode(CommonCodeKey id, String name, String reserved, String refCode1, String refCode2,
-            String refCode3,
-            String regUserId, LocalDateTime regDt, String modUserId, LocalDateTime modDt, GrpCode grpCode) {
-        this.id = id;
-        this.name = name;
-        this.reserved = reserved;
-        this.refCode1 = refCode1;
-        this.refCode2 = refCode2;
-        this.refCode3 = refCode3;
-        this.regUserId = regUserId;
-        this.regDt = regDt;
-        this.modUserId = modUserId;
-        this.modDt = modDt;
-        this.group = grpCode;
+    public void updateCommonCodeName(String commonCodeName) {
+        this.name = commonCodeName;
     }
 
 }

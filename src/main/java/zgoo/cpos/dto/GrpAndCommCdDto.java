@@ -1,9 +1,6 @@
 package zgoo.cpos.dto;
 
-import java.time.LocalDateTime;
-
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -14,12 +11,9 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-@Builder
-public class GrpCodeDto {
+public class GrpAndCommCdDto {
     private String grpCode;
     private String grpcdName;
-    private String regUserId;
-    private LocalDateTime regDt;
-    private String modUserId;
-    private LocalDateTime modDt;
+    private String commonCode;
+    private String name;
 }

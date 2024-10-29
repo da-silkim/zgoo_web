@@ -27,7 +27,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.1/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="/css/node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" th:href="@{/css/node_modules/bootstrap/dist/css/bootstrap.min.css}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
         integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -120,7 +120,7 @@
                                 <a href="./model_management.html">모델관리</a>
                             </li>
                             <li class="nav-list list-hover">
-                                <a href="./code_management.html">공통코드 관리</a>
+                                <a href="/code_management/list">공통코드 관리</a>
                             </li>
                             <li class="nav-list list-hover">
                                 <a href="./user_management.html">사용자 관리</a>
@@ -317,17 +317,17 @@
                                             <th scope="col" class="w-5"></th>
                                             <th scope="col" class="w-20">그룹코드</th>
                                             <th scope="col" class="w-25">그룹코드명</th>
-                                            <th scope="col" class="w-25">작성자</th>
-                                            <th scope="col" class="w-25">수정일시</th>
+                                            <th scope="col" class="w-25">작성자ID</th>
+                                            <th scope="col" class="w-25">등록일시</th>
                                         </tr>
                                     </thead>
                                     <tbody id="pageList">
-                                        <tr>
+                                        <tr th:each="gcd : ${gcdlist}">
                                             <td scope="col"><input type="checkbox" /></td>
-                                            <td scope="col">AAA</td>
-                                            <td scope="col">사업자구분코드</td>
-                                            <td scope="col">홍길동</td>
-                                            <td scope="col">2024-10-17 08:19:22</td>
+                                            <td scope="col" th:text="${gcd.grpCode}"></td>
+                                            <td scope="col" th:text="${gcd.grpcdName}"></td>
+                                            <td scope="col" th:text="${gcd.regUserId}"></td>
+                                            <td scope="col" th:text="${gcd.regDt}"></td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -360,21 +360,21 @@
                                     <thead>
                                         <tr class="table-border-top">
                                             <th scope="col" class="w-5"></th>
+                                            <th scope="col" class="w-20">그룹코드</th>
                                             <th scope="col" class="w-20">공통코드</th>
-                                            <th scope="col" class="w-25">그룹코드명</th>
-                                            <th scope="col" class="w-10">사용여부</th>
+                                            <th scope="col" class="w-25">공통코드명</th>
                                             <th scope="col" class="w-20">작성자</th>
                                             <th scope="col" class="w-20">수정일시</th>
                                         </tr>
                                     </thead>
                                     <tbody id="pageListSub">
-                                        <tr>
+                                        <tr th:each="ccd : ${ccdlist}">
                                             <td scope="col"><input type="checkbox" /></td>
-                                            <td scope="col">1000</td>
-                                            <td scope="col">비상정지</td>
-                                            <td slope="col">Y</td>
-                                            <td scope="col">홍길동</td>
-                                            <td scope="col">2024-10-17 08:19:22</td>
+                                            <td scope="col" th:text="${ccd.id.grpCode}"></td>
+                                            <td scope="col" th:text="${ccd.id.commonCode}"></td>
+                                            <td scope="col" th:text="${ccd.name}"></td>
+                                            <td scope="col" th:text="${ccd.regUserId}"></td>
+                                            <td scope="col" th:text="${ccd.regDt}"></td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -399,7 +399,7 @@
                     <div class="modal-content mh-100 overflow-y-auto">
                         <!-- modal body start -->
                         <div class="modal-body">
-                            <form>
+                            <form action="/code_management/grpcode/new" method="post" th:object="${grpcodeDto}">
                                 <!-- 모달 내용 -->
                                 <!-- table:1 start -->
                                 <div class="modal-title mb-2"><span class="modal-title-bar"></span><span>그룹코드</span>
@@ -410,12 +410,12 @@
                                             <th class="w-20">그룹코드<b class="required-data">*</b></th>
                                             <td class="w-30">
                                                 <input type="text" name="" id="" class="form-control"
-                                                    placeholder="그룹코드를 입력해주세요." required>
+                                                    placeholder="그룹코드를 입력해주세요." th:field="*{grpCode}" required>
                                             </td>
                                             <th class="w-20">그룹코드명<b class="required-data">*</b></th>
                                             <td class="w-30">
                                                 <input type="text" name="" id="" class="form-control"
-                                                    placeholder="그룹코드명을 입력해주세요." required>
+                                                    placeholder="그룹코드명을 입력해주세요." th:field="*{grpcdName}" required>
                                             </td>
                                         </tr>
                                     </tbody>
@@ -440,13 +440,10 @@
             <div class="modal fade" id="commonAddModal" tabindex="-1" aria-labelledby="commonAddModalLabel"
                 data-bs-backdrop="static" data-bs-keyboard="false">
                 <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable"
-                    style="max-width: 60vw; height: 90vh;"> <!-- height: 90vh; -->
+                    style="max-width: 60vw; height: 90vh;">
                     <div class="modal-content mh-100 overflow-y-auto">
-                        <!-- modal body start -->
                         <div class="modal-body">
-                            <form>
-                                <!-- 모달 내용 -->
-                                <!-- table:1 start -->
+                            <form action="/code_management/commoncd/new" method="post" th:object="${commonCdDto}">
                                 <div class="modal-title mb-2"><span class="modal-title-bar"></span><span>공통코드</span>
                                 </div>
                                 <table class="table table-bg-v table-fixed w-100 text-center align-middle">
@@ -454,51 +451,59 @@
                                         <tr class="table-border-top">
                                             <th class="w-20">그룹코드<b class="required-data">*</b></th>
                                             <td class="w-30">
-                                                <select id="" class="form-control" required>
-                                                    <option value='%'>(선택)</option>
-                                                    <option value="">test</option>
+                                                <select id="grpCode" name="grpCode" class="form-control"
+                                                    th:field="*{id.grpCode}" required>
+                                                    <option th:value="*{null}" th:text="'없음'"></option>
+                                                    <option th:each="gcd : ${gcdlist}" th:value="${gcd.grpCode}"
+                                                        th:text="${gcd.grpCode}"></option>
                                                 </select>
                                             </td>
                                             <th class="w-20">참조코드1</th>
                                             <td class="w-30">
-                                                <select id="" class="form-control">
-                                                    <option value='%'>(선택)</option>
-                                                    <option value="">test</option>
+                                                <select id="referenceCode1" name="referenceCode1" class="form-control"
+                                                    th:field="*{refCode1}">
+                                                    <option th:value="*{null}" th:text="'없음'"></option>
+                                                    <option th:each="gcd : ${gcdlist}" th:value="${gcd.grpCode}"
+                                                        th:text="${gcd.grpCode}"></option>
                                                 </select>
                                             </td>
                                         </tr>
                                         <tr>
                                             <th class="w-20">참조코드2</th>
                                             <td class="w-30">
-                                                <select id="" class="form-control">
-                                                    <option value='%'>(선택)</option>
-                                                    <option value="">test</option>
+                                                <select id="referenceCode2" name="referenceCode2" class="form-control"
+                                                    th:field="*{refCode2}">
+                                                    <option th:value="*{null}" th:text="'없음'"></option>
+                                                    <option th:each="gcd : ${gcdlist}" th:value="${gcd.grpCode}"
+                                                        th:text="${gcd.grpCode}"></option>
                                                 </select>
                                             </td>
                                             <th class="w-20">참조코드3</th>
                                             <td class="w-30">
-                                                <select id="" class="form-control">
-                                                    <option value='%'>(선택)</option>
-                                                    <option value="">test</option>
+                                                <select id="referenceCode3" name="referenceCode3" class="form-control"
+                                                    th:field="*{refCode3}">
+                                                    <option th:value="*{null}" th:text="'없음'"></option>
+                                                    <option th:each="gcd : ${gcdlist}" th:value="${gcd.grpCode}"
+                                                        th:text="${gcd.grpCode}"></option>
                                                 </select>
                                             </td>
                                         </tr>
                                         <tr>
                                             <th class="w-20">공통코드<b class="required-data">*</b></th>
                                             <td class="w-30">
-                                                <input type="text" name="" id="" class="form-control"
-                                                    placeholder="공통코드를 입력해주세요." required>
+                                                <input type="text" name="commonCode" id="commonCode"
+                                                    class="form-control" placeholder="공통코드를 입력해주세요."
+                                                    th:field="*{id.commonCode}" required>
                                             </td>
                                             <th class="w-20">공통코드명<b class="required-data">*</b></th>
                                             <td class="w-30">
-                                                <input type="text" name="" id="" class="form-control"
-                                                    placeholder="공통코드명을 입력해주세요." required>
+                                                <input type="text" name="commonCodeName" id="commonCodeName"
+                                                    class="form-control" placeholder="공통코드명을 입력해주세요." th:field="*{name}"
+                                                    required>
                                             </td>
                                         </tr>
                                     </tbody>
                                 </table>
-                                <!-- table:1 end -->
-                                <!-- modal body end -->
                                 <div class="modal-footer justify-content-center" style="border-top: none;">
                                     <button type="button" class="btn btn-outline-grey me-2"
                                         data-bs-dismiss="modal">취소</button>
@@ -507,13 +512,15 @@
                             </form>
                         </div>
                     </div>
-                    <!-- modal content end -->
+                    <!--modal content end-->
                 </div>
-                <!-- modal dialog end -->
             </div>
-            <!-- Common Add Modal end -->
         </div>
-        <!-- contents end -->
+        <!-- modal dialog end -->
+    </div>
+    <!-- Common Add Modal end -->
+    </div>
+    <!-- contents end -->
     </div>
     <!-- body-content end -->
 </body>
