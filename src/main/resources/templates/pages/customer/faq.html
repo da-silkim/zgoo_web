@@ -4,7 +4,7 @@
     <div class="card">
         <!-- card body:1 start -->
         <div class="card-body">
-            <div class="content-title mb-4 fw-bolder"><i class="fa-solid fa-gear font-ico me-2"></i>시스템 > 공지사항 관리</div>
+            <div class="content-title mb-4 fw-bolder"><i class="fa-solid fa-headset me-2"></i>고객센터 > FAQ 관리</div>
             <!-- card:2 start -->
             <div class="card card-shadow">
                 <!-- card body:2 start -->
@@ -15,17 +15,11 @@
                         <!-- row:1 start -->
                         <div class="row mb-3 row-cols-2 row-cols-lg-3 g-2">
                             <div class="col d-flex align-items-center">
-                                <label for="business" class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">사업자</label>
+                                <label for="business" class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">구분</label>
                                 <select id="business" class="mx-3 form-control">
                                     <option value='%'>(선택)</option>
                                     <option value="">test</option>
                                 </select>
-                            </div>
-                            <div class="col d-flex align-items-center">
-                                <span class="flex-shrink-0 col-form-label font-weight-bold mr-3p text-right w-25">등록일시</span>
-                                <input type="date" min="1970-01-01" max="2199-12-31" name="fromDate" id="fromDate" class="mx-3 form-control">
-                                <span class="flex-shrink-0 col-form-label font-weight-bold">~</span>
-                                <input type="date" min="1970-01-01" max="2199-12-31" name="toDate" id="toDate" class="mx-3 form-control">
                             </div>
                         </div>
                         <div class="search-btn">
@@ -43,9 +37,7 @@
             <div class="card card-shadow mt-4">
                 <!-- card body:3 start -->
                 <div class="card-body">
-                    <div class="card-title">
-                        <span class="card-title-bar"></span><span>공지사항 리스트</span>
-                    </div>
+                    <div class="card-title"><span class="card-title-bar"></span><span>장애 등록 현황</span></div>
                     <div class="mt-3 position-relative">
                         <button class="btn btn-data-add" data-bs-toggle="modal" data-bs-target="#dataAddModal"><i class="bi bi-plus-square me-2"></i>등록</button>
                         <button class="btn btn-data-edit" id="editBtn" disabled><i class="fa-regular fa-pen-to-square me-2"></i>수정</button>
@@ -60,23 +52,22 @@
                         </span>
                     </div>
                     <div class="w-100 table-responsive position-relative">
-                        <table class="table text-center mt-3 table-bg table-hover" style="min-width: 1000px;">
+                        <table class="table text-center mt-3 table-bg table-hover">
                             <thead>
                                 <tr class="table-border-top">
                                     <th scope="col"></th>
-                                    <th scope="col">공지유형</th>
+                                    <th scope="col">게시번호</th>
+                                    <th scope="col">구분</th>
                                     <th scope="col">제목</th>
-                                    <th scope="col">작성자ID</th>
-                                    <th scope="col">작성자명</th>
-                                    <th scope="col">등록일</th>
-                                    <th scope="col">사업자</th>
+                                    <th scope="col">게시자</th>
+                                    <th scope="col">게시일</th>
                                 </tr>
                             </thead>
-                            <tbody id="pageList"></tbody>
+                            <tbody id=""></tbody>
                         </table>                                
                     </div>
                     <div class="text-center">
-                        <ul class="pagination" id="paging"></ul>
+                        <ul class="pagination" id=""></ul>
                     </div>
                 </div>
                 <!-- card body:3 end -->
@@ -92,38 +83,41 @@
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width: 60vw; height: 90vh;"> <!-- height: 90vh; -->
             <div class="modal-content mh-100 overflow-y-auto scrollbar">
                 <form>
-                <!-- modal body start -->
-                <div class="modal-body">
-                    <!-- 모달 내용 -->
-                    <div class="modal-title mb-2"><span class="modal-title-bar"></span><span>공지사항 등록</span></div>
-                    <!-- table:1 start -->
-                    <table class="table table-bg-v table-fixed w-100 text-center align-middle">
-                        <tbody>
-                            <tr class="table-border-top">
-                                <th class="w-20">제목<b class="required-data">*</b></th>
-                                <td colspan="3">
-                                    <input type="text" name="" id="" class="form-control" placeholder="" autocomplete="off" required>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th class="w-20">공지유형<b class="required-data">*</b></th>
-                                <td class="w-30">
-                                    <select id="" class="form-control" required>
-                                        <option value="%">선택</option>
-                                        <option value="">test</option>
-                                    </select>
-                                </td>
-                                <td colspan="2"></td>
-                            </tr>
-                            <tr>
-                                <th class="w-20">내용</th>
-                                <td colspan="3">
-                                    <textarea class="form-control" name="opinion" cols="" rows="10"></textarea>
-                                </td>
-                            </tr>                 
-                        </tbody>
-                    </table>
-                    <!-- table:1 end -->
+                    <!-- modal body start -->
+                    <div class="modal-body">
+                        <!-- 모달 내용 -->
+                        <!-- table:1 start -->
+                        <div class="modal-title mb-2"><span class="modal-title-bar"></span><span>FAQ 등록</span></div>
+                        <table class="table table-bg-v table-fixed w-100 text-center align-middle">
+                            <tbody>
+                                <tr class="table-border-top">
+                                    <th class="w-20">문서번호</th>
+                                    <td colspan="w-30">
+                                        <input type="text" name="" id="" class="form-control" placeholder="" autocomplete="off" required disabled>
+                                    </td>
+                                    <th class="w-20">구분<b class="required-data">*</b></th>
+                                    <td class="w-30">
+                                        <select id="" class="form-control" required>
+                                            <option value='%'>(선택)</option>
+                                            <option value="">test</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="w-20">제목<b class="required-data">*</b></th>
+                                    <td colspan="3">
+                                        <input type="text" name="" id="" class="form-control" placeholder="" autocomplete="off" required>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="w-20">내용<b class="required-data">*</b></th>
+                                    <td colspan="3">
+                                        <textarea class="form-control" name="opinion" cols="" rows="5" style="resize: none;"  required></textarea>
+                                    </td>
+                                </tr>                 
+                            </tbody>
+                        </table>
+                        <!-- table:1 end -->
                     </div>
                     <!-- modal body end -->
                     <div class="modal-footer justify-content-center" style="border-top: none;">
@@ -138,4 +132,5 @@
     </div>
     <!-- Add Modal end -->
     <script type="text/javascript" th:src="@{/js/table.js}"></script>
+</div>
 </html>

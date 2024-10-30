@@ -1,0 +1,178 @@
+<!-- side-nav start -->
+<div th:fragment="navbarFragment" class="side-nav">
+    <div class="side-nav-detail">
+        <ul>
+            <li class="nav-menu list-hover">
+                <a th:href="@{/dashboard}">
+                    <span class="nav-list"><i class="fa-solid fa-chart-line font-ico"></i><span class="nav-list-txt">대시보드</span></span>
+                </a>
+            </li>
+            <li class="nav-menu list-hover">
+                <a th:href="@{/map}">
+                    <span class="nav-list"><i class="fa-solid fa-map font-ico"></i><span class="nav-list-txt">지도</span></span>
+                </a>
+        </li>
+            <li class="nav-menu">
+                <span class="nav-list"><i class="fa-solid fa-user-tie font-ico"></i><span class="nav-list-txt">회원관리</span><i class="fa-solid fa-chevron-down font-ico-arrow"></i></span>
+                <ul class="nav-list-detail">
+                    <li class="nav-list list-hover">
+                        <a th:href="@{/member/list}">회원 리스트</a>
+                    </li>
+                    <li class="nav-list list-hover">
+                        <a th:href="@{/member/authentication/list}">회원 인증 내역</a>
+                    </li>
+                </ul>
+            </li>
+            <li class="nav-menu">
+                <span class="nav-list"><i class="fa-solid fa-charging-station font-ico"></i><span class="nav-list-txt">충전소 관리</span><i class="fa-solid fa-chevron-down font-ico-arrow"></i></span>
+                <ul class="nav-list-detail">
+                    <li class="nav-list list-hover">
+                        <a th:href="@{/station/list}">충전소 리스트</a>
+                    </li>
+                </ul>
+            </li>                    
+            <li class="nav-menu">
+                <span class="nav-list"><i class="fa-solid fa-plug font-ico"></i><span class="nav-list-txt">충전기 관리</span><i class="fa-solid fa-chevron-down font-ico-arrow"></i></span>
+                <ul class="nav-list-detail">
+                    <li class="nav-list list-hover">
+                        <a th:href="@{/charger/list}">충전기 리스트</a>
+                    </li>
+                </ul>
+            </li>                    
+            <li class="nav-menu">
+                <span class="nav-list"><i class="fa-solid fa-battery-full"></i><span class="nav-list-txt">충전현황</span><i class="fa-solid fa-chevron-down font-ico-arrow"></i></span>
+                <ul class="nav-list-detail">
+                    <li class="nav-list list-hover">
+                        <a th:href="@{/charging/list}">실시간 충전 리스트</a>
+                    </li> 
+                </ul>
+            </li>
+            <li class="nav-menu">
+                <span class="nav-list"><i class="fa-solid fa-gear font-ico"></i><span class="nav-list-txt">시스템</span><i class="fa-solid fa-chevron-down font-ico-arrow"></i></span>
+                <ul class="nav-list-detail">
+                    <li class="nav-list list-hover">
+                        <a th:href="@{/system/model/list}">모델관리</a>
+                    </li>
+                    <li class="nav-list list-hover">
+                        <a th:href="@{/system/code/list}">공통코드 관리</a>
+                    </li>
+                    <li class="nav-list list-hover">
+                        <a th:href="@{/system/user/list}">사용자 관리</a>
+                    </li>
+                    <li class="nav-list list-hover">
+                        <a th:href="@{/system/notice/list}">공지사항 관리</a>
+                    </li>
+                    <li class="nav-list list-hover">
+                        <a th:href="@{/system/authority/list}">메뉴접근권한 관리</a>
+                    </li>
+                    <li class="nav-list list-hover">
+                        <a th:href="@{/system/errcode/list}">에러코드 관리</a>
+                    </li>
+                    <li class="nav-list list-hover">
+                        <a th:href="@{/system/tariff/list}">요금제 관리</a>
+                    </li>
+                </ul>
+            </li>
+            <li class="nav-menu">
+                <span class="nav-list"><i class="fa-solid fa-wrench font-ico"></i><span class="nav-list-txt">유지보수</span><i class="fa-solid fa-chevron-down font-ico-arrow"></i></span>
+                <ul class="nav-list-detail">
+                    <li class="nav-list list-hover">
+                        <a th:href="@{/maintenance/errlist}">장애관리</a>
+                    </li>
+                </ul>
+            </li>
+            <li class="nav-menu">
+                <span class="nav-list"><i class="fa-solid fa-satellite-dish"></i><span class="nav-list-txt">제어</span><i class="fa-solid fa-chevron-down font-ico-arrow"></i></span>
+                <ul class="nav-list-detail">
+                    <li class="nav-list list-hover">
+                        <a th:href="@{/control/charger/list}">충전기 제어</a>
+                    </li>
+                </ul>
+            </li>
+            <li class="nav-menu">
+                <span class="nav-list"><i class="fa-solid fa-headset"></i><span class="nav-list-txt">고객센터</span><i class="fa-solid fa-chevron-down font-ico-arrow"></i></span>
+                <ul class="nav-list-detail">
+                    <li class="nav-list list-hover">
+                        <a th:href="@{/voc}">1:1 문의</a>
+                    </li>
+                    <li class="nav-list list-hover">
+                        <a th:href="@{/faq}">FAQ 관리</a>
+                    </li>
+                </ul>
+            </li>
+            <li class="nav-menu">
+                <span class="nav-list"><i class="fa-solid fa-clipboard-list font-ico"></i><span class="nav-list-txt">이력</span><i class="fa-solid fa-chevron-down font-ico-arrow"></i></span>
+                <ul class="nav-list-detail">
+                    <li class="nav-list list-hover">
+                        <a href="#">충전이력</a>
+                    </li>
+                    <li class="nav-list list-hover">
+                        <a href="#">결제이력</a>
+                    </li> 
+                    <li class="nav-list list-hover">
+                        <a href="#">통신이력</a>
+                    </li> 
+                    <li class="nav-list list-hover">
+                        <a href="#">에러이력</a>
+                    </li> 
+                </ul>
+            </li>
+            <li class="nav-menu">
+                <span class="nav-list"><i class="fa-solid fa-receipt"></i><span class="nav-list-txt">정산</span><i class="fa-solid fa-chevron-down font-ico-arrow"></i></span>
+                <ul class="nav-list-detail">
+                    <li class="nav-list list-hover">
+                        <a href="#">매출정산</a>
+                    </li>
+                    <li class="nav-list list-hover">
+                        <a href="#">매입관리</a>
+                    </li>
+                </ul>
+            </li>
+            <li class="nav-menu">
+                <span class="nav-list"><i class="fa-solid fa-chart-simple"></i><span class="nav-list-txt">통계</span><i class="fa-solid fa-chevron-down font-ico-arrow"></i></span>
+                <ul class="nav-list-detail">
+                    <li class="nav-list list-hover">
+                        <a href="#">매출통계</a>
+                    </li>
+                    <li class="nav-list list-hover">
+                        <a href="#">이용률 통계</a>
+                    </li>
+                    <li class="nav-list list-hover">
+                        <a href="#">충전량 통계</a>
+                    </li>
+                    <li class="nav-list list-hover">
+                        <a href="#">장애율 통계</a>
+                    </li>
+                </ul>
+            </li>
+            <li class="nav-menu">
+                <span class="nav-list"><i class="fa-solid fa-building"></i><span class="nav-list-txt">업체관리</span><i class="fa-solid fa-chevron-down font-ico-arrow"></i></span>
+                <ul class="nav-list-detail">
+                    <li class="nav-list list-hover">
+                        <a th:href="@{/biz/list}">사업자 관리</a>
+                    </li>
+                    <li class="nav-list list-hover">
+                        <a th:href="@{/corp/list}">법인 관리</a>
+                    </li>
+                </ul>
+            </li>
+            <li class="nav-menu">
+                <span class="nav-list"><i class="fa-solid fa-microchip font-ico"></i><span class="nav-list-txt">펌웨어</span><i class="fa-solid fa-chevron-down font-ico-arrow"></i></span>
+                <ul class="nav-list-detail">
+                    <li class="nav-list list-hover">
+                        <a href="#">펌웨어 버전관리</a>
+                    </li>
+                    <li class="nav-list list-hover">
+                        <a href="#">펌웨어 업데이트</a>
+                    </li>
+                </ul>
+            </li>
+            <li class="nav-menu list-hover">
+                <a href="#">
+                    <span class="nav-list"><i class="fa-regular fa-clock"></i><span class="nav-list-txt">예약</span></span>
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>
+<!-- side-nav end -->
