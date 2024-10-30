@@ -1,6 +1,9 @@
 // 사이드바 토글
 $(function() {
     $(".side-nav-detail ul .nav-list-detail").hide();
+
+    var isSubmenuOpen = false; // 서브메뉴가 열렸는지 상태 저장
+
     $(".nav-menu > .nav-list").click(function(e){
         e.preventDefault();
         $(this).siblings(".nav-list-detail").slideToggle(300);
@@ -9,8 +12,22 @@ $(function() {
         let arrow = $(this).find(".font-ico-arrow");
         if(arrow.hasClass("fa-chevron-down")) {
             arrow.removeClass("fa-chevron-down").addClass("fa-chevron-up");
+            isSubmenuOpen = true;   // 서브메뉴가 열림
         } else {
             arrow.removeClass("fa-chevron-up").addClass("fa-chevron-down");
+            isSubmenuOpen = false;  // 서브메뉴 닫힘
+        }
+    });
+
+    // 사이드바에서 마우스가 벗어나면 서브메뉴 닫힘 처리
+    $('.side-nav').mouseleave(function() {
+        console.log('mouseleave event');
+
+        // 서브메뉴가 열려있으면, 열림 -> 닫힘
+        if (isSubmenuOpen) {
+            $('.side-nav-detail ul .nav-list-detail').slideUp(300);
+            $('.font-ico-arrow').removeClass('fa-chevron-up').addClass('fa-chevron-down');
+            console.log('서브메뉴 닫힘');
         }
     });
 });

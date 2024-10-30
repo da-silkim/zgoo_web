@@ -49,7 +49,8 @@ input.input-add-row:focus {
 .top-nav .lang-content #loginContainer #login { color: white; font-size: 18px; }
 
 /* 사이드바 */
-.side-nav { width: 260px; height: 100vh;  background-color: white;  z-index: 999; float: left; padding-top: 80px;}
+.side-nav { width: 50px; height: 100vh;  background-color: white;  z-index: 999; float: left; padding-top: 80px; transition: width 0.3s ease; overflow: hidden; }
+.side-nav:hover { width: 260px; }
 .side-nav .side-nav-detail::-webkit-scrollbar{width: 6px; height: 6px;}
 .side-nav .side-nav-detail::-webkit-scrollbar-thumb { background-color: darkgrey; border-radius: 5px; }
 .side-nav .side-nav-detail::-webkit-scrollbar-button { display: none; }
@@ -64,6 +65,8 @@ input.input-add-row:focus {
 .side-nav .side-nav-detail .nav-menu .nav-list-detail { padding: 0; }
 .side-nav .side-nav-detail .nav-menu .nav-list .nav-list-txt { position: absolute; left: 40px; }
 .side-nav .side-nav-detail .nav-menu .font-ico-arrow { color: #3f495a;  float: right; }
+.side-nav .nav-list-txt, .side-nav .font-ico-arrow { display: none; }
+.side-nav:hover .nav-list-txt, .side-nav:hover .font-ico-arrow {display: inline-block;}
 
 /* 사이드바 마우스 hover */
 .side-nav .side-nav-detail .nav-menu span:hover, 
@@ -73,7 +76,8 @@ input.input-add-row:focus {
 .side-nav .side-nav-detail .nav-menu .nav-list-detail .list-hover.active  { color: #434b5b; background-color: #EEEDEB; border-radius: 0.3rem; }
 
 /* contents */
-.main-content { display: inline-block; height: 100vh; width: calc(100vw - 260px); padding: 90px 10px 10px 10px; }
+.side-nav:hover ~ .main-content { width: calc(100vw - 260px);}
+.main-content { display: inline-block; height: 100vh; width: calc(100vw - 50px); padding: 90px 10px 10px 10px; transition: width 0.3s ease; position: relative; }
 .main-content .main-row { height: 33.3333%; width: 100%; margin: auto; padding: 5px; }
 .main-content .main-row .row { height: 50%; }
 
