@@ -8,7 +8,7 @@ import zgoo.cpos.dto.code.GrpCodeDto;
 
 public class GrpCodeMapper {
     /*
-     * Dto >> Entity111
+     * Dto >> Entity
      */
     public static GrpCode toEntity(GrpCodeDto dto) {
         GrpCode grpCode = GrpCode.builder()
