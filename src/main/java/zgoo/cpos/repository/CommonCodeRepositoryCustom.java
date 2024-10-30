@@ -10,7 +10,7 @@ import zgoo.cpos.dto.code.GrpAndCommCdDto;
 
 public interface CommonCodeRepositoryCustom {
 
-    /*
+    /* ttt
      * 조회
      */
     // 공통코드조회 - 전체조회
