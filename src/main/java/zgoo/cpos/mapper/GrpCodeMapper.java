@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import zgoo.cpos.domain.GrpCode;
-import zgoo.cpos.dto.GrpCodeDto;
+import zgoo.cpos.dto.code.GrpCodeDto;
 
 public class GrpCodeMapper {
     /*

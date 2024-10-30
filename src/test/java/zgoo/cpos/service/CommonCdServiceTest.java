@@ -13,9 +13,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
-import zgoo.cpos.dto.CommonCdDto;
-import zgoo.cpos.dto.GrpAndCommCdDto;
-import zgoo.cpos.dto.GrpCodeDto;
+import zgoo.cpos.dto.code.CommonCdDto;
+import zgoo.cpos.dto.code.GrpAndCommCdDto;
+import zgoo.cpos.dto.code.GrpCodeDto;
 import zgoo.cpos.repository.CommonCodeRepository;
 import zgoo.cpos.repository.GrpCodeRepository;
 import zgoo.cpos.type.CommonCodeKey;

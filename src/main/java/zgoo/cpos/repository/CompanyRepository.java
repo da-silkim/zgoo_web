@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import zgoo.cpos.domain.Company;
-import zgoo.cpos.dto.CompanyLvInfoDto;
+import zgoo.cpos.dto.company.CompanyLvInfoDto;
 
 @Repository
 public class CompanyRepository {

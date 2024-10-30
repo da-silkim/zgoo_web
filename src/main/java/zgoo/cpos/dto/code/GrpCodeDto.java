@@ -1,4 +1,4 @@
-package zgoo.cpos.dto;
+package zgoo.cpos.dto.code;
 
 import java.time.LocalDateTime;
 

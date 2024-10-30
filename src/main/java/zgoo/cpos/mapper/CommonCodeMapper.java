@@ -5,7 +5,7 @@ import java.util.stream.Collectors;
 
 import zgoo.cpos.domain.CommonCode;
 import zgoo.cpos.domain.GrpCode;
-import zgoo.cpos.dto.CommonCdDto;
+import zgoo.cpos.dto.code.CommonCdDto;
 
 public class CommonCodeMapper {
     /*

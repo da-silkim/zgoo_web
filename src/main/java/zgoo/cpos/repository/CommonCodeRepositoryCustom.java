@@ -6,7 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import zgoo.cpos.domain.CommonCode;
-import zgoo.cpos.dto.GrpAndCommCdDto;
+import zgoo.cpos.dto.code.GrpAndCommCdDto;
 
 public interface CommonCodeRepositoryCustom {
 

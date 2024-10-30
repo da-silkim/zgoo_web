@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import zgoo.cpos.dto.CommonCdDto;
-import zgoo.cpos.dto.GrpCodeDto;
+import zgoo.cpos.dto.code.CommonCdDto;
+import zgoo.cpos.dto.code.GrpCodeDto;
 import zgoo.cpos.service.CodeService;
 
 @Controller

@@ -1,4 +1,4 @@
-package zgoo.cpos.dto;
+package zgoo.cpos.dto.company;
 
 import groovy.transform.ToString;
 import lombok.AllArgsConstructor;

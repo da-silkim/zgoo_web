@@ -14,9 +14,9 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import zgoo.cpos.domain.Company;
-import zgoo.cpos.dto.CompanyListDto;
-import zgoo.cpos.dto.CompanyLvInfoDto;
-import zgoo.cpos.dto.CompanyRegDto;
+import zgoo.cpos.dto.company.CompanyListDto;
+import zgoo.cpos.dto.company.CompanyLvInfoDto;
+import zgoo.cpos.dto.company.CompanyRegDto;
 import zgoo.cpos.service.CompanyService;
 
 @Controller

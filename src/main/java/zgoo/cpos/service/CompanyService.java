@@ -10,8 +10,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import zgoo.cpos.domain.Company;
 import zgoo.cpos.domain.CompanyRelationInfo;
-import zgoo.cpos.dto.CompanyLvInfoDto;
-import zgoo.cpos.dto.CompanyRegDto;
+import zgoo.cpos.dto.company.CompanyLvInfoDto;
+import zgoo.cpos.dto.company.CompanyRegDto;
 import zgoo.cpos.repository.CompanyRelationRepository;
 import zgoo.cpos.repository.CompanyRepository;
 
