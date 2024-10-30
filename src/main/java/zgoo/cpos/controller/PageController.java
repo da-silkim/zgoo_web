@@ -63,7 +63,7 @@ public class PageController {
     @GetMapping("/station/list")
     public String showstationlist(Model model) {
         log.info("=== Charging Station List Page ===");
-        return "pages/charge/charge_station_list";
+        return "pages/charge/cs_list";
     }
 
     /*
@@ -72,7 +72,7 @@ public class PageController {
     @GetMapping("/charger/list")
     public String showchargerlist(Model model) {
         log.info("=== Charger List Page ===");
-        return "pages/charge/charger_list";
+        return "pages/charge/cp_list";
     }
 
     /*
@@ -81,7 +81,7 @@ public class PageController {
     @GetMapping("/charging/list")
     public String showcharginglist(Model model) {
         log.info("=== Charging List Page ===");
-        return "pages/charge/charge_real_time_list";
+        return "pages/charge/cp_real_time_list";
     }
 
     /*
@@ -147,10 +147,20 @@ public class PageController {
     /*
      * 시스템 > 에러코드관리
      */
+    @GetMapping("/system/errcode/list")
+    public String showerrcodelist(Model model) {
+        log.info("=== Errcode List Page ===");
+        return "pages/system/errcode_management";
+    }
 
     /*
      * 시스템 > 요금제관리
      */
+    @GetMapping("/system/tariff/list")
+    public String showtarifflist(Model model) {
+        log.info("=== Tariff List Page ===");
+        return "pages/system/tariff_management";
+    }
 
     /*
      * 유지보수 > 장애관리

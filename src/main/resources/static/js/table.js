@@ -1,48 +1,80 @@
 document.addEventListener('DOMContentLoaded', () => {
-    printErrorList();
-    printNoticeList();
-})
+    // 테이블 단일 선택 및 수정/삭제 기능
+    const tableBody = document.getElementById('pageList');
+    const editBtn = document.getElementById('editBtn');
+    const deleteBtn = document.getElementById('deleteBtn');
+    const editBtnSub = document.getElementById('editBtnSub');
+    const deleteBtnSub = document.getElementById('deleteBtnSub');
 
-var errorList = [
-    {chargingStationID:'DAE100', chargerID: '01', errorCode: '1001', errorContent: '비상정지 버튼 눌림1', errorDate: '2024-07-09 13:14:11', division: '처리중' },
-    {chargingStationID:'DAE100', chargerID: '01', errorCode: '1001', errorContent: '비상정지 버튼 눌림2', errorDate: '2024-07-09 13:14:11', division: '처리중' },
-    {chargingStationID:'DAE100', chargerID: '01', errorCode: '1001', errorContent: '비상정지 버튼 눌림3', errorDate: '2024-07-09 13:14:11', division: '처리중' },
-];
-
-function printErrorList() {
-    let html = "";
-    errorList = errorList.reverse();
-    const totalCount = errorList.length;
-
-    for(let i = 0; i < totalCount; i++ ){
-        html += `<tr id="charge-error-${i}">
-                    <td>${errorList[i].chargingStationID}</td>
-                    <td>${errorList[i].chargerID}</td>
-                    <td>${errorList[i].errorCode}</td>
-                    <td>${errorList[i].errorContent}</td>
-                    <td>${errorList[i].errorDate}</td>
-                    <td>${errorList[i].division}</td>
-                </tr>`
+    function updateBtn() {
+        const selectedCheckboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+        if (selectedCheckboxes.length === 1) {
+            // 체크된 항목이 하나일 때 버튼 활성화
+            editBtn.disabled = false;
+            deleteBtn.disabled = false;
+        } else {
+            // 체크된 항목이 없거나 두 개 이상일 때 버튼 비활성화
+            editBtn.disabled = true;
+            deleteBtn.disabled = true;
+        }
     }
-    document.getElementById("errorList").innerHTML = html;
-}
+    
+    // 행 클릭 또는 체크박스 클릭 시 단일 선택 처리
+    tableBody.addEventListener('click', (event) => {
+        let checkbox, row;
 
-var noticeList = [
-    {type:'안내', title:'공지사항입니다.',date:'2024-10-18 14:51:11'},
-    {type:'안내', title:'공지사항입니다.',date:'2024-10-18 14:51:11'},
-    {type:'안내', title:'공지사항입니다.',date:'2024-10-18 14:51:11'},
-]
+        // 클릭한 요소가 체크박스인 경우
+        if (event.target.type === 'checkbox') {
+            checkbox = event.target;
+            row = checkbox.closest('tr');
+        } 
+        // 클릭한 요소가 체크박스가 아닌 경우 (행 클릭 시)
+        else {
+            row = event.target.closest('tr');
+            if (!row) return; // tr이 없을 경우 무시
+            checkbox = row.querySelector('input[type="checkbox"]');
+            if (!checkbox) return; // 체크박스가 없을 경우 무시
+            checkbox.checked = !checkbox.checked; // 체크박스 상태 반전
+        }
 
-function printNoticeList() {
-    let html = "";
-    noticeList = noticeList.reverse();
-    const noticeCount = noticeList.length;
+        // 단일 선택을 위해 모든 체크박스를 해제
+        const checkboxes = tableBody.querySelectorAll('input[type="checkbox"]');
+        checkboxes.forEach(cb => {
+            if (cb !== checkbox) {
+                cb.checked = false;
+                cb.closest('tr').classList.remove('table-selected-active');
+            }
+        });
 
-    for(let i=0; i <noticeCount; i++){
-        html += `<div class="row pb-2 mb-4 main-article-list">
-                    <div class="col-7 text-left">[${noticeList[i].type}] ${noticeList[i].title}</div>
-                    <div class="col-5 text-right">${noticeList[i].date}</div>
-                </div>`
-    }
-    document.getElementById("noticeList").innerHTML = html;
-}
+        // 클릭된 체크박스의 상태에 따라 배경색 설정
+        if (checkbox.checked) {
+            row.classList.add('table-selected-active');
+        } else {
+            row.classList.remove('table-selected-active');
+        }
+
+        updateBtn();
+    });
+
+    document.getElementById('deleteBtn').addEventListener('click', () => {
+        const checkedBox = document.querySelector('input[type="checkbox"]:checked'); // 단일 선택을 가정
+    
+        if (checkedBox) {
+            // 사용자에게 삭제 여부 확인
+            const isConfirmed = confirm('정말로 이 항목을 삭제하시겠습니까?');
+            
+            if (isConfirmed) {
+                const idx = parseInt(checkedBox.getAttribute('data-index')); // 체크된 항목의 data-index 값 추출
+                list.splice(idx, 1); // 데이터 배열에서 해당 인덱스 삭제
+                
+                showList(1, list.length); // 변경된 리스트 렌더링
+                
+                // 버튼 비활성화
+                document.getElementById('deleteBtn').disabled = true;
+                document.getElementById('editBtn').disabled = true;
+            }
+        } else {
+            alert('삭제할 항목을 선택하세요.');
+        }
+    });
+});
