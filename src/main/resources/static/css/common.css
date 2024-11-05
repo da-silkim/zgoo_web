@@ -51,8 +51,8 @@ input.input-add-row:focus {
 /* 사이드바 */
 .side-nav { width: 50px; height: 100vh;  background-color: white;  z-index: 999; float: left; padding-top: 80px; transition: width 0.3s ease; overflow: hidden; }
 .side-nav:hover { width: 260px; }
-.side-nav .side-nav-detail::-webkit-scrollbar{width: 6px; height: 6px;}
-.side-nav .side-nav-detail::-webkit-scrollbar-thumb { background-color: darkgrey; border-radius: 5px; }
+.side-nav .side-nav-detail::-webkit-scrollbar{width: 3px; height: 6px;}
+.side-nav .side-nav-detail::-webkit-scrollbar-thumb { background-color: rgb(223, 223, 223); border-radius: 5px; }
 .side-nav .side-nav-detail::-webkit-scrollbar-button { display: none; }
 .side-nav .side-nav-detail { overflow-y: auto; height: 100%; }
 .side-nav .side-nav-detail ul { margin: 0; padding: 0; width: 100%; list-style: none; }
