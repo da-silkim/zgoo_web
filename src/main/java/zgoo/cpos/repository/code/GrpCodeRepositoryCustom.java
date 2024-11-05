@@ -1,8 +1,8 @@
-package zgoo.cpos.repository;
+package zgoo.cpos.repository.code;
 
 import java.util.List;
 
-import zgoo.cpos.domain.GrpCode;
+import zgoo.cpos.domain.code.GrpCode;
 
 public interface GrpCodeRepositoryCustom {
     // ======= 조회 =====================

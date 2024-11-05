@@ -1,9 +1,6 @@
-package zgoo.cpos.domain;
+package zgoo.cpos.domain.company;
 
 import java.time.LocalDateTime;
-
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -14,17 +11,23 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.ToString;
 
 @Entity
-@NoArgsConstructor
+@Table(name = "COMPANY", uniqueConstraints = {
+        @UniqueConstraint(columnNames = "company_name")
+})
 @Getter
-@Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
+@Builder(toBuilder = true)
 @ToString
 public class Company {
 
@@ -84,14 +87,24 @@ public class Company {
     @Column(length = 10, nullable = false)
     private String consignmentPayment; // 위탁결제구분
 
-    @CreatedDate
     private LocalDateTime createdAt;
 
-    @LastModifiedDate
     private LocalDateTime updatedAt;
 
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "company_relation_info_id")
     private CompanyRelationInfo companyRelationInfo;
+
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "company_contract_id")
+    private CompanyContract companyContract;
+
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "company_pg_id")
+    private CompanyPG companyPG;
+
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "company_roaming_id")
+    private CompanyRoaming companyRoaming;
 
 }

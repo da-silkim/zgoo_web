@@ -1,4 +1,4 @@
-package zgoo.cpos.repository;
+package zgoo.cpos.repository.code;
 
 import java.util.List;
 
@@ -6,8 +6,8 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
-import zgoo.cpos.domain.GrpCode;
-import zgoo.cpos.domain.QGrpCode;
+import zgoo.cpos.domain.code.GrpCode;
+import zgoo.cpos.domain.code.QGrpCode;
 
 @RequiredArgsConstructor
 public class GrpCodeRepositoryCustomImpl implements GrpCodeRepositoryCustom {

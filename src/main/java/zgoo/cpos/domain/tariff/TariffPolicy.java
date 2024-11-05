@@ -1,4 +1,4 @@
-package zgoo.cpos.domain;
+package zgoo.cpos.domain.tariff;
 
 import java.time.LocalDateTime;
 import java.util.List;

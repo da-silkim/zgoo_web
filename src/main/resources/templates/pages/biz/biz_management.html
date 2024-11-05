@@ -14,27 +14,35 @@
                     <form class="position-relative">
                         <div class="row mb-3 row-cols-2 row-cols-lg-3 g-2">
                             <div class="col d-flex align-items-center p-0 search-border">
-                                <label for="business" class="d-flex justify-content-center align-items-center flex-shrink-0 col-form-label font-weight-bold text-center w-25" style="background-color: #F5F5F5; height: 54px;">사업자명<b>*</b></label>
+                                <label for="business"
+                                    class="d-flex justify-content-center align-items-center flex-shrink-0 col-form-label font-weight-bold text-center w-25"
+                                    style="background-color: #F5F5F5; height: 54px;">사업자명<b>*</b></label>
                                 <select id="business" class="mx-3 form-control" name="business" required>
                                     <option value='%'>(선택)</option>
                                 </select>
                             </div>
                             <div class="col d-flex align-items-center search-border">
-                                <label for="businessType" class="d-flex justify-content-center align-items-center flex-shrink-0 col-form-label font-weight-bold text-center w-25" style="background-color: #F5F5F5; height: 54px;">사업자유형<b>*</b></label>
+                                <label for="businessType"
+                                    class="d-flex justify-content-center align-items-center flex-shrink-0 col-form-label font-weight-bold text-center w-25"
+                                    style="background-color: #F5F5F5; height: 54px;">사업자유형<b>*</b></label>
                                 <select id="businessType" class="mx-3 form-control" name="businessType" required>
                                     <option value='%'>(선택)</option>
                                 </select>
                             </div>
                             <div class="col d-flex align-items-center search-border">
-                                <label for="businessLv" class="d-flex justify-content-center align-items-center flex-shrink-0 col-form-label font-weight-bold text-center w-25" style="background-color: #F5F5F5; height: 54px;">사업자레벨<b>*</b></label>
+                                <label for="businessLv"
+                                    class="d-flex justify-content-center align-items-center flex-shrink-0 col-form-label font-weight-bold text-center w-25"
+                                    style="background-color: #F5F5F5; height: 54px;">사업자레벨<b>*</b></label>
                                 <select class="mx-3 form-control" id="businessLv" name="businessLv" required>
                                     <option value='%'>(선택)</option>
                                 </select>
                             </div>
                         </div>
                         <div class="search-btn">
-                            <button type="button" class="btn btn-outline-grey me-2" data-bs-dismiss="modal"><i class="bi bi-search me-2"></i>검색</button>
-                            <button type="button" class="btn btn-outline-grey me-2" data-bs-dismiss="modal"><i class="bi bi-arrow-repeat me-2"></i>초기화</button>
+                            <button type="button" class="btn btn-outline-grey me-2" data-bs-dismiss="modal"><i
+                                    class="bi bi-search me-2"></i>검색</button>
+                            <button type="button" class="btn btn-outline-grey me-2" data-bs-dismiss="modal"><i
+                                    class="bi bi-arrow-repeat me-2"></i>초기화</button>
                         </div>
                     </form>
                     <!-- form end -->
@@ -49,12 +57,14 @@
                     <div class="card-title">
                         <span class="card-title-bar"></span><span>업체 리스트</span>
                     </div>
-                    <div class="mt-3 position-relative">                                
+                    <div class="mt-3 position-relative">
                         <!-- btn-outline-grey -->
-                            <button class="btn btn-data-add" data-bs-toggle="modal" data-bs-target="#dataAddModal"><i class="bi bi-plus-square me-2"></i>등록</button>
-                            <button class="btn btn-data-edit" id="editBtn"><i class="fa-regular fa-pen-to-square me-2"></i>수정</button>
-                            <button class="btn btn-data-delete"><i class="bi bi-trash me-2"></i>삭제</button>
-                        
+                        <button class="btn btn-data-add" data-bs-toggle="modal" data-bs-target="#dataAddModal"><i
+                                class="bi bi-plus-square me-2"></i>등록</button>
+                        <button class="btn btn-data-edit" id="editBtn"><i
+                                class="fa-regular fa-pen-to-square me-2"></i>수정</button>
+                        <button class="btn btn-data-delete"><i class="bi bi-trash me-2"></i>삭제</button>
+
                         <span class="position-absolute" style="right: 0; bottom: 0;">
                             <span id="page-info"></span>
                             <select class="mx-3 page-select" id="" name="">
@@ -79,7 +89,7 @@
                                 </tr>
                             </thead>
                             <tbody id=""></tbody>
-                        </table>      
+                        </table>
                     </div>
                     <div class="text-center">
                         <ul class="pagination" id="paging"></ul>
@@ -94,238 +104,259 @@
     <!-- card:1 end -->
 
     <!-- Add Modal start -->
-    <div class="modal fade" id="dataAddModal" tabindex="-1" aria-labelledby="dataAddModalLabel" data-bs-backdrop="static" data-bs-keyboard="false">
-        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width: 60vw; height: 90vh;"> <!-- height: 90vh; -->
+    <div class="modal fade" id="dataAddModal" tabindex="-1" aria-labelledby="dataAddModalLabel"
+        data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width: 60vw; height: 90vh;">
+            <!-- height: 90vh; -->
             <div class="modal-content mh-100 overflow-y-auto scrollbar">
                 <form>
-                <!-- modal body start -->
-                <div class="modal-body">
-                    <!-- 모달 내용 -->
-                    <div class="modal-title mb-2"><span class="modal-title-bar"></span><span>사업자 정보</span></div>
-                    <!-- table:1 start -->
-                    <table class="table table-bg-v table-fixed w-100 text-center align-middle">
-                        <tbody>
-                            <tr class="table-border-top">
-                                <th class="w-20">사업자유형<b class="required-data">*</b></th>
-                                <td class="w-30">
-                                    <select id="companyType" class="form-control" required>
-                                        <option value="">충전사업자</option>
-                                        <option value="">위탁운영사</option>
-                                    </select>
-                                </td>
-                                <th class="w-20">사업자레벨<b class="required-data">*</b></th>
-                                <td class="w-30">
-                                    <select id="companyLv" class="form-control" required>
-                                        <option value="">상위사업자</option>
-                                        <option value="">하위사업자</option>
-                                        <option value="">최하위사업자</option>
-                                    </select>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th class="w-20">사업자명<b class="required-data">*</b></th>
-                                <td class="w-30">
-                                    <input type="text" name="bizName" id="bizName" class="form-control" placeholder="" autocomplete="off" required>
-                                </td>
-                                <th class="w-20">사업자등록번호<b class="required-data">*</b></th>
-                                <td class="w-30">
-                                    <input type="text" name="bizNum" id="bizNum" class="form-control" maxlength="13" placeholder="" autocomplete="off" required>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th class="w-20">사업자구분<b class="required-data">*</b></th>
-                                <td class="w-30">
-                                    <select id="bizType" class="form-control" required>
-                                        <option value='%'>(선택)</option>
-                                        <option value="">개인</option>
-                                        <option value="">법인</option>
-                                    </select>
-                                </td>
-                                <th class="w-20">업종<b class="required-data">*</b></th>
-                                <td class="w-30">
-                                    <input type="text" name="bizKind" id="bizKind" class="form-control" placeholder="" required>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th class="w-20">대표자명<b class="required-data">*</b></th>
-                                <td class="w-30">
-                                    <input type="text" name="headName" id="headName" class="form-control" placeholder="" required>
-                                </td>
-                                <th class="w-20">대표전화번호<b class="required-data">*</b></th>
-                                <td class="w-30">
-                                    <input type="text" name="headPhone" id="headPhone" class="form-control" placeholder="" required>
-                                </td>
-                            </tr>                                    
-                            <tr>
-                                <th class="w-20">주소<b class="required-data">*</b></th>
-                                <td class="w-30" colspan="3">
-                                    <div class="address-container mb-2 display-input-btn">
-                                        <input type="text" name="postCode" id="postCode" class="form-control w-25" placeholder="" disabled>
-                                        <button class="btn btn-outline-grey flex-btn" id="postBtn" onclick="postSearch()">주소 검색</button>
-                                    </div>
-                                    <input type="text" name="address" id="address" class="form-control mb-2" placeholder="" autocomplete="off" disabled>
-                                    <input type="text" name="addressDetail" id="addressDetail" class="form-control" placeholder="상세 주소" autocomplete="off">
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <!-- table:1 end -->
-                    <!-- table:2 start -->
-                    <div class="modal-title mb-2"><span class="modal-title-bar"></span><span>사업자 관계 정보</span></div>
-                    <table class="table table-bg-v table-fixed w-100 text-center align-middle">
-                        <tbody>
-                            <tr class="table-border-top">
-                                <th class="w-20">상위사업자</th>
-                                <td class="w-30">
-                                    <select id="bizLv" class="form-control">
-                                        <option value='%'>(선택)</option>
-                                        <option value="">test1</option>
-                                        <option value="">test2</option>
-                                    </select>
-                                </td>
-                                <td colspan="2"></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <!-- table:2 end -->
-                    <!-- table:3 start -->
-                    <div class="modal-title mb-2 position-relative">
-                        <span class="modal-title-bar"></span><span>로밍 정보</span>
-                        <span class="ms-5 position-absolute" style="margin-left: 4px; right: 0;">
-                            <button type="button" class="btn btn-outline-grey me-2" onclick="addRow()">+ 추가</button>
-                            <button type="button" class="btn btn-outline-grey" onclick="deleteRow()">- 삭제</button>
-                        </span>
-                    </div>
-                    <table class="table table-bg table-fixed w-100 text-center align-middle" id="roamingTable">
-                        <thead>
-                            <tr class="table-border-top">
-                                <th scope="col" class="w-5"></th>
-                                <th scope="col" class="w-15">로밍기관</th>
-                                <th scope="col" class="w-25">기관 인증키</th>
-                                <th scope="col" class="w-25">e-mail</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td><input type="checkbox"></th>
-                                <td><input type="text" class="input-add-row" value="환경부"></td>
-                                <td><input type="text" class="input-add-row" value="XXXXXXXXXXXXXXXXXX"></td>
-                                <td><input type="text" class="input-add-row" value="test@email.com"></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <!-- table:3 end -->
-                    <!-- table:4 start -->
-                    <div class="modal-title mb-2"><span class="modal-title-bar"></span><span>담당자 정보</span></div>
-                    <table class="table table-bg-v table-fixed w-100 text-center align-middle">
-                        <tbody>
-                            <tr class="table-border-top">
-                                <th class="w-20">이름<b class="required-data">*</b></th>
-                                <td class="w-30">
-                                    <input type="text" name="staffName" id="staffName" class="form-control" placeholder="" required>
-                                </td>
-                                <th class="w-20">이메일<b class="required-data">*</b></th>
-                                <td class="w-30">
-                                    <input type="text" name="staffEmail" id="staffEmail" class="form-control" placeholder="" required>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th class="w-20">전화번호<b class="required-data">*</b></th>
-                                <td class="w-30">
-                                    <input type="text" name="staffNo" id="staffNo" class="form-control" placeholder="" required>
-                                </td>
-                                <th class="w-20">휴대전화<b class="required-data">*</b></th>
-                                <td class="w-30">
-                                    <input type="text" name="staffPhone" id="staffPhone" class="form-control" placeholder="" required>
-                                </td>
-                            </tr>   
-                        </tbody>
-                    </table>
-                    <!-- table:4 end -->
-                    <!-- table:5 start -->
-                    <div class="modal-title mb-2"><span class="modal-title-bar"></span><span>PG 결제정보</span></div>
-                    <table class="table table-bg-v table-fixed w-100 text-center align-middle">
-                        <tbody>
-                            <tr class="table-border-top">
-                                <th class="w-20">결제위탁사용<b class="required-data">*</b></th>
-                                <td class="w-30">
-                                    <select id="userState" class="form-control" required>
-                                        <option value='%'>(선택)</option>
-                                    </select>
-                                </td>
-                                <td class="w-50" colspan="2"></td>
-                            </tr>
-                            <tr>
-                                <th class="w-20">SSP Mall ID<b class="required-data">*</b></th>
-                                <td class="w-30">
-                                    <input type="text" name="mallID" id="mallID" class="form-control" placeholder="" required>
-                                </td>
-                                <th class="w-20">MID<b class="required-data">*</b></th>
-                                <td class="w-30">
-                                    <input type="text" name="mID" id="mID" class="form-control" placeholder="" required>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th class="w-20">Merchant Key<b class="required-data">*</b></th>
-                                <td class="w-80" colspan="3">
-                                    <input type="text" name="merchantKey" id="merchantKey" class="form-control" placeholder="" required>
-                                </td>
-                            </tr>    
-                        </tbody>
-                    </table>
-                    <!-- table:5 end -->
-                    <!-- table:6 start -->
-                    <div class="modal-title mb-2"><span class="modal-title-bar"></span><span>계약 정보</span></div>
-                    <table class="table table-bg-v table-fixed w-100 text-center align-middle">
-                        <tbody>
-                            <tr class="table-border-top">
-                                <th class="w-20">계약 상태<b class="required-data">*</b></th>
-                                <td class="w-30">
-                                    <select id="userState" class="form-control" disabled required>
-                                        <option value='%'>(선택)</option>
-                                    </select>
-                                </td>
-                                <th class="w-20">계약일자<b class="required-data">*</b></th>
-                                <td class="w-30">
-                                    <input type="date" min="1970-01-01" max="2199-12-31" name="contractAt" id="contractAt" class="form-control" required>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th class="w-20">계약시작<b class="required-data">*</b></th>
-                                <td class="w-30">
-                                    <input type="date" min="1970-01-01" max="2199-12-31" name="contractStart" id="contractStart" class="form-control" required>
-                                </td>
-                                <th class="w-20">계약종료<b class="required-data">*</b></th>
-                                <td class="w-30">
-                                    <input type="date" min="1970-01-01" max="2199-12-31" name="contractEnd" id="contractEnd" class="form-control" required>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th class="w-20">유지보수</th>
-                                <td class="w-30">
-                                    <select id="asCompany" class="form-control">
-                                        <option value='%'>(선택)</option>
-                                    </select>
-                                </td>
-                                <th class="w-20">계약종류</th>
-                                <td class="w-30">
-                                    <select id="contractType" class="form-control">
-                                        <option value='%'>(선택)</option>
-                                    </select>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th class="w-20">고객센터</th>
-                                <td class="w-30">
-                                    <input type="text" name="asNum" id="asNum" class="form-control" placeholder="">
-                                </td>
-                                <td colspan="2">
-                                    <div class="text-left">**자체 유지보수 시, 사업자 정보의 전화번호가 고객센터 전화로 안내됩니다.</div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <!-- table:6 end -->
+                    <!-- modal body start -->
+                    <div class="modal-body">
+                        <!-- 모달 내용 -->
+                        <div class="modal-title mb-2"><span class="modal-title-bar"></span><span>사업자 정보</span></div>
+                        <!-- table:1 start -->
+                        <table class="table table-bg-v table-fixed w-100 text-center align-middle">
+                            <tbody>
+                                <tr class="table-border-top">
+                                    <th class="w-20">사업자유형<b class="required-data">*</b></th>
+                                    <td class="w-30">
+                                        <select id="companyType" class="form-control" required>
+                                            <option value="">충전사업자</option>
+                                            <option value="">위탁운영사</option>
+                                        </select>
+                                    </td>
+                                    <th class="w-20">사업자레벨<b class="required-data">*</b></th>
+                                    <td class="w-30">
+                                        <select id="companyLv" class="form-control" required>
+                                            <option value="">상위사업자</option>
+                                            <option value="">하위사업자</option>
+                                            <option value="">최하위사업자</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="w-20">사업자명<b class="required-data">*</b></th>
+                                    <td class="w-30">
+                                        <input type="text" name="bizName" id="bizName" class="form-control"
+                                            placeholder="" autocomplete="off" required>
+                                    </td>
+                                    <th class="w-20">사업자등록번호<b class="required-data">*</b></th>
+                                    <td class="w-30">
+                                        <input type="text" name="bizNum" id="bizNum" class="form-control" maxlength="13"
+                                            placeholder="" autocomplete="off" required>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="w-20">사업자구분<b class="required-data">*</b></th>
+                                    <td class="w-30">
+                                        <select id="bizType" class="form-control" required>
+                                            <option value='%'>(선택)</option>
+                                            <option value="">개인</option>
+                                            <option value="">법인</option>
+                                        </select>
+                                    </td>
+                                    <th class="w-20">업종<b class="required-data">*</b></th>
+                                    <td class="w-30">
+                                        <input type="text" name="bizKind" id="bizKind" class="form-control"
+                                            placeholder="" required>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="w-20">대표자명<b class="required-data">*</b></th>
+                                    <td class="w-30">
+                                        <input type="text" name="headName" id="headName" class="form-control"
+                                            placeholder="" required>
+                                    </td>
+                                    <th class="w-20">대표전화번호<b class="required-data">*</b></th>
+                                    <td class="w-30">
+                                        <input type="text" name="headPhone" id="headPhone" class="form-control"
+                                            placeholder="" required>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="w-20">주소<b class="required-data">*</b></th>
+                                    <td class="w-30" colspan="3">
+                                        <div class="address-container mb-2 display-input-btn">
+                                            <input type="text" name="postCode" id="postCode" class="form-control w-25"
+                                                placeholder="" disabled>
+                                            <button class="btn btn-outline-grey flex-btn" id="postBtn"
+                                                onclick="postSearch()">주소 검색</button>
+                                        </div>
+                                        <input type="text" name="address" id="address" class="form-control mb-2"
+                                            placeholder="" autocomplete="off" disabled>
+                                        <input type="text" name="addressDetail" id="addressDetail" class="form-control"
+                                            placeholder="상세 주소" autocomplete="off">
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <!-- table:1 end -->
+                        <!-- table:2 start -->
+                        <div class="modal-title mb-2"><span class="modal-title-bar"></span><span>사업자 관계 정보</span></div>
+                        <table class="table table-bg-v table-fixed w-100 text-center align-middle">
+                            <tbody>
+                                <tr class="table-border-top">
+                                    <th class="w-20">상위사업자</th>
+                                    <td class="w-30">
+                                        <select id="bizLv" class="form-control">
+                                            <option value='%'>(선택)</option>
+                                            <option value="">test1</option>
+                                            <option value="">test2</option>
+                                        </select>
+                                    </td>
+                                    <td colspan="2"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <!-- table:2 end -->
+                        <!-- table:3 start -->
+                        <div class="modal-title mb-2 position-relative">
+                            <span class="modal-title-bar"></span><span>로밍 정보</span>
+                            <span class="ms-5 position-absolute" style="margin-left: 4px; right: 0;">
+                                <button type="button" class="btn btn-outline-grey me-2" onclick="addRow()">+ 추가</button>
+                                <button type="button" class="btn btn-outline-grey" onclick="deleteRow()">- 삭제</button>
+                            </span>
+                        </div>
+                        <table class="table table-bg table-fixed w-100 text-center align-middle" id="roamingTable">
+                            <thead>
+                                <tr class="table-border-top">
+                                    <th scope="col" class="w-5"></th>
+                                    <th scope="col" class="w-15">로밍기관</th>
+                                    <th scope="col" class="w-25">기관 인증키</th>
+                                    <th scope="col" class="w-25">e-mail</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><input type="checkbox"></th>
+                                    <td><input type="text" class="input-add-row" value="환경부"></td>
+                                    <td><input type="text" class="input-add-row" value="XXXXXXXXXXXXXXXXXX"></td>
+                                    <td><input type="text" class="input-add-row" value="test@email.com"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <!-- table:3 end -->
+                        <!-- table:4 start -->
+                        <div class="modal-title mb-2"><span class="modal-title-bar"></span><span>담당자 정보</span></div>
+                        <table class="table table-bg-v table-fixed w-100 text-center align-middle">
+                            <tbody>
+                                <tr class="table-border-top">
+                                    <th class="w-20">이름<b class="required-data">*</b></th>
+                                    <td class="w-30">
+                                        <input type="text" name="staffName" id="staffName" class="form-control"
+                                            placeholder="" required>
+                                    </td>
+                                    <th class="w-20">이메일<b class="required-data">*</b></th>
+                                    <td class="w-30">
+                                        <input type="text" name="staffEmail" id="staffEmail" class="form-control"
+                                            placeholder="" required>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="w-20">전화번호<b class="required-data">*</b></th>
+                                    <td class="w-30">
+                                        <input type="text" name="staffNo" id="staffNo" class="form-control"
+                                            placeholder="" required>
+                                    </td>
+                                    <th class="w-20">휴대전화<b class="required-data">*</b></th>
+                                    <td class="w-30">
+                                        <input type="text" name="staffPhone" id="staffPhone" class="form-control"
+                                            placeholder="" required>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <!-- table:4 end -->
+                        <!-- table:5 start -->
+                        <div class="modal-title mb-2"><span class="modal-title-bar"></span><span>PG 결제정보</span></div>
+                        <table class="table table-bg-v table-fixed w-100 text-center align-middle">
+                            <tbody>
+                                <tr class="table-border-top">
+                                    <th class="w-20">결제위탁사용<b class="required-data">*</b></th>
+                                    <td class="w-30">
+                                        <select id="userState" class="form-control" required>
+                                            <option value='%'>(선택)</option>
+                                        </select>
+                                    </td>
+                                    <td class="w-50" colspan="2"></td>
+                                </tr>
+                                <tr>
+                                    <th class="w-20">SSP Mall ID<b class="required-data">*</b></th>
+                                    <td class="w-30">
+                                        <input type="text" name="mallID" id="mallID" class="form-control" placeholder=""
+                                            required>
+                                    </td>
+                                    <th class="w-20">MID<b class="required-data">*</b></th>
+                                    <td class="w-30">
+                                        <input type="text" name="mID" id="mID" class="form-control" placeholder=""
+                                            required>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="w-20">Merchant Key<b class="required-data">*</b></th>
+                                    <td class="w-80" colspan="3">
+                                        <input type="text" name="merchantKey" id="merchantKey" class="form-control"
+                                            placeholder="" required>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <!-- table:5 end -->
+                        <!-- table:6 start -->
+                        <div class="modal-title mb-2"><span class="modal-title-bar"></span><span>계약 정보</span></div>
+                        <table class="table table-bg-v table-fixed w-100 text-center align-middle">
+                            <tbody>
+                                <tr class="table-border-top">
+                                    <th class="w-20">계약 상태<b class="required-data">*</b></th>
+                                    <td class="w-30">
+                                        <select id="userState" class="form-control" disabled required>
+                                            <option value='%'>(선택)</option>
+                                        </select>
+                                    </td>
+                                    <th class="w-20">계약일자<b class="required-data">*</b></th>
+                                    <td class="w-30">
+                                        <input type="date" min="1970-01-01" max="2199-12-31" name="contractAt"
+                                            id="contractAt" class="form-control" required>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="w-20">계약시작<b class="required-data">*</b></th>
+                                    <td class="w-30">
+                                        <input type="date" min="1970-01-01" max="2199-12-31" name="contractStart"
+                                            id="contractStart" class="form-control" required>
+                                    </td>
+                                    <th class="w-20">계약종료<b class="required-data">*</b></th>
+                                    <td class="w-30">
+                                        <input type="date" min="1970-01-01" max="2199-12-31" name="contractEnd"
+                                            id="contractEnd" class="form-control" required>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="w-20">유지보수</th>
+                                    <td class="w-30">
+                                        <select id="asCompany" class="form-control">
+                                            <option value='%'>(선택)</option>
+                                        </select>
+                                    </td>
+                                    <th class="w-20">계약종류</th>
+                                    <td class="w-30">
+                                        <select id="contractType" class="form-control">
+                                            <option value='%'>(선택)</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="w-20">고객센터</th>
+                                    <td class="w-30">
+                                        <input type="text" name="asNum" id="asNum" class="form-control" placeholder="">
+                                    </td>
+                                    <td colspan="2">
+                                        <div class="text-left">**자체 유지보수 시, 사업자 정보의 전화번호가 고객센터 전화로 안내됩니다.</div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <!-- table:6 end -->
                     </div>
                     <!-- modal body end -->
                     <div class="modal-footer justify-content-center border-top-none">
@@ -339,12 +370,12 @@
         <!-- modal dialog end -->
     </div>
     <!-- Add Modal end -->
-     
+
     <script type="text/javascript">
         function addRow() {
             const table = document.getElementById('roamingTable').getElementsByTagName("tbody")[0];
             const newRow = table.insertRow();
-            
+
             // 각 셀(Column) 추가 및 input 요소로 설정
             var cell1 = newRow.insertCell(0);
             var cell2 = newRow.insertCell(1);
@@ -355,7 +386,7 @@
             cell2.innerHTML = '<input type="text" class="input-add-row">';
             cell3.innerHTML = '<input type="text" class="input-add-row">';
             cell4.innerHTML = '<input type="text" class="input-add-row">';
-            
+
             applySingleCheckboxSelection();
         }
 
@@ -363,9 +394,9 @@
             const table = document.getElementById('roamingTable').getElementsByTagName("tbody")[0];
             const rows = table.getElementsByTagName("tr");
 
-            for(var i = rows.length-1; i >= 0; i--) {
+            for (var i = rows.length - 1; i >= 0; i--) {
                 var checkbox = rows[i].getElementsByTagName("input")[0];
-                if(checkbox && checkbox.checked) {
+                if (checkbox && checkbox.checked) {
                     table.deleteRow(i);
                 }
             }
@@ -375,12 +406,12 @@
         function applySingleCheckboxSelection() {
             var checkboxes = document.querySelectorAll('.single-checkbox');
 
-            checkboxes.forEach(function(checkbox) {
-                checkbox.addEventListener('change', function() {
+            checkboxes.forEach(function (checkbox) {
+                checkbox.addEventListener('change', function () {
                     // 체크된 checkbox 외의 모든 checkbox 해제
-                    if(this.checked) {
-                        checkboxes.forEach(function(otherCheckbox) {
-                            if(otherCheckbox !== checkbox) {
+                    if (this.checked) {
+                        checkboxes.forEach(function (otherCheckbox) {
+                            if (otherCheckbox !== checkbox) {
                                 otherCheckbox.checked = false;
                             }
                         });
@@ -391,4 +422,5 @@
     </script>
     <script type="text/javascript" th:src="@{/js/table.js}"></script>
 </div>
+
 </html>

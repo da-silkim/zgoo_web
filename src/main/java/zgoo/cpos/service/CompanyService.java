@@ -4,19 +4,19 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import zgoo.cpos.domain.Company;
-import zgoo.cpos.domain.CompanyRelationInfo;
-import zgoo.cpos.dto.company.CompanyLvInfoDto;
-import zgoo.cpos.dto.company.CompanyRegDto;
-import zgoo.cpos.repository.CompanyRelationRepository;
-import zgoo.cpos.repository.CompanyRepository;
+import zgoo.cpos.domain.company.Company;
+import zgoo.cpos.domain.company.CompanyContract;
+import zgoo.cpos.domain.company.CompanyPG;
+import zgoo.cpos.domain.company.CompanyRelationInfo;
+import zgoo.cpos.domain.company.CompanyRoaming;
+import zgoo.cpos.dto.company.CompanyDto;
+import zgoo.cpos.repository.company.CompanyRelationRepository;
+import zgoo.cpos.repository.company.CompanyRepository;
 
 @Service
-@Transactional(readOnly = true)
 @RequiredArgsConstructor
 @Slf4j
 public class CompanyService {
@@ -24,68 +24,87 @@ public class CompanyService {
     private final CompanyRepository companyRepository;
     private final CompanyRelationRepository companyRelationRepository;
 
+    /*
+     * 조회(사업자리스트 - CompanyDto.CompanyListDto)
+     */
+    public List<CompanyDto.CompanyListDto> searchCompanyList() {
+        return companyRepository.findCompanyListAllCustom();
+    }
+
     /**
-     * 업체저장
+     * 저장
      */
-    @Transactional
-    public void saveCompany(CompanyRegDto dto) {
+    public void saveCompany(CompanyDto.CompanyRegDto dto) {
 
-        // dto > compnay entity
-        Company company = new Company();
-        company.setCompanyType(dto.getCompanyType());
-        company.setCompanyLv(dto.getCompanyLv());
-        company.setCompanyName(dto.getCompanyName());
-        company.setBizNum(dto.getBizNum());
-        company.setBizType(dto.getBizType());
-        company.setBizKind(dto.getBizType());
-        company.setCeoName(dto.getCeoName());
-        company.setHeadPhone(dto.getHeadPhone());
-        company.setZipcode(dto.getZipcode());
-        company.setAddress(dto.getAddress());
-        company.setAddressDetail(dto.getAddressDetail());
-        company.setStaffName(dto.getStaffName());
-        company.setStaffEmail(dto.getStaffEmail());
-        company.setStaffTel(dto.getStaffTel());
-        company.setStaffPhone(dto.getStaffPhone());
-        company.setConsignmentPayment(dto.getConsignmentPayment());
-        company.setCreatedAt(LocalDateTime.now());
+        log.info("== company dto : {}", dto.toString());
 
-        // dto >> companyrelation entity
-        CompanyRelationInfo companyRelationInfo = new CompanyRelationInfo();
-        companyRelationInfo.setParentId(dto.getParentId().isEmpty() ? null : Long.valueOf(dto.getParentId()));
+        // dto >> entity(relation)
+        CompanyRelationInfo companyRelationInfo = CompanyRelationInfo.builder()
+                .parentId(dto.getParentId())
+                .build();
 
-        company.setCompanyRelationInfo(companyRelationInfo);
+        // dto >> entity(roaming)
+        CompanyRoaming companyRoaming = CompanyRoaming.builder()
+                .institutionCode(dto.getInstitutionCode())
+                .institutionKey(dto.getInstitutionKey())
+                .institutionEmail(dto.getInstitutionEmail())
+                .build();
 
-        companyRepository.save(company);
+        // dto >> entity(pg)
+        CompanyPG companyPG = CompanyPG.builder()
+                .sspMallId(dto.getSspMallId())
+                .mid(dto.getMid())
+                .merchantKey(dto.getMerchantKey())
+                .regDt(LocalDateTime.now())
+                .build();
+
+        // dto >> entity(contract)
+        CompanyContract companyContract = CompanyContract.builder()
+                .contractStatus(dto.getContractStatus())
+                .contractedAt(LocalDateTime.now())
+                .contractStart(dto.getContractStart())
+                .contractEnd(dto.getContractEnd())
+                .asCompany(dto.getAsCompany())
+                .asNum(dto.getAsNum())
+                .build();
+
+        // dto >> entity(company)
+        Company company = Company.builder()
+                .companyType(dto.getCompanyType())
+                .companyLv(dto.getCompanyLv())
+                .companyName(dto.getCompanyName())
+                .bizNum(dto.getBizNum())
+                .ceoName(dto.getCeoName())
+                .headPhone(dto.getHeadPhone())
+                .bizKind(dto.getBizKind())
+                .bizType(dto.getBizType())
+                .zipcode(dto.getZipcode())
+                .address(dto.getAddress())
+                .addressDetail(dto.getAddressDetail())
+                .staffName(dto.getStaffName())
+                .staffEmail(dto.getStaffEmail())
+                .staffTel(dto.getStaffTel())
+                .staffPhone(dto.getStaffPhone())
+                .consignmentPayment(dto.getConsignmentPayment())
+                .createdAt(LocalDateTime.now())
+                .companyRelationInfo(companyRelationInfo)
+                .companyRoaming(companyRoaming)
+                .companyPG(companyPG)
+                .companyContract(companyContract)
+                .build();
+
+        Company saved = companyRepository.save(company);
+
+        log.info(">>> Company saved : {}", saved.toString());
 
     }
 
     /*
-     * 전체 업체 조회
+     * 수정
      */
-    public List<Company> findAllCompany() {
-        return companyRepository.findAll();
-    }
 
     /*
-     * CompanyRelationInfo table 전체조회
+     * 삭제
      */
-    public List<CompanyRelationInfo> findAllCompanyWithRelation() {
-        return companyRelationRepository.findAll();
-    }
-
-    /*
-     * 특정 업체 조회(id)
-     */
-    public Company findOne(Long companyId) {
-        return companyRepository.findOne(companyId);
-    }
-
-    /*
-     * 업체레벨 조건에따른 조회
-     */
-    public List<CompanyLvInfoDto> findCompanyByLv(String lv) {
-        return companyRepository.findCompanyByLevel(lv);
-    }
 
 }

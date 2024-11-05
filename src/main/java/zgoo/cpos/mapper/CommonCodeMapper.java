@@ -4,8 +4,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import zgoo.cpos.domain.CommonCode;
-import zgoo.cpos.domain.GrpCode;
+import zgoo.cpos.domain.code.CommonCode;
+import zgoo.cpos.domain.code.GrpCode;
 import zgoo.cpos.dto.code.CommonCdDto;
 
 public class CommonCodeMapper {
