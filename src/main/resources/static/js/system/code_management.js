@@ -18,7 +18,7 @@ $(document).ready(function() {
         // 선택한 그룹코드에 연관된 공통코드 조회
         $.ajax({
             type: 'GET',
-            url: `/code_management/commoncd/search/${currGrpCode}`,
+            url: `/system/code/commoncd/search/${currGrpCode}`,
             success: function(data) {
                 console.info("공통코드: ", data);
                 $('#pageListSub').empty();  // 기존 내용 삭제
@@ -100,7 +100,7 @@ $(document).ready(function() {
                 console.log("삭제 테스트: " + currGrpCd);
                 $.ajax({
                     type: 'DELETE',
-                    url: `/code_management/grpcode/delete/${currGrpCd}`,
+                    url: `/system/code/grpcode/delete/${currGrpCd}`,
                     contentType: "application/json",
                     success: function(response) {
                         console.log("그룹코드 데이터 삭제 완료: ", response);
@@ -140,7 +140,7 @@ $(document).ready(function() {
             console.log("수정 테스트: " + currGrpCd + ', ' + currComcd);
             $.ajax({
                 type: 'GET',
-                url: `/code_management/commoncd/get/${currGrpCd}/${currComcd}`,
+                url: `/system/code/commoncd/get/${currGrpCd}/${currComcd}`,
                 contentType: "application/json",
                 dataType: 'json',
                 success: function(data) {
@@ -176,7 +176,7 @@ $(document).ready(function() {
                 console.log("삭제 테스트: " + currGrpCd + ', ' + currComcd);
                 $.ajax({
                     type: 'DELETE',
-                    url: `/code_management/commoncd/delete/${currGrpCd}/${currComcd}`,
+                    url: `/system/code/commoncd/delete/${currGrpCd}/${currComcd}`,
                     contentType: "application/json",
                     success: function(response) {
                         console.log("공통코드 데이터 삭제 완료: ", response);
@@ -200,7 +200,7 @@ $(document).ready(function() {
                 grpcdName: $('#grpcdNameM').val()
             }
 
-            const URL = grpModalCon ? '/code_management/grpcode/update' : '/code_management/grpcode/update';
+            const URL = grpModalCon ? '/system/code/grpcode/update' : '/system/code/grpcode/new';
             const TYPE = grpModalCon ? 'PATCH' : 'POST';
             $.ajax({
                 type: TYPE,
@@ -232,7 +232,7 @@ $(document).ready(function() {
         // console.log("입력한 공통코드 값: " + $('#commonCode').val());
         
         if (confirmSubmit(btnMsg)) {
-            const URL = comModalCon ? '/code_management/commoncd/update' : '/code_management/commoncd/new';
+            const URL = comModalCon ? '/system/code/commoncd/update' : '/system/code/commoncd/new';
             const TYPE = comModalCon ? 'PATCH' : 'POST';
             const data = {
                 id: {
@@ -294,7 +294,7 @@ $(document).ready(function() {
         console.log(searchGrpcdName + ' 그룹코드 조회');
         $.ajax({
             type: 'GET',
-            url: '/code_management/grpcode/search',
+            url: '/system/code/grpcode/search',
             data: { grpcdName: searchGrpcdName },
             success: function(data) {
                 console.log(data);

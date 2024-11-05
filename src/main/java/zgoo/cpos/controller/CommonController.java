@@ -30,35 +30,35 @@ import zgoo.cpos.service.CodeService;
 @Controller
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping("/code_management")
+@RequestMapping("/system/code")
 public class CommonController {
 
     private final CodeService codeService;
 
-    // @PostMapping("/code_management/grpcode/new")
+    // @PostMapping("/system/code/grpcode/new")
     // public String createGrpCode(@Valid GrpCodeDto dto, BindingResult result) {
     //     log.info("==== create group code(list) ======");
     //     if (result.hasErrors()) {
     //         log.error("그룹코드 등록 에러: {}", result.getAllErrors());
     //         // TODO: web에 팝업띄우기
-    //         return "pages/system/code_management";
+    //         return "pages/system/system/code";
     //     }
 
     //     log.info("groupcode_dto >> {}", dto.toString());
 
     //     codeService.saveGrpCode(dto);
 
-    //     return "redirect:/code_management/list";
+    //     return "redirect:/system/code/list";
     // }
 
-    // @PostMapping("/code_management/commoncd/new")
+    // @PostMapping("/system/code/commoncd/new")
     // public String createCommonCode(@Valid CommonCdDto dto, BindingResult result) {
     //     log.info("==== create common code(list) ======");
     //     // valid error 발생시 등록폼 이동
     //     if (result.hasErrors()) {
     //         log.error("공통코드 등록 에러: {}", result.getAllErrors());
     //         // TODO: web에 팝업띄우기
-    //         return "pages/system/code_management";
+    //         return "pages/system/system/code";
     //     }
 
     //     log.info("commoncd_dto >> {}", dto.toString());
@@ -69,7 +69,7 @@ public class CommonController {
 
     //     codeService.saveCommonCode(dto);
         
-    //     return "redirect:/code_management/list";
+    //     return "redirect:/system/code/list";
     // }
 
     // 그룹코드 - 등록

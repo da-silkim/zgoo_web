@@ -4,31 +4,27 @@
     <div class="card">
         <!-- card body:1 start -->
         <div class="card-body">
-            <div class="content-title mb-4" style="font-size: 20px; font-weight: bold;"><i
+            <div class="content-title mb-4 fw-bolder" style="font-size: 20px;"><i
                     class="fa-solid fa-gear font-ico me-2"></i>시스템 > 공통코드관리</div>
             <!-- card:2 start -->
             <div class="card card-shadow">
                 <!-- card body:2 start -->
                 <div class="card-body">
-                    <!-- form start -->
-                    <form class="position-relative">
-                        <!-- row:1 start -->
-                        <div class="row row-cols-2 row-cols-lg-3 g-2">
-                            <div class="col d-flex align-items-center">
-                                <label for="searchGrpcdName"
-                                    class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">그룹코드명</label>
-                                <input type="text" name="grpcdName" id="searchGrpcdName" class="mx-3 form-control">
-                            </div>
-                            <div>
-                                <button type="button" class="btn btn-outline-grey me-2" id="grpcdNameSearchBtn">
-                                    <i class="bi bi-search me-2"></i>검색</button>
-                                <button type="button" class="btn btn-outline-grey me-2" id="resetBtn">
-                                    <i class="bi bi-arrow-repeat me-2"></i>초기화</button>
-                            </div>
+                    <!-- row:1 start -->
+                    <div class="row row-cols-2 row-cols-lg-3 g-2">
+                        <div class="col d-flex align-items-center">
+                            <label for="searchGrpcdName"
+                                class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">그룹코드명</label>
+                            <input type="text" name="grpcdName" id="searchGrpcdName" class="mx-3 form-control">
                         </div>
-                        <!-- row:1 end -->
-                    </form>
-                    <!-- form end -->
+                        <div>
+                            <button type="button" class="btn btn-outline-grey me-2" id="grpcdNameSearchBtn">
+                                <i class="bi bi-search me-2"></i>검색</button>
+                            <button type="button" class="btn btn-outline-grey me-2" id="resetBtn">
+                                <i class="bi bi-arrow-repeat me-2"></i>초기화</button>
+                        </div>
+                    </div>
+                    <!-- row:1 end -->
                 </div>
                 <!-- card body:2 end -->
             </div>
@@ -142,14 +138,13 @@
         data-bs-backdrop="static" data-bs-keyboard="false">
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable"
             style="max-width: 60vw; height: 90vh;">
-            <div class="modal-content mh-100 overflow-y-auto scrollbar">
+            <div class="modal-content mh-100 overflow-y-auto scrollbar" style="z-index: 1050;">
                 <!-- modal body start -->
                 <div class="modal-body">
                     <form  th:object="${grpcodeDto}">
                         <!-- 모달 내용 -->
-                        <!-- table:1 start -->
-                        <div class="modal-title mb-2"><span class="modal-title-bar"></span><span>그룹코드</span>
-                        </div>
+                        <!-- table: start -->
+                        <div class="modal-title mb-2"><span class="modal-title-bar"></span><span>그룹코드</span></div>
                         <table class="table table-bg-v table-fixed w-100 text-center align-middle">
                             <tbody>
                                 <tr class="table-border-top">
@@ -166,8 +161,7 @@
                                 </tr>
                             </tbody>
                         </table>
-                        <!-- table:1 end -->
-                        <!-- modal body end -->
+                        <!-- table: end -->
                         <div class="modal-footer justify-content-center" style="border-top: none;">
                             <button type="button" class="btn btn-outline-grey me-2"
                                 data-bs-dismiss="modal">취소</button>
@@ -175,6 +169,7 @@
                         </div>
                     </form>
                 </div>
+                <!-- modal body end -->
             </div>
             <!-- modal content end -->
         </div>
@@ -263,15 +258,7 @@
     </div>
     <!-- Common Add Modal end -->
 
-    <!-- 에러 메시지 표시 부분 -->
-    <!-- <div th:if="${errorMessage}" class="alert alert-danger">
-        <span th:text="${errorMessage}"></span>
-    </div> -->
-
     <script type="text/javascript" th:src="@{/js/table.js}"></script>
     <script type="text/javascript" th:src="@{/js/system/code_management.js}"></script>
-    <script th:inline="javascript">
-        
-    </script>
 </div>
 </html>
