@@ -32,6 +32,9 @@ $(function() {
     });
 });
 
+function confirmSubmit(msg) {
+    return confirm("정말로 해당 데이터를 " + msg + "하시겠습니까?");
+}
 
 document.addEventListener('DOMContentLoaded', () => {
     // 사이드바 hover 

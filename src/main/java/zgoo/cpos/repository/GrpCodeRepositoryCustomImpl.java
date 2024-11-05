@@ -53,4 +53,12 @@ public class GrpCodeRepositoryCustomImpl implements GrpCodeRepositoryCustom {
                 .execute();
     }
 
+    @Override
+    // 그룹코드이름 일부분으로 그룹코드 조회
+    public List<GrpCode> findByGrpcdNameLike(String grpcdName) {
+        return queryFactory
+                .selectFrom(grpCode)
+                .where(grpCode.grpcdName.like("%" + grpcdName + "%"))
+                .fetch();
+    }
 }

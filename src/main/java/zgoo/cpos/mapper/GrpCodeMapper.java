@@ -1,5 +1,6 @@
 package zgoo.cpos.mapper;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -15,7 +16,7 @@ public class GrpCodeMapper {
                 .grpCode(dto.getGrpCode())
                 .grpcdName(dto.getGrpcdName())
                 .regUserId(dto.getRegUserId())
-                .regDt(dto.getRegDt())
+                .regDt(LocalDateTime.now())
                 .modUserId(dto.getModUserId())
                 .modDt(dto.getModDt())
                 .build();

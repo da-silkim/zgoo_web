@@ -50,4 +50,8 @@ public class GrpCode {
     // this.modDt = modDt;
     // }
 
+    public void updateGrpcdCode(String grpcdName) {
+        this.grpcdName = grpcdName;
+        this.modDt = LocalDateTime.now();
+    }
 }

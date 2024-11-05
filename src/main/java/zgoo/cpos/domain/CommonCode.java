@@ -60,6 +60,7 @@ public class CommonCode {
 
     public void updateCommonCodeName(String commonCodeName) {
         this.name = commonCodeName;
+        this.modDt = LocalDateTime.now();
     }
 
 }

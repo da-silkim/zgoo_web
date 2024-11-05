@@ -1,5 +1,6 @@
 package zgoo.cpos.mapper;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -20,7 +21,7 @@ public class CommonCodeMapper {
                 .refCode2(dto.getRefCode2())
                 .refCode3(dto.getRefCode3())
                 .regUserId(dto.getRegUserId())
-                .regDt(dto.getRegDt())
+                .regDt(LocalDateTime.now())
                 .modUserId(dto.getModUserId())
                 .modDt(dto.getModDt())
                 .group(grp)

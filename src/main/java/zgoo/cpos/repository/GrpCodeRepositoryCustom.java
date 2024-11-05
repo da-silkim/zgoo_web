@@ -15,6 +15,9 @@ public interface GrpCodeRepositoryCustom {
     // 그룹코드 - 그룹코드이름으로 조회
     GrpCode findByGrpCodeName(String name);
 
+    // 그룹코드 - 그룹코드이름 일부분으로 조회
+    List<GrpCode> findByGrpcdNameLike(String grpcdName);
+
     // ========== 삭제 ==================
     Long deleteGrpCode(String grpcode);
 
