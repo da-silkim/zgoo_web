@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import zgoo.cpos.dto.code.CommonCdDto;
 import zgoo.cpos.dto.code.GrpCodeDto;
+import zgoo.cpos.dto.company.CompanyDto;
 import zgoo.cpos.service.CodeService;
 
 @Controller
@@ -234,6 +235,34 @@ public class PageController {
     @GetMapping("/biz/list")
     public String showbizlist(Model model) {
         log.info("=== Biz managment List Page ===");
+        List<CompanyDto.CompanyListDto> cdtolist = null;
+        // List<Company> companyList = companyService.findAllCompany();
+
+        // if (companyList.size() > 0) {
+        // log.info("==========");
+        // log.info("company_name : {}", companyList.get(0).getCompanyName());
+        // log.info("parent_id : {}",
+        // companyList.get(0).getCompanyRelationInfo().getParentId());
+        // log.info("==========");
+
+        // cdtolist = companyList.stream()
+        // .map(cinfo -> new CompanyListDto(cinfo.getId(),
+        // cinfo.getCompanyName(),
+        // cinfo.getCompanyType(),
+        // cinfo.getCompanyLv(),
+        // cinfo.getBizNum(),
+        // cinfo.getBizType(),
+        // cinfo.getConsignmentPayment(),
+        // cinfo.getCompanyRelationInfo().getParentId(),
+        // cinfo.getCreatedAt(),
+        // cinfo.getUpdatedAt()))
+        // .collect(Collectors.toList());
+        // } else {
+        // log.info("==== No comany list : {}", companyList);
+        // }
+
+        // model.addAttribute("clist", cdtolist);
+
         return "pages/biz/biz_management";
     }
 

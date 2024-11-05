@@ -1,4 +1,4 @@
-package zgoo.cpos.repository;
+package zgoo.cpos.repository.code;
 
 import java.util.List;
 
@@ -11,9 +11,9 @@ import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
-import zgoo.cpos.domain.CommonCode;
-import zgoo.cpos.domain.QCommonCode;
-import zgoo.cpos.domain.QGrpCode;
+import zgoo.cpos.domain.code.CommonCode;
+import zgoo.cpos.domain.code.QCommonCode;
+import zgoo.cpos.domain.code.QGrpCode;
 import zgoo.cpos.dto.code.GrpAndCommCdDto;
 
 @RequiredArgsConstructor

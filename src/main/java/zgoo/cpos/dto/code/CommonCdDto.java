@@ -8,7 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import zgoo.cpos.domain.GrpCode;
+import zgoo.cpos.domain.code.GrpCode;
 import zgoo.cpos.type.CommonCodeKey;
 
 @Getter

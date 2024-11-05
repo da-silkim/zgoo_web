@@ -1,4 +1,4 @@
-package zgoo.cpos.repository;
+package zgoo.cpos.repository.company;
 
 import java.util.List;
 
@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import zgoo.cpos.domain.CompanyRelationInfo;
+import zgoo.cpos.domain.company.CompanyRelationInfo;
 
 @Repository
 public class CompanyRelationRepository {

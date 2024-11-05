@@ -1,16 +1,17 @@
-package zgoo.cpos.repository;
+package zgoo.cpos.repository.code;
 
 import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import zgoo.cpos.domain.CommonCode;
+import zgoo.cpos.domain.code.CommonCode;
 import zgoo.cpos.dto.code.GrpAndCommCdDto;
 
 public interface CommonCodeRepositoryCustom {
 
-    /* ttt
+    /*
+     * ttt
      * 조회
      */
     // 공통코드조회 - 전체조회

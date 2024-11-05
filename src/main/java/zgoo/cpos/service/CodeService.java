@@ -7,15 +7,15 @@ import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import zgoo.cpos.domain.CommonCode;
-import zgoo.cpos.domain.GrpCode;
+import zgoo.cpos.domain.code.CommonCode;
+import zgoo.cpos.domain.code.GrpCode;
 import zgoo.cpos.dto.code.CommonCdDto;
 import zgoo.cpos.dto.code.GrpAndCommCdDto;
 import zgoo.cpos.dto.code.GrpCodeDto;
 import zgoo.cpos.mapper.CommonCodeMapper;
 import zgoo.cpos.mapper.GrpCodeMapper;
-import zgoo.cpos.repository.CommonCodeRepository;
-import zgoo.cpos.repository.GrpCodeRepository;
+import zgoo.cpos.repository.code.CommonCodeRepository;
+import zgoo.cpos.repository.code.GrpCodeRepository;
 
 @Service
 @RequiredArgsConstructor

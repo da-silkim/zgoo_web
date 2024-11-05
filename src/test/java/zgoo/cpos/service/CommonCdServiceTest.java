@@ -16,8 +16,8 @@ import org.springframework.transaction.annotation.Transactional;
 import zgoo.cpos.dto.code.CommonCdDto;
 import zgoo.cpos.dto.code.GrpAndCommCdDto;
 import zgoo.cpos.dto.code.GrpCodeDto;
-import zgoo.cpos.repository.CommonCodeRepository;
-import zgoo.cpos.repository.GrpCodeRepository;
+import zgoo.cpos.repository.code.CommonCodeRepository;
+import zgoo.cpos.repository.code.GrpCodeRepository;
 import zgoo.cpos.type.CommonCodeKey;
 
 @SpringBootTest

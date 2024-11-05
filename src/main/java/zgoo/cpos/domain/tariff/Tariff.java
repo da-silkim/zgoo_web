@@ -1,4 +1,4 @@
-package zgoo.cpos.domain;
+package zgoo.cpos.domain.tariff;
 
 import java.math.BigDecimal;
 

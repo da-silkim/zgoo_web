@@ -1,8 +1,8 @@
-package zgoo.cpos.repository;
+package zgoo.cpos.repository.code;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import zgoo.cpos.domain.GrpCode;
+import zgoo.cpos.domain.code.GrpCode;
 
 // @Repository
 public interface GrpCodeRepository extends JpaRepository<GrpCode, String>, GrpCodeRepositoryCustom {
