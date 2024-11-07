@@ -106,19 +106,7 @@
                                     <th class="w-15">등록일시</th>
                                 </tr>
                             </thead>
-                            <tbody id="pageListSub">
-                                <tr th:each="ccd : ${ccdlist}">
-                                    <td><input type="checkbox"/></td>
-                                    <td th:text="${ccd.id.grpCode}"></td>
-                                    <td th:text="${ccd.id.commonCode}"></td>
-                                    <td th:text="${ccd.name}"></td>
-                                    <td th:text="${ccd.refCode1}"></td>
-                                    <td th:text="${ccd.refCode2}"></td>
-                                    <td th:text="${ccd.refCode3}"></td>
-                                    <td th:text="${ccd.regUserId}"></td>
-                                    <td th:text="${#temporals.format(ccd.regDt, 'yyyy-MM-dd HH:mm:ss')}"></td>
-                                </tr>
-                            </tbody>
+                            <tbody id="pageListSub"></tbody>
                         </table>
                     </div>
                     <div class="text-center">
@@ -199,32 +187,20 @@
                                     </td>
                                     <th class="w-20">참조코드1</th>
                                     <td class="w-30">
-                                        <select id="referenceCode1" name="referenceCode1" class="form-control"
-                                            th:field="*{refCode1}">
-                                            <option th:value="*{null}" th:text="'없음'"></option>
-                                            <option th:each="gcd : ${gcdlist}" th:value="${gcd.grpCode}"
-                                                th:text="${gcd.grpCode}"></option>
-                                        </select>
+                                        <input type="text" name="referenceCode1" id="referenceCode1"
+                                            class="form-control" th:field="*{refCode1}">
                                     </td>
                                 </tr>
                                 <tr>
                                     <th class="w-20">참조코드2</th>
                                     <td class="w-30">
-                                        <select id="referenceCode2" name="referenceCode2" class="form-control"
-                                            th:field="*{refCode2}">
-                                            <option th:value="*{null}" th:text="'없음'"></option>
-                                            <option th:each="gcd : ${gcdlist}" th:value="${gcd.grpCode}"
-                                                th:text="${gcd.grpCode}"></option>
-                                        </select>
+                                        <input type="text" name="referenceCode2" id="referenceCode2"
+                                            class="form-control" th:field="*{refCode2}">
                                     </td>
                                     <th class="w-20">참조코드3</th>
                                     <td class="w-30">
-                                        <select id="referenceCode3" name="referenceCode3" class="form-control"
-                                            th:field="*{refCode3}">
-                                            <option th:value="*{null}" th:text="'없음'"></option>
-                                            <option th:each="gcd : ${gcdlist}" th:value="${gcd.grpCode}"
-                                                th:text="${gcd.grpCode}"></option>
-                                        </select>
+                                        <input type="text" name="referenceCode3" id="referenceCode3"
+                                            class="form-control" th:field="*{refCode3}">
                                     </td>
                                 </tr>
                                 <tr>
