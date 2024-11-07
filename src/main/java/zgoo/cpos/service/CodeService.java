@@ -2,7 +2,6 @@ package zgoo.cpos.service;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,9 +10,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import zgoo.cpos.domain.code.CommonCode;
 import zgoo.cpos.domain.code.GrpCode;
-import zgoo.cpos.dto.code.CommonCdDto;
-import zgoo.cpos.dto.code.GrpAndCommCdDto;
-import zgoo.cpos.dto.code.GrpCodeDto;
+import zgoo.cpos.dto.code.CodeDto;
+import zgoo.cpos.dto.code.CodeDto.CommCdBaseDto;
+import zgoo.cpos.dto.code.CodeDto.CommCodeDto;
+import zgoo.cpos.dto.code.CodeDto.GrpCodeDto;
 import zgoo.cpos.mapper.CommonCodeMapper;
 import zgoo.cpos.mapper.GrpCodeMapper;
 import zgoo.cpos.repository.code.CommonCodeRepository;
@@ -60,10 +60,10 @@ public class CodeService {
     }
 
     // 그룹코드 조회 - 전체
-    public List<GrpCodeDto> findGrpCodeAll() {
+    public List<CodeDto.GrpCodeDto> findGrpCodeAll() {
 
         List<GrpCode> grpcdList = grpCodeRepository.findAll();
-        List<GrpCodeDto> list = null;
+        List<CodeDto.GrpCodeDto> list = null;
 
         if (grpcdList.size() > 0) {
             list = GrpCodeMapper.toDtoList(grpcdList);
@@ -80,9 +80,9 @@ public class CodeService {
     }
 
     // 공통코드 저장
-    public void saveCommonCode(CommonCdDto cdto) {
+    public void saveCommonCode(CodeDto.CommCodeDto cdto) {
 
-        GrpCode grpfind = grpCodeRepository.findByGrpCode(cdto.getId().getGrpCode());
+        GrpCode grpfind = grpCodeRepository.findByGrpCode(cdto.getGrpCode());
 
         // dto >> entity
         CommonCode commonCode = CommonCodeMapper.toEntity(cdto, grpfind);
@@ -91,7 +91,7 @@ public class CodeService {
     }
 
     // 그룹,공통코드 저장
-    public void saveGrpAndCommonCode(CommonCdDto cdto, GrpCodeDto gdto) {
+    public void saveGrpAndCommonCode(CodeDto.CommCodeDto cdto, GrpCodeDto gdto) {
         // dto >> entity
         GrpCode grpCode = GrpCodeMapper.toEntity(gdto);
 
@@ -102,16 +102,16 @@ public class CodeService {
     }
 
     // 공통코드 조회 (그룹코드, 공통코드)
-    public CommonCdDto findCommonOne(String grpcd, String commoncd) {
+    public CodeDto.CommCodeDto findCommonOne(String grpcd, String commoncd) {
 
         CommonCode findOne = commonCodeRepository.findCommonCodeOne(grpcd, commoncd);
         return CommonCodeMapper.toDto(findOne);
     }
 
     // 공통코드 조회 - 전체
-    public List<CommonCdDto> findCommonCodeAll() {
+    public List<CodeDto.CommCodeDto> findCommonCodeAll() {
         List<CommonCode> findList = commonCodeRepository.findAll();
-        List<CommonCdDto> list = null;
+        List<CodeDto.CommCodeDto> list = null;
 
         if (findList.size() > 0) {
             list = CommonCodeMapper.toDtoList(findList);
@@ -126,45 +126,50 @@ public class CodeService {
     }
 
     // 공통코드 조회
-    public CommonCdDto findCommCdGrpCd(String grpcd, String commoncd) {
+    public CodeDto.CommCodeDto findCommCdGrpCd(String grpcd, String commoncd) {
         CommonCode findOne = commonCodeRepository.findCommonCodeOne(grpcd, commoncd);
         // CommonCdDt
-        return convertToDto(findOne);
+        return CommonCodeMapper.toDto(findOne);
     }
 
     // 공통코드 조회 - 그룹코드 선택 시
-    @Transactional(readOnly=true)
-    public List<CommonCdDto> findCommonCdByGrpCd(String grpcd) {
+    @Transactional(readOnly = true)
+    public List<CommCodeDto> findCommonCdByGrpCd(String grpcd) {
         List<CommonCode> commonCodes = commonCodeRepository.findAllByGrpCode(grpcd);
 
-        if(commonCodes.isEmpty()) return Collections.emptyList(); 
+        if (commonCodes.isEmpty())
+            return Collections.emptyList();
 
         // 공통코드 엔티티를 DTO로 변환하여 반환
-        return commonCodes.stream()
-                .map(this::convertToDto)
-                .collect(Collectors.toList());
-        // return CommonCodeMapper.toDtoList(commonCodes);
+        // return commonCodes.stream()
+        // .map(this::convertToDto)
+        // .collect(Collectors.toList());
+        return CommonCodeMapper.toDtoList(commonCodes);
     }
 
-    // 공통코드 entity -> dto
-    private CommonCdDto convertToDto(CommonCode commonCode) {
-        return CommonCdDto.builder()
-                .name(commonCode.getName())
-                .refCode1(commonCode.getRefCode1())
-                .refCode2(commonCode.getRefCode2())
-                .refCode3(commonCode.getRefCode3())
-                .regDt(commonCode.getRegDt())
-                .regUserId(commonCode.getRegUserId())
-                .modDt(commonCode.getModDt())
-                .modUserId(commonCode.getModUserId())
-                .id(commonCode.getId())
-                .build();
+    public List<CommCdBaseDto> findCommonCdNamesByGrpcd(String grpcd) {
+        return commonCodeRepository.findCommonCdNamesByGrpCode(grpcd);
     }
+
+    // // 공통코드 entity -> dto
+    // private CommonCdDto convertToDto(CommonCode commonCode) {
+    // return CommonCdDto.builder()
+    // .name(commonCode.getName())
+    // .refCode1(commonCode.getRefCode1())
+    // .refCode2(commonCode.getRefCode2())
+    // .refCode3(commonCode.getRefCode3())
+    // .regDt(commonCode.getRegDt())
+    // .regUserId(commonCode.getRegUserId())
+    // .modDt(commonCode.getModDt())
+    // .modUserId(commonCode.getModUserId())
+    // .id(commonCode.getId())
+    // .build();
+    // }
 
     // 그룹코드,그룹코드명,공통코드,공통코드명(GrpAndCommCdDto) 조회 - 조건(그룹코드)
-    public List<GrpAndCommCdDto> findCodeAndName(String grpcode) {
-        return commonCodeRepository.findGrpAndCommCodeByGrpcode(grpcode);
-    }
+    // public List<GrpAndCommCdDto> findCodeAndName(String grpcode) {
+    // return commonCodeRepository.findGrpAndCommCodeByGrpcode(grpcode);
+    // }
 
     /*
      * 수정
@@ -174,7 +179,8 @@ public class CodeService {
      * 여러개의 data를 업데이트 해야 할 경우 벌크
      */
     @Transactional
-    public CommonCdDto updateCommonCodeInfo(String origin_grpcode, String origin_commoncd, String commoncdName) {
+    public CodeDto.CommCodeDto updateCommonCodeInfo(String origin_grpcode, String origin_commoncd,
+            String commoncdName) {
 
         // @Transactional 어노테이션으로 조회시 영속성 상태로 전환
         CommonCode findOne = commonCodeRepository.findCommonCodeOne(origin_grpcode, origin_commoncd);

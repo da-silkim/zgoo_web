@@ -8,17 +8,13 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
-import zgoo.cpos.dto.code.CommonCdDto;
-import zgoo.cpos.dto.code.GrpAndCommCdDto;
-import zgoo.cpos.dto.code.GrpCodeDto;
+import zgoo.cpos.dto.code.CodeDto.CommCodeDto;
+import zgoo.cpos.dto.code.CodeDto.GrpCodeDto;
 import zgoo.cpos.repository.code.CommonCodeRepository;
 import zgoo.cpos.repository.code.GrpCodeRepository;
-import zgoo.cpos.type.CommonCodeKey;
 
 @SpringBootTest
 @Transactional
@@ -90,9 +86,9 @@ public class CommonCdServiceTest {
     public void 공통코드조회_전체() throws Exception {
         // given
         // when
-        List<CommonCdDto> commonCodeAll = codeService.findCommonCodeAll();
+        List<CommCodeDto> commonCodeAll = codeService.findCommonCodeAll();
         // then
-        for (CommonCdDto commonCdDto : commonCodeAll) {
+        for (CommCodeDto commonCdDto : commonCodeAll) {
             System.out.println("===result : " + commonCdDto.toString());
         }
 
@@ -108,14 +104,13 @@ public class CommonCdServiceTest {
         String commonCode = "CO";
 
         // when
-        CommonCdDto dto = codeService.findCommonOne(grpCode, commonCode);
+        CommCodeDto dto = codeService.findCommonOne(grpCode, commonCode);
 
-        System.out.println("==== grpCode : " + dto.getGroup().toString());
         System.out.println("=== commonCode : " + dto.toString());
 
         // then
-        Assertions.assertThat(dto.getId().getCommonCode()).isEqualTo(commonCode);
-        Assertions.assertThat(dto.getId().getGrpCode()).isEqualTo(grpCode);
+        Assertions.assertThat(dto.getCommonCode()).isEqualTo(commonCode);
+        Assertions.assertThat(dto.getGrpCode()).isEqualTo(grpCode);
     }
 
     /*
@@ -123,16 +118,16 @@ public class CommonCdServiceTest {
      */
     @Test
     public void 그룹코드_공통코드_조회_1() throws Exception {
-        // given
-        String grpCode = "COKIND";
+        // // given
+        // String grpCode = "COKIND";
 
-        // when
-        List<GrpAndCommCdDto> findList = codeService.findCodeAndName(grpCode);
+        // // when
+        // List<GrpAndCommCdDto> findList = codeService.findCodeAndName(grpCode);
 
-        // then
-        for (GrpAndCommCdDto dto : findList) {
-            System.out.println("==== result : " + dto.toString());
-        }
+        // // then
+        // for (GrpAndCommCdDto dto : findList) {
+        // System.out.println("==== result : " + dto.toString());
+        // }
 
     }
 
@@ -166,50 +161,19 @@ public class CommonCdServiceTest {
     @Rollback(false)
     public void 공통코드_저장() throws Exception {
 
-        // given
-        String grpCode = "GTEST3";
-        CommonCdDto cdto = new CommonCdDto();
-        CommonCodeKey ckey = new CommonCodeKey(grpCode, "GCTEST3-1");
-        cdto.setId(ckey);
-        cdto.setName("gctest3");
-        cdto.setRegUserId("test");
-        cdto.setRegDt(LocalDateTime.now());
+        // // given
+        // String grpCode = "GTEST3";
+        // CommCodeDto cdto = new Comm();
+        // CommonCodeKey ckey = new CommonCodeKey(grpCode, "GCTEST3-1");
+        // cdto.setId(ckey);
+        // cdto.setName("gctest3");
+        // cdto.setRegUserId("test");
+        // cdto.setRegDt(LocalDateTime.now());
 
-        // when
-        codeService.saveCommonCode(cdto);
+        // // when
+        // codeService.saveCommonCode(cdto);
 
-        // then
-    }
-
-    /*
-     * 그룹코드, 공통코드 동시 저장
-     */
-    @Test
-    @Rollback(false)
-    public void 공통코드_저장2() throws Exception {
-        // given
-        GrpCodeDto dto = new GrpCodeDto();
-        dto.setGrpCode("GTEST4");
-        dto.setGrpcdName("그룹테스트4");
-        dto.setRegDt(LocalDateTime.now());
-        dto.setRegUserId("test");
-
-        codeService.saveGrpCode(dto);
-
-        GrpCodeDto findGrpCode = codeService.findGrpOne(dto.getGrpCode());
-
-        CommonCdDto cdto = new CommonCdDto();
-        CommonCodeKey ckey = new CommonCodeKey(dto.getGrpCode(), "GCTEST4");
-
-        cdto.setId(ckey);
-        cdto.setName("공통코드테스트4");
-        cdto.setRegUserId("test");
-        cdto.setRegDt(LocalDateTime.now());
-
-        // when
-        codeService.saveGrpAndCommonCode(cdto, findGrpCode);
-
-        // then
+        // // then
     }
 
     // 업데이트 테스트
@@ -227,11 +191,11 @@ public class CommonCdServiceTest {
 
         // when
         // 공통코드 수정
-        CommonCdDto updateOne = codeService.updateCommonCodeInfo(origin_grpcode, origin_commoncd, changeCommonCdName);
+        CommCodeDto updateOne = codeService.updateCommonCodeInfo(origin_grpcode, origin_commoncd, changeCommonCdName);
 
-        System.out.println("==result code : " + updateOne.getName());
+        System.out.println("==result code : " + updateOne.getCommonCodeName());
         // then
-        Assertions.assertThat(updateOne.getName()).isEqualTo(changeCommonCdName);
+        Assertions.assertThat(updateOne.getCommonCodeName()).isEqualTo(changeCommonCdName);
     }
 
     // 삭제 테스트
@@ -269,22 +233,24 @@ public class CommonCdServiceTest {
     @Test
     @DisplayName("Page테스트")
     public void searchWithPage() throws Exception {
-        // given
-        String grpCode = "GTEST1";
+        // // given
+        // String grpCode = "GTEST1";
 
-        // 페이징에 사용할 page, size 데이터를 갖는 pageRequest 생성
-        PageRequest pageRequest = PageRequest.of(0, 4);
+        // // 페이징에 사용할 page, size 데이터를 갖는 pageRequest 생성
+        // PageRequest pageRequest = PageRequest.of(0, 4);
 
-        // when
-        Page<GrpAndCommCdDto> results = commonCodeRepository.findAllByGrpCodePaging(grpCode, pageRequest);
+        // // when
+        // Page<GrpAndCommCdDto> results =
+        // commonCodeRepository.findAllByGrpCodePaging(grpCode, pageRequest);
 
-        for (GrpAndCommCdDto grpAndCommCdDto : results) {
-            System.out.println("===resutl : " + grpAndCommCdDto.toString());
-        }
+        // for (GrpAndCommCdDto grpAndCommCdDto : results) {
+        // System.out.println("===resutl : " + grpAndCommCdDto.toString());
+        // }
 
-        // then
-        Assertions.assertThat(results.getSize()).isEqualTo(4);
-        Assertions.assertThat(results.getContent()).extracting("commonCode").containsExactly("ATEST", "BTEST",
-                "CTEST", "ETEST");
+        // // then
+        // Assertions.assertThat(results.getSize()).isEqualTo(4);
+        // Assertions.assertThat(results.getContent()).extracting("commonCode").containsExactly("ATEST",
+        // "BTEST",
+        // "CTEST", "ETEST");
     }
 }

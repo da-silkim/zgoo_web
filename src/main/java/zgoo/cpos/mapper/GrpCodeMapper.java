@@ -4,13 +4,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import zgoo.cpos.domain.code.GrpCode;
-import zgoo.cpos.dto.code.GrpCodeDto;
+import zgoo.cpos.dto.code.CodeDto;
 
 public class GrpCodeMapper {
         /*
          * Dto >> Entity
          */
-        public static GrpCode toEntity(GrpCodeDto dto) {
+        public static GrpCode toEntity(CodeDto.GrpCodeDto dto) {
                 GrpCode grpCode = GrpCode.builder()
                                 .grpCode(dto.getGrpCode())
                                 .grpcdName(dto.getGrpcdName())
@@ -26,7 +26,7 @@ public class GrpCodeMapper {
         /*
          * Dto List >> Entity List
          */
-        public static List<GrpCode> toEntityList(List<GrpCodeDto> dtolist) {
+        public static List<GrpCode> toEntityList(List<CodeDto.GrpCodeDto> dtolist) {
                 List<GrpCode> entityList = dtolist.stream()
                                 .map(grp -> new GrpCode(grp.getGrpCode(),
                                                 grp.getGrpcdName(),
@@ -42,8 +42,8 @@ public class GrpCodeMapper {
         /*
          * Entity >> Dto
          */
-        public static GrpCodeDto toDto(GrpCode entity) {
-                GrpCodeDto dto = GrpCodeDto.builder()
+        public static CodeDto.GrpCodeDto toDto(GrpCode entity) {
+                CodeDto.GrpCodeDto dto = CodeDto.GrpCodeDto.builder()
                                 .grpCode(entity.getGrpCode())
                                 .grpcdName(entity.getGrpcdName())
                                 .modDt(entity.getModDt())
@@ -58,14 +58,15 @@ public class GrpCodeMapper {
         /*
          * Entity List >> Dto list
          */
-        public static List<GrpCodeDto> toDtoList(List<GrpCode> entitylist) {
-                List<GrpCodeDto> dtolist = entitylist.stream()
-                                .map(grpinfo -> new GrpCodeDto(grpinfo.getGrpCode(),
-                                                grpinfo.getGrpcdName(),
-                                                grpinfo.getRegUserId(),
-                                                grpinfo.getRegDt(),
-                                                grpinfo.getModUserId(),
-                                                grpinfo.getModDt()))
+        public static List<CodeDto.GrpCodeDto> toDtoList(List<GrpCode> entitylist) {
+                List<CodeDto.GrpCodeDto> dtolist = entitylist.stream()
+                                .map(grpinfo -> CodeDto.GrpCodeDto.builder().grpCode(grpinfo.getGrpCode())
+                                                .grpcdName(grpinfo.getGrpcdName())
+                                                .regUserId(grpinfo.getRegUserId())
+                                                .regDt(grpinfo.getRegDt())
+                                                .modUserId(grpinfo.getModUserId())
+                                                .modDt(grpinfo.getModDt())
+                                                .build())
                                 .collect(Collectors.toList());
 
                 return dtolist;

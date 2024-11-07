@@ -21,7 +21,7 @@ import zgoo.cpos.type.CommonCodeKey;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @ToString
 @Getter
-@Builder
+@Builder(toBuilder = true)
 @AllArgsConstructor
 public class CommonCode {
 

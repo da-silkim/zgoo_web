@@ -2,11 +2,8 @@ package zgoo.cpos.repository.code;
 
 import java.util.List;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-
 import zgoo.cpos.domain.code.CommonCode;
-import zgoo.cpos.dto.code.GrpAndCommCdDto;
+import zgoo.cpos.dto.code.CodeDto.CommCdBaseDto;
 
 public interface CommonCodeRepositoryCustom {
 
@@ -23,10 +20,13 @@ public interface CommonCodeRepositoryCustom {
     // 공통코드조회 - 그룹코드명조건으로 조회
     List<CommonCode> findAllByGrpCode(String grpcode);
 
-    Page<GrpAndCommCdDto> findAllByGrpCodePaging(String grpcode, Pageable pageable);
+    List<CommCdBaseDto> findCommonCdNamesByGrpCode(String grpcode);
 
-    // 공통코드,그룹코드 조회 - entity가 아닌 dto로 특정 컬럼들만 결과로 반환
-    List<GrpAndCommCdDto> findGrpAndCommCodeByGrpcode(String grpcode);
+    // Page<GrpAndCommCdDto> findAllByGrpCodePaging(String grpcode, Pageable
+    // pageable);
+
+    // // 공통코드,그룹코드 조회 - entity가 아닌 dto로 특정 컬럼들만 결과로 반환
+    // List<GrpAndCommCdDto> findGrpAndCommCodeByGrpcode(String grpcode);
 
     /*
      * 수정

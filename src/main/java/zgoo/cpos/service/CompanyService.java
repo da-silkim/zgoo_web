@@ -13,8 +13,9 @@ import zgoo.cpos.domain.company.CompanyPG;
 import zgoo.cpos.domain.company.CompanyRelationInfo;
 import zgoo.cpos.domain.company.CompanyRoaming;
 import zgoo.cpos.dto.company.CompanyDto;
-import zgoo.cpos.repository.company.CompanyRelationRepository;
+import zgoo.cpos.dto.company.CompanyDto.CompanyRoamingtDto;
 import zgoo.cpos.repository.company.CompanyRepository;
+import zgoo.cpos.repository.company.CompanyRoamingRepository;
 
 @Service
 @RequiredArgsConstructor
@@ -22,32 +23,47 @@ import zgoo.cpos.repository.company.CompanyRepository;
 public class CompanyService {
 
     private final CompanyRepository companyRepository;
-    private final CompanyRelationRepository companyRelationRepository;
+    private final CompanyRoamingRepository companyRoamingRepository;
 
     /*
      * 조회(사업자리스트 - CompanyDto.CompanyListDto)
      */
-    public List<CompanyDto.CompanyListDto> searchCompanyList() {
+    public List<CompanyDto.CompanyListDto> searchCompanyAll() {
         return companyRepository.findCompanyListAllCustom();
+    }
+
+    // 검색조건 - 사업자ID
+    public List<CompanyDto.CompanyListDto> searchCompanyListWith(CompanyDto.BaseCompnayDto dto) throws Exception {
+
+        try {
+            if (dto.getCompanyId() != null) {
+                log.info("Start Search By companyId");
+                return companyRepository.findCompanyListById(dto.getCompanyId());
+            } else if (!dto.getCompanyType().isEmpty()) {
+                log.info("Start Search By companyType");
+                return companyRepository.findCompanyListByType(dto.getCompanyType());
+            } else if (!dto.getCompanyLv().isEmpty()) {
+                log.info("Start Search By companyLevel");
+                return companyRepository.findCompanyListByLv(dto.getCompanyLv());
+            } else {
+                return companyRepository.findCompanyListAllCustom();
+            }
+        } catch (Exception e) {
+            throw new Exception("Failed to search(searchCompanyListWith)", e);
+        }
     }
 
     /**
      * 저장
      */
-    public void saveCompany(CompanyDto.CompanyRegDto dto) {
+    // 업체 정보 저장
+    public Company saveCompany(CompanyDto.CompanyRegDto dto) {
 
         log.info("== company dto : {}", dto.toString());
 
         // dto >> entity(relation)
         CompanyRelationInfo companyRelationInfo = CompanyRelationInfo.builder()
                 .parentId(dto.getParentId())
-                .build();
-
-        // dto >> entity(roaming)
-        CompanyRoaming companyRoaming = CompanyRoaming.builder()
-                .institutionCode(dto.getInstitutionCode())
-                .institutionKey(dto.getInstitutionKey())
-                .institutionEmail(dto.getInstitutionEmail())
                 .build();
 
         // dto >> entity(pg)
@@ -88,7 +104,6 @@ public class CompanyService {
                 .consignmentPayment(dto.getConsignmentPayment())
                 .createdAt(LocalDateTime.now())
                 .companyRelationInfo(companyRelationInfo)
-                .companyRoaming(companyRoaming)
                 .companyPG(companyPG)
                 .companyContract(companyContract)
                 .build();
@@ -96,6 +111,26 @@ public class CompanyService {
         Company saved = companyRepository.save(company);
 
         log.info(">>> Company saved : {}", saved.toString());
+
+        return saved;
+
+    }
+
+    // 업체 로밍정보 저장
+    public void saveCompanyRoamingInfo(Company company, List<CompanyRoamingtDto> dtos) {
+
+        for (CompanyRoamingtDto dto : dtos) {
+
+            CompanyRoaming companyRoaming = CompanyRoaming.builder()
+                    .institutionCode(dto.getInstitutionCode())
+                    .institutionKey(dto.getInstitutionKey())
+                    .institutionEmail(dto.getInstitutionEmail())
+                    .company(company)
+                    .build();
+
+            // db save
+            companyRoamingRepository.save(companyRoaming);
+        }
 
     }
 
