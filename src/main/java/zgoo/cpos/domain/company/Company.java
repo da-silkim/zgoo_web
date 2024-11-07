@@ -103,8 +103,4 @@ public class Company {
     @JoinColumn(name = "company_pg_id")
     private CompanyPG companyPG;
 
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name = "company_roaming_id")
-    private CompanyRoaming companyRoaming;
-
 }

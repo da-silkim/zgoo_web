@@ -1,5 +1,6 @@
 package zgoo.cpos.controller;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.stereotype.Controller;
@@ -8,10 +9,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import zgoo.cpos.dto.code.CommonCdDto;
-import zgoo.cpos.dto.code.GrpCodeDto;
-import zgoo.cpos.dto.company.CompanyDto;
+import zgoo.cpos.dto.code.CodeDto.CommCdBaseDto;
+import zgoo.cpos.dto.code.CodeDto.CommCodeDto;
+import zgoo.cpos.dto.code.CodeDto.GrpCodeDto;
+import zgoo.cpos.dto.company.CompanyDto.CompanyListDto;
+import zgoo.cpos.dto.company.CompanyDto.CompanyRegDto;
 import zgoo.cpos.service.CodeService;
+import zgoo.cpos.service.CompanyService;
 
 @Controller
 @Slf4j
@@ -19,11 +23,12 @@ import zgoo.cpos.service.CodeService;
 public class PageController {
 
     private final CodeService codeService;
+    private final CompanyService companyService;
 
     /*
      * 대시보드
      */
-    @GetMapping(value = "/dashboard")
+    @GetMapping("/dashboard")
     public String showdashboard(Model model) {
         log.info("Dashboard Home");
         // 필요한 data를 model에 추가 !!!
@@ -104,15 +109,27 @@ public class PageController {
         // group code 등록폼 전달
         model.addAttribute("grpcodeDto", new GrpCodeDto());
         // commoncode 등록폼 전달
-        model.addAttribute("commonCdDto", new CommonCdDto());
+        model.addAttribute("commonCdDto", new CommCodeDto());
 
-        // 그룹코드 조회
-        List<GrpCodeDto> gcdlist = codeService.findGrpCodeAll();
-        model.addAttribute("gcdlist", gcdlist);
+        try {
+            // 그룹코드 조회
+            List<GrpCodeDto> gcdlist = codeService.findGrpCodeAll();
+            model.addAttribute("gcdlist", gcdlist);
 
-        // 공통코드 조회
-        List<CommonCdDto> ccdlist = codeService.findCommonCodeAll();
-        model.addAttribute("ccdlist", ccdlist);
+            log.info("== grpcode list found : ", gcdlist.size());
+
+            // 공통코드 조회
+            List<CommCodeDto> ccdlist = codeService.findCommonCodeAll();
+            model.addAttribute("ccdlist", ccdlist);
+
+            log.info("== commCode list found : ", ccdlist.size());
+
+        } catch (Exception e) {
+
+            log.error("Error occurred while fetching code list: {}", e.getMessage(), e);
+            model.addAttribute("gcdlist", Collections.emptyList());
+            model.addAttribute("ccdlist", Collections.emptyList());
+        }
 
         return "pages/system/code_management";
     }
@@ -245,33 +262,45 @@ public class PageController {
     @GetMapping("/biz/list")
     public String showbizlist(Model model) {
         log.info("=== Biz managment List Page ===");
-        List<CompanyDto.CompanyListDto> cdtolist = null;
-        // List<Company> companyList = companyService.findAllCompany();
 
-        // if (companyList.size() > 0) {
-        // log.info("==========");
-        // log.info("company_name : {}", companyList.get(0).getCompanyName());
-        // log.info("parent_id : {}",
-        // companyList.get(0).getCompanyRelationInfo().getParentId());
-        // log.info("==========");
+        // 업체 등록폼 전달
+        model.addAttribute("companyRegDto", new CompanyRegDto());
+        // 업체 로밍정보 등록폼 전달
 
-        // cdtolist = companyList.stream()
-        // .map(cinfo -> new CompanyListDto(cinfo.getId(),
-        // cinfo.getCompanyName(),
-        // cinfo.getCompanyType(),
-        // cinfo.getCompanyLv(),
-        // cinfo.getBizNum(),
-        // cinfo.getBizType(),
-        // cinfo.getConsignmentPayment(),
-        // cinfo.getCompanyRelationInfo().getParentId(),
-        // cinfo.getCreatedAt(),
-        // cinfo.getUpdatedAt()))
-        // .collect(Collectors.toList());
-        // } else {
-        // log.info("==== No comany list : {}", companyList);
-        // }
+        try {
+            log.info("=== DB search result >>>");
+            // 사업자 list
+            List<CompanyListDto> flist = companyService.searchCompanyAll();
+            log.info("=== companyListDto : {}", flist.toString());
 
-        // model.addAttribute("clist", cdtolist);
+            model.addAttribute("companyList", flist);
+
+            List<CommCdBaseDto> lvList = codeService.findCommonCdNamesByGrpcd("COLV"); // 사업자레벨
+            log.info("== lvList : {}", lvList.toString());
+
+            List<CommCdBaseDto> coKindList = codeService.findCommonCdNamesByGrpcd("COKIND"); // 사업자유형(위탁,충전)
+            log.info("=== coKindList : {}", coKindList.toString());
+
+            List<CommCdBaseDto> biztypeList = codeService.findCommonCdNamesByGrpcd("BIZTYPECD"); // 사업자구분(법인/개인)
+            log.info("=== biztypelist : {}", biztypeList.toString());
+
+            List<CommCdBaseDto> bizkindList = codeService.findCommonCdNamesByGrpcd("BIZKIND"); // 업종(제조업)
+            log.info("=== bizkindlist : {}", bizkindList.toString());
+
+            model.addAttribute("clvlist", lvList);
+            model.addAttribute("ckindlist", coKindList);
+            model.addAttribute("biztypelist", biztypeList);
+            model.addAttribute("bizkindlist", bizkindList);
+
+        } catch (Exception e) {
+
+            log.error("Error occurred while fetching company list: {}", e.getMessage(), e);
+            model.addAttribute("companyList", Collections.emptyList());
+            model.addAttribute("clvlist", Collections.emptyList());
+            model.addAttribute("ckindlist", Collections.emptyList());
+            model.addAttribute("biztypelist", Collections.emptyList());
+            model.addAttribute("bizkindlist", Collections.emptyList());
+        }
 
         return "pages/biz/biz_management";
     }

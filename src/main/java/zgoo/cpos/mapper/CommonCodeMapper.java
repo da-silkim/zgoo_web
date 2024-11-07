@@ -6,16 +6,17 @@ import java.util.stream.Collectors;
 
 import zgoo.cpos.domain.code.CommonCode;
 import zgoo.cpos.domain.code.GrpCode;
-import zgoo.cpos.dto.code.CommonCdDto;
+import zgoo.cpos.dto.code.CodeDto;
+import zgoo.cpos.type.CommonCodeKey;
 
 public class CommonCodeMapper {
     /*
      * Dto >> Entity
      */
-    public static CommonCode toEntity(CommonCdDto dto, GrpCode grp) {
+    public static CommonCode toEntity(CodeDto.CommCodeDto dto, GrpCode grp) {
         CommonCode cen = CommonCode.builder()
-                .id(dto.getId())
-                .name(dto.getName())
+                .id(new CommonCodeKey(dto.getGrpCode(), dto.getCommonCode()))
+                .name(dto.getCommonCodeName())
                 .reserved(dto.getReserved())
                 .refCode1(dto.getRefCode1())
                 .refCode2(dto.getRefCode2())
@@ -33,7 +34,7 @@ public class CommonCodeMapper {
     /*
      * Dto List >> Entity List
      */
-    public static List<CommonCode> toEntityList(List<CommonCdDto> dtolist) {
+    public static List<CommonCode> toEntityList(List<CodeDto.CommCodeDto> dtolist) {
         return null;
         // List<CommonCode> entityList = dtolist.stream()
         // .map(common -> new CommonCdDto(common.getId(),
@@ -55,10 +56,11 @@ public class CommonCodeMapper {
     /*
      * Entity >> Dto
      */
-    public static CommonCdDto toDto(CommonCode entity) {
-        CommonCdDto dto = CommonCdDto.builder()
-                .id(entity.getId())
-                .name(entity.getName())
+    public static CodeDto.CommCodeDto toDto(CommonCode entity) {
+        CodeDto.CommCodeDto dto = CodeDto.CommCodeDto.builder()
+                .grpCode(entity.getId().getGrpCode())
+                .commonCode(entity.getId().getCommonCode())
+                .commonCodeName(entity.getName())
                 .reserved(entity.getReserved())
                 .refCode1(entity.getRefCode1())
                 .refCode2(entity.getRefCode2())
@@ -67,7 +69,6 @@ public class CommonCodeMapper {
                 .regDt(entity.getRegDt())
                 .modUserId(entity.getModUserId())
                 .modDt(entity.getModDt())
-                .group(entity.getGroup())
                 .build();
 
         return dto;
@@ -76,20 +77,21 @@ public class CommonCodeMapper {
     /*
      * Entity List >> Dto list
      */
-    public static List<CommonCdDto> toDtoList(List<CommonCode> entitylist) {
-        List<CommonCdDto> dtolist = entitylist.stream()
-                .map(eninfo -> new CommonCdDto(
-                        eninfo.getId(),
-                        eninfo.getName(),
-                        eninfo.getReserved(),
-                        eninfo.getRefCode1(),
-                        eninfo.getRefCode2(),
-                        eninfo.getRefCode3(),
-                        eninfo.getRegUserId(),
-                        eninfo.getRegDt(),
-                        eninfo.getModUserId(),
-                        eninfo.getModDt(),
-                        eninfo.getGroup()))
+    public static List<CodeDto.CommCodeDto> toDtoList(List<CommonCode> entitylist) {
+        List<CodeDto.CommCodeDto> dtolist = entitylist.stream()
+                .map(eninfo -> CodeDto.CommCodeDto.builder()
+                        .grpCode(eninfo.getId().getGrpCode())
+                        .commonCode(eninfo.getId().getCommonCode())
+                        .commonCodeName(eninfo.getName())
+                        .reserved(eninfo.getReserved())
+                        .refCode1(eninfo.getRefCode1())
+                        .refCode2(eninfo.getRefCode2())
+                        .refCode3(eninfo.getRefCode3())
+                        .regUserId(eninfo.getRegUserId())
+                        .regDt(eninfo.getRegDt())
+                        .modUserId(eninfo.getModUserId())
+                        .modDt(eninfo.getModDt())
+                        .build())
                 .collect(Collectors.toList());
 
         return dtolist;

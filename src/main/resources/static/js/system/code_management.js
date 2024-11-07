@@ -26,12 +26,12 @@ $(document).ready(function() {
                     // null 값 체크
                     const comGrpCode = comcode.id.grpCode || '';
                     const comCode = comcode.id.commonCode || '';
-                    const comcdName = comcode.name || '';
+                    const comcdName = comcode.commonCodeName || '';
                     const comRefCode1 = comcode.refCode1 || '';
                     const comRefCode2 = comcode.refCode2 || '';
                     const comRefCode3 = comcode.refCode3 || '';
                     const comcdRegId = comcode.regUserId || '';
-                    const comcdModDt = comcode.modDt ? formatDate(new Date(comcode.modDt)) : '';
+                    const comcdModDt = comcode.regDt ? formatDate(new Date(comcode.regDt)) : '';
 
                     $('#pageListSub').append(`
                         <tr>
@@ -151,7 +151,7 @@ $(document).ready(function() {
 
                     $('#grpCode').val(data.id.grpCode);
                     $('#commonCode').val(data.id.commonCode);
-                    $('#commonCodeName').val(data.name);
+                    $('#commonCodeName').val(data.commonCodeName);
                     $('#referenceCode1').val(refcode1);
                     $('#referenceCode2').val(refcode2);
                     $('#referenceCode3').val(refcode3);
@@ -239,7 +239,7 @@ $(document).ready(function() {
                     grpCode: $('.grpCodeInput').val(),
                     commonCode: $('#commonCode').val()
                 },
-                name: $('#commonCodeName').val(),
+                commonCodeName: $('#commonCodeName').val(),
                 refCode1: $('#referenceCode1').val(),
                 refCode2: $('#referenceCode2').val(),
                 refCode3: $('#referenceCode3').val()

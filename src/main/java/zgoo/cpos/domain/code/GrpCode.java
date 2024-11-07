@@ -17,7 +17,7 @@ import lombok.ToString;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @ToString
-@Builder
+@Builder(toBuilder = true)
 public class GrpCode {
     @Id
     @Column(name = "grp_code", length = 20)

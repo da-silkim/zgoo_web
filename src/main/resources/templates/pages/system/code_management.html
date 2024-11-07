@@ -39,7 +39,7 @@
                             <button class="btn btn-data-add" id="addBtn" data-bs-toggle="modal"
                                 data-bs-target="#grpAddModal"><i class="bi bi-plus-square me-2"></i>등록</button>
                             <button class="btn btn-data-edit" id="editBtn" data-bs-toggle="modal"
-                            data-bs-target="#grpAddModal" disabled><i
+                                data-bs-target="#grpAddModal" disabled><i
                                     class="fa-regular fa-pen-to-square me-2"></i>수정</button>
                             <button class="btn btn-data-delete" id="deleteBtn" disabled><i
                                     class="bi bi-trash me-2"></i>삭제</button>
@@ -81,11 +81,11 @@
                     <div class="card-title position-relative">
                         <span class="card-title-bar"></span><span>공통코드</span>
                         <div class="position-absolute" style="right: 0;">
-                            <button class="btn btn-data-add" id="addBtnSub"
-                                    data-bs-toggle="modal" data-bs-target="#commonAddModal" disabled>
-                                    <i class="bi bi-plus-square me-2"></i>등록</button>
-                            <button class="btn btn-data-edit" id="editBtnSub" 
-                                    data-bs-toggle="modal" data-bs-target="#commonAddModal" disabled><i
+                            <button class="btn btn-data-add" id="addBtnSub" data-bs-toggle="modal"
+                                data-bs-target="#commonAddModal" disabled>
+                                <i class="bi bi-plus-square me-2"></i>등록</button>
+                            <button class="btn btn-data-edit" id="editBtnSub" data-bs-toggle="modal"
+                                data-bs-target="#commonAddModal" disabled><i
                                     class="fa-regular fa-pen-to-square me-2"></i>수정</button>
                             <button class="btn btn-data-delete" id="deleteBtnSub" disabled><i
                                     class="bi bi-trash me-2"></i>삭제</button>
@@ -106,7 +106,19 @@
                                     <th class="w-15">등록일시</th>
                                 </tr>
                             </thead>
-                            <tbody id="pageListSub"></tbody>
+                            <tbody id="pageListSub">
+                                <tr th:each="ccd : ${ccdlist}">
+                                    <td><input type="checkbox" /></td>
+                                    <td th:text="${ccd.id.grpCode}"></td>
+                                    <td th:text="${ccd.id.commonCode}"></td>
+                                    <td th:text="${ccd.commonCodeName}"></td>
+                                    <td th:text="${ccd.refCode1}"></td>
+                                    <td th:text="${ccd.refCode2}"></td>
+                                    <td th:text="${ccd.refCode3}"></td>
+                                    <td th:text="${ccd.regUserId}"></td>
+                                    <td th:text="${#temporals.format(ccd.regDt, 'yyyy-MM-dd HH:mm:ss')}"></td>
+                                </tr>
+                            </tbody>
                         </table>
                     </div>
                     <div class="text-center">
@@ -122,14 +134,13 @@
     <!-- card:1 end -->
 
     <!-- Group Add Modal start -->
-    <div class="modal fade" id="grpAddModal" tabindex="-1" aria-labelledby="grpAddModalLabel"
-        data-bs-backdrop="static" data-bs-keyboard="false">
-        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable"
-            style="max-width: 60vw; height: 90vh;">
-            <div class="modal-content mh-100 overflow-y-auto scrollbar" style="z-index: 1050;">
+    <div class="modal fade" id="grpAddModal" tabindex="-1" aria-labelledby="grpAddModalLabel" data-bs-backdrop="static"
+        data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width: 60vw; height: 90vh;">
+            <div class="modal-content mh-100 overflow-y-auto scrollbar">
                 <!-- modal body start -->
                 <div class="modal-body">
-                    <form  th:object="${grpcodeDto}">
+                    <form th:object="${grpcodeDto}">
                         <!-- 모달 내용 -->
                         <!-- table: start -->
                         <div class="modal-title mb-2"><span class="modal-title-bar"></span><span>그룹코드</span></div>
@@ -139,20 +150,21 @@
                                     <th class="w-20">그룹코드<b class="required-data">*</b></th>
                                     <td class="w-30">
                                         <input type="text" name="" id="grpCodeM" class="form-control"
-                                            placeholder="그룹코드를 입력해주세요." autocomplete="off" th:field="*{grpCode}" required>
+                                            placeholder="그룹코드를 입력해주세요." autocomplete="off" th:field="*{grpCode}"
+                                            required>
                                     </td>
                                     <th class="w-20">그룹코드명<b class="required-data">*</b></th>
                                     <td class="w-30">
                                         <input type="text" name="" id="grpcdNameM" class="form-control"
-                                            placeholder="그룹코드명을 입력해주세요." autocomplete="off" th:field="*{grpcdName}" required>
+                                            placeholder="그룹코드명을 입력해주세요." autocomplete="off" th:field="*{grpcdName}"
+                                            required>
                                     </td>
                                 </tr>
                             </tbody>
                         </table>
                         <!-- table: end -->
                         <div class="modal-footer justify-content-center" style="border-top: none;">
-                            <button type="button" class="btn btn-outline-grey me-2"
-                                data-bs-dismiss="modal">취소</button>
+                            <button type="button" class="btn btn-outline-grey me-2" data-bs-dismiss="modal">취소</button>
                             <button type="submit" id="grpModalBtn" class="btn btn-data-add">등록</button>
                         </div>
                     </form>
@@ -169,21 +181,20 @@
     <div class="modal fade" id="commonAddModal" tabindex="-1" aria-labelledby="commonAddModalLabel"
         data-bs-backdrop="static" data-bs-keyboard="false">
         <!-- common modal dialog start -->
-        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable"
-            style="max-width: 60vw; height: 90vh;">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width: 60vw; height: 90vh;">
             <!-- common modal content start -->
             <div class="modal-content mh-100 overflow-y-auto scrollbar">
                 <!-- common modal body start -->
                 <div class="modal-body">
-                    <form  th:object="${commonCdDto}">
+                    <form th:object="${commonCdDto}">
                         <div class="modal-title mb-2"><span class="modal-title-bar"></span><span>공통코드</span></div>
                         <table class="table table-bg-v table-fixed w-100 text-center align-middle">
                             <tbody>
                                 <tr class="table-border-top">
                                     <th class="w-20">그룹코드<b class="required-data">*</b></th>
                                     <td class="w-30">
-                                        <input type="text" name="grpCode" id="grpCode"
-                                            class="form-control grpCodeInput" th:field="*{id.grpCode}" disabled>
+                                        <input type="text" name="grpCode" id="grpCode" class="form-control grpCodeInput"
+                                            th:field="*{id.grpCode}" disabled>
                                     </td>
                                     <th class="w-20">참조코드1</th>
                                     <td class="w-30">
@@ -206,22 +217,21 @@
                                 <tr>
                                     <th class="w-20">공통코드<b class="required-data">*</b></th>
                                     <td class="w-30">
-                                        <input type="text" name="commonCode" id="commonCode"
-                                            class="form-control" placeholder="공통코드를 입력해주세요."
-                                            th:field="*{id.commonCode}" autocomplete="off" required>
+                                        <input type="text" name="commonCode" id="commonCode" class="form-control"
+                                            placeholder="공통코드를 입력해주세요." th:field="*{id.commonCode}" autocomplete="off"
+                                            required>
                                     </td>
                                     <th class="w-20">공통코드명<b class="required-data">*</b></th>
                                     <td class="w-30">
                                         <input type="text" name="commonCodeName" id="commonCodeName"
-                                            class="form-control" placeholder="공통코드명을 입력해주세요." th:field="*{name}"
-                                            autocomplete="off" required>
+                                            class="form-control" placeholder="공통코드명을 입력해주세요."
+                                            th:field="*{commonCodeName}" autocomplete="off" required>
                                     </td>
                                 </tr>
                             </tbody>
                         </table>
                         <div class="modal-footer justify-content-center" style="border-top: none;">
-                            <button type="button" class="btn btn-outline-grey me-2"
-                                data-bs-dismiss="modal">취소</button>
+                            <button type="button" class="btn btn-outline-grey me-2" data-bs-dismiss="modal">취소</button>
                             <button type="button" id="comModalBtn" class="btn btn-data-add">등록</button>
                         </div>
                     </form>
@@ -236,5 +246,9 @@
 
     <script type="text/javascript" th:src="@{/js/table.js}"></script>
     <script type="text/javascript" th:src="@{/js/system/code_management.js}"></script>
+    <script th:inline="javascript">
+
+    </script>
 </div>
+
 </html>

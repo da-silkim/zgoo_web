@@ -1,8 +1,10 @@
 package zgoo.cpos.dto.company;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -58,16 +60,14 @@ public class CompanyDto {
         // 사업자 관계정보
         private Long parentId;
 
-        // 로밍정보
-        private String institutionCode;
-        private String institutionKey;
-        private String institutionEmail;
-
         // 담당자 정보
         private String staffName; // 담당자명
         private String staffEmail;
         private String staffTel;
         private String staffPhone;
+
+        // 로밍정보
+        private List<CompanyRoamingtDto> romaing;
 
         // PG 결제정보
         private String mid;
@@ -82,6 +82,16 @@ public class CompanyDto {
         private String asCompany;
         private String asNum;
 
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class CompanyRoamingtDto {
+        private String institutionCode;
+        private String institutionKey;
+        private String institutionEmail;
     }
 
 }

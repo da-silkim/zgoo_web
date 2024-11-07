@@ -23,8 +23,8 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import zgoo.cpos.dto.code.CommonCdDto;
-import zgoo.cpos.dto.code.GrpCodeDto;
+import zgoo.cpos.dto.code.CodeDto.CommCodeDto;
+import zgoo.cpos.dto.code.CodeDto.GrpCodeDto;
 import zgoo.cpos.service.CodeService;
 
 @Controller
@@ -37,48 +37,50 @@ public class CommonController {
 
     // @PostMapping("/system/code/grpcode/new")
     // public String createGrpCode(@Valid GrpCodeDto dto, BindingResult result) {
-    //     log.info("==== create group code(list) ======");
-    //     if (result.hasErrors()) {
-    //         log.error("그룹코드 등록 에러: {}", result.getAllErrors());
-    //         // TODO: web에 팝업띄우기
-    //         return "pages/system/system/code";
-    //     }
-
-    //     log.info("groupcode_dto >> {}", dto.toString());
-
-    //     codeService.saveGrpCode(dto);
-
-    //     return "redirect:/system/code/list";
+    // log.info("==== create group code(list) ======");
+    // if (result.hasErrors()) {
+    // log.error("그룹코드 등록 에러: {}", result.getAllErrors());
+    // // TODO: web에 팝업띄우기
+    // return "pages/system/code_management";
     // }
 
-    // @PostMapping("/system/code/commoncd/new")
-    // public String createCommonCode(@Valid CommonCdDto dto, BindingResult result) {
-    //     log.info("==== create common code(list) ======");
-    //     // valid error 발생시 등록폼 이동
-    //     if (result.hasErrors()) {
-    //         log.error("공통코드 등록 에러: {}", result.getAllErrors());
-    //         // TODO: web에 팝업띄우기
-    //         return "pages/system/system/code";
-    //     }
+    // log.info("groupcode_dto >> {}", dto.toString());
 
-    //     log.info("commoncd_dto >> {}", dto.toString());
+    // codeService.saveGrpCode(dto);
 
-    //     // 여기서 grpCode를 조회하고 saveCommonCode에 넘겼을때, gpr_code 테이블에 insert 수행 ,, 왜??
-    //     // GrpCode grpCode = commonCdService.findGrpOne(dto.getId().getGrpCode());
-    //     // log.info("grpcode_find : {}", grpCode);
+    // return "redirect:/code_management/list";
+    // }
 
-    //     codeService.saveCommonCode(dto);
-        
-    //     return "redirect:/system/code/list";
+    // @PostMapping("/code_management/commoncd/new")
+    // public String createCommonCode(@Valid CommonCdDto dto, BindingResult result)
+    // {
+    // log.info("==== create common code(list) ======");
+    // // valid error 발생시 등록폼 이동
+    // if (result.hasErrors()) {
+    // log.error("공통코드 등록 에러: {}", result.getAllErrors());
+    // // TODO: web에 팝업띄우기
+    // return "pages/system/code_management";
+    // }
+
+    // log.info("commoncd_dto >> {}", dto.toString());
+
+    // // 여기서 grpCode를 조회하고 saveCommonCode에 넘겼을때, gpr_code 테이블에 insert 수행 ,, 왜??
+    // // GrpCode grpCode = commonCdService.findGrpOne(dto.getId().getGrpCode());
+    // // log.info("grpcode_find : {}", grpCode);
+
+    // codeService.saveCommonCode(dto);
+
+    // return "redirect:/code_management/list";
     // }
 
     // 그룹코드 - 등록
     @PostMapping("/grpcode/new")
-    public ResponseEntity<Map<String, String>> createGrpCode(@Valid @RequestBody GrpCodeDto dto, BindingResult result) {
-        log.info("==== create group code(list) ======");
+    public ResponseEntity<Map<String, String>> createGrpCode(@Valid @RequestBody GrpCodeDto dto,
+            BindingResult result) {
+        log.info("==== create group code ======");
 
         Map<String, String> response = new HashMap<>();
-        
+
         if (result.hasErrors()) {
             log.error("그룹코드 등록 에러: {}", result.getAllErrors());
 
@@ -96,7 +98,7 @@ public class CommonController {
             response.put("message", "서버 오류");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
-        
+
         // 성공적으로 저장된 경우 응답에 메시지와 리다이렉트 URL을 포함
         response.put("message", "그룹코드가 성공적으로 등록되었습니다.");
         // response.put("redirect", "/system/code/list"); // 리다이렉트 URL 포함
@@ -106,14 +108,15 @@ public class CommonController {
     // 그룹코드 - 검색창으로 조회
     @GetMapping("/grpcode/search")
     public ResponseEntity<Map<String, Object>> searchGrpCode(
-        @RequestParam(value="grpcdName", required=false) String grpcdName) {
+            @RequestParam(value = "grpcdName", required = false) String grpcdName) {
         log.info("==== search input group code(list) ======");
 
         Map<String, Object> response = new HashMap<>();
 
         try {
-            List<GrpCodeDto> grpCodeList = grpcdName == null || grpcdName.isEmpty() ?
-            this.codeService.findGrpCodeAll() : this.codeService.findGrpCodeByGrpcdName(grpcdName);
+            List<GrpCodeDto> grpCodeList = grpcdName == null || grpcdName.isEmpty()
+                    ? this.codeService.findGrpCodeAll()
+                    : this.codeService.findGrpCodeByGrpcdName(grpcdName);
             response.put("searchGrpCode", grpCodeList);
         } catch (Exception e) {
             log.error("[그룹코드 조회] 중 알 수 없는 오류 발생: {}", e.getMessage());
@@ -125,17 +128,17 @@ public class CommonController {
 
     // 그룹코드 - 연관된 공통코드 조회
     @GetMapping("/commoncd/search/{grpCode}")
-    public ResponseEntity<List<CommonCdDto>> searchComCode(@PathVariable("grpCode") String grpCode) {
+    public ResponseEntity<List<CommCodeDto>> searchComCode(@PathVariable("grpCode") String grpCode) {
         log.info("==== find the associated common code(list) ======");
-        
+
         try {
-            List<CommonCdDto> commonCd = this.codeService.findCommonCdByGrpCd(grpCode);
+            List<CommCodeDto> commonCd = this.codeService.findCommonCdByGrpCd(grpCode);
 
             if (commonCd.isEmpty()) {
                 log.info("조회된 공통코드가 없습니다.");
                 // return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); // 404 Not Found
-                return ResponseEntity.ok(Collections.emptyList());  // 빈 리스트 반환
-            } 
+                return ResponseEntity.ok(Collections.emptyList()); // 빈 리스트 반환
+            }
             log.info("조회된 공통코드 값: {}", commonCd);
             return ResponseEntity.ok(commonCd);
         } catch (Exception e) {
@@ -175,13 +178,14 @@ public class CommonController {
 
     // 공통코드 - 등록
     @PostMapping("/commoncd/new")
-    public ResponseEntity<Map<String, String>> createCommonCode(@Valid @RequestBody CommonCdDto dto, BindingResult result) {
+    public ResponseEntity<Map<String, String>> createCommonCode(@Valid @RequestBody CommCodeDto dto,
+            BindingResult result) {
         log.info("==== create common code(list) ======");
-        log.info("grpCode: {}, comCode: {}", dto.getId().getGrpCode(), dto.getId().getCommonCode());
-        
+        log.info("grpCode: {}, comCode: {}", dto.getGrpCode(), dto.getCommonCode());
+
         Map<String, String> response = new HashMap<>();
 
-        if (dto == null || dto.getId() == null) {
+        if (dto == null || dto.getGrpCode() == null || dto.getCommonCode() == null) {
             log.error("DTO 또는 ID가 NULL입니다.");
             response.put("message", "DTO 또는 ID가 NULL입니다.");
             return ResponseEntity.badRequest().body(response);
@@ -208,7 +212,7 @@ public class CommonController {
             log.error("[공통코드] 널 포인터 예외 발생: {}", e.getMessage());
             response.put("message", "서버 오류");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
-        } catch(Exception e) {
+        } catch (Exception e) {
             log.error("[공통코드] 알 수 없는 오류 발생: {}", e.getMessage());
             response.put("message", "서버 오류");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
@@ -217,15 +221,15 @@ public class CommonController {
 
     // 공통코드 - 단건 조회
     @GetMapping("/commoncd/get/{grpcd}/{commoncd}")
-    public ResponseEntity<CommonCdDto> findCommonOne(
-        @PathVariable("grpcd") String grpcd, @PathVariable("commoncd") String commoncd) {
-            log.info("==== search common code(list) ======");
+    public ResponseEntity<CommCodeDto> findCommonOne(
+            @PathVariable("grpcd") String grpcd, @PathVariable("commoncd") String commoncd) {
+        log.info("==== search common code(list) ======");
 
         try {
             // CommonCdDto commonCdDto = this.codeService.findCommonOne(grpcd, commoncd);
-            CommonCdDto commonCdDto = this.codeService.findCommCdGrpCd(grpcd, commoncd);
+            CommCodeDto commonCdDto = this.codeService.findCommCdGrpCd(grpcd, commoncd);
 
-            if(commonCdDto != null) {
+            if (commonCdDto != null) {
                 return ResponseEntity.ok(commonCdDto);
             } else {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -238,13 +242,14 @@ public class CommonController {
 
     // 공통코드 - 수정
     @PatchMapping("/commoncd/update")
-    public ResponseEntity<Map<String, String>> updateCommonCode(@RequestBody CommonCdDto commonCdDto) {
+    public ResponseEntity<Map<String, String>> updateCommonCode(@RequestBody CommCodeDto commonCdDto) {
         log.info("==== update common code(list) ======");
 
         Map<String, String> response = new HashMap<>();
 
-         try {
-            CommonCdDto updatedCommonCode = this.codeService.updateCommonCodeInfo(commonCdDto.getId().getGrpCode(), commonCdDto.getId().getCommonCode(), commonCdDto.getName());
+        try {
+            CommCodeDto updatedCommonCode = this.codeService.updateCommonCodeInfo(commonCdDto.getGrpCode(),
+                    commonCdDto.getCommonCode(), commonCdDto.getCommonCodeName());
             response.put("message", "공통코드가 성공적으로 수정되었습니다.");
             response.put("updatedCommonCode", updatedCommonCode.toString()); // 필요 시 수정된 코드 정보를 포함할 수 있습니다.
             return ResponseEntity.ok(response);
@@ -259,9 +264,10 @@ public class CommonController {
 
     // 공통코드 - 삭제
     @DeleteMapping("/commoncd/delete/{grpcd}/{commoncd}")
-    public ResponseEntity<String> deleteCommonCode(@PathVariable("grpcd") String grpCode, @PathVariable("commoncd") String commonCode) {
+    public ResponseEntity<String> deleteCommonCode(@PathVariable("grpcd") String grpCode,
+            @PathVariable("commoncd") String commonCode) {
         log.info("==== delete common code(list) ======");
-        
+
         try {
             this.codeService.deleteCommonCode(commonCode);
             return ResponseEntity.ok("공통코드 삭제 성공");
