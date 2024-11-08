@@ -24,14 +24,14 @@ $(document).ready(function() {
                 $('#pageListSub').empty();  // 기존 내용 삭제
                 data.forEach(function(comcode) {
                     // null 값 체크
-                    const comGrpCode = comcode.id.grpCode || '';
-                    const comCode = comcode.id.commonCode || '';
+                    const comGrpCode = comcode.grpCode || '';
+                    const comCode = comcode.commonCode || '';
                     const comcdName = comcode.commonCodeName || '';
                     const comRefCode1 = comcode.refCode1 || '';
                     const comRefCode2 = comcode.refCode2 || '';
                     const comRefCode3 = comcode.refCode3 || '';
                     const comcdRegId = comcode.regUserId || '';
-                    const comcdModDt = comcode.regDt ? formatDate(new Date(comcode.regDt)) : '';
+                    const comcdRegDt = comcode.regDt ? formatDate(new Date(comcode.regDt)) : '';
 
                     $('#pageListSub').append(`
                         <tr>
@@ -43,7 +43,7 @@ $(document).ready(function() {
                             <td>${comRefCode2}</td>
                             <td>${comRefCode3}</td>
                             <td>${comcdRegId}</td>
-                            <td>${comcdModDt}</td>
+                            <td>${comcdRegDt}</td>
                         </tr>
                     `);
                 });
@@ -149,8 +149,8 @@ $(document).ready(function() {
                     const refcode2 = data.refCode2 || '';
                     const refcode3 = data.refCode3 || '';
 
-                    $('#grpCode').val(data.id.grpCode);
-                    $('#commonCode').val(data.id.commonCode);
+                    $('#grpCode').val(data.grpCode);
+                    $('#commonCode').val(data.commonCode);
                     $('#commonCodeName').val(data.commonCodeName);
                     $('#referenceCode1').val(refcode1);
                     $('#referenceCode2').val(refcode2);
