@@ -15,12 +15,12 @@ document.addEventListener('DOMContentLoaded', () => {
             // 체크된 항목이 하나일 때 버튼 활성화
             editBtn.disabled = false;
             deleteBtn.disabled = false;
-            addBtnSub.disabled = false;
+            if(addBtnSub) addBtnSub.disabled = false;
         } else {
             // 체크된 항목이 없거나 두 개 이상일 때 버튼 비활성화
             editBtn.disabled = true;
             deleteBtn.disabled = true;
-            addBtnSub.disabled = true;
+            if(addBtnSub) addBtnSub.disabled = true;
         }
     }
     

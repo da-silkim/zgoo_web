@@ -14,8 +14,10 @@ import zgoo.cpos.dto.code.CodeDto.CommCodeDto;
 import zgoo.cpos.dto.code.CodeDto.GrpCodeDto;
 import zgoo.cpos.dto.company.CompanyDto.CompanyListDto;
 import zgoo.cpos.dto.company.CompanyDto.CompanyRegDto;
+import zgoo.cpos.dto.users.UsersDto;
 import zgoo.cpos.service.CodeService;
 import zgoo.cpos.service.CompanyService;
+import zgoo.cpos.service.UsersService;
 
 @Controller
 @Slf4j
@@ -24,6 +26,7 @@ public class PageController {
 
     private final CodeService codeService;
     private final CompanyService companyService;
+    private final UsersService usersService;
 
     /*
      * 대시보드
@@ -141,6 +144,30 @@ public class PageController {
     @GetMapping("/system/user/list")
     public String showuserlist(Model model) {
         log.info("=== User List Page ===");
+        model.addAttribute("usersDto", new UsersDto.UsersRegDto());
+
+        try {
+            log.info("=== user DB search result >>>");
+
+            // 사업자 list
+            List<CompanyListDto> flist = companyService.searchCompanyAll();
+            model.addAttribute("companyList", flist);
+
+            // 사용자 리스트 조회
+            List<UsersDto.UsersListDto> ulist = usersService.findUsersAll();
+            model.addAttribute("ulist", ulist);
+
+            List<CommCdBaseDto> authList = codeService.findCommonCdNamesByGrpcd("MENUACCLV"); // 메뉴권한
+            model.addAttribute("authList", authList);
+            // log.info("== authList : {}", authList.toString());
+        } catch (Exception e) {
+
+            log.error("Error occurred while fetching user list: {}", e.getMessage(), e);
+            model.addAttribute("companyList", Collections.emptyList());
+            model.addAttribute("ulist", Collections.emptyList());
+            model.addAttribute("authList", Collections.emptyList());
+        }
+
         return "pages/system/user_management";
     }
 

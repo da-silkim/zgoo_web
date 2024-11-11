@@ -42,4 +42,6 @@ public interface CommonCodeRepositoryCustom {
     // 공통코드 삭제 - 특정 그룹코드를 가진 모든 공통코드를 삭제
     Long deleteAllCommonCodeByGrpCode(String grpcode);
 
+    String findCommonCodeName(String commoncode);
+
 }

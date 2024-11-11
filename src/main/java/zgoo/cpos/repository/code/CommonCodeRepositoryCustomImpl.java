@@ -119,4 +119,13 @@ public class CommonCodeRepositoryCustomImpl implements CommonCodeRepositoryCusto
 
         // }
 
+        @Override
+        public String findCommonCodeName(String commoncode) {
+                return queryFactory
+                                .select(commonCode.name)
+                                .from(commonCode)
+                                .where(commonCode.id.commonCode.eq(commoncode))
+                                .fetchOne();
+        }
+
 }

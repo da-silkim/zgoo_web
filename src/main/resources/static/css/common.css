@@ -141,3 +141,7 @@ input[type="checkbox"] {  box-sizing: border-box; padding: 0; accent-color: #102
   .main-content .main-row .card-body .sales-status .col6-text, .main-content .main-row .card-body .charge-status .col6-text { font-size: 14px !important; }
 
 }
+
+.input-info-group { position: relative; }
+.input-info-group input { padding-right: 38px; }
+.input-info-group .info-eyes { position: absolute; top: 50%; right: 18px; transform: translateY(-50%); font-size: 18px; color: #9BA4B4; cursor: pointer; }
