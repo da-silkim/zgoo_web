@@ -33,7 +33,6 @@ public class UsersServiceTest {
     }
 
     @Test
-    @Rollback(false)
     @DisplayName("사용자 - 등록")
     public void createUsers() throws Exception {
 
@@ -99,6 +98,16 @@ public class UsersServiceTest {
         List<UsersDto.UsersListDto> ulist = this.usersService.findUsersAll();
         for (UsersListDto usersListDto : ulist) {
             System.out.println("=== full search after deleting user info : " + usersListDto.toString());
+        }
+    }
+
+    @Test
+    @Rollback(false)
+    @DisplayName("사용자 - 검색")
+    public void searchUsers() throws Exception {
+        List<UsersDto.UsersListDto> ulist = this.usersService.searchUsersList(1L, null, null);
+        for (UsersListDto usersListDto : ulist) {
+            System.out.println("=== search user info : " + usersListDto.toString());
         }
     }
 }

@@ -45,6 +45,30 @@ public class UsersService {
         return UsersMapper.toDto(user);
     }
 
+    // 사용자 - 검색
+    @Transactional
+    public List<UsersDto.UsersListDto> searchUsersList(Long companyId, String companyType, String name) {
+        log.info("=== search user info ===");
+
+        List<Users> usersList = this.usersRepository.searchUsers(companyId, companyType, name);
+        log.info("search data >>> {}", usersList);
+
+        if(usersList.isEmpty()) {
+            log.info("=== no users found ===");
+            return new ArrayList<>();   // empty list
+        }
+        
+        try {
+            List<UsersDto.UsersListDto> list = UsersMapper.toDtoList(usersList);
+            log.info("=== users DB search success ===");
+            log.info("entity >> dto user info >>> {}", list);
+            return list;
+        } catch (Exception e) {
+            log.info("=== users DB search failure ===", e);
+            return new ArrayList<>();   // empty list
+        }
+    }
+
     // 사용자 - 등록
     @Transactional
     public void saveUsers(UsersDto.UsersRegDto dto) {

@@ -10,38 +10,40 @@
                 <!-- card body:2 start -->
                 <div class="card-body">
                     <div class="card-title"><span class="card-title-bar"></span><span>검색조건</span></div>
-                    <!-- form start -->
-                    <form class="position-relative">
+                    <!-- search start -->
+                    <div class="position-relative">
                         <!-- row: start -->
                         <div class="row mb-3 row-cols-2 row-cols-lg-3 g-2">
                             <div class="col d-flex align-items-center">
-                                <label for="business" class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">사업자</label>
-                                <select id="business" class="mx-3 form-control">
-                                    <option value='%'>(선택)</option>
-                                    <option value="">test</option>
+                                <label for="companyIdSearch" class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">사업자</label>
+                                <select id="companyIdSearch" class="mx-3 form-control">
+                                    <option th:value="null">선택</option>
+                                    <option th:each="company : ${companyList}" th:value="${company.companyId}"
+                                                th:text="${company.companyName}"></option>
                                 </select>
                             </div>
                             <div class="col d-flex align-items-center">
-                                <label for="" class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">사업자 유형</label>
-                                <select id="" class="mx-3 form-control">
-                                    <option value='%'>(선택)</option>
-                                    <option value="">test</option>
+                                <label for="companyTypeSearch" class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">사업자 유형</label>
+                                <select id="companyTypeSearch" class="mx-3 form-control">
+                                    <option th:value="null">선택</option>
+                                    <option th:each="data : ${coKind}" th:value="${data.commonCode}"
+                                                th:text="${data.commonCodeName}"></option>
                                 </select>
                             </div>
                             <div class="col d-flex align-items-center">
-                                <label for="userName" class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">사용자명</label>
-                                <input type="text" name="userName" id="userName" class="mx-3 form-control" placeholder="사용자명을 입력해주세요." autocomplete="off">
+                                <label for="nameSearch" class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">사용자명</label>
+                                <input type="text" name="nameSearch" id="nameSearch" class="mx-3 form-control" placeholder="사용자명을 입력해주세요." autocomplete="off">
                             </div>
-                        </div>
-                        <div class="search-btn">
-                            <button type="button" class="btn btn-outline-grey me-2" data-bs-dismiss="modal">
-                                <i class="bi bi-search me-2"></i>검색</button>
-                            <button type="button" class="btn btn-outline-grey me-2" id="resetBtn" data-bs-dismiss="modal">
-                                <i class="bi bi-arrow-repeat me-2"></i>초기화</button>
                         </div>
                         <!-- row: end -->
-                    </form>
-                    <!-- form end -->
+                        <div class="search-btn">
+                            <button type="button" class="btn btn-outline-grey me-2" id="searchBtn">
+                                <i class="bi bi-search me-2"></i>검색</button>
+                            <button type="button" class="btn btn-outline-grey me-2" id="resetBtn">
+                                <i class="bi bi-arrow-repeat me-2"></i>초기화</button>
+                        </div>
+                    </div>
+                    <!-- search end -->
                 </div>
                 <!-- card body:2 end -->
             </div>
@@ -112,7 +114,7 @@
     <div class="modal fade" id="dataAddModal" tabindex="-1" aria-labelledby="dataAddModalLabel" data-bs-backdrop="static" data-bs-keyboard="false">
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width: 60vw; height: 90vh;"> <!-- height: 90vh; -->
             <div class="modal-content mh-100 overflow-y-auto scrollbar">
-                <form id="userForm" th:action="@{/system/user/new}" method="post" th:object="${usersDto}">
+                <form id="userForm" th:object="${usersDto}">
                 <!-- modal body start -->
                 <div class="modal-body">
                     <!-- 모달 내용 -->
