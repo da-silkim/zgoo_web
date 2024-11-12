@@ -152,7 +152,7 @@ public class PageController {
             // 사업자 list
             List<CompanyListDto> flist = companyService.searchCompanyAll();
             model.addAttribute("companyList", flist);
-
+            
             // 사용자 리스트 조회
             List<UsersDto.UsersListDto> ulist = usersService.findUsersAll();
             model.addAttribute("ulist", ulist);
@@ -160,6 +160,10 @@ public class PageController {
             List<CommCdBaseDto> authList = codeService.findCommonCdNamesByGrpcd("MENUACCLV"); // 메뉴권한
             model.addAttribute("authList", authList);
             // log.info("== authList : {}", authList.toString());
+            
+            List<CommCdBaseDto> coKind = codeService.findCommonCdNamesByGrpcd("COKIND");
+            model.addAttribute("coKind", coKind);
+
         } catch (Exception e) {
 
             log.error("Error occurred while fetching user list: {}", e.getMessage(), e);

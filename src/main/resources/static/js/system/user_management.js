@@ -8,6 +8,51 @@ $(document).ready(function() {
         window.location.replace('/system/user/list');
     });
 
+    // 검색
+    $('#searchBtn').on('click', function() {
+        const DATA = {
+            companyId : $('#companyIdSearch').val(),
+            companyType : $('#companyTypeSearch').val() || null,
+            name : $('#nameSearch').val() || null
+        }
+        // console.log("검색할 데이터: ", DATA);
+
+        $.ajax({
+            type: 'GET',
+            url: '/system/user/search',
+            data: DATA,
+            success: function(response) {
+                // 테이블 초기화
+                $('#pageList').empty();
+                // console.log("조회된 데이터: ", response);
+
+                if (response && response.length > 0) {
+                    $.each(response, function(index, user) {
+                        $('#pageList').append(`
+                            <tr>
+                                <td><input type="checkbox" /></td>
+                                <td>${user.companyName || ''}</td>
+                                <td>${user.companyType || ''}</td>
+                                <td>${user.userId || ''}</td>
+                                <td>${user.name || ''}</td>
+                                <td>${user.phone || ''}</td>
+                                <td>${user.email || ''}</td>
+                                <td>${user.authority || ''}</td>
+                                <td>${formatDate(new Date(user.regDt)) || ''}</td>
+                            </tr>
+                        `);
+                    });
+                } else {
+                    $('#pageList').append(`
+                        <tr>
+                            <td colspan="9">조회된 데이터가 없습니다.</td>
+                        </tr>
+                    `);
+                }
+            }
+        });
+    });
+
     // 행 선택
     $('#pageList').on('click', 'tr', function() {
         selectRow = $(this);
@@ -18,9 +63,6 @@ $(document).ready(function() {
         modalCon = false;
         btnMsg = "등록";
         $('#modalBtn').text(btnMsg);
-        $('#userForm').attr('action', '/system/user/new');
-        $('#userForm').attr('method', 'post');
-
 
         // 사업자, 사용자ID, 권한, 중복버튼 => 활성화
         $('#companyId').prop('disabled', false);
@@ -44,8 +86,6 @@ $(document).ready(function() {
         btnMsg = "수정";
         $('#modalBtn').text(btnMsg);
 
-        $('#userForm').removeAttr('method');
-
         // 사업자, 사용자ID, 권한, 중복버튼 => 비활성화
         $('#companyId').prop('disabled', true);
         $('#userId').prop('disabled', true);
@@ -53,9 +93,7 @@ $(document).ready(function() {
         $('#duplicateBtn').prop('disabled', true);
 
         const $userId = selectRow.find('td').eq(3).text();
-        console.log('userId: ' + $userId);
-
-        $('#userForm').attr('action', `/system/user/update`);
+        // console.log('userId: ' + $userId);
 
         // 선택된 행에 대한 사용자 정보 불러오기
         $.ajax({
@@ -109,7 +147,7 @@ $(document).ready(function() {
         event.preventDefault();
 
         if(confirmSubmit(btnMsg)) {
-            const data = {
+            const DATA = {
                 companyId: $('#companyId').val(),
                 userId: $('#userId').val(),
                 name: $('#name').val(),
@@ -119,19 +157,22 @@ $(document).ready(function() {
                 authority: $('#authority').val()
             }
 
-            console.log("사용자 데이터 확인: ", data);
+            console.log("사용자 데이터 확인: ", DATA);
+
+            const URL = modalCon ? `/system/user/update` : `/system/user/new`;
+            const TYPE = modalCon ? 'PATCH' : 'POST';
 
             $.ajax({
-                type: 'POST',
-                url: `/system/user/update`,
-                data: JSON.stringify(data),
+                type: TYPE,
+                url: URL,
+                data: JSON.stringify(DATA),
                 contentType: "application/json",
                 success: function() {
-                    console.log("사용자 정보 수정 성공");
+                    console.log("사용자 정보 처리 성공");
                     window.location.replace('/system/user/list');
                 },
                 error: function() {
-                    console.log("사용자 정보 수정 실패");
+                    console.log("사용자 정보 처리 실패");
                 }
             });
         }
@@ -146,7 +187,7 @@ $(document).ready(function() {
         }
 
         $.ajax({
-            url: '/system/user/checkUserId',  // 서버의 API 엔드포인트
+            url: '/system/user/checkUserId',
             type: 'GET',
             data: { userId: userId },
             success: function(isDuplicate) {
@@ -166,19 +207,19 @@ $(document).ready(function() {
     // 비밀번호 보이기
     $('.info-eyes').on('click', function() {
         // 현재 클릭한 요소의 부모인 .input-info-group에서 password input을 찾음
-        var $inputGroup = $(this).parents('.input-info-group');
-        var $passwordField = $inputGroup.find('#password');
+        var inputGroup = $(this).parents('.input-info-group');
+        var passwordField = inputGroup.find('#password');
         
         // .input-info-group에 active 클래스 토글
-        $inputGroup.toggleClass('active');
+        inputGroup.toggleClass('active');
         
         // active 클래스가 있는 경우 비밀번호를 텍스트로 보여줌, 없는 경우 숨김
-        if ($inputGroup.hasClass('active')) {
+        if (inputGroup.hasClass('active')) {
             $(this).find('.bi-eye').attr('class', 'bi bi-eye-slash');
-            $passwordField.attr('type', 'text');
+            passwordField.attr('type', 'text');
         } else {
             $(this).find('.bi-eye-slash').attr('class', 'bi bi-eye');
-            $passwordField.attr('type', 'password');
+            passwordField.attr('type', 'password');
         }
     });
     

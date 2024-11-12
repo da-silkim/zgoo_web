@@ -1,6 +1,7 @@
 package zgoo.cpos.controller;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.HttpStatus;
@@ -8,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -30,8 +32,10 @@ public class UsersController {
 
     // 사용자 등록
     @PostMapping("/new")
-    public String createUsers(UsersDto.UsersRegDto dto) {
-        
+    public String createUsers(@RequestBody UsersDto.UsersRegDto dto) {
+        log.info("=== create user info ===");
+        log.info("사용자 DTO 정보: {}", dto.toString());
+
         try {
             this.usersService.saveUsers(dto);
         } catch (Exception e) {
@@ -44,7 +48,8 @@ public class UsersController {
     // userID 중복 검사
     @GetMapping("/checkUserId")
     public ResponseEntity<Boolean> checkUserId(@RequestParam String userId) {
-
+        log.info("=== duplicate check userId ===");
+        
         try {
             boolean response = usersService.isUserIdDuplicate(userId);
             return ResponseEntity.ok(response);
@@ -73,8 +78,37 @@ public class UsersController {
         }
     }
 
+    // 사용자 - 검색
+    @GetMapping("/search")
+    public ResponseEntity<List<UsersDto.UsersListDto>> searchUsers(
+            @RequestParam(required = false) Long companyId,
+            @RequestParam(required = false) String companyType,
+            @RequestParam(required = false) String name) {
+
+        log.info("=== search user info ===");
+        
+        if (companyType != null && companyType.trim().isEmpty()) {
+            companyType = null;
+        }
+
+        if (name != null && name.trim().isEmpty()) {
+            name = null;
+        }
+
+        log.info("companyId: {}, companyType: {}, name: {}", companyId, companyType, name);
+
+        try {
+            List<UsersDto.UsersListDto> uList = this.usersService.searchUsersList(companyId, companyType, name);
+            log.info("조회된 사용자 리스트 >> {}", uList);
+            return ResponseEntity.ok(uList);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build(); 
+        }
+    }
+    
+
     // 사용자 수정
-    @PostMapping("/update")
+    @PatchMapping("/update")
     public ResponseEntity<Map<String, Object>> updateUsers(@RequestBody UsersDto.UsersRegDto dto) {
 
         Map<String, Object> response = new HashMap<>();
