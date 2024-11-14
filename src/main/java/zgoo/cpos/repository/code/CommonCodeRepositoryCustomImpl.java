@@ -3,6 +3,7 @@ package zgoo.cpos.repository.code;
 import java.util.List;
 
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
@@ -128,4 +129,19 @@ public class CommonCodeRepositoryCustomImpl implements CommonCodeRepositoryCusto
                                 .fetchOne();
         }
 
+        @Override
+        public List<CommCdBaseDto> commonCodeStringSort(String grpcode) {
+                return queryFactory
+                                .select(Projections.fields(CommCdBaseDto.class,
+                                        commonCode.id.grpCode.as("grpCode"),
+                                        commonCode.id.commonCode.as("commonCode"),
+                                        commonCode.name.as("commonCodeName")))
+                                .from(commonCode)
+                                .where(commonCode.id.grpCode.eq(grpcode))
+                                .orderBy(
+                                        Expressions.numberTemplate(Integer.class, "LENGTH({0})", commonCode.id.commonCode).asc(),
+                                        commonCode.id.commonCode.asc()
+                                )
+                                .fetch();
+        }
 }

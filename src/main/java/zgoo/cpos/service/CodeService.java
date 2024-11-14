@@ -151,6 +151,11 @@ public class CodeService {
         return commonCodeRepository.findCommonCdNamesByGrpCode(grpcd);
     }
 
+    // 공통코드 - 문자열 >> 정수
+    public List<CommCdBaseDto> commonCodeStringToNum(String grpcd) {
+        return commonCodeRepository.commonCodeStringSort(grpcd);
+    }
+
     // // 공통코드 entity -> dto
     // private CommonCdDto convertToDto(CommonCode commonCode) {
     // return CommonCdDto.builder()

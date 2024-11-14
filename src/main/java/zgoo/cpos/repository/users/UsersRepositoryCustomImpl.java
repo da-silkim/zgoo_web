@@ -2,6 +2,10 @@ package zgoo.cpos.repository.users;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
@@ -24,6 +28,23 @@ public class UsersRepositoryCustomImpl implements UsersRepositoryCustom {
             .selectFrom(users)
             .leftJoin(users.company, company)
             .fetch();
+    }
+
+    @Override
+    public Page<Users> findUsersWithPagination(Pageable pageable) {
+        List<Users> uList =  queryFactory
+                                .selectFrom(users)
+                                .leftJoin(users.company, company).fetchJoin()
+                                .orderBy(users.regDt.desc())
+                                .offset(pageable.getOffset())
+                                .limit(pageable.getPageSize())
+                                .fetch();
+
+        long totalCount = queryFactory
+                                .selectFrom(users)
+                                .fetchCount();
+                            
+        return new PageImpl<>(uList, pageable, totalCount);
     }
 
     @Override
@@ -57,6 +78,39 @@ public class UsersRepositoryCustomImpl implements UsersRepositoryCustom {
             .leftJoin(users.company, company)
             .where(builder)
             .fetch();
+    }
+
+    @Override
+    public Page<Users> searchUsersWithPagination(Long companyId, String companyType, String name, Pageable pageable) {
+        BooleanBuilder builder = new BooleanBuilder();
+
+        if (companyId != null) {
+            builder.and(users.company.id.eq(companyId));
+        }
+
+        if (companyType != null && !companyType.isEmpty()) {
+            builder.and(company.companyType.eq(companyType));
+        }
+
+        if (name != null && !name.isEmpty()) {
+            builder.and(users.name.contains(name));
+        }
+
+        List<Users> uList =  queryFactory
+                                .selectFrom(users)
+                                .leftJoin(users.company, company)
+                                .where(builder)
+                                .offset(pageable.getOffset())
+                                .limit(pageable.getPageSize())
+                                .fetch();
+
+        long totalCount = queryFactory
+                                .selectFrom(users)
+                                .leftJoin(users.company, company)
+                                .where(builder)
+                                .fetchCount();
+                           
+        return new PageImpl<>(uList, pageable, totalCount);
     }
 
     @Override

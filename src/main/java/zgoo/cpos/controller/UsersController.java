@@ -106,7 +106,6 @@ public class UsersController {
         }
     }
     
-
     // 사용자 수정
     @PatchMapping("/update")
     public ResponseEntity<Map<String, Object>> updateUsers(@RequestBody UsersDto.UsersRegDto dto) {

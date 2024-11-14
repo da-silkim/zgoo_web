@@ -10,47 +10,32 @@ $(document).ready(function() {
 
     // 검색
     $('#searchBtn').on('click', function() {
-        const DATA = {
-            companyId : $('#companyIdSearch').val(),
-            companyType : $('#companyTypeSearch').val() || null,
-            name : $('#nameSearch').val() || null
-        }
-        // console.log("검색할 데이터: ", DATA);
+        const selectedSize = document.getElementById('size').value;
+        const form = document.getElementById('searchForm');
 
-        $.ajax({
-            type: 'GET',
-            url: '/system/user/search',
-            data: DATA,
-            success: function(response) {
-                // 테이블 초기화
-                $('#pageList').empty();
-                // console.log("조회된 데이터: ", response);
+        const hiddenSizeInput = document.createElement('input');
+        hiddenSizeInput.type = 'hidden';
+        hiddenSizeInput.name = 'size';
+        hiddenSizeInput.value = selectedSize;
+        hiddenSizeInput.id = 'hiddenSizeInput';
 
-                if (response && response.length > 0) {
-                    $.each(response, function(index, user) {
-                        $('#pageList').append(`
-                            <tr>
-                                <td><input type="checkbox" /></td>
-                                <td>${user.companyName || ''}</td>
-                                <td>${user.companyType || ''}</td>
-                                <td>${user.userId || ''}</td>
-                                <td>${user.name || ''}</td>
-                                <td>${user.phone || ''}</td>
-                                <td>${user.email || ''}</td>
-                                <td>${user.authority || ''}</td>
-                                <td>${formatDate(new Date(user.regDt)) || ''}</td>
-                            </tr>
-                        `);
-                    });
-                } else {
-                    $('#pageList').append(`
-                        <tr>
-                            <td colspan="9">조회된 데이터가 없습니다.</td>
-                        </tr>
-                    `);
-                }
-            }
-        });
+        form.appendChild(hiddenSizeInput);
+        form.submit();
+    });
+
+    // pagination
+    $('#size').on('change', function() {
+        // 현재 URL에서 쿼리 파라미터 추출
+        const urlParams = new URLSearchParams(window.location.search);
+        const selectedSize = document.getElementById("size").value;
+        const selectedCompanyId = urlParams.get('companyIdSearch') || '';
+        const selectedCompanyType = urlParams.get('companyTypeSearch') || '';
+        const selectedName = urlParams.get('nameSearch') || '';
+
+        window.location.href = "/system/user/list?page=0&size=" + selectedSize +
+                               "&companyIdSearch=" + (selectedCompanyId) +
+                               "&companyTypeSearch=" + encodeURIComponent(selectedCompanyType) +
+                               "&nameSearch=" + encodeURIComponent(selectedName);
     });
 
     // 행 선택
@@ -148,28 +133,31 @@ $(document).ready(function() {
         const password = $('#password').val();
         const email = $('#email').val();
 
-        // 유효성 체크
-        var form = document.getElementById('userForm');
-        if (!form.checkValidity()) { 
-            alert('필수 입력 값이 누락되어 있습니다.');
-            return;
-        }
+        // 등록일 경우
+        if (!modalCon) {
+            // 유효성 체크
+            var form = document.getElementById('userForm');
+            if (!form.checkValidity()) { 
+                alert('필수 입력 값이 누락되어 있습니다.');
+                return;
+            }
 
-        if(!userIdCheck) {
-            alert('사용자ID를 다시 확인해주세요.');
-            return;
-        }
+            if(!userIdCheck) {
+                alert('사용자ID를 다시 확인해주세요.');
+                return;
+            }
 
-        if (!isPasswordSpecial(password)) { return; }
+            if (!isPasswordSpecial(password)) { return; }
 
-        if (email.trim() != '') {
-            if (!isEmail(email)) { return; }
-        }
+            if (email.trim() != '') {
+                if (!isEmail(email)) { return; }
+            }
 
-        // 사용자ID 중복 버튼을 통해 중복ID 확인을 했는지
-        if(!isDuplicateCheck) {
-            alert('사용자ID 중복체크를 해주세요.');
-            return;
+            // 사용자ID 중복 버튼을 통해 중복ID 확인을 했는지
+            if(!isDuplicateCheck) {
+                alert('사용자ID 중복체크를 해주세요.');
+                return;
+            }
         }
 
         if(confirmSubmit(btnMsg)) {

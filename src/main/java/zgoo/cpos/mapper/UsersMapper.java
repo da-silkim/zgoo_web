@@ -29,11 +29,31 @@ public class UsersMapper {
     }
 
     /*
-     * Entity >> Dto
+     * Entity >> Dto (등록용)
      */
     public static UsersDto.UsersRegDto toDto(Users entity) {
         UsersDto.UsersRegDto dto = UsersDto.UsersRegDto.builder()
             .companyId(entity.getCompany().getId())
+            .userId(entity.getUserId())
+            .name(entity.getName())
+            .password(entity.getPassword())
+            .phone(entity.getPhone())
+            .email(entity.getEmail())
+            .authority(entity.getAuthority())
+            .regDt(entity.getRegDt())
+            .build();
+
+        return dto;
+    }
+
+    /*
+     * Entity >> Dto (리스트 조회용)
+     */
+    public static UsersDto.UsersListDto toListDto(Users entity) {
+        UsersDto.UsersListDto dto = UsersDto.UsersListDto.builder()
+            .companyId(entity.getCompany().getId())
+            .companyName(entity.getCompany().getCompanyName())
+            .companyType(entity.getCompany().getCompanyType())
             .userId(entity.getUserId())
             .name(entity.getName())
             .password(entity.getPassword())
