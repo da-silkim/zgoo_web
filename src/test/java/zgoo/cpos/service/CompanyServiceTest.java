@@ -12,11 +12,13 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
 import zgoo.cpos.domain.company.Company;
+import zgoo.cpos.domain.company.CompanyRoaming;
 import zgoo.cpos.dto.company.CompanyDto;
 import zgoo.cpos.dto.company.CompanyDto.CompanyListDto;
 import zgoo.cpos.dto.company.CompanyDto.CompanyRegDto;
 import zgoo.cpos.dto.company.CompanyDto.CompanyRoamingtDto;
 import zgoo.cpos.repository.company.CompanyRepository;
+import zgoo.cpos.repository.company.CompanyRoamingRepository;
 
 @SpringBootTest
 @Transactional
@@ -26,6 +28,8 @@ public class CompanyServiceTest {
     CompanyService companyService;
     @Autowired
     CompanyRepository companyRepository;
+    @Autowired
+    CompanyRoamingRepository companyRoamingRepository;
 
     @Test
     @DisplayName("조회 - 업체관리 업체리스트 차트 리스트 가져오기")
@@ -57,7 +61,7 @@ public class CompanyServiceTest {
                 .headPhone(null)
                 .bizKind("1")
                 .bizType("PB")
-                .parentId(null)
+                .parentCompanyName(null)
                 .staffName("담당자1")
                 .consignmentPayment("C")
                 .sspMallId("testmallid")
@@ -84,6 +88,19 @@ public class CompanyServiceTest {
         List<CompanyListDto> flist = companyService.searchCompanyAll();
         for (CompanyListDto data : flist) {
             System.out.println("=== result : " + data.toString());
+        }
+    }
+
+    @Test
+    @DisplayName("조회 >> 사업자 로밍정보")
+    public void searchCompanyRoamingInfoTest() throws Exception {
+        // givn
+        Long companyId = 1L;
+        // when
+        List<CompanyRoaming> allByCompanyId = companyRoamingRepository.findAllByCompanyId(companyId);
+        // thsn
+        for (CompanyRoaming companyRoaming : allByCompanyId) {
+            System.out.println("==result : " + companyRoaming.toString());
         }
     }
 

@@ -11,16 +11,14 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
+import zgoo.cpos.dto.company.CompanyDto.CompanyRegDto;
 
 @Entity
 @Table(name = "COMPANY_RELATION_INFO")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@Builder
-@ToString
-
+@Builder(toBuilder = true)
 public class CompanyRelationInfo {
 
     @Id
@@ -32,6 +30,10 @@ public class CompanyRelationInfo {
     // @JoinColumn(name = "company_id")
     // private Company company;
 
-    private Long parentId;
+    private String parentCompanyName;
+
+    public void updateRelationInfo(CompanyRegDto dto) {
+        this.parentCompanyName = dto.getParentCompanyName();
+    }
 
 }

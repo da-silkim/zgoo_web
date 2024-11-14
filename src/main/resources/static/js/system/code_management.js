@@ -24,8 +24,8 @@ $(document).ready(function() {
                 $('#pageListSub').empty();  // 기존 내용 삭제
                 data.forEach(function(comcode) {
                     // null 값 체크
-                    const comGrpCode = comcode.id.grpCode || '';
-                    const comCode = comcode.id.commonCode || '';
+                    const comGrpCode = comcode.grpCode || '';
+                    const comCode = comcode.commonCode || '';
                     const comcdName = comcode.commonCodeName || '';
                     const comRefCode1 = comcode.refCode1 || '';
                     const comRefCode2 = comcode.refCode2 || '';
@@ -149,8 +149,8 @@ $(document).ready(function() {
                     const refcode2 = data.refCode2 || '';
                     const refcode3 = data.refCode3 || '';
 
-                    $('#grpCode').val(data.id.grpCode);
-                    $('#commonCode').val(data.id.commonCode);
+                    $('#grpCode').val(data.grpCode);
+                    $('#commonCode').val(data.commonCode);
                     $('#commonCodeName').val(data.commonCodeName);
                     $('#referenceCode1').val(refcode1);
                     $('#referenceCode2').val(refcode2);
@@ -235,10 +235,8 @@ $(document).ready(function() {
             const URL = comModalCon ? '/system/code/commoncd/update' : '/system/code/commoncd/new';
             const TYPE = comModalCon ? 'PATCH' : 'POST';
             const data = {
-                id: {
-                    grpCode: $('.grpCodeInput').val(),
-                    commonCode: $('#commonCode').val()
-                },
+                grpCode: $('.grpCodeInput').val(),
+                commonCode: $('#commonCode').val(),
                 commonCodeName: $('#commonCodeName').val(),
                 refCode1: $('#referenceCode1').val(),
                 refCode2: $('#referenceCode2').val(),

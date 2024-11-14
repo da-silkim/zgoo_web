@@ -27,7 +27,7 @@ public class CompanyRepositoryCustomImpl implements CompanyRepositoryCustom {
                 company.companyName.as("companyName"),
                 company.companyLv.as("companyLv"),
                 company.companyType.as("companyType"),
-                relation.parentId.as("parentId"),
+                relation.parentCompanyName.as("parentCompanyName"),
                 contract.contractedAt.as("contractedAt"),
                 contract.contractEnd.as("contractEnd"),
                 contract.contractStatus.as("contractStatus")))
@@ -44,7 +44,7 @@ public class CompanyRepositoryCustomImpl implements CompanyRepositoryCustom {
                 company.companyName.as("companyName"),
                 company.companyLv.as("companyLv"),
                 company.companyType.as("companyType"),
-                relation.parentId.as("parentId"),
+                relation.parentCompanyName.as("parentCompanyName"),
                 contract.contractedAt.as("contractedAt"),
                 contract.contractEnd.as("contractEnd"),
                 contract.contractStatus.as("contractStatus")))
@@ -62,7 +62,7 @@ public class CompanyRepositoryCustomImpl implements CompanyRepositoryCustom {
                 company.companyName.as("companyName"),
                 company.companyLv.as("companyLv"),
                 company.companyType.as("companyType"),
-                relation.parentId.as("parentId"),
+                relation.parentCompanyName.as("parentCompanyName"),
                 contract.contractedAt.as("contractedAt"),
                 contract.contractEnd.as("contractEnd"),
                 contract.contractStatus.as("contractStatus")))
@@ -80,7 +80,7 @@ public class CompanyRepositoryCustomImpl implements CompanyRepositoryCustom {
                 company.companyName.as("companyName"),
                 company.companyLv.as("companyLv"),
                 company.companyType.as("companyType"),
-                relation.parentId.as("parentId"),
+                relation.parentCompanyName.as("parentCompanyName"),
                 contract.contractedAt.as("contractedAt"),
                 contract.contractEnd.as("contractEnd"),
                 contract.contractStatus.as("contractStatus")))

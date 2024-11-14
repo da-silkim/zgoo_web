@@ -272,34 +272,41 @@ public class PageController {
             // 사업자 list
             List<CompanyListDto> flist = companyService.searchCompanyAll();
             log.info("=== companyListDto : {}", flist.toString());
-
             model.addAttribute("companyList", flist);
 
             List<CommCdBaseDto> lvList = codeService.findCommonCdNamesByGrpcd("COLV"); // 사업자레벨
             log.info("== lvList : {}", lvList.toString());
+            model.addAttribute("clvlist", lvList);
 
             List<CommCdBaseDto> coKindList = codeService.findCommonCdNamesByGrpcd("COKIND"); // 사업자유형(위탁,충전)
             log.info("=== coKindList : {}", coKindList.toString());
+            model.addAttribute("ckindlist", coKindList);
 
             List<CommCdBaseDto> biztypeList = codeService.findCommonCdNamesByGrpcd("BIZTYPECD"); // 사업자구분(법인/개인)
             log.info("=== biztypelist : {}", biztypeList.toString());
+            model.addAttribute("biztypelist", biztypeList);
 
             List<CommCdBaseDto> bizkindList = codeService.findCommonCdNamesByGrpcd("BIZKIND"); // 업종(제조업)
             log.info("=== bizkindlist : {}", bizkindList.toString());
-
-            model.addAttribute("clvlist", lvList);
-            model.addAttribute("ckindlist", coKindList);
-            model.addAttribute("biztypelist", biztypeList);
             model.addAttribute("bizkindlist", bizkindList);
+
+            List<CommCdBaseDto> consignmentList = codeService.findCommonCdNamesByGrpcd("CONSIGNMENTCD"); // 결제위탁여부
+            log.info("=== consignmentList : {}", consignmentList.toString());
+            model.addAttribute("consignmentList", consignmentList);
+
+            // 계약상태
+            List<CommCdBaseDto> contractStatList = codeService.findCommonCdNamesByGrpcd("CONSTAT");
+            log.info("=== contractStatList : {}", contractStatList.toString());
+            model.addAttribute("contractStatList", contractStatList);
+
+            // 유지보수업체
+            List<CommCdBaseDto> mcompanyList = codeService.findCommonCdNamesByGrpcd("MCOMPANY");
+            log.info("=== mcompanyList : {}", mcompanyList.toString());
+            model.addAttribute("mcompanyList", mcompanyList);
 
         } catch (Exception e) {
 
             log.error("Error occurred while fetching company list: {}", e.getMessage(), e);
-            model.addAttribute("companyList", Collections.emptyList());
-            model.addAttribute("clvlist", Collections.emptyList());
-            model.addAttribute("ckindlist", Collections.emptyList());
-            model.addAttribute("biztypelist", Collections.emptyList());
-            model.addAttribute("bizkindlist", Collections.emptyList());
         }
 
         return "pages/biz/biz_management";

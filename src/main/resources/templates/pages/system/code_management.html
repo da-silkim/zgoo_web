@@ -109,8 +109,8 @@
                             <tbody id="pageListSub">
                                 <tr th:each="ccd : ${ccdlist}">
                                     <td><input type="checkbox" /></td>
-                                    <td th:text="${ccd.id.grpCode}"></td>
-                                    <td th:text="${ccd.id.commonCode}"></td>
+                                    <td th:text="${ccd.grpCode}"></td>
+                                    <td th:text="${ccd.commonCode}"></td>
                                     <td th:text="${ccd.commonCodeName}"></td>
                                     <td th:text="${ccd.refCode1}"></td>
                                     <td th:text="${ccd.refCode2}"></td>
@@ -194,7 +194,7 @@
                                     <th class="w-20">그룹코드<b class="required-data">*</b></th>
                                     <td class="w-30">
                                         <input type="text" name="grpCode" id="grpCode" class="form-control grpCodeInput"
-                                            th:field="*{id.grpCode}" disabled>
+                                            th:field="*{grpCode}" disabled>
                                     </td>
                                     <th class="w-20">참조코드1</th>
                                     <td class="w-30">
@@ -218,7 +218,7 @@
                                     <th class="w-20">공통코드<b class="required-data">*</b></th>
                                     <td class="w-30">
                                         <input type="text" name="commonCode" id="commonCode" class="form-control"
-                                            placeholder="공통코드를 입력해주세요." th:field="*{id.commonCode}" autocomplete="off"
+                                            placeholder="공통코드를 입력해주세요." th:field="*{commonCode}" autocomplete="off"
                                             required>
                                     </td>
                                     <th class="w-20">공통코드명<b class="required-data">*</b></th>

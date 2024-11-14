@@ -1,16 +1,16 @@
 // 사이드바 토글
-$(function() {
+$(function () {
     $(".side-nav-detail ul .nav-list-detail").hide();
 
     var isSubmenuOpen = false; // 서브메뉴가 열렸는지 상태 저장
 
-    $(".nav-menu > .nav-list").click(function(e){
+    $(".nav-menu > .nav-list").click(function (e) {
         e.preventDefault();
         $(this).siblings(".nav-list-detail").slideToggle(300);
 
         // Toggle the arrow direction
         let arrow = $(this).find(".font-ico-arrow");
-        if(arrow.hasClass("fa-chevron-down")) {
+        if (arrow.hasClass("fa-chevron-down")) {
             arrow.removeClass("fa-chevron-down").addClass("fa-chevron-up");
             isSubmenuOpen = true;   // 서브메뉴가 열림
         } else {
@@ -20,7 +20,7 @@ $(function() {
     });
 
     // 사이드바에서 마우스가 벗어나면 서브메뉴 닫힘 처리
-    $('.side-nav').mouseleave(function() {
+    $('.side-nav').mouseleave(function () {
         console.log('mouseleave event');
 
         // 서브메뉴가 열려있으면, 열림 -> 닫힘
@@ -48,8 +48,8 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // 금액 단위 포맷 함수
-$(document).ready(function() {
-    $('.price-format').each(function() {
+$(document).ready(function () {
+    $('.price-format').each(function () {
         var price = parseInt($(this).text(), 10);
         $(this).text(price.toLocaleString('ko-KR'));
     });
@@ -58,16 +58,16 @@ $(document).ready(function() {
 // 주소 검색 함수
 function postSearch() {
     new daum.Postcode({
-        oncomplete: function(data) {
+        oncomplete: function (data) {
             var addr = ''; // 주소 변수
-            
-            if(data.userSelectedType === 'R') {
+
+            if (data.userSelectedType === 'R') {
                 addr = data.roadAddress;
-            } else{
+            } else {
                 addr = data.jibunAddress;
             }
 
-            document.getElementById('postCode').value = data.zonecode;
+            document.getElementById('zipCode').value = data.zonecode;
             document.getElementById('address').value = addr;
             // 커서를 상세주소 필드로 이동
             document.getElementById('addressDetail').focus();

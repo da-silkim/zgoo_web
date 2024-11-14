@@ -4,6 +4,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import zgoo.cpos.domain.company.CompanyRoaming;
 
-public interface CompanyRoamingRepository extends JpaRepository<CompanyRoaming, Long> {
+public interface CompanyRoamingRepository extends JpaRepository<CompanyRoaming, Long>, CompanyRoamingRepositoryCustom {
 
 }

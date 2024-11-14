@@ -13,15 +13,15 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
+import zgoo.cpos.dto.company.CompanyDto.CompanyRegDto;
 
 @Entity
 @Table(name = "COMPANY_PG")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@Builder
-@ToString
+@Builder(toBuilder = true)
+
 public class CompanyPG {
 
     @Id
@@ -36,4 +36,12 @@ public class CompanyPG {
     private LocalDateTime regDt;
     private String modUserId;
     private LocalDateTime modDt;
+
+    public void updatePgInfo(CompanyRegDto dto) {
+        this.mid = dto.getMid();
+        this.merchantKey = dto.getMerchantKey();
+        this.sspMallId = dto.getSspMallId();
+        this.modUserId = "admin";
+        this.modDt = LocalDateTime.now();
+    }
 }

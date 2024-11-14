@@ -15,6 +15,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import zgoo.cpos.dto.company.CompanyDto.CompanyRoamingtDto;
 
 @Entity
 @Table(name = "COMPANY_ROAMING")
@@ -36,4 +37,13 @@ public class CompanyRoaming {
     @JoinColumn(name = "company_id")
     @ManyToOne(fetch = FetchType.LAZY)
     private Company company;
+
+    /*
+     * update logic
+     */
+    public void updateRoamingInfo(CompanyRoamingtDto dto) {
+        this.institutionCode = dto.getInstitutionCode();
+        this.institutionKey = dto.getInstitutionKey();
+        this.institutionEmail = dto.getInstitutionEmail();
+    }
 }
