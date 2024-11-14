@@ -3,9 +3,11 @@ package zgoo.cpos.controller;
 import java.util.Collections;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -142,9 +144,25 @@ public class PageController {
      */
 
     @GetMapping("/system/user/list")
-    public String showuserlist(Model model) {
+    public String showuserlist(
+        @RequestParam(value = "companyIdSearch",required = false) Long companyId,
+        @RequestParam(value = "companyTypeSearch",required = false) String companyType,
+        @RequestParam(value = "nameSearch",required = false) String name,
+        @RequestParam(value = "page", defaultValue="0") int page,
+        @RequestParam(value = "size", defaultValue="10") int size,
+        Model model) {
+
         log.info("=== User List Page ===");
         model.addAttribute("usersDto", new UsersDto.UsersRegDto());
+        log.info("companyId: {}, companyType: {}, name: {}", companyId, companyType, name);
+
+        if (companyType != null && companyType.trim().isEmpty()) {
+            companyType = null;
+        }
+
+        if (name != null && name.trim().isEmpty()) {
+            name = null;
+        }
 
         try {
             log.info("=== user DB search result >>>");
@@ -154,22 +172,53 @@ public class PageController {
             model.addAttribute("companyList", flist);
             
             // 사용자 리스트 조회
-            List<UsersDto.UsersListDto> ulist = usersService.findUsersAll();
-            model.addAttribute("ulist", ulist);
+            // List<UsersDto.UsersListDto> ulist = usersService.findUsersAll();
+            // model.addAttribute("ulist", ulist);
+            Page<UsersDto.UsersListDto> ulist;
+
+            if(companyId == null && companyType == null && name == null) {
+                ulist = usersService.findUsersAll(page, size);
+            } else {
+                ulist = usersService.searchUsersListWithPagination(companyId, companyType, name, page, size);
+            }
+
+            // 검색 값 저장
+            model.addAttribute("selectedCompanyId", companyId);
+            model.addAttribute("selectedCompanyType", companyType);
+            model.addAttribute("selectedName", name);
+
+            int totalPages = ulist.getTotalPages() == 0 ? 1 : ulist.getTotalPages();
+
+            // System.out.println("Total pages: " + totalPages);
+            // System.out.println("Total elements: " + ulist.getTotalElements());
+            // System.out.println("Page size: " + ulist.getSize());
+
+            model.addAttribute("ulist", ulist.getContent());
+            model.addAttribute("size", String.valueOf(size));
+            model.addAttribute("currentPage", page);
+            model.addAttribute("totalPages", totalPages);
+            model.addAttribute("totalCount", ulist.getTotalElements());
 
             List<CommCdBaseDto> authList = codeService.findCommonCdNamesByGrpcd("MENUACCLV"); // 메뉴권한
             model.addAttribute("authList", authList);
             // log.info("== authList : {}", authList.toString());
             
-            List<CommCdBaseDto> coKind = codeService.findCommonCdNamesByGrpcd("COKIND");
+            List<CommCdBaseDto> coKind = codeService.findCommonCdNamesByGrpcd("COKIND"); // 사업자 유형
             model.addAttribute("coKind", coKind);
 
-        } catch (Exception e) {
+            List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT"); // 메뉴권한
+            model.addAttribute("showListCnt", showListCnt);
 
+        } catch (Exception e) {
             log.error("Error occurred while fetching user list: {}", e.getMessage(), e);
             model.addAttribute("companyList", Collections.emptyList());
             model.addAttribute("ulist", Collections.emptyList());
+            model.addAttribute("currentPage", Collections.emptyList());
+            model.addAttribute("totalPages", Collections.emptyList());
+            model.addAttribute("totalCount", Collections.emptyList());
             model.addAttribute("authList", Collections.emptyList());
+            model.addAttribute("coKind", Collections.emptyList());
+            model.addAttribute("showListCnt", Collections.emptyList());
         }
 
         return "pages/system/user_management";

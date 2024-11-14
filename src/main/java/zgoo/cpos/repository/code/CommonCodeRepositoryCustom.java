@@ -44,4 +44,6 @@ public interface CommonCodeRepositoryCustom {
 
     String findCommonCodeName(String commoncode);
 
+    // 공통코드 조회 - 문자열 >> 정수로 변환하여 정렬(그리드ROW수: SHOWLISTCNT)
+    List<CommCdBaseDto> commonCodeStringSort(String commoncode);
 }

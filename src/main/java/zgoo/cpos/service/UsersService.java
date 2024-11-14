@@ -2,7 +2,12 @@ package zgoo.cpos.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -104,5 +109,49 @@ public class UsersService {
     public void deleteUsers(String userId) {
         Long count = this.usersRepository.deleteUserOne(userId);
         log.info("=== delete user info: {}", count);
+    }
+
+    // 사용자 - 전체 조회 페이징
+    @Transactional
+    public Page<UsersDto.UsersListDto> findUsersAll(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        
+        try {
+            Page<Users> usersPage = this.usersRepository.findUsersWithPagination(pageable);
+
+            // Users -> UsersListDto로 변환
+            List<UsersDto.UsersListDto> usersListDto = usersPage.getContent().stream()
+                    .map(user -> UsersMapper.toListDto(user))  // Users -> UsersListDto 변환
+                    .collect(Collectors.toList());
+
+            log.info("=== paging user info >> {}", usersListDto.toString());
+
+            return new PageImpl<>(usersListDto, pageable, usersPage.getTotalElements());
+        } catch (Exception e) {
+            log.error("Error occurred while fetching users with pagination: {}", e.getMessage(), e);
+            return Page.empty(pageable);
+        }
+    }
+
+    // 사용자 - 검색 페이징
+    @Transactional
+    public Page<UsersDto.UsersListDto> searchUsersListWithPagination(Long companyId, String companyType, String name, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        
+        try {
+            Page<Users> usersPage = this.usersRepository.searchUsersWithPagination(companyId, companyType, name, pageable);
+
+            // Users -> UsersListDto로 변환
+            List<UsersDto.UsersListDto> usersListDto = usersPage.getContent().stream()
+                    .map(user -> UsersMapper.toListDto(user))  // Users -> UsersListDto 변환
+                    .collect(Collectors.toList());
+
+            log.info("=== paging user info >> {}", usersListDto.toString());
+
+            return new PageImpl<>(usersListDto, pageable, usersPage.getTotalElements());
+        } catch (Exception e) {
+            log.error("Error occurred while fetching users with pagination: {}", e.getMessage(), e);
+            return Page.empty(pageable);
+        }
     }
 }

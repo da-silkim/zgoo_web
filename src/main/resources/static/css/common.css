@@ -104,27 +104,19 @@ input.input-add-row:focus {
 .main-article-list { border-bottom-style: solid; border-bottom-color: #EEEDEB; }
 
 /* pagination */
-.pagination { display: inline-flex; justify-content: center; padding: 0; margin: 0; list-style-type: none; }
+.pagination { display: inline-flex; justify-content: center; gap: 5px; padding: 0; margin: 0; list-style-type: none; }
 .pagination .page-item { margin: 0 2px; }
-.pagination .page-link { display: block; padding: 6px 12px; font-size: 14px; line-height: 1.5; text-decoration: none; color:#021526; border: none; }
+.pagination .page-link { display: block; padding: 6px 12px; font-size: 14px; line-height: 1.5; text-decoration: none; color:#021526; border: none; border-radius: 50% !important; }
 
-/* 현재 페이지 활성화 스타일 */
-.pagination .page-item.active .page-link {
-    background-color: #021526; /* 활성 페이지 배경 색상: 연회색 */
-    color: white; /* 폰트 색상: 검은색 */
-    border-radius: 50%;
-}
+/* Bootstrap default active css custom */
+.pagination .page-link.active,
+.pagination .active > .page-link { z-index: 3; color: white; background-color: #021526; border: none; border-radius: 50%; }
+
 .pagination .page-item:hover .page-link,
-.pagination .page-item:active .page-link {
-    background-color: #e0e0e0; /* 활성 페이지 배경 색상: 연회색 */
-    color: black; /* 폰트 색상: 검은색 */
-    border-radius: 50%;
-}
-/* 비활성 페이지 링크 (비활성화된 상태) */
-.pagination .page-item.disabled .page-link {
-    color: #ccc; /* 비활성 페이지 폰트 색상 */
-    pointer-events: none; /* 클릭 방지 */
-}
+.pagination .page-item:active .page-link { background-color: #e0e0e0; color: black; border-radius: 50%; }
+
+/* page link disabled */
+.pagination .page-item.disabled .page-link { pointer-events: none; color: #fff;  background-color: #fff;}
 
 table.table tbody tr.row-selected { background-color: #3D3B40 !important; color: #fff !important; }
 input[type="checkbox"] {  box-sizing: border-box; padding: 0; accent-color: #102C57; }
