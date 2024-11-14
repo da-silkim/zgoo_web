@@ -87,3 +87,84 @@ function formatDate(date) {
 
     return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 }
+
+// input[type="number"] maxLength setting function
+function maxLengthCheck(object) {
+    if(object.value.length > object.maxLength) {
+        object.value = object.value.slice(0, object.maxLength);
+    }
+}
+
+function addHyphen(input) {
+    let value = input.value.replace(/\D/g, '');  // 숫자만 추출
+    let formattedValue = '';
+
+    if (value.length <= 3) {
+        formattedValue = value;
+    } else if (value.length <= 6) {
+        formattedValue = value.substring(0, 3) + '-' + value.substring(3);
+    } else if (value.length <= 10) {
+        formattedValue = value.substring(0, 3) + '-' + value.substring(3, 6) + '-' + value.substring(6);
+    } else {
+        formattedValue = value.substring(0, 3) + '-' + value.substring(3, 7) + '-' + value.substring(7, 11);
+    }
+
+    // maxlength을 넘지 않도록 체크
+    if (formattedValue.length <= 13) {
+        input.value = formattedValue;
+    } else {
+        input.value = formattedValue.substring(0, 13);
+    }
+}
+
+
+// Regular expression
+// 1. email
+function isEmail(asValue) {
+	var regExp = /^[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*\.[a-zA-Z]{2,3}$/i;
+    var result = regExp.test(asValue);
+
+    if (!result) {
+        alert('유효하지 않은 이메일 형식입니다.');
+    }
+
+	return result;
+}
+
+// 2. id(영문으로 시작, 영문+숫자 조합 6~20자)
+function isId(asValue) {
+	var regExp = /^[a-z][a-z0-9]{5,19}$/
+    var result = regExp.test(asValue);
+
+    if (!result) {
+        alert("아이디는 영문자로 시작하고 6~20자의 영문자 및 숫자로 구성되어야 합니다.");
+    }
+
+    return result;
+}
+
+// 3. password(8~16자 영문, 숫자 조합)
+function isPassword(asValue) {
+	var regExp = /^(?=.*\d)(?=.*[a-zA-Z])[0-9a-zA-Z]{8,16}$/;
+    var result = regExp.test(asValue);
+
+    if(!result) {
+        alert("비밀번호는 8~16자의 영문자와 숫자를 최소 하나씩 포함해야 합니다.");
+    }   
+
+    return result;
+}
+
+// 4. password(8~16자 영문, 숫자, 특수문자 최소 한 가지씩 조합)
+function isPasswordSpecial(asValue) {
+    // 사용가능 특수문자: $~!@%*^?&()-_=+
+	var regExp = /^(?=.*[a-zA-z])(?=.*[0-9])(?=.*[$`~!@$!%*#^?&\\(\\)\-_=+]).{8,16}$/;
+    // var regExp = /^(?=.*\d)(?=.*[a-zA-Z])[a-zA-Z0-9]{8,16}$/;
+    var result = regExp.test(asValue);
+
+    if (!result) {
+        alert("비밀번호는 8~16자의 영문자, 숫자, 특수문자를 최소 하나씩 포함해야 합니다.");
+    }
+
+	return result;
+}

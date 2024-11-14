@@ -112,13 +112,23 @@
 
     <!-- Add Modal start -->
     <div class="modal fade" id="dataAddModal" tabindex="-1" aria-labelledby="dataAddModalLabel" data-bs-backdrop="static" data-bs-keyboard="false">
-        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width: 60vw; height: 90vh;"> <!-- height: 90vh; -->
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width: 60vw; height: 90vh;">
             <div class="modal-content mh-100 overflow-y-auto scrollbar">
                 <form id="userForm" th:object="${usersDto}">
                 <!-- modal body start -->
                 <div class="modal-body">
                     <!-- 모달 내용 -->
-                    <div class="modal-title mb-2"><span class="modal-title-bar"></span><span>사용자 정보</span></div>
+                    <div class="modal-title mb-2 position-relative">
+                        <span class="modal-title-bar"></span><span>사용자 정보</span>
+                        <span class="position-absolute" style="right: 0;">
+                            <i class="bi bi-info-circle info-icon"></i>
+                            <div class="tooltip-info" >
+                                - 아이디는 영문자로 시작하고 6~20자의 영문자 및 숫자로 구성되어야 합니다.<br>
+                                - 비밀번호는 8~16자의 영문자, 숫자, 특수문자를 최소 하나씩 포함해야 합니다.<br>
+                                - <b>사업자, 사용자ID, 사용자명, 비밀번호, 권한</b> 항목은 필수 값입니다.
+                            </div>
+                        </span>
+                    </div>
                     <!-- table:1 start -->
                     <table class="table table-bg-v table-fixed w-100 text-center align-middle">
                         <tbody>
@@ -138,7 +148,6 @@
                                         <button type="button" class="btn btn-outline-grey flex-btn"
                                                 id="duplicateBtn">중복체크</button>
                                     </div>
-                                    <small id="userIdCheckMessage" class="text-danger"></small>
                                 </td>
                             </tr>
                             <tr>
@@ -162,7 +171,7 @@
                                 </td>
                                 <th class="w-20">전화번호</th>
                                 <td class="w-30">
-                                    <input type="number" name="phone" id="phone" class="form-control"
+                                    <input type="text" name="phone" id="phone" class="form-control" maxlength="13" oninput="addHyphen(this)"
                                             th:field="*{phone}" autocomplete="off">
                                 </td>
                             </tr>
@@ -182,7 +191,7 @@
                     </div>
                     <!-- modal body end -->
                     <div class="modal-footer justify-content-center" style="border-top: none;">
-                        <button type="button" class="btn btn-outline-grey me-2" data-bs-dismiss="modal">취소</button>
+                        <button type="button" id="cancelBtn" class="btn btn-outline-grey me-2" data-bs-dismiss="modal">취소</button>
                         <button type="submit" id="modalBtn" class="btn btn-data-add">등록</button>
                     </div>
                 </form>              
