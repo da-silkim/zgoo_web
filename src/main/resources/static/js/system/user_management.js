@@ -1,6 +1,6 @@
 $(document).ready(function() {
     let modalCon = false;   // false: 등록 / true: 수정
-    let selectRow;
+    let selectRow; isDuplicateCheck = false, userIdCheck = false;
     let btnMsg = "등록";
 
     // 초기화
@@ -102,22 +102,14 @@ $(document).ready(function() {
             contentType: "application/json",
             dataType: 'json',
             success: function(data) {
-                console.log("사용자 정보 불러오기: ", data);
-                const companyId = data.companyId || '';
-                const userId = data.userId || '';
-                const userName = data.name || '';
-                const pw = data.password || '';
-                const email = data.email || '';
-                const phone = data.phone || '';
-                const authority = data.authority || '';
-
-                $('#companyId').val(companyId);
-                $('#userId').val(userId);
-                $('#name').val(userName);
-                $('#password').val(pw);
-                $('#email').val(email);
-                $('#phone').val(phone);
-                $('#authority').val(authority);
+                // console.log("사용자 정보 불러오기: ", data);
+                $('#companyId').val(data.companyId || '');
+                $('#userId').val(data.userId || '');
+                $('#name').val(data.name || '');
+                $('#password').val(data.password || '');
+                $('#email').val(data.email || '');
+                $('#phone').val(data.phone || '');
+                $('#authority').val(data.authority || '');
             }
         });
     });
@@ -143,16 +135,50 @@ $(document).ready(function() {
         }
     });
 
-    $('#modalBtn').on('click', function() {
+    $('#cancelBtn').on('click', function() {
+        isDuplicateCheck = false;
+        userIdCheck = false;
+    });
+
+    $('#modalBtn').on('click', function(event) {
         event.preventDefault();
+
+        const userID = $('#userId').val();
+        const name = $('#name').val();
+        const password = $('#password').val();
+        const email = $('#email').val();
+
+        // 유효성 체크
+        var form = document.getElementById('userForm');
+        if (!form.checkValidity()) { 
+            alert('필수 입력 값이 누락되어 있습니다.');
+            return;
+        }
+
+        if(!userIdCheck) {
+            alert('사용자ID를 다시 확인해주세요.');
+            return;
+        }
+
+        if (!isPasswordSpecial(password)) { return; }
+
+        if (email.trim() != '') {
+            if (!isEmail(email)) { return; }
+        }
+
+        // 사용자ID 중복 버튼을 통해 중복ID 확인을 했는지
+        if(!isDuplicateCheck) {
+            alert('사용자ID 중복체크를 해주세요.');
+            return;
+        }
 
         if(confirmSubmit(btnMsg)) {
             const DATA = {
                 companyId: $('#companyId').val(),
-                userId: $('#userId').val(),
-                name: $('#name').val(),
-                password: $('#password').val(),
-                email: $('#email').val(),
+                userId: userID,
+                name: name,
+                password: password,
+                email: email,
                 phone: $('#phone').val(),
                 authority: $('#authority').val()
             }
@@ -175,14 +201,22 @@ $(document).ready(function() {
                     console.log("사용자 정보 처리 실패");
                 }
             });
-        }
+        }        
     });
 
     // 중복검사
     $('#duplicateBtn').on('click', function() {
+        isDuplicateCheck = true;
+
         var userId = $('#userId').val();
         if (userId.trim() === '') {
-            $('#userIdCheckMessage').text('사용자 ID를 입력해 주세요.');
+            alert('사용자ID를 입력해주세요');
+            userIdCheck = false;
+            return;
+        }
+
+        if (!isId(userId)) { 
+            userIdCheck = false;
             return;
         }
 
@@ -192,10 +226,11 @@ $(document).ready(function() {
             data: { userId: userId },
             success: function(isDuplicate) {
                 if (isDuplicate) {
-                    $('#userIdCheckMessage').text('이미 사용 중인 ID입니다.').removeClass('text-sucess').addClass("text-danger");
                     alert('이미 사용 중인 ID입니다.');
+                    userIdCheck = false;
                 } else {
-                    $('#userIdCheckMessage').text('사용 가능한 ID입니다.').removeClass('text-danger').addClass('text-success');
+                    alert('사용 가능한 ID입니다.');
+                    userIdCheck = true;
                 }
             },
             error: function() {
@@ -222,5 +257,6 @@ $(document).ready(function() {
             passwordField.attr('type', 'password');
         }
     });
-    
 });
+
+

@@ -145,3 +145,9 @@ input[type="checkbox"] {  box-sizing: border-box; padding: 0; accent-color: #102
 .input-info-group { position: relative; }
 .input-info-group input { padding-right: 38px; }
 .input-info-group .info-eyes { position: absolute; top: 50%; right: 18px; transform: translateY(-50%); font-size: 18px; color: #9BA4B4; cursor: pointer; }
+
+/* tooltip information */
+.tooltip-info { display: none; position: absolute; right:0; background: rgb(12, 12, 12);
+                padding: 10px; border-radius: 5px; box-shadow: 0 4px 8px rgb(0, 0, 0, 0.1); z-index: 9999; white-space: nowrap;
+                font-size: 14px; font-weight: 400; color: white;}
+.info-icon:hover + .tooltip-info { display: block; }
