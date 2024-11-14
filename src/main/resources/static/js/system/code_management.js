@@ -235,10 +235,8 @@ $(document).ready(function() {
             const URL = comModalCon ? '/system/code/commoncd/update' : '/system/code/commoncd/new';
             const TYPE = comModalCon ? 'PATCH' : 'POST';
             const data = {
-                id: {
-                    grpCode: $('.grpCodeInput').val(),
-                    commonCode: $('#commonCode').val()
-                },
+                grpCode: $('.grpCodeInput').val(),
+                commonCode: $('#commonCode').val(),
                 commonCodeName: $('#commonCodeName').val(),
                 refCode1: $('#referenceCode1').val(),
                 refCode2: $('#referenceCode2').val(),

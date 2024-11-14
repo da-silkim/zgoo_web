@@ -106,7 +106,19 @@
                                     <th class="w-15">등록일시</th>
                                 </tr>
                             </thead>
-                            <tbody id="pageListSub"></tbody>
+                            <tbody id="pageListSub">
+                                <tr th:each="ccd : ${ccdlist}">
+                                    <td><input type="checkbox" /></td>
+                                    <td th:text="${ccd.grpCode}"></td>
+                                    <td th:text="${ccd.commonCode}"></td>
+                                    <td th:text="${ccd.commonCodeName}"></td>
+                                    <td th:text="${ccd.refCode1}"></td>
+                                    <td th:text="${ccd.refCode2}"></td>
+                                    <td th:text="${ccd.refCode3}"></td>
+                                    <td th:text="${ccd.regUserId}"></td>
+                                    <td th:text="${#temporals.format(ccd.regDt, 'yyyy-MM-dd HH:mm:ss')}"></td>
+                                </tr>
+                            </tbody>
                         </table>
                     </div>
                     <div class="text-center">
@@ -235,4 +247,5 @@
     <script type="text/javascript" th:src="@{/js/table.js}"></script>
     <script type="text/javascript" th:src="@{/js/system/code_management.js}"></script>
 </div>
+
 </html>

@@ -13,15 +13,14 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
+import zgoo.cpos.dto.company.CompanyDto.CompanyRegDto;
 
 @Entity
 @Table(name = "COMPANY_CONTRACT")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@Builder
-@ToString
+@Builder(toBuilder = true)
 public class CompanyContract {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,4 +34,12 @@ public class CompanyContract {
     private String asCompany;
     private String asNum;
 
+    public void updateContractInfo(CompanyRegDto dto) {
+        this.contractStatus = dto.getContractStatus();
+        this.contractedAt = dto.getContractedAt();
+        this.contractStart = dto.getContractStart();
+        this.contractEnd = dto.getContractEnd();
+        this.asCompany = dto.getAsCompany();
+        this.asNum = dto.getAsNum();
+    }
 }

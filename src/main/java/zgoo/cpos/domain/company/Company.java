@@ -18,7 +18,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
+import zgoo.cpos.dto.company.CompanyDto.CompanyRegDto;
 
 @Entity
 @Table(name = "COMPANY", uniqueConstraints = {
@@ -28,7 +28,6 @@ import lombok.ToString;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder(toBuilder = true)
-@ToString
 public class Company {
 
     @Id
@@ -39,13 +38,13 @@ public class Company {
     // @EmbeddedId
     // private CompanyCompositeKey compkey;
 
-    @Column(length = 10, nullable = false)
+    @Column(nullable = false)
     private String companyType; // 사업자유형
 
-    @Column(length = 4, nullable = false)
+    @Column(nullable = false)
     private String companyLv; // 사업자레벨
 
-    @Column(length = 45, nullable = false)
+    @Column(nullable = false)
     private String companyName; // 사업자명
 
     @Column(length = 20)
@@ -54,7 +53,7 @@ public class Company {
     @Column(length = 10, nullable = false)
     private String bizType; // 사업자구분(법인/개인)
 
-    @Column(length = 10)
+    @Column()
     private String bizKind; // 업종
 
     @Column(length = 20)
@@ -66,10 +65,10 @@ public class Company {
     @Column(length = 10)
     private String zipcode;
 
-    @Column(length = 50)
+    @Column()
     private String address;
 
-    @Column(length = 50)
+    @Column()
     private String addressDetail;
 
     @Column(length = 20)
@@ -84,7 +83,7 @@ public class Company {
     @Column(length = 30)
     private String staffPhone;
 
-    @Column(length = 10, nullable = false)
+    @Column(nullable = false)
     private String consignmentPayment; // 위탁결제구분
 
     private LocalDateTime createdAt;
@@ -102,5 +101,26 @@ public class Company {
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "company_pg_id")
     private CompanyPG companyPG;
+
+    // ==== update logic ====//
+    public void updateCompanyBasicInfo(CompanyRegDto dto) {
+        this.companyType = dto.getCompanyType();
+        this.companyLv = dto.getCompanyLv();
+        this.companyName = dto.getCompanyName();
+        this.bizNum = dto.getBizNum();
+        this.bizType = dto.getBizType();
+        this.bizKind = dto.getBizKind();
+        this.ceoName = dto.getCeoName();
+        this.headPhone = dto.getHeadPhone();
+        this.zipcode = dto.getZipcode();
+        this.address = dto.getAddress();
+        this.addressDetail = dto.getAddressDetail();
+        this.staffName = dto.getStaffName();
+        this.staffEmail = dto.getStaffEmail();
+        this.staffTel = dto.getStaffTel();
+        this.staffPhone = dto.getStaffPhone();
+        this.consignmentPayment = dto.getConsignmentPayment();
+        this.updatedAt = LocalDateTime.now();
+    }
 
 }

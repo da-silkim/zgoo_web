@@ -16,7 +16,7 @@ import lombok.experimental.SuperBuilder;
 public class CompanyDto {
 
     @Data
-    @SuperBuilder
+    @SuperBuilder(toBuilder = true)
     @EqualsAndHashCode
     @NoArgsConstructor
     public static class BaseCompnayDto {
@@ -33,7 +33,7 @@ public class CompanyDto {
     @ToString(callSuper = true)
     public static class CompanyListDto extends BaseCompnayDto {
 
-        private Long parentId; // 상위사업자ID
+        private String parentCompanyName; // 상위사업자명
         private LocalDateTime contractedAt; // 서비스가입일
         private LocalDateTime contractEnd; // 가입종료일
         private String contractStatus; // 계약상태
@@ -42,7 +42,7 @@ public class CompanyDto {
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
-    @SuperBuilder
+    @SuperBuilder(toBuilder = true)
     @EqualsAndHashCode(callSuper = true)
     @ToString(callSuper = true)
     public static class CompanyRegDto extends BaseCompnayDto {
@@ -58,7 +58,7 @@ public class CompanyDto {
         private String consignmentPayment; // 위탁결제구분
 
         // 사업자 관계정보
-        private Long parentId;
+        private String parentCompanyName;
 
         // 담당자 정보
         private String staffName; // 담당자명
