@@ -65,10 +65,10 @@ public class UsersController {
         log.info("=== find user info ===");
 
         try {
-            UsersDto.UsersRegDto usersDto = this.usersService.findUserOne(userId);
+            UsersDto.UsersRegDto userFindOne = this.usersService.findUserOne(userId);
 
-            if ( usersDto != null ) {
-                return ResponseEntity.ok(usersDto);
+            if ( userFindOne != null ) {
+                return ResponseEntity.ok(userFindOne);
             } else {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
             }
@@ -87,7 +87,7 @@ public class UsersController {
 
         log.info("=== search user info ===");
         
-        if (companyType != null && companyType.trim().isEmpty()) {
+        if (companyType != null && companyType.isEmpty()) {
             companyType = null;
         }
 
@@ -98,9 +98,9 @@ public class UsersController {
         log.info("companyId: {}, companyType: {}, name: {}", companyId, companyType, name);
 
         try {
-            List<UsersDto.UsersListDto> uList = this.usersService.searchUsersList(companyId, companyType, name);
-            log.info("조회된 사용자 리스트 >> {}", uList);
-            return ResponseEntity.ok(uList);
+            List<UsersDto.UsersListDto> usersList = this.usersService.searchUsersList(companyId, companyType, name);
+            log.info("조회된 사용자 리스트 >> {}", usersList);
+            return ResponseEntity.ok(usersList);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build(); 
         }

@@ -145,18 +145,23 @@ public class PageController {
 
     @GetMapping("/system/user/list")
     public String showuserlist(
-        @RequestParam(value = "companyIdSearch",required = false) Long companyId,
-        @RequestParam(value = "companyTypeSearch",required = false) String companyType,
-        @RequestParam(value = "nameSearch",required = false) String name,
+        @RequestParam(value = "companyIdSearch", required = false) Long companyId,
+        @RequestParam(value = "companyTypeSearch", required = false) String companyType,
+        @RequestParam(value = "nameSearch", required = false) String name,
         @RequestParam(value = "page", defaultValue="0") int page,
         @RequestParam(value = "size", defaultValue="10") int size,
         Model model) {
 
         log.info("=== User List Page ===");
-        model.addAttribute("usersDto", new UsersDto.UsersRegDto());
         log.info("companyId: {}, companyType: {}, name: {}", companyId, companyType, name);
-
-        if (companyType != null && companyType.trim().isEmpty()) {
+        model.addAttribute("usersDto", new UsersDto.UsersRegDto());
+       
+        /*
+         * required = false일 때 요청 파라미터 값이 없으면 null를 저장해야 하는데
+         * companyType, name 값이 공백으로 처리되는 문제발생(companyId는 정상적으로 처리)
+         * null 값이 아닌 공백이 들어왔을 경우 null 처리
+         */
+        if (companyType != null && companyType.isEmpty()) {
             companyType = null;
         }
 
@@ -168,42 +173,36 @@ public class PageController {
             log.info("=== user DB search result >>>");
 
             // 사업자 list
-            List<CompanyListDto> flist = companyService.searchCompanyAll();
-            model.addAttribute("companyList", flist);
+            List<CompanyListDto> companyList = companyService.searchCompanyAll();
+            model.addAttribute("companyList", companyList);
             
-            // 사용자 리스트 조회
-            // List<UsersDto.UsersListDto> ulist = usersService.findUsersAll();
-            // model.addAttribute("ulist", ulist);
-            Page<UsersDto.UsersListDto> ulist;
+            // 사용자 list
+            Page<UsersDto.UsersListDto> userList;
 
-            if(companyId == null && companyType == null && name == null) {
-                ulist = usersService.findUsersAll(page, size);
-            } else {
-                ulist = usersService.searchUsersListWithPagination(companyId, companyType, name, page, size);
+            if(companyId == null && companyType == null && name == null) {  // 검색 조건이 없으면 전체 조회
+                userList = usersService.findUsersAll(page, size);
+            } else {    // 검색 조건이 1개 이상 존재할 경우
+                userList = usersService.searchUsersListWithPagination(companyId, companyType, name, page, size);
             }
 
-            // 검색 값 저장
+            // 검색 조건 저장
             model.addAttribute("selectedCompanyId", companyId);
             model.addAttribute("selectedCompanyType", companyType);
             model.addAttribute("selectedName", name);
 
-            int totalPages = ulist.getTotalPages() == 0 ? 1 : ulist.getTotalPages();
+            int totalPages = userList.getTotalPages() == 0 ? 1 : userList.getTotalPages();  // 전체 페이지 수
 
-            // System.out.println("Total pages: " + totalPages);
-            // System.out.println("Total elements: " + ulist.getTotalElements());
-            // System.out.println("Page size: " + ulist.getSize());
+            model.addAttribute("ulist", userList.getContent());               // 사용자 list
+            model.addAttribute("size", String.valueOf(size));                 // 페이지당 보여지는 데이터 건 수
+            model.addAttribute("currentPage", page);                          // 현재 페이지
+            model.addAttribute("totalPages", totalPages);                     // 총 페이지 수
+            model.addAttribute("totalCount", userList.getTotalElements());    // 총 데이터
 
-            model.addAttribute("ulist", ulist.getContent());
-            model.addAttribute("size", String.valueOf(size));
-            model.addAttribute("currentPage", page);
-            model.addAttribute("totalPages", totalPages);
-            model.addAttribute("totalCount", ulist.getTotalElements());
-
-            List<CommCdBaseDto> authList = codeService.findCommonCdNamesByGrpcd("MENUACCLV"); // 메뉴권한
+            List<CommCdBaseDto> authList = codeService.findCommonCdNamesByGrpcd("MENUACCLV");   // 메뉴권한
             model.addAttribute("authList", authList);
             // log.info("== authList : {}", authList.toString());
             
-            List<CommCdBaseDto> coKind = codeService.findCommonCdNamesByGrpcd("COKIND"); // 사업자 유형
+            List<CommCdBaseDto> coKind = codeService.findCommonCdNamesByGrpcd("COKIND");        // 사업자 유형
             model.addAttribute("coKind", coKind);
 
             List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT"); // 메뉴권한

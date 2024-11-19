@@ -39,10 +39,10 @@ public class UsersService {
             return new ArrayList<>();   // empty list
         }
 
-        List<UsersDto.UsersListDto> list = UsersMapper.toDtoList(usersList);
+        List<UsersDto.UsersListDto> userListDto = UsersMapper.toDtoList(usersList);
         log.info("=== users DB search success ===");
 
-        return list;
+        return userListDto;
     }
 
     // 사용자 - 단건 조회
@@ -65,10 +65,10 @@ public class UsersService {
         }
         
         try {
-            List<UsersDto.UsersListDto> list = UsersMapper.toDtoList(usersList);
+            List<UsersDto.UsersListDto> userListDto = UsersMapper.toDtoList(usersList);
             log.info("=== users DB search success ===");
-            log.info("entity >> dto user info >>> {}", list);
-            return list;
+            log.info("entity >> dto user info >>> {}", userListDto);
+            return userListDto;
         } catch (Exception e) {
             log.info("=== users DB search failure ===", e);
             return new ArrayList<>();   // empty list

@@ -32,7 +32,7 @@ public class UsersRepositoryCustomImpl implements UsersRepositoryCustom {
 
     @Override
     public Page<Users> findUsersWithPagination(Pageable pageable) {
-        List<Users> uList =  queryFactory
+        List<Users> usersList =  queryFactory
                                 .selectFrom(users)
                                 .leftJoin(users.company, company).fetchJoin()
                                 .orderBy(users.regDt.desc())
@@ -44,7 +44,7 @@ public class UsersRepositoryCustomImpl implements UsersRepositoryCustom {
                                 .selectFrom(users)
                                 .fetchCount();
                             
-        return new PageImpl<>(uList, pageable, totalCount);
+        return new PageImpl<>(usersList, pageable, totalCount);
     }
 
     @Override
@@ -96,7 +96,7 @@ public class UsersRepositoryCustomImpl implements UsersRepositoryCustom {
             builder.and(users.name.contains(name));
         }
 
-        List<Users> uList =  queryFactory
+        List<Users> usersList =  queryFactory
                                 .selectFrom(users)
                                 .leftJoin(users.company, company)
                                 .where(builder)
@@ -110,7 +110,7 @@ public class UsersRepositoryCustomImpl implements UsersRepositoryCustom {
                                 .where(builder)
                                 .fetchCount();
                            
-        return new PageImpl<>(uList, pageable, totalCount);
+        return new PageImpl<>(usersList, pageable, totalCount);
     }
 
     @Override
