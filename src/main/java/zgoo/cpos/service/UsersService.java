@@ -19,6 +19,7 @@ import zgoo.cpos.dto.users.UsersDto;
 import zgoo.cpos.mapper.UsersMapper;
 import zgoo.cpos.repository.company.CompanyRepository;
 import zgoo.cpos.repository.users.UsersRepository;
+import zgoo.cpos.util.EncryptionUtils;
 
 @Service
 @RequiredArgsConstructor
@@ -80,8 +81,12 @@ public class UsersService {
         Company company = this.companyRepository.findById(dto.getCompanyId())
             .orElseThrow(() -> new IllegalArgumentException("=== company not found ==="));
 
+        // password SHA-256
+        dto.setPassword(EncryptionUtils.encryptSHA256(dto.getPassword()));
+
         // dto >> entity
         Users user = UsersMapper.toEntity(dto, company);
+
         usersRepository.save(user);
     }
 
@@ -97,6 +102,8 @@ public class UsersService {
 
         log.info("=== before update: {}", user.toString());
 
+        // password SHA-256
+        dto.setPassword(EncryptionUtils.encryptSHA256(dto.getPassword()));
         user.updateUsersinfo(dto);
 
         log.info("=== after update: {}", user.toString());
