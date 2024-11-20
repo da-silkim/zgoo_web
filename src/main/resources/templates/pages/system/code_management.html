@@ -107,16 +107,8 @@
                                 </tr>
                             </thead>
                             <tbody id="pageListSub">
-                                <tr th:each="ccd : ${ccdlist}">
-                                    <td><input type="checkbox" /></td>
-                                    <td th:text="${ccd.grpCode}"></td>
-                                    <td th:text="${ccd.commonCode}"></td>
-                                    <td th:text="${ccd.commonCodeName}"></td>
-                                    <td th:text="${ccd.refCode1}"></td>
-                                    <td th:text="${ccd.refCode2}"></td>
-                                    <td th:text="${ccd.refCode3}"></td>
-                                    <td th:text="${ccd.regUserId}"></td>
-                                    <td th:text="${#temporals.format(ccd.regDt, 'yyyy-MM-dd HH:mm:ss')}"></td>
+                                <tr>
+                                    <td colspan="9">그룹코드를 선택 시 공통코드가 조회됩니다.</td>
                                 </tr>
                             </tbody>
                         </table>
