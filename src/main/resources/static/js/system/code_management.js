@@ -8,7 +8,7 @@ $(document).ready(function() {
         grpSelectRow = $(this);
         const currGrpCode = grpSelectRow.find('td').eq(1).text();    // 그룹코드
         // const currGrpcdName = grpSelectRow.find('td').eq(2).text();  // 그룹코드명
-        console.log('curr grpCode: ' + currGrpCode);    // 현재 클릭한 그룹코드 정보 확인
+        // console.log('curr grpCode: ' + currGrpCode);    // 현재 클릭한 그룹코드 정보 확인
 
         // 그룹코드 정보 공통코드 모달창에 자동 입력
         $('.grpCodeInput').val(currGrpCode);
@@ -19,7 +19,6 @@ $(document).ready(function() {
             type: 'GET',
             url: `/system/code/commoncd/search/${currGrpCode}`,
             success: function(data) {
-                console.info("공통코드: ", data);
                 $('#pageListSub').empty();  // 기존 내용 삭제
 
                 if (!data || data.length === 0) {   // 빈 리스트 처리
@@ -247,7 +246,7 @@ $(document).ready(function() {
                     console.log("공통코드 데이터 처리 응답:", response);
                     window.location.href = '/system/code/list';
                 },
-                error: function(xhr, status, error) {
+                error: function(error) {
                     console.error("AJAX 요청 실패:", error);
                 }
             });
@@ -281,23 +280,35 @@ $(document).ready(function() {
             url: '/system/code/grpcode/search',
             data: { grpcdName: searchGrpcdName },
             success: function(data) {
-                console.log(data);
-
                 // 그룹, 공통 테이블 내용 삭제
                 $('#pageList').empty();
                 $('#pageListSub').empty();
 
-                data.searchGrpCode.forEach(function(grp) {
+                if (!data.searchGrpCode || data.searchGrpCode.length === 0) {
                     $('#pageList').append(`
                         <tr>
-                            <td><input type="checkbox"/></td>
-                            <td>${grp.grpCode || ''}</td>
-                            <td>${grp.grpcdName || ''}</td>
-                            <td>${grp.regUserId || ''}</td>
-                            <td>${grp.regDt ? formatDate(new Date(grp.regDt)) : ''}</td>
+                            <td colspan="5">조회된 데이터가 없습니다.</td>
                         </tr>
                     `);
-                });
+                } else {
+                    data.searchGrpCode.forEach(function(grp) {
+                        $('#pageList').append(`
+                            <tr>
+                                <td><input type="checkbox"/></td>
+                                <td>${grp.grpCode || ''}</td>
+                                <td>${grp.grpcdName || ''}</td>
+                                <td>${grp.regUserId || ''}</td>
+                                <td>${grp.regDt ? formatDate(new Date(grp.regDt)) : ''}</td>
+                            </tr>
+                        `);
+                    });
+                }
+
+                $('#pageListSub').append(`
+                    <tr>
+                        <td colspan="9">그룹코드를 선택 시 공통코드가 조회됩니다.</td>
+                    </tr>
+                `);
             }
         });
     }
