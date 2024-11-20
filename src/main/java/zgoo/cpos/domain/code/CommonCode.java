@@ -6,6 +6,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
@@ -15,7 +16,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import zgoo.cpos.type.CommonCodeKey;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -25,8 +25,9 @@ import zgoo.cpos.type.CommonCodeKey;
 @AllArgsConstructor
 public class CommonCode {
 
-    @EmbeddedId
-    private CommonCodeKey id;
+    @Id
+    @Column(name = "common_code")
+    private String commonCode;
 
     @Column(name = "name", length = 50)
     private String name;
@@ -54,7 +55,6 @@ public class CommonCode {
     private LocalDateTime modDt;
 
     @JoinColumn(name = "grp_code")
-    @MapsId("grpCode")
     @ManyToOne(fetch = FetchType.LAZY)
     private GrpCode group;
 

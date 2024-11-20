@@ -16,7 +16,7 @@ import zgoo.cpos.dto.code.CodeDto.CommCdBaseDto;
 public class CommonCodeRepositoryCustomImpl implements CommonCodeRepositoryCustom {
         private final JPAQueryFactory queryFactory;
         QGrpCode grpCode = QGrpCode.grpCode1;
-        QCommonCode commonCode = QCommonCode.commonCode;
+        QCommonCode commonCode = QCommonCode.commonCode1;
 
         @Override
         public List<CommonCode> findAll() {
@@ -30,8 +30,8 @@ public class CommonCodeRepositoryCustomImpl implements CommonCodeRepositoryCusto
                 return queryFactory
                                 .selectFrom(commonCode)
                                 .where(
-                                                commonCode.id.grpCode.eq(grpcode)
-                                                                .and(commonCode.id.commonCode.eq(commoncode)))
+                                                commonCode.group.grpCode.eq(grpcode)
+                                                                .and(commonCode.commonCode.eq(commoncode)))
                                 .fetchOne();
         }
 
@@ -39,7 +39,7 @@ public class CommonCodeRepositoryCustomImpl implements CommonCodeRepositoryCusto
         public List<CommonCode> findAllByGrpCode(String grpcode) {
                 return queryFactory
                                 .selectFrom(commonCode)
-                                .where(commonCode.id.grpCode.eq(grpcode))
+                                .where(commonCode.group.grpCode.eq(grpcode))
                                 .fetch();
         }
 
@@ -61,7 +61,7 @@ public class CommonCodeRepositoryCustomImpl implements CommonCodeRepositoryCusto
         public Long deleteCommonCodeOne(String commoncode) {
                 return queryFactory
                                 .delete(commonCode)
-                                .where(commonCode.id.commonCode.eq(commoncode))
+                                .where(commonCode.commonCode.eq(commoncode))
                                 .execute();
         }
 
@@ -69,7 +69,7 @@ public class CommonCodeRepositoryCustomImpl implements CommonCodeRepositoryCusto
         public Long deleteAllCommonCodeByGrpCode(String grpcode) {
                 return queryFactory
                                 .delete(commonCode)
-                                .where(commonCode.id.grpCode.eq(grpcode))
+                                .where(commonCode.group.grpCode.eq(grpcode))
                                 .execute();
         }
 
@@ -77,11 +77,11 @@ public class CommonCodeRepositoryCustomImpl implements CommonCodeRepositoryCusto
         public List<CommCdBaseDto> findCommonCdNamesByGrpCode(String grpcode) {
                 return queryFactory
                                 .select(Projections.fields(CommCdBaseDto.class,
-                                                commonCode.id.grpCode.as("grpCode"),
-                                                commonCode.id.commonCode.as("commonCode"),
+                                                commonCode.group.grpCode.as("grpCode"),
+                                                commonCode.commonCode.as("commonCode"),
                                                 commonCode.name.as("commonCodeName")))
                                 .from(commonCode)
-                                .where(commonCode.id.grpCode.eq(grpcode))
+                                .where(commonCode.group.grpCode.eq(grpcode))
                                 .fetch();
         }
 
@@ -125,7 +125,7 @@ public class CommonCodeRepositoryCustomImpl implements CommonCodeRepositoryCusto
                 return queryFactory
                                 .select(commonCode.name)
                                 .from(commonCode)
-                                .where(commonCode.id.commonCode.eq(commoncode))
+                                .where(commonCode.commonCode.eq(commoncode))
                                 .fetchOne();
         }
 
@@ -133,14 +133,14 @@ public class CommonCodeRepositoryCustomImpl implements CommonCodeRepositoryCusto
         public List<CommCdBaseDto> commonCodeStringSort(String grpcode) {
                 return queryFactory
                                 .select(Projections.fields(CommCdBaseDto.class,
-                                        commonCode.id.grpCode.as("grpCode"),
-                                        commonCode.id.commonCode.as("commonCode"),
+                                        commonCode.group.grpCode.as("grpCode"),
+                                        commonCode.commonCode.as("commonCode"),
                                         commonCode.name.as("commonCodeName")))
                                 .from(commonCode)
-                                .where(commonCode.id.grpCode.eq(grpcode))
+                                .where(commonCode.group.grpCode.eq(grpcode))
                                 .orderBy(
-                                        Expressions.numberTemplate(Integer.class, "LENGTH({0})", commonCode.id.commonCode).asc(),
-                                        commonCode.id.commonCode.asc()
+                                        Expressions.numberTemplate(Integer.class, "LENGTH({0})", commonCode.commonCode).asc(),
+                                        commonCode.commonCode.asc()
                                 )
                                 .fetch();
         }

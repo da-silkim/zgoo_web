@@ -140,10 +140,7 @@ public class CodeService {
         if (commonCodes.isEmpty())
             return Collections.emptyList();
 
-        // 공통코드 엔티티를 DTO로 변환하여 반환
-        // return commonCodes.stream()
-        // .map(this::convertToDto)
-        // .collect(Collectors.toList());
+        // entity >> dto
         return CommonCodeMapper.toDtoList(commonCodes);
     }
 
