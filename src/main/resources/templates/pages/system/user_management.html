@@ -93,12 +93,12 @@
                                 <tr th:each="user : ${ulist}">
                                     <td><input type="checkbox" /></td>
                                     <td th:text="${user.companyName}"></td>
-                                    <td th:text="${user.companyType}"></td>
+                                    <td th:text="${user.companyTypeName}"></td>
                                     <td th:text="${user.userId}"></td>
                                     <td th:text="${user.name}"></td>
                                     <td th:text="${user.phone}"></td>
                                     <td th:text="${user.email}"></td>
-                                    <td th:text="${user.authority}"></td>
+                                    <td th:text="${user.authorityName}"></td>
                                     <td th:text="${#temporals.format(user.regDt, 'yyyy-MM-dd HH:mm:ss')}"></td>
                                 </tr>
                                 <tr th:if="${ulist.size() == 0}">

@@ -200,12 +200,11 @@ public class PageController {
 
             List<CommCdBaseDto> authList = codeService.findCommonCdNamesByGrpcd("MENUACCLV");   // 메뉴권한
             model.addAttribute("authList", authList);
-            // log.info("== authList : {}", authList.toString());
             
             List<CommCdBaseDto> coKind = codeService.findCommonCdNamesByGrpcd("COKIND");        // 사업자 유형
             model.addAttribute("coKind", coKind);
 
-            List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT"); // 메뉴권한
+            List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT"); // 그리드 row 수
             model.addAttribute("showListCnt", showListCnt);
 
         } catch (Exception e) {

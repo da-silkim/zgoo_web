@@ -24,6 +24,7 @@ public class UsersDto {
         private String phone;
         private String email;
         private String authority;
+        private String authorityName;
     }
 
     @Data
@@ -35,6 +36,7 @@ public class UsersDto {
         private Long companyId;
         private String companyName;
         private String companyType;
+        private String companyTypeName;
         private LocalDateTime regDt;
     }
 

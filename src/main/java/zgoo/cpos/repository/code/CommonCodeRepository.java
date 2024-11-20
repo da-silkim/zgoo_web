@@ -3,9 +3,8 @@ package zgoo.cpos.repository.code;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import zgoo.cpos.domain.code.CommonCode;
-import zgoo.cpos.type.CommonCodeKey;
 
-public interface CommonCodeRepository extends JpaRepository<CommonCode, CommonCodeKey>, CommonCodeRepositoryCustom {
+public interface CommonCodeRepository extends JpaRepository<CommonCode, String>, CommonCodeRepositoryCustom {
     // @PersistenceContext
     // private EntityManager em;
 

@@ -2,10 +2,9 @@ package zgoo.cpos.service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
+import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -32,7 +31,6 @@ public class UsersService {
     @Transactional
     public List<UsersDto.UsersListDto> findUsersAll() {
         List<Users> usersList = this.usersRepository.findAll();
-        // List<UsersDto.UsersListDto> list = null;
 
         if(usersList.isEmpty()) {
             log.info("=== no users found ===");
@@ -124,16 +122,11 @@ public class UsersService {
         Pageable pageable = PageRequest.of(page, size);
         
         try {
-            Page<Users> usersPage = this.usersRepository.findUsersWithPagination(pageable);
-
-            // Users -> UsersListDto로 변환
-            List<UsersDto.UsersListDto> usersListDto = usersPage.getContent().stream()
-                    .map(user -> UsersMapper.toListDto(user))  // Users -> UsersListDto 변환
-                    .collect(Collectors.toList());
-
-            log.info("=== paging user info >> {}", usersListDto.toString());
-
-            return new PageImpl<>(usersListDto, pageable, usersPage.getTotalElements());
+            Page<UsersDto.UsersListDto> usersList = this.usersRepository.findUsersWithPaginationToDto(pageable);
+            return usersList;
+        } catch (DataAccessException dae) {
+            log.error("Database error occurred while fetching users with pagination: {}", dae.getMessage(), dae);
+            return Page.empty(pageable);
         } catch (Exception e) {
             log.error("Error occurred while fetching users with pagination: {}", e.getMessage(), e);
             return Page.empty(pageable);
@@ -146,16 +139,11 @@ public class UsersService {
         Pageable pageable = PageRequest.of(page, size);
         
         try {
-            Page<Users> usersPage = this.usersRepository.searchUsersWithPagination(companyId, companyType, name, pageable);
-
-            // Users -> UsersListDto로 변환
-            List<UsersDto.UsersListDto> usersListDto = usersPage.getContent().stream()
-                    .map(user -> UsersMapper.toListDto(user))  // Users -> UsersListDto 변환
-                    .collect(Collectors.toList());
-
-            log.info("=== paging user info >> {}", usersListDto.toString());
-
-            return new PageImpl<>(usersListDto, pageable, usersPage.getTotalElements());
+            Page<UsersDto.UsersListDto> usersList = this.usersRepository.searchUsersWithPaginationToDto(companyId, companyType, name, pageable);
+            return usersList;
+        } catch (DataAccessException dae) {
+            log.error("Database error occurred while fetching users with pagination: {}", dae.getMessage(), dae);
+            return Page.empty(pageable);
         } catch (Exception e) {
             log.error("Error occurred while fetching users with pagination: {}", e.getMessage(), e);
             return Page.empty(pageable);
