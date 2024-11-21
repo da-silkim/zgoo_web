@@ -7,7 +7,6 @@
     <title>DAEV</title>
 
     <link rel="stylesheet" type="text/css" th:href="@{/css/login.css}">
-    <link rel="stylesheet" type="text/css" th:href="@{/css/login.scss}">
     <link rel="shortcut icon" th:href="@{/img/favicon_dongah.ico(v=1)}" id="faviconHref" />
     <link rel="stylesheet" type="text/css" th:href="@{/css/node_modules/bootstrap/dist/css/bootstrap.min.css}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
@@ -15,6 +14,7 @@
         crossorigin="anonymous" referrerpolicy="no-referrer" />
 
     <script src="https://code.jquery.com/jquery-3.4.1.js"></script>
+    <!-- <script type="text/javascript" th:src="@{/js/login.js}"></script> -->
 </head>
 
 <body>
@@ -26,29 +26,32 @@
                 <img th:src="@{/img/dongah.png}" alt="logo" class="login-logo2"><hr>
             </div>
             <!-- login form: start -->
-            <form class="login-form needs-validation" id="loginForm">
-                <div class="form-group">
-                    <div class="input-group mb-4">
+            <form class="login-form needs-validation" id="loginForm" th:action="@{/login}" method="post">
+                <div class="form-group mb-4">
+                    <div class="input-group">
                         <span class="input-group-text" id="basicAddon1"><i class="fa-solid fa-user"></i></span>
-                        <input type="text" class="form-control" placeholder="ID" name="id" aria-label="ID"
-                            aria-describedby="basicAddon1" autocomplete="current-id" required>
+                        <input type="text" class="form-control" placeholder="ID" name="userId"
+                            th:value="${rememberedUserId != null ? rememberedUserId : (session.userId != null ? session.userId : '')}"
+                            aria-label="ID" aria-describedby="basicAddon1" autocomplete="current-id" required>
                         <div class="invalid-feedback login-invalid">아이디를 입력하세요.</div>
                     </div>
                 </div>
-                <div class="form-group">
-                    <div class="input-group mb-4">
+                <div class="form-group mb-4">
+                    <div class="input-group">
                         <span class="input-group-text" id="basicAddon2"><i class="fa-solid fa-lock"></i></span>
                         <input type="password" class="form-control" placeholder="Password" name="password"
+                            th:value="${session.password == null ? '' : session.password}"
                             aria-label="Password" aria-describedby="basicAddon2" autocomplete="current-password"
                             required>
                         <div class="invalid-feedback login-invalid">비밀번호를 입력하세요.</div>
                     </div>
                 </div>
                 <div class="form-check mb-5">
-                    <label class="form-check-label">
-                        <input type="checkbox" class="form-check-input">
+                    <span class="form-check-label">
+                        <input type="checkbox" class="form-check-input" id="rememberCheckbox" name="rememberCheckbox"
+                            th:checked="${rememberedUserId != null ? 'checked' : ''}">
                         <small>Remember ID</small>
-                    </label>
+                    </span>
                 </div>
                 <button type="submit" class="btn btn-login" id="login-form-btn">Submit</button>
             </form>
@@ -57,7 +60,23 @@
         <!-- login container: end -->
     </div>
     <!-- login: end -->
-</body>
-<script th:src="@{/js/login.js}"></script>
 
+    <script th:inline="javascript">
+        window.addEventListener('DOMContentLoaded', (event) => {
+
+            const rememberedUserId = document.cookie.split(';').find(cookie => cookie.trim().startsWith('rememberedUserId='));
+            if (rememberedUserId) {
+                document.getElementById('rememberCheckbox').checked = true;
+            } else {
+                document.getElementById('rememberCheckbox').checked = false;
+            }
+
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('error')) {
+                const loginError = /*[[${session.loginError}]]*/'';
+                alert(loginError);
+            }
+        });
+    </script>
+</body>
 </html>
