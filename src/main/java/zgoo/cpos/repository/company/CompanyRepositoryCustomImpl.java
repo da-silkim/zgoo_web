@@ -20,9 +20,9 @@ public class CompanyRepositoryCustomImpl implements CompanyRepositoryCustom {
     QCompany company = QCompany.company;
     QCompanyRelationInfo relation = QCompanyRelationInfo.companyRelationInfo;
     QCompanyContract contract = QCompanyContract.companyContract;
-    QCommonCode companyLevelCode = QCommonCode.commonCode;
-    QCommonCode companyTypeCode = QCommonCode.commonCode;
-    QCommonCode contractStatusCode = QCommonCode.commonCode;
+    QCommonCode companyLevelCode = new QCommonCode("companyLv");
+    QCommonCode companyTypeCode = new QCommonCode("companyType");
+    QCommonCode contractStatusCode = new QCommonCode("companyType");
 
     @Override
     public List<CompanyDto.CompanyListDto> findCompanyListAllCustom() {
