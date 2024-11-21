@@ -6,6 +6,7 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
+import zgoo.cpos.domain.code.QCommonCode;
 import zgoo.cpos.domain.company.QCompany;
 import zgoo.cpos.domain.company.QCompanyContract;
 import zgoo.cpos.domain.company.QCompanyRelationInfo;
@@ -19,6 +20,9 @@ public class CompanyRepositoryCustomImpl implements CompanyRepositoryCustom {
     QCompany company = QCompany.company;
     QCompanyRelationInfo relation = QCompanyRelationInfo.companyRelationInfo;
     QCompanyContract contract = QCompanyContract.companyContract;
+    QCommonCode companyLevelCode = QCommonCode.commonCode;
+    QCommonCode companyTypeCode = QCommonCode.commonCode;
+    QCommonCode contractStatusCode = QCommonCode.commonCode;
 
     @Override
     public List<CompanyDto.CompanyListDto> findCompanyListAllCustom() {
@@ -26,14 +30,18 @@ public class CompanyRepositoryCustomImpl implements CompanyRepositoryCustom {
                 company.id.as("companyId"),
                 company.companyName.as("companyName"),
                 company.companyLv.as("companyLv"),
+                companyLevelCode.name.as("companyLvName"),
                 company.companyType.as("companyType"),
+                companyTypeCode.name.as("companyTypeName"),
                 relation.parentCompanyName.as("parentCompanyName"),
                 contract.contractedAt.as("contractedAt"),
                 contract.contractEnd.as("contractEnd"),
-                contract.contractStatus.as("contractStatus")))
+                contract.contractStatus.as("contractStatus"),
+                contractStatusCode.name.as("contractStatName")))
                 .from(company)
                 .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
                 .leftJoin(contract).on(company.companyContract.eq(contract))
+                // .leftJoin(companyLevelCode).on(company.companyLv.eq(companyLevelCode.commonCode))
                 .fetch();
     }
 

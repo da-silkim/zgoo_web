@@ -142,14 +142,14 @@
                                     <th class="w-20">사업자유형<b class="required-data">*</b></th>
                                     <td class="w-30">
                                         <select id="companyType" class="form-control" required>
-                                            <option th:each="data : ${ckindlist}" th:value="${data.commonCodeName}"
+                                            <option th:each="data : ${ckindlist}" th:value="${data.commonCode}"
                                                 th:text="${data.commonCodeName}" th:field="*{companyType}"></option>
                                         </select>
                                     </td>
                                     <th class="w-20">사업자레벨<b class="required-data">*</b></th>
                                     <td class="w-30">
                                         <select id="companyLv" class="form-control" required>
-                                            <option th:each="data : ${clvlist}" th:value="${data.commonCodeName}"
+                                            <option th:each="data : ${clvlist}" th:value="${data.commonCode}"
                                                 th:text="${data.commonCodeName}" th:field="*{companyLv}"></option>
                                         </select>
                                     </td>
@@ -182,17 +182,15 @@
                                     <th class="w-20">사업자구분<b class="required-data">*</b></th>
                                     <td class="w-30">
                                         <select id="bizType" class="form-control" required>
-                                            <option th:each="biztype : ${biztypelist}"
-                                                th:value="${biztype.commonCodeName}" th:text="${biztype.commonCodeName}"
-                                                th:field="*{bizType}"></option>
+                                            <option th:each="biztype : ${biztypelist}" th:value="${biztype.commonCode}"
+                                                th:text="${biztype.commonCodeName}" th:field="*{bizType}"></option>
                                         </select>
                                     </td>
                                     <th class="w-20">업종<b class="required-data">*</b></th>
                                     <td class="w-30">
                                         <select id="bizKind" class="form-control" required>
-                                            <option th:each="bizkind : ${bizkindlist}"
-                                                th:value="${bizkind.commonCodeName}" th:text="${bizkind.commonCodeName}"
-                                                th:field="*{bizKind}"></option>
+                                            <option th:each="bizkind : ${bizkindlist}" th:value="${bizkind.commonCode}"
+                                                th:text="${bizkind.commonCodeName}" th:field="*{bizKind}"></option>
                                         </select>
                                     </td>
                                 </tr>
@@ -301,7 +299,7 @@
                                     <td class="w-30">
                                         <select id="consignmentState" class="form-control" required>
                                             <option th:each="element : ${consignmentList}"
-                                                th:value="${element.commonCodeName}" th:text="${element.commonCodeName}"
+                                                th:value="${element.commonCode}" th:text="${element.commonCodeName}"
                                                 th:field="*{consignmentPayment}">
                                             </option>
                                         </select>
@@ -339,7 +337,7 @@
                                     <td class="w-30">
                                         <select id="contractState" class="form-control" required>
                                             <option th:each="element : ${contractStatList}"
-                                                th:value="${element.commonCodeName}" th:text="${element.commonCodeName}"
+                                                th:value="${element.commonCode}" th:text="${element.commonCodeName}"
                                                 th:field="*{contractStatus}">
                                             </option>
                                         </select>

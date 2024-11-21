@@ -97,16 +97,16 @@ document.addEventListener("DOMContentLoaded", function () {
         //기존 옵션 초기화
         parentCompanySelect.innerHTML = '<option value="">없음</option>';
 
-        if (selectedCompanyLv === "하위사업자") {
-            companyList.filter(company => company.companyLv === "상위사업자")
+        if (selectedCompanyLv === "MID") {
+            companyList.filter(company => company.companyLv === "TOP")
                 .forEach(company => {
                     const option = document.createElement("option");
                     option.value = company.companyName;
                     option.textContent = company.companyName;
                     parentCompanySelect.appendChild(option);
                 });
-        } else if (selectedCompanyLv === "최하위사업자") {
-            companyList.filter(company => company.companyLv === "하위사업자")
+        } else if (selectedCompanyLv === "LOW") {
+            companyList.filter(company => company.companyLv === "MID")
                 .forEach(company => {
                     const option = document.createElement("option");
                     option.value = company.companyName;
@@ -128,7 +128,8 @@ document.addEventListener("DOMContentLoaded", function () {
         const f_mid = document.getElementById("mID");
         const f_merchantkey = document.getElementById("merchantKey");
 
-        if (selectedOption === "자체") {
+        //자체 : S, 위탁 : C
+        if (selectedOption === "S") {
             //활성화
             f_mallid.disabled = false;
             f_mid.disabled = false;
@@ -227,7 +228,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     // 서버 응답 후 처리 (예: 검색 결과 출력)
                     console.log("검색 결과:", data);
 
-                    document.getElementById("companyType").value = data.companyType ? data.companyType : "";
+                    // document.getElementById("companyType").value = data.companyType ? data.companyType : "";
                     document.getElementById("companyType").value = data.companyType ? data.companyType : "";
                     document.getElementById("companyLv").value = data.companyLv ? data.companyLv : "";
                     document.getElementById("companyName").value = data.companyName ? data.companyName : "";
