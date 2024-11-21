@@ -46,8 +46,8 @@ input.input-add-row:focus {
 .top-nav .lang-content { float: right; margin: 24px 10px; }
 .top-nav .lang-content > label { color: white; }
 .top-nav .lang-content .input-lang { width: 120px; text-align: center; border-radius: 5px; }
-.top-nav .lang-content #loginContainer {text-decoration: none;}
-.top-nav .lang-content #loginContainer #login { color: white; font-size: 18px; }
+.top-nav .lang-content #loginContainer, .top-nav .lang-content #logoutContainer {text-decoration: none;}
+.top-nav .lang-content #loginContainer #login, .top-nav .lang-content #logoutContainer #logout { color: white; font-size: 18px; }
 
 /* 사이드바 */
 .side-nav { width: 50px; height: 100vh;  background-color: white;  z-index: 999; float: left; padding-top: 80px; transition: width 0.3s ease; overflow: hidden; }
