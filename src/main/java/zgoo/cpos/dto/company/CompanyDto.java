@@ -23,7 +23,9 @@ public class CompanyDto {
         private Long companyId;
         private String companyName;
         private String companyLv; // 사업자구분
+        private String companyLvName;
         private String companyType; // 사업자유형
+        private String companyTypeName;
     }
 
     @Data
@@ -36,7 +38,8 @@ public class CompanyDto {
         private String parentCompanyName; // 상위사업자명
         private LocalDateTime contractedAt; // 서비스가입일
         private LocalDateTime contractEnd; // 가입종료일
-        private String contractStatus; // 계약상태
+        private String contractStatus; // 계약상태 코드
+        private String contractStatName;
     }
 
     @Data
