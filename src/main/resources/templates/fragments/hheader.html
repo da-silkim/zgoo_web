@@ -4,8 +4,11 @@
             <img th:src="@{/img/dongah_white.png}" alt="logo" class="dashboard-logo">
         </a>
         <span class="lang-content">
-            <a th:href="@{/}" id="loginContainer">
+            <a th:href="@{/}" id="loginContainer" sec:authorize="isAnonymous()">
                 <span class="me-4" id="login">Sign In<i class="fa-solid fa-right-to-bracket ms-3"></i></span>
+            </a>
+            <a th:href="@{/logout}" id="logoutContainer" sec:authorize="isAuthenticated()">
+                <span class="me-4" id="logout">Sign Out<i class="fa-solid fa-right-from-bracket ms-3"></i></i></span>
             </a>
         </span>
     </div>
