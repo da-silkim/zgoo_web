@@ -11,36 +11,40 @@
                 <div class="card-body">
                     <div class="card-title"><span class="card-title-bar"></span><span>검색조건</span></div>
                     <!-- form start -->
-                    <form class="position-relative">
+                    <form id="searchForm" class="position-relative" th:action="@{/biz/list}" method="get">
                         <div class="row mb-3 row-cols-2 row-cols-lg-3 g-2">
                             <div class="col d-flex align-items-center p-0 search-border">
-                                <label for="business"
+                                <label for="companyIdSearch"
                                     class="d-flex justify-content-center align-items-center flex-shrink-0 col-form-label font-weight-bold text-center w-25"
                                     style="background-color: #F5F5F5; height: 54px;">사업자명<b>*</b></label>
-                                <select id="business" class="mx-3 form-control" name="business" required>
+                                <select id="companyIdSearch" class="mx-3 form-control" name="companyIdSearch" required>
                                     <option th:value="*{null}" th:text="'(없음)'"></option>
                                     <option th:each="company : ${companyList}" th:value="${company.companyId}"
-                                        th:text="${company.companyName}"></option>
+                                        th:text="${company.companyName}"
+                                        th:selected="${company.companyId == selectedCompanyId}"></option>
                                 </select>
                             </div>
                             <div class="col d-flex align-items-center search-border">
-                                <label for="businessType"
+                                <label for="companyTypeSearch"
                                     class="d-flex justify-content-center align-items-center flex-shrink-0 col-form-label font-weight-bold text-center w-25"
                                     style="background-color: #F5F5F5; height: 54px;">사업자유형<b>*</b></label>
-                                <select id="businessType" class="mx-3 form-control" name="businessType" required>
+                                <select id="companyTypeSearch" class="mx-3 form-control" name="companyTypeSearch"
+                                    required>
                                     <option th:value="*{null}" th:text="'(없음)'"></option>
-                                    <option th:each="data : ${ckindlist}" th:value="${data.commonCodeName}"
-                                        th:text="${data.commonCodeName}"></option>
+                                    <option th:each="data : ${ckindlist}" th:value="${data.commonCode}"
+                                        th:text="${data.commonCodeName}"
+                                        th:selected="${data.commonCode == selectedCompanyKind}"></option>
                                 </select>
                             </div>
                             <div class="col d-flex align-items-center search-border">
-                                <label for="businessLv"
+                                <label for="companyLvSearch"
                                     class="d-flex justify-content-center align-items-center flex-shrink-0 col-form-label font-weight-bold text-center w-25"
                                     style="background-color: #F5F5F5; height: 54px;">사업자레벨<b>*</b></label>
-                                <select class="mx-3 form-control" id="businessLv" name="businessLv" required>
+                                <select class="mx-3 form-control" id="companyLvSearch" name="companyLvSearch" required>
                                     <option th:value="*{null}" th:text="'(없음)'"></option>
-                                    <option th:each="data : ${clvlist}" th:value="${data.commonCodeName}"
-                                        th:text="${data.commonCodeName}"></option>
+                                    <option th:each="data : ${clvlist}" th:value="${data.commonCode}"
+                                        th:text="${data.commonCodeName}"
+                                        th:selected="${data.commonCode == selectedCompanyLv}"></option>
                                 </select>
                             </div>
                         </div>
@@ -74,9 +78,13 @@
                                 class="bi bi-trash me-2"></i>삭제</button>
 
                         <span class="position-absolute" style="right: 0; bottom: 0;">
-                            <span id="page-info"></span>
-                            <select class="mx-3 page-select" id="" name="">
-                                <option value='%'>10개</option>
+                            <span id="pageInfo">
+                                <span
+                                    th:text="'Page ' + (${currentPage + 1}) + ' of ' + ${totalPages} + ' [총 ' + ${totalCount} + '건]'"></span>
+                            </span>
+                            <select class="mx-3 page-select" id="size" name="size">
+                                <option th:each="data : ${showListCnt}" th:value="${data.commonCode}"
+                                    th:text="${data.commonCodeName}" th:selected="${data.commonCode == size}"></option>
                             </select>
                         </span>
                     </div>
@@ -85,7 +93,6 @@
                             <thead>
                                 <tr class="table-border-top">
                                     <th scope="col"></th>
-                                    <th scope="col">사업자ID</th>
                                     <th scope="col">사업자명</th>
                                     <th scope="col">사업자구분</th>
                                     <th scope="col">사업자유형</th>
@@ -98,22 +105,51 @@
                             <tbody id="pageList">
                                 <tr th:each="company : ${companyList}">
                                     <td><input type="checkbox" /></td>
-                                    <td th:text="${company.companyId}"></td>
                                     <td th:text="${company.companyName}"></td>
-                                    <td th:text="${company.companyLv}"></td>
-                                    <td th:text="${company.companyType}"></td>
+                                    <td th:text="${company.companyLvName}"></td>
+                                    <td th:text="${company.companyTypeName}"></td>
                                     <td th:text="${company.parentCompanyName}"></td>
                                     <td th:text="${#temporals.format(company.contractedAt,'yyyy-MM-dd HH:mm:ss')}"></td>
                                     <td th:text="${#temporals.format(company.contractEnd,'yyyy-MM-dd HH:mm:ss')}"></td>
-                                    <td th:text="${company.contractStatus}"></td>
-
+                                    <td th:text="${company.contractStatName}"></td>
+                                </tr>
+                                <tr th:if="${companyList.size() == 0}">
+                                    <td colspan="9">조회된 데이터가 없습니다.</td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
-                    <div class="text-center">
-                        <ul class="pagination" id="paging"></ul>
+                    <!-- paging navigation start -->
+                    <div th:if="${companyList.size() > 0}">
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled' : ''">
+                                <a class="page-link" th:href="@{/biz/list(page=0, size=${size}, companyIdSearch=${selectedCompanyId},
+                                companyTypeSearch=${selectedCompanyKind}, companyLvSearch=${selectedCompanyLv})}"><i
+                                        class="bi bi-chevron-double-left"></i></a>
+                            </li>
+                            <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled' : ''">
+                                <a class="page-link" th:href="@{/biz/list(page=${currentPage-1}, size=${size}, companyIdSearch=${selectedCompanyId},
+                                companyTypeSearch=${selectedCompanyKind}, companyLvSearch=${selectedCompanyLv})}"><i
+                                        class="bi bi-chevron-left"></i></a>
+                            </li>
+                            <li class="page-item" th:each="i : ${#numbers.sequence(currentPage - 2, currentPage + 2)}"
+                                th:if="${i >= 0 && i < totalPages}">
+                                <a class="page-link" th:href="@{/biz/list(page=${i}, size=${size}, companyIdSearch=${selectedCompanyId},
+                                companyTypeSearch=${selectedCompanyKind}, companyLvSearch=${selectedCompanyLv})}"
+                                    th:text="${i+1}" th:classappend="${i == currentPage} ? 'active' : ''"></a>
+                            <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled' : ''">
+                                <a class="page-link" th:href="@{/biz/list(page=${currentPage+1}, size=${size}, companyIdSearch=${selectedCompanyId},
+                                companyTypeSearch=${selectedCompanyKind}, companyLvSearch=${selectedCompanyLv})}"><i
+                                        class="bi bi-chevron-right"></i></a>
+                            </li>
+                            <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled' : ''">
+                                <a class="page-link" th:href="@{/biz/list(page=${totalPages - 1}, size=${size}, companyIdSearch=${selectedCompanyId},
+                                companyTypeSearch=${selectedCompanyKind}, companyLvSearch=${selectedCompanyLv})}"><i
+                                        class="bi bi-chevron-double-right"></i></a>
+                            </li>
+                        </ul>
                     </div>
+                    <!-- paging navigation end -->
                 </div>
                 <!-- card body:3 end -->
             </div>

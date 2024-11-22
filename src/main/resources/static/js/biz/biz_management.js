@@ -6,77 +6,44 @@ document.addEventListener("DOMContentLoaded", function () {
     // '검색' 버튼 클릭 이벤트 처리
     document.getElementById("companySearchBtn").addEventListener("click", function () {
 
-        // 폼 요소 가져오기
-        const business = document.getElementById("business").value;
-        const businessType = document.getElementById("businessType").value;
-        const businessLv = document.getElementById("businessLv").value;
+        const selectedSize = document.getElementById('size').value;
+        const form = document.getElementById('searchForm');
 
-        // 선택된 값 콘솔 출력 (디버깅용)
-        console.log("사업자명:", business);
-        console.log("사업자유형:", businessType);
-        console.log("사업자레벨:", businessLv);
+        const hiddenSizeInput = document.createElement('input');
+        hiddenSizeInput.type = 'hidden';
+        hiddenSizeInput.name = 'size';
+        hiddenSizeInput.value = selectedSize;
+        hiddenSizeInput.id = 'hiddenSizeInput';
 
-        // 선택된 값으로 필터링을 위한 요청 처리 (예시: AJAX, Fetch API 등)
-        // 예를 들어, Fetch API로 서버에 데이터를 전송하는 방법
-        fetch("/biz_management/biz/search", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                companyId: business,
-                companyType: businessType,
-                companyLv: businessLv
-            })
-        })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error("업체정보 조회 실패: " + response.statusText);
-                }
-                return response.json();
-            })
-            .then(data => {
-                // 서버 응답 후 처리 (예: 검색 결과 출력)
-                console.log("검색 결과:", data);
-
-                const tableBody = document.getElementById("pageList");
-                tableBody.innerHTML = "";       //기존내용 초기화
-
-                data.forEach(company => {
-                    const row = document.createElement("tr");
-
-                    row.innerHTML = `
-                    <td><input type="checkbox"/></td>
-                    <td>${company.companyId || ''}</td>
-                    <td>${company.companyName || ''}</td>
-                    <td>${company.companyLv || ''}</td>
-                    <td>${company.companyType || ''}</td>
-                    <td>${company.parentCompanyName || ''}</td>
-                    <td>${formatDate(company.contractedAt) || ''}</td>
-                    <td>${formatDate(company.contractEnd) || ''}</td>
-                    <td>${company.contractStatus || ''}</td>
-                `;
-
-                    tableBody.appendChild(row);
-
-                });
-
-            })
-            .catch(error => {
-                console.error("업체정보 조회 실패:", error);
-            });
+        form.appendChild(hiddenSizeInput);
+        form.submit();
     });
 
 
     // '초기화' 버튼 클릭 이벤트 처리
     document.getElementById("resetBtn").addEventListener("click", function () {
         // 폼 필드 초기화
-        document.getElementById("business").selectedIndex = 0; // 사업자명 초기화 (첫 번째 옵션)
-        document.getElementById("businessType").selectedIndex = 0; // 사업자유형 초기화 (첫 번째 옵션)
-        document.getElementById("businessLv").selectedIndex = 0; // 사업자레벨 초기화 (첫 번째 옵션)
+        document.getElementById("companyIdSearch").selectedIndex = 0; // 사업자명 초기화 (첫 번째 옵션)
+        document.getElementById("companyTypeSearch").selectedIndex = 0; // 사업자유형 초기화 (첫 번째 옵션)
+        document.getElementById("companyLvSearch").selectedIndex = 0; // 사업자레벨 초기화 (첫 번째 옵션)
 
         // 로그 출력 (디버깅용)
         console.log("폼 필드가 초기화되었습니다.");
+    });
+
+    // pagination
+    $('#size').on('change', function () {
+        // 현재 URL에서 쿼리 파라미터 추출
+        const urlParams = new URLSearchParams(window.location.search);
+        const selectedSize = document.getElementById("size").value;
+        const selectedCompanyId = urlParams.get('companyIdSearch') || '';
+        const selectedCompanyType = urlParams.get('companyTypeSearch') || '';
+        const selectedName = urlParams.get('companyLvSearch') || '';
+
+        window.location.href = "/biz/list?page=0&size=" + selectedSize +
+            "&companyIdSearch=" + (selectedCompanyId) +
+            "&companyTypeSearch=" + encodeURIComponent(selectedCompanyType) +
+            "&companyLvSearch=" + encodeURIComponent(selectedName);
     });
 
     // 등록 모달 열릴 떄 이벤트 설정
@@ -116,6 +83,8 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
     }
+
+
 
     // PG결제정보 자체/위탁 옵션에 따른 활성/비활성화 처리 함수
     document.getElementById("consignmentState").addEventListener("change", consignmentOptionCheck);
@@ -376,7 +345,11 @@ function formatDate(dateString) {
 
 // 날짜 형식을 LocalDateTIme 형식으로 변환
 function formatToLocalDateTimeString(date) {
-    return date + "T00:00:00";
+    // Ensure the date is non-empty and valid
+    if (!date || date.trim() === "") {
+        return null; // Return null if no date is provided
+    }
+    return date.trim() + "T00:00:00"; // Append time only to valid dates
 }
 
 // 문자열 형식의 날짜를 Date 형식으로 변환

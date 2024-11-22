@@ -8,6 +8,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,7 +38,7 @@ public class CompanyServiceTest {
         // given
 
         // when
-        List<CompanyDto.CompanyListDto> flist = companyService.searchCompanyAll();
+        Page<CompanyDto.CompanyListDto> flist = companyService.searchCompanyAll(0, 0);
 
         for (CompanyListDto companyListDto : flist) {
             System.out.println("=== result : " + companyListDto.toString());
@@ -85,7 +86,7 @@ public class CompanyServiceTest {
         companyService.saveCompanyRoamingInfo(saveCompany, rdtos);
 
         // then
-        List<CompanyListDto> flist = companyService.searchCompanyAll();
+        Page<CompanyListDto> flist = companyService.searchCompanyAll(0, 0);
         for (CompanyListDto data : flist) {
             System.out.println("=== result : " + data.toString());
         }

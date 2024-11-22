@@ -1,8 +1,6 @@
 package zgoo.cpos.controller;
 
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.HttpStatus;
@@ -23,8 +21,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import zgoo.cpos.domain.company.Company;
 import zgoo.cpos.dto.company.CompanyDto;
-import zgoo.cpos.dto.company.CompanyDto.BaseCompnayDto;
-import zgoo.cpos.dto.company.CompanyDto.CompanyListDto;
 import zgoo.cpos.dto.company.CompanyDto.CompanyRegDto;
 import zgoo.cpos.service.CompanyService;
 
@@ -35,31 +31,9 @@ import zgoo.cpos.service.CompanyService;
 public class CompanyController {
     private final CompanyService companyService;
 
-    /*
-     * 사업자 조회 - 검색창
-     */
-    @PostMapping("/biz/search")
-    public ResponseEntity<List<CompanyListDto>> searchCompany(@RequestBody BaseCompnayDto dto) {
-        log.info("== searchCompany Request(dto) : {}", dto.toString());
-        try {
-            List<CompanyListDto> result = companyService.searchCompanyListWith(dto);
-
-            if (result.isEmpty()) {
-                return ResponseEntity.ok(Collections.emptyList()); // 빈 리스트 반환
-            }
-
-            return ResponseEntity.ok(result);
-
-        } catch (Exception e) {
-            log.error("[Controller - searchCompany] : {}", e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-        }
-
-    }
-
     @GetMapping("/biz/search/{companyId}")
     public ResponseEntity<CompanyRegDto> searchForUpdate(@PathVariable String companyId) {
-        log.info("=== search(update) >> companyId:{}", companyId);
+        log.info("=== search By Id >> companyId:{}", companyId);
         try {
             CompanyRegDto findOne = companyService.searchCompanyById(companyId);
 
