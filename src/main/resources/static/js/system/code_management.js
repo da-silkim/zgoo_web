@@ -64,6 +64,7 @@ $(document).ready(function() {
         $('#grpModalBtn').text(btnMsg);
         $('#grpCodeM').val('');
         $('#grpcdNameM').val('');
+        $('#grpCodeM').prop('disabled', false);
     });
 
     // 그룹코드 - 수정
@@ -71,6 +72,7 @@ $(document).ready(function() {
         grpModalCon = true;
         btnMsg = "수정";
         $('#grpModalBtn').text(btnMsg);
+        $('#grpCodeM').prop('disabled', true);
 
         // 선택된 행이 있는 경우
         if (grpSelectRow) {
@@ -121,6 +123,7 @@ $(document).ready(function() {
         $('#referenceCode1').val('');
         $('#referenceCode2').val('');
         $('#referenceCode3').val('');
+        $('#commonCode').prop('disabled', false);
     });
 
     // 공통코드 - 수정
@@ -128,6 +131,7 @@ $(document).ready(function() {
         comModalCon = true;
         btnMsg = "수정";
         $('#comModalBtn').text(btnMsg);
+        $('#commonCode').prop('disabled', true);
 
         // 선택된 행이 있는 경우
         if (comSelectRow) {
