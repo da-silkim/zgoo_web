@@ -12,6 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -76,10 +77,14 @@ public class CommonController {
     // 그룹코드 - 등록
     @PostMapping("/grpcode/new")
     public ResponseEntity<Map<String, String>> createGrpCode(@Valid @RequestBody GrpCodeDto dto,
-            BindingResult result) {
+            BindingResult result, @ModelAttribute("loginUserId") String loginUserId) {
         log.info("==== create group code ======");
-
+        
         Map<String, String> response = new HashMap<>();
+
+        if (loginUserId != null) {
+            dto.setRegUserId(loginUserId);
+        }
 
         if (result.hasErrors()) {
             log.error("그룹코드 등록 에러: {}", result.getAllErrors());
@@ -149,8 +154,12 @@ public class CommonController {
 
     // 그룹코드 - 그룹코드명 수정
     @PatchMapping("/grpcode/update")
-    public ResponseEntity<String> updateGrpCode(@RequestBody GrpCodeDto grpCodeDto) {
+    public ResponseEntity<String> updateGrpCode(@RequestBody GrpCodeDto grpCodeDto, @ModelAttribute("loginUserId") String loginUserId) {
         log.info("==== update group code(list) ======");
+
+        if (loginUserId != null) {
+            grpCodeDto.setModUserId(loginUserId);
+        }
 
         try {
             this.codeService.updateGrpCode(grpCodeDto);
@@ -179,7 +188,7 @@ public class CommonController {
     // 공통코드 - 등록
     @PostMapping("/commoncd/new")
     public ResponseEntity<Map<String, String>> createCommonCode(@Valid @RequestBody CommCodeDto dto,
-            BindingResult result) {
+            BindingResult result, @ModelAttribute("loginUserId") String loginUserId) {
         log.info("==== create common code(list) ======");
         log.info("grpCode: {}, comCode: {}", dto.getGrpCode(), dto.getCommonCode());
 
@@ -189,6 +198,10 @@ public class CommonController {
             log.error("DTO 또는 ID가 NULL입니다.");
             response.put("message", "DTO 또는 ID가 NULL입니다.");
             return ResponseEntity.badRequest().body(response);
+        }
+
+        if (loginUserId != null) {
+            dto.setRegUserId(loginUserId);
         }
 
         if (result.hasErrors()) {
@@ -242,14 +255,18 @@ public class CommonController {
 
     // 공통코드 - 수정
     @PatchMapping("/commoncd/update")
-    public ResponseEntity<Map<String, String>> updateCommonCode(@RequestBody CommCodeDto commonCdDto) {
+    public ResponseEntity<Map<String, String>> updateCommonCode(@RequestBody CommCodeDto commonCdDto,
+            @ModelAttribute("loginUserId") String loginUserId) {
         log.info("==== update common code(list) ======");
 
         Map<String, String> response = new HashMap<>();
 
+        if (loginUserId != null) {
+            commonCdDto.setModUserId(loginUserId);
+        }
+        
         try {
-            CommCodeDto updatedCommonCode = this.codeService.updateCommonCodeInfo(commonCdDto.getGrpCode(),
-                    commonCdDto.getCommonCode(), commonCdDto.getCommonCodeName());
+            CommCodeDto updatedCommonCode = this.codeService.updateCommonCodeInfo(commonCdDto);
             response.put("message", "공통코드가 성공적으로 수정되었습니다.");
             response.put("updatedCommonCode", updatedCommonCode.toString()); // 필요 시 수정된 코드 정보를 포함할 수 있습니다.
             return ResponseEntity.ok(response);

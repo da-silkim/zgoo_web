@@ -16,6 +16,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import zgoo.cpos.dto.code.CodeDto.CommCodeDto;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -58,8 +59,9 @@ public class CommonCode {
     @ManyToOne(fetch = FetchType.LAZY)
     private GrpCode group;
 
-    public void updateCommonCodeName(String commonCodeName) {
-        this.name = commonCodeName;
+    public void updateCommonCodeName(CommCodeDto cdto) {
+        this.name = cdto.getCommonCodeName();
+        this.modUserId = cdto.getModUserId();
         this.modDt = LocalDateTime.now();
     }
 

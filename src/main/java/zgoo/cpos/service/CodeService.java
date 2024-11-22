@@ -181,15 +181,14 @@ public class CodeService {
      * 여러개의 data를 업데이트 해야 할 경우 벌크
      */
     @Transactional
-    public CodeDto.CommCodeDto updateCommonCodeInfo(String origin_grpcode, String origin_commoncd,
-            String commoncdName) {
+    public CodeDto.CommCodeDto updateCommonCodeInfo(CommCodeDto cdto) {
 
         // @Transactional 어노테이션으로 조회시 영속성 상태로 전환
-        CommonCode findOne = commonCodeRepository.findCommonCodeOne(origin_grpcode, origin_commoncd);
+        CommonCode findOne = commonCodeRepository.findCommonCodeOne(cdto.getGrpCode(), cdto.getCommonCode());
 
         log.info("=== before update: {}", findOne.toString());
 
-        findOne.updateCommonCodeName(commoncdName);
+        findOne.updateCommonCodeName(cdto);
 
         log.info("=== after update: {}", findOne.toString());
 
@@ -228,7 +227,7 @@ public class CodeService {
 
         log.info("=== before update: {}", findOne.toString());
 
-        findOne.updateGrpcdCode(grpcode.getGrpcdName());
+        findOne.updateGrpcdCode(grpcode);
 
         log.info("=== after update: {}", findOne.toString());
 

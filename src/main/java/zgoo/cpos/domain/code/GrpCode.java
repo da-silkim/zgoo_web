@@ -11,6 +11,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import zgoo.cpos.dto.code.CodeDto.GrpCodeDto;
 
 @Entity
 @Getter
@@ -50,8 +51,9 @@ public class GrpCode {
     // this.modDt = modDt;
     // }
 
-    public void updateGrpcdCode(String grpcdName) {
-        this.grpcdName = grpcdName;
+    public void updateGrpcdCode(GrpCodeDto grpcode) {
+        this.grpcdName = grpcode.getGrpcdName();
+        this.modUserId = grpcode.getModUserId();
         this.modDt = LocalDateTime.now();
     }
 }

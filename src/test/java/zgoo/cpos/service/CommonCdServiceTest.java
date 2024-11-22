@@ -189,9 +189,18 @@ public class CommonCdServiceTest {
         String origin_commoncd = "GCTEST3-1";
         String changeCommonCdName = "gctest3-1";
 
+         // 공통코드 수정 DTO 생성
+        CommCodeDto commonCdDto = CommCodeDto.builder()
+                .grpCode(origin_grpcode)
+                .commonCode(origin_commoncd)
+                .commonCodeName(changeCommonCdName) // 변경될 공통코드명
+                .modUserId("testUser") // 수정할 사용자 ID
+                .modDt(LocalDateTime.now()) // 수정 시간
+                .build();
+
         // when
         // 공통코드 수정
-        CommCodeDto updateOne = codeService.updateCommonCodeInfo(origin_grpcode, origin_commoncd, changeCommonCdName);
+        CommCodeDto updateOne = codeService.updateCommonCodeInfo(commonCdDto);
 
         System.out.println("==result code : " + updateOne.getCommonCodeName());
         // then
