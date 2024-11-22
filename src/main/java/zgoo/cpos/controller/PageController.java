@@ -145,17 +145,17 @@ public class PageController {
 
     @GetMapping("/system/user/list")
     public String showuserlist(
-        @RequestParam(value = "companyIdSearch", required = false) Long companyId,
-        @RequestParam(value = "companyTypeSearch", required = false) String companyType,
-        @RequestParam(value = "nameSearch", required = false) String name,
-        @RequestParam(value = "page", defaultValue="0") int page,
-        @RequestParam(value = "size", defaultValue="10") int size,
-        Model model) {
+            @RequestParam(value = "companyIdSearch", required = false) Long companyId,
+            @RequestParam(value = "companyTypeSearch", required = false) String companyType,
+            @RequestParam(value = "nameSearch", required = false) String name,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size,
+            Model model) {
 
         log.info("=== User List Page ===");
         log.info("companyId: {}, companyType: {}, name: {}", companyId, companyType, name);
         model.addAttribute("usersDto", new UsersDto.UsersRegDto());
-       
+
         /*
          * required = false일 때 요청 파라미터 값이 없으면 null를 저장해야 하는데
          * companyType, name 값이 공백으로 처리되는 문제발생(companyId는 정상적으로 처리)
@@ -173,15 +173,15 @@ public class PageController {
             log.info("=== user DB search result >>>");
 
             // 사업자 list
-            List<CompanyListDto> companyList = companyService.searchCompanyAll();
+            Page<CompanyListDto> companyList = companyService.searchCompanyAll(page, size);
             model.addAttribute("companyList", companyList);
-            
+
             // 사용자 list
             Page<UsersDto.UsersListDto> userList;
 
-            if(companyId == null && companyType == null && name == null) {  // 검색 조건이 없으면 전체 조회
+            if (companyId == null && companyType == null && name == null) { // 검색 조건이 없으면 전체 조회
                 userList = usersService.findUsersAll(page, size);
-            } else {    // 검색 조건이 1개 이상 존재할 경우
+            } else { // 검색 조건이 1개 이상 존재할 경우
                 userList = usersService.searchUsersListWithPagination(companyId, companyType, name, page, size);
             }
 
@@ -190,18 +190,18 @@ public class PageController {
             model.addAttribute("selectedCompanyType", companyType);
             model.addAttribute("selectedName", name);
 
-            int totalPages = userList.getTotalPages() == 0 ? 1 : userList.getTotalPages();  // 전체 페이지 수
+            int totalPages = userList.getTotalPages() == 0 ? 1 : userList.getTotalPages(); // 전체 페이지 수
 
-            model.addAttribute("ulist", userList.getContent());               // 사용자 list
-            model.addAttribute("size", String.valueOf(size));                 // 페이지당 보여지는 데이터 건 수
-            model.addAttribute("currentPage", page);                          // 현재 페이지
-            model.addAttribute("totalPages", totalPages);                     // 총 페이지 수
-            model.addAttribute("totalCount", userList.getTotalElements());    // 총 데이터
+            model.addAttribute("ulist", userList.getContent()); // 사용자 list
+            model.addAttribute("size", String.valueOf(size)); // 페이지당 보여지는 데이터 건 수
+            model.addAttribute("currentPage", page); // 현재 페이지
+            model.addAttribute("totalPages", totalPages); // 총 페이지 수
+            model.addAttribute("totalCount", userList.getTotalElements()); // 총 데이터
 
-            List<CommCdBaseDto> authList = codeService.findCommonCdNamesByGrpcd("MENUACCLV");   // 메뉴권한
+            List<CommCdBaseDto> authList = codeService.findCommonCdNamesByGrpcd("MENUACCLV"); // 메뉴권한
             model.addAttribute("authList", authList);
-            
-            List<CommCdBaseDto> coKind = codeService.findCommonCdNamesByGrpcd("COKIND");        // 사업자 유형
+
+            List<CommCdBaseDto> coKind = codeService.findCommonCdNamesByGrpcd("COKIND"); // 사업자 유형
             model.addAttribute("coKind", coKind);
 
             List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT"); // 그리드 row 수
@@ -338,20 +338,52 @@ public class PageController {
      * 업체관리 > 사업자관리
      */
     @GetMapping("/biz/list")
-    public String showbizlist(Model model) {
+    public String showbizlist(
+            @RequestParam(value = "companyIdSearch", required = false) Long companyId,
+            @RequestParam(value = "companyTypeSearch", required = false) String companyType,
+            @RequestParam(value = "companyLvSearch", required = false) String companyLv,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size,
+            Model model) {
+
         log.info("=== Biz managment List Page ===");
+        log.info("== companyId: {}, companyType:{}, companyLv: {}, page: {}, size: {}", companyId, companyType,
+                companyLv, page, size);
 
         // 업체 등록폼 전달
         model.addAttribute("companyRegDto", new CompanyRegDto());
-        // 업체 로밍정보 등록폼 전달
+
+        Page<CompanyListDto> companyList;
 
         try {
-            log.info("=== DB search result >>>");
-            // 사업자 list
-            List<CompanyListDto> flist = companyService.searchCompanyAll();
-            log.info("=== companyListDto : {}", flist.toString());
-            model.addAttribute("companyList", flist);
+            log.info("=== Compnay DB search result >>>");
 
+            // check null and call the approrpiate search method
+            if (companyId != null) {
+                log.info("Searching by companyId: {}", companyId);
+                companyList = companyService.searchCompanyById(companyId, page, size);
+            } else if (companyType != null && !companyType.isEmpty()) {
+                log.info("Searching by companyType: {}", companyType);
+                companyList = companyService.searchCompanyByType(companyType, page, size);
+            } else if (companyLv != null && !companyLv.isEmpty()) {
+                log.info("Searching by CompanyLevel", companyLv);
+                companyList = companyService.searchCompanyByLevel(companyLv, page, size);
+            } else {
+                log.info("Fetching all companies >> ");
+                companyList = companyService.searchCompanyAll(page, size);
+            }
+
+            log.info("=== companyListDto : {}", companyList.toString());
+
+            // page 처리
+            int totalPages = companyList.getTotalPages() == 0 ? 1 : companyList.getTotalPages(); // 전체 페이지 수
+            model.addAttribute("companyList", companyList.getContent()); // 사용자 list
+            model.addAttribute("size", String.valueOf(size)); // 페이지당 보여지는 데이터 건 수
+            model.addAttribute("currentPage", page); // 현재 페이지
+            model.addAttribute("totalPages", totalPages); // 총 페이지 수
+            model.addAttribute("totalCount", companyList.getTotalElements()); // 총 데이터
+
+            // select options 조회
             List<CommCdBaseDto> lvList = codeService.findCommonCdNamesByGrpcd("COLV"); // 사업자레벨
             log.info("== lvList : {}", lvList.toString());
             model.addAttribute("clvlist", lvList);
@@ -382,9 +414,13 @@ public class PageController {
             log.info("=== mcompanyList : {}", mcompanyList.toString());
             model.addAttribute("mcompanyList", mcompanyList);
 
+            List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT"); // 그리드 row 수
+            model.addAttribute("showListCnt", showListCnt);
+
         } catch (Exception e) {
 
             log.error("Error occurred while fetching company list: {}", e.getMessage(), e);
+            companyList = Page.empty();
         }
 
         return "pages/biz/biz_management";

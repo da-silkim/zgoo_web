@@ -5,6 +5,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +20,7 @@ import zgoo.cpos.domain.company.CompanyPG;
 import zgoo.cpos.domain.company.CompanyRelationInfo;
 import zgoo.cpos.domain.company.CompanyRoaming;
 import zgoo.cpos.dto.company.CompanyDto;
+import zgoo.cpos.dto.company.CompanyDto.CompanyListDto;
 import zgoo.cpos.dto.company.CompanyDto.CompanyRegDto;
 import zgoo.cpos.dto.company.CompanyDto.CompanyRoamingtDto;
 import zgoo.cpos.mapper.CompanyMapper;
@@ -40,29 +44,26 @@ public class CompanyService {
     /*
      * 조회(사업자리스트 - CompanyDto.CompanyListDto)
      */
-    public List<CompanyDto.CompanyListDto> searchCompanyAll() {
-        return companyRepository.findCompanyListAllCustom();
+    public Page<CompanyDto.CompanyListDto> searchCompanyAll(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<CompanyListDto> companylist = companyRepository.findCompanyListAllCustom(pageable);
+
+        return companylist;
     }
 
-    // 검색조건 - dto
-    public List<CompanyDto.CompanyListDto> searchCompanyListWith(CompanyDto.BaseCompnayDto dto) throws Exception {
+    public Page<CompanyListDto> searchCompanyById(Long companyId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return companyRepository.findCompanyListById(companyId, pageable);
+    }
 
-        try {
-            if (dto.getCompanyId() != null) {
-                log.info("Start Search By companyId");
-                return companyRepository.findCompanyListById(dto.getCompanyId());
-            } else if (!dto.getCompanyType().isEmpty()) {
-                log.info("Start Search By companyType");
-                return companyRepository.findCompanyListByType(dto.getCompanyType());
-            } else if (!dto.getCompanyLv().isEmpty()) {
-                log.info("Start Search By companyLevel");
-                return companyRepository.findCompanyListByLv(dto.getCompanyLv());
-            } else {
-                return companyRepository.findCompanyListAllCustom();
-            }
-        } catch (Exception e) {
-            throw new Exception("Failed to search(searchCompanyListWith)", e);
-        }
+    public Page<CompanyListDto> searchCompanyByType(String companyType, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return companyRepository.findCompanyListByType(companyType, pageable);
+    }
+
+    public Page<CompanyListDto> searchCompanyByLevel(String companyLevel, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return companyRepository.findCompanyListByLv(companyLevel, pageable);
     }
 
     // 조회 - 사업자ID(업데이트 항목 조회시 사용)
