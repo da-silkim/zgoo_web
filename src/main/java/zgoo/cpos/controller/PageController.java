@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import zgoo.cpos.dto.authority.MenuAuthorityDto;
 import zgoo.cpos.dto.code.CodeDto.CommCdBaseDto;
 import zgoo.cpos.dto.code.CodeDto.CommCodeDto;
 import zgoo.cpos.dto.code.CodeDto.GrpCodeDto;
@@ -19,6 +20,7 @@ import zgoo.cpos.dto.company.CompanyDto.CompanyRegDto;
 import zgoo.cpos.dto.users.UsersDto;
 import zgoo.cpos.service.CodeService;
 import zgoo.cpos.service.CompanyService;
+import zgoo.cpos.service.MenuAuthorityService;
 import zgoo.cpos.service.UsersService;
 
 @Controller
@@ -29,6 +31,7 @@ public class PageController {
     private final CodeService codeService;
     private final CompanyService companyService;
     private final UsersService usersService;
+    private final MenuAuthorityService menuAuthorityService;
 
     /*
      * 대시보드
@@ -237,6 +240,18 @@ public class PageController {
     @GetMapping("/system/authority/list")
     public String showautoritylist(Model model) {
         log.info("=== Authority List Page ===");
+
+        // model.addAttribute("companyAuthorityList", new MenuAuthorityDto.CompanyAuthorityListDto());
+
+        try {
+            // 사업자 권한 list
+            List<MenuAuthorityDto.CompanyAuthorityListDto> companyAuthorityList = menuAuthorityService.findCompanyAuthorityList();
+            // log.info("사업자 권한 확인 >> {}", companyAuthorityList.toString());
+            model.addAttribute("companyAuthorityList", companyAuthorityList);
+
+        } catch (Exception e) {
+            e.getStackTrace();
+        }
         return "pages/system/authority_management";
     }
 
