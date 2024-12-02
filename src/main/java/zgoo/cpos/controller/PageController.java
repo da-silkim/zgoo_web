@@ -11,16 +11,18 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import zgoo.cpos.dto.authority.MenuAuthorityDto;
 import zgoo.cpos.dto.code.CodeDto.CommCdBaseDto;
 import zgoo.cpos.dto.code.CodeDto.CommCodeDto;
 import zgoo.cpos.dto.code.CodeDto.GrpCodeDto;
 import zgoo.cpos.dto.company.CompanyDto.CompanyListDto;
 import zgoo.cpos.dto.company.CompanyDto.CompanyRegDto;
+import zgoo.cpos.dto.menu.MenuAuthorityDto;
+import zgoo.cpos.dto.menu.MenuDto;
 import zgoo.cpos.dto.users.UsersDto;
 import zgoo.cpos.service.CodeService;
 import zgoo.cpos.service.CompanyService;
 import zgoo.cpos.service.MenuAuthorityService;
+import zgoo.cpos.service.MenuService;
 import zgoo.cpos.service.UsersService;
 
 @Controller
@@ -31,6 +33,7 @@ public class PageController {
     private final CodeService codeService;
     private final CompanyService companyService;
     private final UsersService usersService;
+    private final MenuService menuService;
     private final MenuAuthorityService menuAuthorityService;
 
     /*
@@ -232,6 +235,26 @@ public class PageController {
     public String shownoticelist(Model model) {
         log.info("=== Notice List Page ===");
         return "pages/system/notice_management";
+    }
+
+    /*
+     * 시스템 > 메뉴 관리
+     */
+    @GetMapping("/system/menu/list")
+    public String showmenulist(Model model) {
+        log.info("=== Menu List Page ===");
+
+        model.addAttribute("menuRegDto", new MenuDto.MenuRegDto());
+
+        try {
+            // 메뉴 list
+            List<MenuDto.MenuListDto> menuList = menuService.findMenuList();
+            model.addAttribute("menuList", menuList);
+
+        } catch (Exception e) {
+            e.getStackTrace();
+        }
+        return "pages/system/menu_management";
     }
 
     /*

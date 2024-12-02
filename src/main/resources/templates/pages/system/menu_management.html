@@ -1,0 +1,188 @@
+<html layout:decorate="~{fragments/layout}">
+<div layout:fragment="content" class="main-content">
+    <!-- card:1 start -->
+    <div class="card">
+        <!-- card body:1 start -->
+        <div class="card-body">
+            <div class="content-title mb-4 fw-bolder" style="font-size: 20px;"><i class="fa-solid fa-gear font-ico me-2"></i>시스템 > 메뉴 관리</div>
+            <!-- card:2 start -->
+            <div class="card card-shadow">
+                <!-- card body:2 start -->
+                <div class="card-body">
+                    <div class="card-title position-relative">
+                        <span class="card-title-bar"></span><span>메뉴 리스트</span>
+                        <div class="position-absolute" style="right: 0;">
+                            <button class="btn btn-data-add" id="addBtn" data-bs-toggle="modal"
+                                data-bs-target="#menuAddModal">
+                                <i class="bi bi-plus-square me-2"></i>등록</button>
+                            <button class="btn btn-data-edit" id="editBtn" data-bs-toggle="modal"
+                                data-bs-target="#menuAddModal" disabled><i
+                                    class="fa-regular fa-pen-to-square me-2"></i>수정</button>
+                            <button class="btn btn-data-delete" id="deleteBtn" disabled><i
+                                    class="bi bi-trash me-2"></i>삭제</button>
+                        </div>
+                    </div>
+                    <!-- 메뉴 리스트 table: start -->
+                    <div class="w-100 table-responsive" >
+                        <table class="table text-center mt-3 table-bg table-hover" >
+                            <thead>
+                                <tr class="table-border-top">
+                                    <th scope="col" class="w-5"></th>
+                                    <th scope="col" class="w-15">메뉴명</th>
+                                    <th scope="col" class="w-30">메뉴 URL</th>
+                                    <th scope="col" class="w-10">메뉴코드</th>
+                                    <th scope="col" class="w-15">부모코드</th>
+                                    <th scope="col" class="w-10">메뉴레벨</th>
+                                    <th scope="col" class="w-10">사용여부</th>
+                                </tr>
+                            </thead>
+                            <tbody id="pageList">
+                                <tr th:each="menu : ${menuList}">
+                                    <td><input type="checkbox" /></td>
+                                    <td th:text="${menu.menuName}"></td>
+                                    <td th:text="${menu.menuUrl}" style="text-align: left;"></td>
+                                    <td th:text="${menu.menuCode}"></td>
+                                    <td th:text="${menu.parentCode}"></td>
+                                    <td th:text="${menu.menuLvName}"></td>
+                                    <td th:text="${menu.useYn}"></td>
+                                </tr>
+                                <tr th:if="${menuList.size() == 0}">
+                                    <td colspan="7">조회된 데이터가 없습니다.</td>
+                                </tr>
+                            </tbody>
+                        </table>          
+                    </div>
+                    <div class="text-center">
+                        <ul class="pagination" id="paging"></ul>
+                    </div>
+                    <!-- 메뉴 리스트 table: end -->
+                </div>
+                <!-- card body:2 end -->
+            </div>
+            <!-- card:2 end -->
+            <!-- card:3 start -->
+            <div class="card card-shadow mt-4">
+                <!-- card body:3 start -->
+                <div class="card-body">
+                    <div class="card-title"><span class="card-title-bar"></span><span>사업장별 메뉴 접근 권한</span></div>
+                    <!-- 사업장별 메뉴 접근 권한 form: start -->
+                    <form class="position-relative">                        
+                        <div class="w-100 table-responsive">
+                            <table class="table text-center mt-3 table-bg table-hover">
+                                <thead>
+                                    <tr class="table-border-top">
+                                        <th scope="col">메뉴그룹(대)</th>
+                                        <th scope="col">메뉴그룹(중)</th>
+                                        <th scope="col">메뉴그룹(소)</th>
+                                        <th scope="col">조회권한</th>
+                                        <th scope="col">등록/수정 권한</th>
+                                        <th scope="col">엑셀다운로드권한</th>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="6">사업자 권한 항목 클릭 시 조회됩니다.</td>
+                                    </tr>
+                                </thead>
+                                <tbody id=""></tbody>
+                            </table>                               
+                        </div>
+                        <button class="btn btn-outline-grey position-absolute" style="right: 0; top: -40px;"></i>저장</button>
+                    </form>
+                    <!-- 사업장별 메뉴 접근 권한 form: end -->
+                </div>
+                <!-- card body:3 end -->
+            </div>
+            <!-- card:3 end -->
+        </div>
+        <!-- card body:1 end -->
+    </div>
+    <!-- card:1 end -->
+
+    <!-- Group Add Modal start -->
+    <div class="modal fade" id="menuAddModal" tabindex="-1" aria-labelledby="menuAddModalLabel" data-bs-backdrop="static"
+        data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width: 60vw; height: 90vh;">
+            <div class="modal-content mh-100 overflow-y-auto scrollbar">
+                <!-- modal body start -->
+                <div class="modal-body">
+                    <form th:object="${menuRegDto}">
+                        <!-- 모달 내용 -->
+                        <!-- table: start -->
+                        <div class="modal-title mb-2"><span class="modal-title-bar"></span><span>메뉴</span></div>
+                        <table class="table table-bg-v table-fixed w-100 text-center align-middle">
+                            <tbody>
+                                <tr class="table-border-top">
+                                    <th class="w-20">메뉴레벨<b class="required-data">*</b></th>
+                                    <td class="w-30">
+                                        <select id="menuLv" class="form-control" th:field="*{menuLv}" required>
+                                            <option value="0">상위 메뉴</option>
+                                            <option value="1">중위 메뉴</option>
+                                            <option value="2">하위 메뉴</option>
+                                        </select>
+                                    </td>
+                                    <th class="w-20">부모메뉴</th>
+                                    <td class="w-30">
+                                        <select id="parentCode" class="form-control" th:field="*{parentCode}" required disabled></select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="w-20">메뉴명<b class="required-data">*</b></th>
+                                    <td class="w-30">
+                                        <input type="text" name="menuName" id="menuName" class="form-control"
+                                            placeholder="메뉴명을 입력해주세요." autocomplete="off" th:field="*{menuName}"
+                                            required>
+                                    </td>
+                                    <th class="w-20">메뉴코드<b class="required-data">*</b></th>
+                                    <td class="w-30">
+                                        <input type="text" name="menuCode" id="menuCode" class="form-control"
+                                            placeholder="예) A0000" autocomplete="off" th:field="*{menuCode}"
+                                            required>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="w-20">메뉴 URL<b class="required-data">*</b></th>
+                                    <td class="w-80" colspan="3">
+                                        <input type="text" name="menuUrl" id="menuUrl" class="form-control"
+                                            placeholder="메뉴 URL를 입력해주세요" autocomplete="off" th:field="*{menuUrl}"
+                                            required>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="w-20">Icon Class</th>
+                                    <td class="w-30">
+                                        <input type="text" name="iconClass" id="iconClass" class="form-control"
+                                            placeholder="예) fa-solid fa-map font-ico" autocomplete="off" th:field="*{iconClass}"
+                                            required>
+                                    </td>
+                                    <th class="w-20">메뉴 사용여부<b class="required-data">*</b></th>
+                                    <td class="w-30">
+                                        <div style="display: inline-block;">
+                                            <input type="radio" id="useYnYes" name="useYn" th:field="*{useYn}" value="Y">
+                                            <label for="useYnYes">사용</label>
+                                        </div>
+                                        <div class="ms-5" style="display: inline-block;">
+                                            <input type="radio" id="useYnNo" name="useYn" th:field="*{useYn}" value="N">
+                                            <label for="useYnNo">사용 안 함</label>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <!-- table: end -->
+                        <div class="modal-footer justify-content-center" style="border-top: none;">
+                            <button type="button" class="btn btn-outline-grey me-2" data-bs-dismiss="modal">취소</button>
+                            <button type="submit" id="modalBtn" class="btn btn-data-add">등록</button>
+                        </div>
+                    </form>
+                </div>
+                <!-- modal body end -->
+            </div>
+            <!-- modal content end -->
+        </div>
+        <!-- modal dialog end -->
+    </div>
+    <!-- Group Add Modal end -->
+     
+    <script type="text/javascript" th:src="@{/js/table.js}"></script>
+    <script type="text/javascript" th:src="@{/js/system/menu_management.js}"></script>
+</div>
+</html>

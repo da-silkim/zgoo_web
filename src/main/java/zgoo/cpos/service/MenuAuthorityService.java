@@ -9,9 +9,9 @@ import com.querydsl.core.Tuple;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import zgoo.cpos.dto.authority.MenuAuthorityDto;
+import zgoo.cpos.dto.menu.MenuAuthorityDto;
 import zgoo.cpos.mapper.MenuAuthorityMapper;
-import zgoo.cpos.repository.authority.MenuAuthorityRepository;
+import zgoo.cpos.repository.menu.MenuAuthorityRepository;
 
 @Service
 @RequiredArgsConstructor

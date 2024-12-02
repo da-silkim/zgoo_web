@@ -1,4 +1,4 @@
-package zgoo.cpos.domain.authority;
+package zgoo.cpos.domain.menu;
 
 import java.time.LocalDateTime;
 
@@ -6,6 +6,9 @@ import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
@@ -25,8 +28,16 @@ import zgoo.cpos.type.MenuAuthorityKey;
 @AllArgsConstructor
 public class MenuAuthority {
 
-    @EmbeddedId
-    private MenuAuthorityKey id;
+    // @EmbeddedId
+    // private MenuAuthorityKey id;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "menuauthority_id")
+    private Long id;
+
+    @Column(name = "authority")
+    private String authority;
 
     @Column(name = "top_menu")
     private String topMenu;
@@ -46,8 +57,11 @@ public class MenuAuthority {
     @Column(name = "excel_yn")
     private String excelYn;
 
+    @Column(name = "mod_user_id")
+    private String modUserId;
+
     @Column(name = "reg_at")
-    private LocalDateTime regDt;
+    private LocalDateTime regAt;
 
     @Column(name = "mod_at")
     private LocalDateTime modAt;

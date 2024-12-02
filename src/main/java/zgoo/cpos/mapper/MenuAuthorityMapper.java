@@ -5,7 +5,7 @@ import java.util.stream.Collectors;
 
 import com.querydsl.core.Tuple;
 
-import zgoo.cpos.dto.authority.MenuAuthorityDto;
+import zgoo.cpos.dto.menu.MenuAuthorityDto;
 
 public class MenuAuthorityMapper {
     /*

@@ -1,4 +1,4 @@
-package zgoo.cpos.dto.authority;
+package zgoo.cpos.dto.menu;
 
 import java.time.LocalDateTime;
 
@@ -42,7 +42,7 @@ public class MenuAuthorityDto {
     @EqualsAndHashCode(callSuper = true)
     @ToString(callSuper = true)
     public static class MenuAuthorityListDto extends MenuAuthorityBaseDto {
-        private String userId;
+        private String modUserId;
         private String authority;
         private LocalDateTime regAt;
         private LocalDateTime modAt;

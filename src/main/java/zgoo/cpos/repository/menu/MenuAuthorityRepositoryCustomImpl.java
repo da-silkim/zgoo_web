@@ -1,4 +1,4 @@
-package zgoo.cpos.repository.authority;
+package zgoo.cpos.repository.menu;
 
 import java.util.List;
 

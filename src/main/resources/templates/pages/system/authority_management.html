@@ -46,7 +46,10 @@
             <div class="card card-shadow mt-4">
                 <!-- card body:3 start -->
                 <div class="card-body">
-                    <div class="card-title"><span class="card-title-bar"></span><span>메뉴별 접근 권한</span></div>
+                    <div class="card-title">
+                        <span class="card-title-bar"></span><span>메뉴별 접근 권한</span>
+                        <span class="ms-3" id="currAuthority" style="font-size: 14px; color: grey;"></span>
+                    </div>
                     <!-- 메뉴별 접근 권한 form: start -->
                     <form class="position-relative">                        
                         <div class="w-100 table-responsive">
@@ -79,5 +82,6 @@
     </div>
     <!-- card:1 end -->
     <script type="text/javascript" th:src="@{/js/table.js}"></script>
+    <script type="text/javascript" th:src="@{/js/system/authority_management.js}"></script>
 </div>
 </html>
