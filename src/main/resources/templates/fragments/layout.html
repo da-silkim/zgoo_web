@@ -27,7 +27,6 @@
 
     <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
     <script type="text/javascript" th:src="@{/js/common.js}"></script>
-
 </head>
 
 <body>
@@ -37,7 +36,8 @@
         <!-- top-nav: end -->
 
         <!-- side navbar: start -->
-        <div th:replace="~{fragments/navbar :: navbarFragment}"></div>
+        <!-- <div th:replace="~{fragments/navbar :: navbarFragment}"></div> -->
+        <div th:replace="~{fragments/dynamic_navbar :: dynamicNavbarFragment}"></div>
         <!-- side navbar: end -->
 
         <!-- 기본 템플릿 안에 삽입될 내용: start -->

@@ -1,13 +1,19 @@
 package zgoo.cpos.controller;
 
+import java.util.List;
+
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
+import zgoo.cpos.dto.menu.MenuDto;
+import zgoo.cpos.service.MenuService;
+
 @ControllerAdvice
 public class GlobalController {
+    private MenuService menuService;
 
     @ModelAttribute
     public void loginUser(Model model) {
@@ -18,6 +24,8 @@ public class GlobalController {
             String loginUserId = authentication.getName();
             System.out.println("loginUserId: " + loginUserId);
             model.addAttribute("loginUserId", loginUserId);
+            List<MenuDto.MenuListDto> menuList = menuService.findMenuListWithChild();
+            model.addAttribute("navList", menuList);
         }
     }
 

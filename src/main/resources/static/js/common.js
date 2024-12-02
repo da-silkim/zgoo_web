@@ -1,10 +1,12 @@
 // 사이드바 토글
 $(function () {
-    $(".side-nav-detail ul .nav-list-detail").hide();
+    // $(".side-nav-detail ul .nav-list-detail").hide();
+    $(".nav-list-detail").hide();
 
     var isSubmenuOpen = false; // 서브메뉴가 열렸는지 상태 저장
 
-    $(".nav-menu > .nav-list").click(function (e) {
+    // $(".nav-menu > .nav-list").click(function (e) {
+    $(document).on('click', '.nav-menu > .nav-list', function (e) {
         e.preventDefault();
         $(this).siblings(".nav-list-detail").slideToggle(300);
 
@@ -37,6 +39,67 @@ function confirmSubmit(msg) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    $.ajax({
+        url: '/api/nav/list',
+        method: 'GET',
+        success: function(menuList) {
+            renderMenu(menuList);
+            $(".nav-list-detail").hide();
+        },
+        error: function(error) {
+            console.log("error fetching menu: ", error);
+        }
+    });
+
+    // 상위 메뉴 렌더링 함수
+    function renderMenu(menuList) {
+        menuList.forEach(function(menu) {
+            if (menu.menuLv === '0' && menu.childCnt === 0 && menu.useYn === 'Y') {
+                const parentMenuHtml = `
+                    <li class="nav-menu list-hover">
+                        <a href="${menu.menuUrl}">
+                            <span class="nav-list">
+                                <i class="${menu.iconClass}"></i>
+                                <span class="nav-list-txt">${menu.menuName}</span>
+                            </span>
+                        </a>
+                    </li>
+                `;
+                $('#menuContainer').append(parentMenuHtml);
+            } else if (menu.menuLv === '0' && menu.childCnt != 0 && menu.useYn === 'Y') {
+                const parentMenuHtml = `
+                    <li class="nav-menu">
+                        <span class="nav-list">
+                                <i class="${menu.iconClass}"></i>
+                                <span class="nav-list-txt">${menu.menuName}</span>
+                                <i class="fa-solid fa-chevron-down font-ico-arrow"></i>
+                            </span>
+                        ${menu.childCnt > 0 ? renderSubMenu(menu, menuList) : ''}
+                    </li>
+                `;
+                $('#menuContainer').append(parentMenuHtml);
+            }
+        });
+    }
+
+    // 중위 메뉴 렌더링 함수
+    function renderSubMenu(parentMenu, menuList) {
+        const subMenuHtml = `
+            <ul class="nav-list-detail">
+                ${menuList.filter(function(menu) {
+                    return menu.parentCode === parentMenu.menuCode && menu.menuLv === '1' && menu.useYn === 'Y';
+                }).map(function(menu) {
+                    return `
+                        <li class="nav-list list-hover">
+                            <a href="${menu.menuUrl}">${menu.menuName}</a>
+                        </li>
+                    `;
+                }).join('')}
+            </ul>
+        `;
+        return subMenuHtml;
+    }
+
     // 사이드바 hover 
     const navItems = document.querySelectorAll('.side-nav .list-hover');
     navItems.forEach(item => {
