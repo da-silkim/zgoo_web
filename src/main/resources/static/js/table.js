@@ -37,9 +37,21 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    const links = tableBody.querySelectorAll('a');
+    links.forEach(link => {
+        link.addEventListener('click', (event) => {
+            event.stopPropagation(); // <a> 태그 이벤트 버블링 중지
+        });
+    });
+
     // 행 클릭 또는 체크박스 클릭 시 단일 선택 처리
     tableBody.addEventListener('click', (event) => {
         let checkbox, row;
+
+        // 클릭한 요소가 링크(<a>)인 경우 체크박스 활성화를 무시
+        if (event.target.tagName === 'A') {
+            return;
+        }
 
         // 클릭한 요소가 체크박스인 경우
         if (event.target.type === 'checkbox') {
