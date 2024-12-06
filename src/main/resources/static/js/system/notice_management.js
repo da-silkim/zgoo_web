@@ -1,78 +1,123 @@
-var list = [
-    {noticeType: '회원공지', title: '회원 공지입니다.', writterID: 'admin1', writterName: 'name1', regDate: '2024-01-01', company: '동아일렉콤'},
-    {noticeType: '시스템', title: '시스템 공지입니다.', writterID: 'admin2', writterName: 'name2', regDate: '2024-01-01', company: '동아일렉콤'},
-    {noticeType: '모바일', title: '모바일 공지입니다.', writterID: 'admin3', writterName: 'name3', regDate: '2024-01-01', company: '동아일렉콤'},
-];
-list = list.reverse();
+$(document).ready(function() {
+    let modalCon = false;   // false: 등록 / true: 수정
+    let selectRow, btnMsg = "등록";
 
-const totalCount = list.length;
-const pageSize = 10;
-const totalPage = Math.ceil(totalCount / pageSize);
+    $('#resetBtn').on('click', function() {
+        window.location.replace('/system/notice/list');
+    });
 
-function setPageHtml() {
-    let pageHtml =
-        `<li class="page-item">
-            <a href="#;" class="page-link" onClick="changePage('first');return false;">≪</a>
-        </li>
-        <li class="page-item">
-            <a href="#" class="page-link" onClick="changePage('prev');return false;"><</a>
-        </li>
-        <li class="page-item active">
-            <a href="#;" class="page-link" onClick="changePage(1);return false;">1</a>
-        </li>`;
-    for(let i = 2; i <= totalPage; i ++){
-        pageHtml +=
-            `<li class="page-item">
-                <a href="#;" class="page-link" onClick="changePage(${i});return false;">${i}</a>
-                </li>`;
-    }
-    pageHtml +=
-        `<li class="page-item">
-            <a href="#;" class="page-link" onClick="changePage('next');return false;">></a>
-        </li>
-        <li class="page-item">
-            <a href="#;" class="page-link" onClick="changePage('last');return false;">≫</a>
-        </li>`;
-    document.getElementById("paging").innerHTML = pageHtml;
-}
+    $('#searchBtn').on('click', function() {
+        const selectedSize = document.getElementById('size').value;
+        const form = document.getElementById('searchForm');
 
-function setList(page){
-    let pageCount = 10;
-    page = page == null ? 1 : page;
-    let startPage = (page - 1) * pageCount + 1;
-    let endPage = startPage + pageCount - 1;
-    endPage = endPage > totalCount ? totalCount : endPage;
-    showList(startPage, endPage);
-    let html = `${page}/${totalPage} 쪽 [총 <strong>${totalCount}</strong>건]`;
-    document.getElementById("page-info").innerHTML = html;
+        const hiddenSizeInput = document.createElement('input');
+        hiddenSizeInput.type = 'hidden';
+        hiddenSizeInput.name = 'size';
+        hiddenSizeInput.value = selectedSize;
+        hiddenSizeInput.id = 'hiddenSizeInput';
 
-    document.querySelectorAll("#paging li").forEach( (item) => {
-        let str = item.querySelector("#paging li a").innerText;
-        if(str.includes(page)) {
-            item.classList.add("active");
-        }else{
-            item.classList.remove("active");
+        form.appendChild(hiddenSizeInput);
+        form.submit();
+    });
+
+    $('#size').on('change', function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const selectedSize = document.getElementById("size").value;
+        const selectedCompanyId = urlParams.get('companyIdSearch') || '';
+        const selectedStartDate = urlParams.get('startDateSearch') || '';
+        const selectedEndDate = urlParams.get('endDateSearch') || '';
+
+        window.location.href = "/system/notice/list?page=0&size=" + selectedSize +
+                               "&companyIdSearch=" + (selectedCompanyId) +
+                               "&startDateSearch=" + encodeURIComponent(selectedStartDate) +
+                               "&endDateSearch=" + encodeURIComponent(selectedEndDate);
+    });
+
+    $('#pageList').on('click', 'tr', function() {
+        selectRow = $(this);
+    });
+
+    $('#addBtn').on('click', function() {
+        modalCon = false;
+        btnMsg = "등록";
+        $('#modalBtn').text(btnMsg);
+
+        $('#type').prop('selectedIndex', 0);
+        $('#title').val('');
+        $('#content').val('');
+    });
+
+    $('#editBtn').on('click', function() {
+        modalCon = true;
+        btnMsg = "수정";
+        $('#modalBtn').text(btnMsg);
+
+        // const idx = selectRow.attr('id');
+        const idx = selectRow.find('td').eq(0).attr('id');
+
+        console.log("idx type: " + typeof(idx) );
+        console.log("idx: " + idx );
+
+        $.ajax({
+            type: 'GET',
+            url: `/system/notice/get/${idx}`,
+            contentType: "application/json",
+            dataType: 'json',
+            success: function(data) {
+                $('#type').val(data.type || '');
+                $('#title').val(data.title || '');
+                $('#content').val(data.content || '');
+            }
+        });
+    });
+
+    $('#deleteBtn').on('click', function() {
+        btnMsg = "삭제";
+
+        if(confirmSubmit(btnMsg)) {
+            const idx = selectRow.find('td').eq(0).attr('id');
+
+            $.ajax({
+                type: 'PATCH',
+                url: `/system/notice/delete/${idx}`,
+                success: function(response) {
+                    console.log("공지 삭제 성공: ", response);
+                    window.location.reload();
+                },
+                error: function(error) {
+                    console.log("공지 삭제 실패: ", error);
+                }
+            });
         }
     });
-}
 
-function showList(startPage, endPage){
-    let html = "";
-    for(let i = (startPage - 1) ; i < endPage; i++) {
-        html += `<tr id="charge-user-${i}">
-                    <th scope="row"><input type="checkbox" data-index="${i}"></th>
-                    <td>${list[i].noticeType}</td>
-                    <td>${list[i].title}</td>
-                    <td>${list[i].writterID}</td>
-                    <td>${list[i].writterName}</td>
-                    <td>${list[i].regDate}</td>
-                    <td>${list[i].company}</td>
-                </tr>`;
-    }
-    document.getElementById("pageList").innerHTML = html;
-}
+    $('#modalBtn').on('click', function(event) {
+        event.preventDefault();
 
-document.addEventListener('DOMContentLoaded', () => {
-    setPageHtml();
-    setList();
+        if(confirmSubmit(btnMsg)) {
+            const DATA = {
+                type: $('#type').val(),
+                title: $('#title').val(),
+                content: $('#content').val()
+            }
+            const idx = selectRow.find('td').eq(0).attr('id');
+            const URL = modalCon ? `/system/notice/update/${idx}` : `/system/notice/new`;
+            const TYPE = modalCon ? 'PATCH' : 'POST';
+
+            $.ajax({
+                type: TYPE,
+                url: URL,
+                data: JSON.stringify(DATA),
+                contentType: "application/json",
+                success: function() {
+                    console.log("공지사항 " + btnMsg +  " 성공");
+                    // window.location.replace('/system/notice/list');
+                    window.location.reload();
+                },
+                error: function() {
+                    console.log("공지사항 " + btnMsg +  " 실패");
+                }
+            });
+        }
+    });
 });

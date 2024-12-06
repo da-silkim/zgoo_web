@@ -1,5 +1,7 @@
 package zgoo.cpos.controller;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
 
@@ -18,11 +20,13 @@ import zgoo.cpos.dto.company.CompanyDto.CompanyListDto;
 import zgoo.cpos.dto.company.CompanyDto.CompanyRegDto;
 import zgoo.cpos.dto.menu.MenuAuthorityDto;
 import zgoo.cpos.dto.menu.MenuDto;
+import zgoo.cpos.dto.users.NoticeDto;
 import zgoo.cpos.dto.users.UsersDto;
 import zgoo.cpos.service.CodeService;
 import zgoo.cpos.service.CompanyService;
 import zgoo.cpos.service.MenuAuthorityService;
 import zgoo.cpos.service.MenuService;
+import zgoo.cpos.service.NoticeService;
 import zgoo.cpos.service.UsersService;
 
 @Controller
@@ -35,6 +39,7 @@ public class PageController {
     private final UsersService usersService;
     private final MenuService menuService;
     private final MenuAuthorityService menuAuthorityService;
+    private final NoticeService noticeService;
 
     /*
      * 대시보드
@@ -232,8 +237,70 @@ public class PageController {
      * 시스템 > 공지사항관리
      */
     @GetMapping("/system/notice/list")
-    public String shownoticelist(Model model) {
+    public String shownoticelist(
+            @RequestParam(value = "companyIdSearch", required = false) Long companyId,
+            @RequestParam(value = "startDateSearch", required = false) String startDate,
+            @RequestParam(value = "endDateSearch", required = false) String endDate,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size,
+            Model model) {
         log.info("=== Notice List Page ===");
+        log.info("companyId: {}, startDates: {}, endDate: {}", companyId, startDate, endDate);
+
+        model.addAttribute("noticeDto", new NoticeDto.NoticeRegDto());
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate startDateSearch = (startDate != null && !startDate.isEmpty()) ? LocalDate.parse(startDate, formatter) : null;
+        LocalDate endDateSearch = (endDate != null && !endDate.isEmpty()) ? LocalDate.parse(endDate, formatter) : null;
+
+        // if (startDate.isEmpty()) startDate = null;
+        // if (endDate.isEmpty()) endDate = null;
+
+        try {
+            // 사업자 list
+            // Page<CompanyListDto> companyList = companyService.searchCompanyAll(page, size);
+            List<CompanyListDto> companyList = this.companyService.findCompanyListAll();
+            model.addAttribute("companyList", companyList);
+
+            Page<NoticeDto.NoticeListDto> noticeList;
+            
+            if (companyId == null && startDate == null && endDate == null) {
+                noticeList = this.noticeService.findNoticeAll(page, size);
+            } else {
+                noticeList = this.noticeService.searchNoticeListwithPagination(companyId, startDateSearch, endDateSearch, page, size);
+            }
+
+            int totalPages = noticeList.getTotalPages() == 0 ? 1 : noticeList.getTotalPages();
+
+            // 검색 조건 저장
+            model.addAttribute("selectedCompanyId", companyId);
+            model.addAttribute("selectedStartDate", startDate);
+            model.addAttribute("selectedEndDate", endDate);
+
+            // pagination
+            model.addAttribute("noticeList", noticeList.getContent());
+            model.addAttribute("size", String.valueOf(size));
+            model.addAttribute("currentPage", page);
+            model.addAttribute("totalPages", totalPages);
+            model.addAttribute("totalCount", noticeList.getTotalElements());
+
+            List<CommCdBaseDto> noticeTypeList = codeService.commonCodeStringToNum("NOTICETYPECD"); // 공지유형
+            model.addAttribute("noticeTypeList", noticeTypeList);
+
+            List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT");    // 그리드 row 수
+            model.addAttribute("showListCnt", showListCnt);
+
+        } catch (Exception e) {
+            e.getStackTrace();
+            model.addAttribute("companyList", Collections.emptyList());
+            model.addAttribute("noticeList", Collections.emptyList());
+            model.addAttribute("size", Collections.emptyList());
+            model.addAttribute("currentPage", Collections.emptyList());
+            model.addAttribute("totalPages", Collections.emptyList());
+            model.addAttribute("totalCount", Collections.emptyList());
+            model.addAttribute("showListCnt", Collections.emptyList());
+        }
+
         return "pages/system/notice_management";
     }
 
