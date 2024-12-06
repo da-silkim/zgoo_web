@@ -184,7 +184,7 @@ public class PageController {
             log.info("=== user DB search result >>>");
 
             // 사업자 list
-            Page<CompanyListDto> companyList = companyService.searchCompanyAll(page, size);
+            List<CompanyListDto> companyList = this.companyService.findCompanyListAll();
             model.addAttribute("companyList", companyList);
 
             // 사용자 list
