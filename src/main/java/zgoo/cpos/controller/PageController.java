@@ -253,12 +253,8 @@ public class PageController {
         LocalDate startDateSearch = (startDate != null && !startDate.isEmpty()) ? LocalDate.parse(startDate, formatter) : null;
         LocalDate endDateSearch = (endDate != null && !endDate.isEmpty()) ? LocalDate.parse(endDate, formatter) : null;
 
-        // if (startDate.isEmpty()) startDate = null;
-        // if (endDate.isEmpty()) endDate = null;
-
         try {
             // 사업자 list
-            // Page<CompanyListDto> companyList = companyService.searchCompanyAll(page, size);
             List<CompanyListDto> companyList = this.companyService.findCompanyListAll();
             model.addAttribute("companyList", companyList);
 

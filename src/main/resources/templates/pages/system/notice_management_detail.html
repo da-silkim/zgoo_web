@@ -22,10 +22,10 @@
                         <div>
                             <i class="bi bi-caret-up me-2"></i>
                             <span th:if="${nextNotice != null}">
-                                <a th:href="@{|/system/notice/detail/${nextNotice.idx}?page=${currentPage}&size=${size}
-                                    &companyIdSearch=${selectedCompanyId != null ? selectedCompanyId : ''}
-                                    &startDateSearch=${selectedStartDate != null ? selectedStartDate : ''}
-                                    &endDateSearch=${selectedEndDate != null ? selectedEndDate : ''}|}"
+                                <a th:href="@{/system/notice/detail/{id}(id=${nextNotice.idx},page=${currentPage}, size=${size},
+                                    companyIdSearch=${selectedCompanyId != null ? selectedCompanyId : ''},
+                                    startDateSearch=${selectedStartDate != null ? selectedStartDate : ''},
+                                    endDateSearch=${selectedEndDate != null ? selectedEndDate : ''})}"
                                     th:text="|[${nextNotice.typeName}] ${nextNotice.title}|" class="no-underline"></a>
                             </span>
                             <span th:if="${nextNotice == null}">다음글이 없습니다.</span>
@@ -33,10 +33,10 @@
                         <div>
                             <i class="bi bi-caret-down me-2"></i>
                             <span th:if="${previousNotice != null}">
-                                <a th:href="@{|/system/notice/detail/${previousNotice.idx}?page=${currentPage}&size=${size}
-                                    &companyIdSearch=${selectedCompanyId != null ? selectedCompanyId : ''}
-                                    &startDateSearch=${selectedStartDate != null ? selectedStartDate : ''}
-                                    &endDateSearch=${selectedEndDate != null ? selectedEndDate : ''}|}"
+                                <a th:href="@{/system/notice/detail/{id}(id=${previousNotice.idx}, page=${currentPage}, size=${size},
+                                    companyIdSearch=${selectedCompanyId != null ? selectedCompanyId : ''},
+                                    startDateSearch=${selectedStartDate != null ? selectedStartDate : ''},
+                                    endDateSearch=${selectedEndDate != null ? selectedEndDate : ''})}"
                                     th:text="|[${previousNotice.typeName}] ${previousNotice.title}|" class="no-underline"></a>
                             </span>
                             <span th:if="${previousNotice == null}">이전글이 없습니다.</span>
