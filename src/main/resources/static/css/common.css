@@ -148,3 +148,12 @@ input[type="checkbox"] {  box-sizing: border-box; padding: 0; accent-color: #102
 .textarea-content::-webkit-scrollbar { width: 6px; height: 6px; }
 .textarea-content::-webkit-scrollbar-thumb { background-color: #B6BBC4; border-radius: 10px; }
 .textarea-content::-webkit-scrollbar-button { display: none; }
+
+/* 공지사항상세 */
+.notice-detail-container { border-top: 1px solid grey; border-bottom: 1px solid grey; margin-top: 1.5rem !important; margin-bottom: 1.5rem !important; }
+.notice-detail-container > div { padding: 1.5rem !important; }
+.notice-detail-container > div:nth-child(1) { background-color: #FAFAFA; }
+.notice-detail-container > div:nth-child(1) > div:first-child { margin-bottom: 1.5rem !important; font-size: 1.1rem; }
+.notice-detail-container > div:nth-child(1) > div:nth-child(2) { display: flex !important; justify-content: space-between !important; color: grey; }
+.notice-detail-container > div:nth-child(2) { border-top: 1px solid grey; border-bottom: 1px solid grey; min-height: 340px; }
+.notice-detail-container > div:nth-child(3) { border-bottom: 1px solid grey; }

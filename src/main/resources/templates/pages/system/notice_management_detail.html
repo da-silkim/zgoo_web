@@ -10,66 +10,42 @@
                 <!-- card body:2 start -->
                 <div class="card-body">
                     <div class="card-title"><span class="card-title-bar"></span><span>공지사항</span></div>
-                    <div class="my-4" style="border-top: solid 1px; border-bottom: solid 1px grey;">
-                        <div class="p-4" style="background-color: #FAFAFA;">
-                            <div class="mb-4" style="font-size: 1.1rem;" th:text="|[${notice.typeName}] ${notice.title}|"></div>
-                            <div class="d-flex justify-content-between" style="color: grey;">
+                    <div class="notice-detail-container">
+                        <div>
+                            <div th:text="|[${notice.typeName}] ${notice.title}|"></div>
+                            <div>
                                 <span th:text="|작성자: ${notice.userName} &nbsp;&nbsp;&nbsp; 등록일:  ${#temporals.format(notice.regDt, 'yyyy.MM.dd')}|"></span>
                                 <span th:text="|조회: ${notice.views}|"></span>
                             </div>
                         </div>
-                        <div class="p-4" style="border-top: grey solid 1px; border-bottom: grey solid 1px; min-height: 340px;" th:utext="${content}">
-                        </div>
-                        <div class="p-4" style="border-bottom: grey solid 1px;">
+                        <div th:utext="${content}"></div>
+                        <div>
                             <i class="bi bi-caret-up me-2"></i>
                             <span th:if="${nextNotice != null}">
-                                <!-- <a th:href="@{|/system/notice/detail/${nextNotice.idx}|}"
-                                    th:text="|[${nextNotice.typeName}] ${nextNotice.title}|" class="no-underline"></a> -->
-                                <!-- <a th:href="@{|/system/notice/detail/${nextNotice.idx}?page=${currentPage}&size=${size}&companyIdSearch=${selectedCompanyId}&startDateSearch=${selectedStartDate}&endDateSearch=${selectedEndDate}|}"
-                                    th:text="|[${nextNotice.typeName}] ${nextNotice.title}|" class="no-underline"></a> -->
-                                <!-- <a th:href="@{|/system/notice/detail/${nextNotice.idx}?page=${currentPage}&size=${size}&companyIdSearch=${selectedCompanyId != null ? selectedCompanyId : ''}&startDateSearch=${selectedStartDate != null ? selectedStartDate : ''}&endDateSearch=${selectedEndDate != null ? selectedEndDate : ''}|}"
-                                    th:text="|[${nextNotice.typeName}] ${nextNotice.title}|" class="no-underline"></a> -->
-                                <a th:href="@{|/system/notice/detail/${nextNotice.idx}?page=${currentPage}&size=${size}&companyIdSearch=${selectedCompanyId != null ? selectedCompanyId : ''}&startDateSearch=${selectedStartDate != null ? selectedStartDate : ''}&endDateSearch=${selectedEndDate != null ? selectedEndDate : ''}|}"
+                                <a th:href="@{|/system/notice/detail/${nextNotice.idx}?page=${currentPage}&size=${size}
+                                    &companyIdSearch=${selectedCompanyId != null ? selectedCompanyId : ''}
+                                    &startDateSearch=${selectedStartDate != null ? selectedStartDate : ''}
+                                    &endDateSearch=${selectedEndDate != null ? selectedEndDate : ''}|}"
                                     th:text="|[${nextNotice.typeName}] ${nextNotice.title}|" class="no-underline"></a>
                             </span>
                             <span th:if="${nextNotice == null}">다음글이 없습니다.</span>
                         </div>
-                        <div class="p-4">
+                        <div>
                             <i class="bi bi-caret-down me-2"></i>
                             <span th:if="${previousNotice != null}">
-                                <!-- <a th:href="@{|/system/notice/detail/${previousNotice.idx}|}"
-                                    th:text="|[${previousNotice.typeName}] ${previousNotice.title}|" class="no-underline"></a> -->
-                                <!-- <a th:href="@{|/system/notice/detail/${previousNotice.idx}?page=${currentPage}&size=${size}&companyIdSearch=${selectedCompanyId}&startDateSearch=${selectedStartDate}&endDateSearch=${selectedEndDate}|}"
-                                    th:text="|[${previousNotice.typeName}] ${previousNotice.title}|" class="no-underline"></a> -->
-                                <!-- <a th:href="@{|/system/notice/detail/${previousNotice.idx}?page=${currentPage}&size=${size}&companyIdSearch=${selectedCompanyId != null ? selectedCompanyId : ''}&startDateSearch=${selectedStartDate != null ? selectedStartDate : ''}&endDateSearch=${selectedEndDate != null ? selectedEndDate : ''}|}"
-                                    th:text="|[${previousNotice.typeName}] ${previousNotice.title}|" class="no-underline"></a> -->
-                                <a th:href="@{|/system/notice/detail/${previousNotice.idx}?page=${currentPage}&size=${size}&companyIdSearch=${selectedCompanyId != null ? selectedCompanyId : ''}&startDateSearch=${selectedStartDate != null ? selectedStartDate : ''}&endDateSearch=${selectedEndDate != null ? selectedEndDate : ''}|}"
+                                <a th:href="@{|/system/notice/detail/${previousNotice.idx}?page=${currentPage}&size=${size}
+                                    &companyIdSearch=${selectedCompanyId != null ? selectedCompanyId : ''}
+                                    &startDateSearch=${selectedStartDate != null ? selectedStartDate : ''}
+                                    &endDateSearch=${selectedEndDate != null ? selectedEndDate : ''}|}"
                                     th:text="|[${previousNotice.typeName}] ${previousNotice.title}|" class="no-underline"></a>
                             </span>
                             <span th:if="${previousNotice == null}">이전글이 없습니다.</span>
                         </div>
                     </div>
-                    <!-- <button type="button" style="float: right; width: 100px; height: 32px; background-color: #35373C; color: #fff; border-radius: 5px;">목록</button> -->
-                    <!-- <button type="button" class="list-btn"
-                        th:onclick="|window.location.href='/system/notice/list?page=' + ${currentPage} + '&size=' + ${size} + '&companyIdSearch=' + ${selectedCompanyId} + '&startDateSearch=' + ${selectedStartDate} + '&endDateSearch=' + ${selectedEndDate}|">
-                        목록
-                    </button> -->
-                    <!-- <button type="button" class="list-btn" onclick="window.history.back();">
-                        목록
-                    </button> -->
-                    <!-- <button type="button" class="list-btn"
-                        th:href="@{|/system/notice/list?page=${currentPage}&size=${size}&companyIdSearch=${selectedCompanyId}&startDateSearch=${selectedStartDate}&endDateSearch=${selectedEndDate}|}">
-                    목록
-                    </button> -->
                     <button type="button" class="list-btn" 
-                            th:data-page="${currentPage}"
-                            th:data-size="${size}"
-                            th:data-companyid="${selectedCompanyId}"
-                            th:data-startdate="${selectedStartDate}"
-                            th:data-enddate="${selectedEndDate}"
-                            onclick="goToList2(this)">
-                        목록
-                    </button>
+                            th:data-page="${currentPage}" th:data-size="${size}" th:data-companyid="${selectedCompanyId}"
+                            th:data-startdate="${selectedStartDate}" th:data-enddate="${selectedEndDate}"
+                            onclick="goToList(this)"> 목록 </button>
                 </div>
                 <!-- card body:2 end -->
             </div>
@@ -78,21 +54,9 @@
         <!-- card body:1 end -->
     </div>
     <!-- card:1 end -->
-    <script type="text/javascript" th:src="@{/js/system/notice_management_detail.js}"></script>
     <script>
-        function goToList(button) {
-            var page = button.getAttribute('data-page');
-            var size = button.getAttribute('data-size');
-            var companyId = button.getAttribute('data-companyid');
-            var startDate = button.getAttribute('data-startdate');
-            var endDate = button.getAttribute('data-enddate');
-    
-            window.location.href = '/system/notice/list?page=' + page + '&size=' + size + '&companyIdSearch=' + companyId + '&startDateSearch=' + startDate + '&endDateSearch=' + endDate;
-        }
-
-        function goToList2(btn) {
+        function goToList(btn) {
             const urlParams = new URLSearchParams(window.location.search);
-            // const selectedSize = document.getElementById("size").value;
             const selectedPage = urlParams.get('page') || 0;
             const selectedSize = urlParams.get('size') || 10;
             const selectedCompanyId = urlParams.get('companyIdSearch') || '';

@@ -86,16 +86,8 @@
                                 <tr th:each="notice : ${noticeList}">
                                     <td th:id="${notice.idx}"><input type="checkbox" /></td>
                                     <td>
-                                        <!-- <a th:href="@{|/system/notice/detail/${notice.idx}|}"><i class="bi bi-files"></i></a> -->
-                                        <!-- <a th:href="@{|/system/notice/detail/${notice.idx}?page=${currentPage}&size=${size}
-                                            &companyIdSearch=${selectedCompanyId != null ? selectedCompanyId : ''}
-                                            &startDateSearch=${selectedStartDate != null ? selectedStartDate.trim() : ''}
-                                            &endDateSearch=${selectedEndDate != null ? selectedEndDate.trim() : ''}|}"
-                                            class="no-underline"><i class="bi bi-files"></i></a> -->
-                                        <!-- <a th:href="@{/system/notice/detail/${notice.idx}/(page=${currentPage}, size=${size}, companyIdSearch=${selectedCompanyId},
-                                            startDateSearch=${selectedStartDate}, endDateSearch=${selectedEndDate})}"
-                                            class="no-underline"><i class="bi bi-files"></i></a> -->
-                                        <a th:href="@{/system/notice/detail/{id}(id=${notice.idx}, page=${currentPage}, size=${size}, companyIdSearch=${selectedCompanyId != null ? selectedCompanyId : ''}, 
+                                        <a th:href="@{/system/notice/detail/{id}(id=${notice.idx}, page=${currentPage}, size=${size},
+                                            companyIdSearch=${selectedCompanyId != null ? selectedCompanyId : ''}, 
                                             startDateSearch=${selectedStartDate != null ? selectedStartDate : ''}, 
                                             endDateSearch=${selectedEndDate != null ? selectedEndDate : ''})}" class="no-underline">
                                             <i class="bi bi-files"></i>
