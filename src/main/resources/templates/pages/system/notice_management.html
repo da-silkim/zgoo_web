@@ -11,26 +11,32 @@
                 <div class="card-body">
                     <div class="card-title"><span class="card-title-bar"></span><span>검색조건</span></div>
                     <!-- form start -->
-                    <form class="position-relative">
+                    <form id="searchForm" class="position-relative" th:action="@{/system/notice/list}" method="get">
                         <!-- row:1 start -->
                         <div class="row mb-3 row-cols-2 row-cols-lg-3 g-2">
                             <div class="col d-flex align-items-center">
-                                <label for="business" class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">사업자</label>
-                                <select id="business" class="mx-3 form-control">
-                                    <option value='%'>(선택)</option>
-                                    <option value="">test</option>
+                                <label for="companyIdSearch" class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">사업자</label>
+                                <select id="companyIdSearch" name="companyIdSearch" class="mx-3 form-control">
+                                    <option th:value="null">선택</option>
+                                    <option th:each="company : ${companyList}" th:value="${company.companyId}"
+                                                th:text="${company.companyName}"
+                                                th:selected="${company.companyId == selectedCompanyId}"></option>
                                 </select>
                             </div>
                             <div class="col d-flex align-items-center">
                                 <span class="flex-shrink-0 col-form-label font-weight-bold mr-3p text-right w-25">등록일시</span>
-                                <input type="date" min="1970-01-01" max="2199-12-31" name="fromDate" id="fromDate" class="mx-3 form-control">
+                                <input type="date" min="1970-01-01" max="2199-12-31" th:value="${selectedStartDate}" name="startDateSearch"
+                                        id="startDateSearch" class="mx-3 form-control">
                                 <span class="flex-shrink-0 col-form-label font-weight-bold">~</span>
-                                <input type="date" min="1970-01-01" max="2199-12-31" name="toDate" id="toDate" class="mx-3 form-control">
+                                <input type="date" min="1970-01-01" max="2199-12-31" th:value="${selectedEndtDate}" name="endDateSearch"
+                                        id="endDateSearch" class="mx-3 form-control">
                             </div>
                         </div>
                         <div class="search-btn">
-                            <button type="button" class="btn btn-outline-grey me-2" data-bs-dismiss="modal"><i class="bi bi-search me-2"></i>검색</button>
-                            <button type="button" class="btn btn-outline-grey me-2" data-bs-dismiss="modal"><i class="bi bi-arrow-repeat me-2"></i>초기화</button>
+                            <button type="button" class="btn btn-outline-grey me-2" id="searchBtn">
+                                <i class="bi bi-search me-2"></i>검색</button>
+                            <button type="button" class="btn btn-outline-grey me-2" id="resetBtn">
+                                <i class="bi bi-arrow-repeat me-2"></i>초기화</button>
                         </div>
                         <!-- row:1 end -->
                     </form>
@@ -47,15 +53,18 @@
                         <span class="card-title-bar"></span><span>공지사항 리스트</span>
                     </div>
                     <div class="mt-3 position-relative">
-                        <button class="btn btn-data-add" data-bs-toggle="modal" data-bs-target="#dataAddModal"><i class="bi bi-plus-square me-2"></i>등록</button>
-                        <button class="btn btn-data-edit" id="editBtn" disabled><i class="fa-regular fa-pen-to-square me-2"></i>수정</button>
+                        <button class="btn btn-data-add" id="addBtn" data-bs-toggle="modal" data-bs-target="#dataAddModal">
+                            <i class="bi bi-plus-square me-2"></i>등록</button>
+                        <button class="btn btn-data-edit" id="editBtn" data-bs-toggle="modal" data-bs-target="#dataAddModal" disabled>
+                            <i class="fa-regular fa-pen-to-square me-2"></i>수정</button>
                         <button class="btn btn-data-delete" id="deleteBtn" disabled><i class="bi bi-trash me-2"></i>삭제</button>
                         <span class="position-absolute" style="right: 0; bottom: 0;">
-                            <span id="page-info"></span>
-                            <select class="mx-3 page-select" id="" name="">
-                                <option value='%'>10개</option>
-                                <option value="">30개</option>
-                                <option value="">50개</option>
+                            <span id="pageInfo">
+                                <span th:text="'Page ' + (${currentPage + 1}) + ' of ' + ${totalPages} + ' [총 ' + ${totalCount} + '건]'"></span>
+                            </span>
+                            <select class="mx-3 page-select" id="size" name="size">
+                                <option th:each="data : ${showListCnt}" th:value="${data.commonCode}"
+                                        th:text="${data.commonCodeName}" th:selected="${data.commonCode == size}"></option>
                             </select>
                         </span>
                     </div>
@@ -63,21 +72,76 @@
                         <table class="table text-center mt-3 table-bg table-hover" style="min-width: 1000px;">
                             <thead>
                                 <tr class="table-border-top">
-                                    <th scope="col"></th>
-                                    <th scope="col">공지유형</th>
-                                    <th scope="col">제목</th>
-                                    <th scope="col">작성자ID</th>
-                                    <th scope="col">작성자명</th>
-                                    <th scope="col">등록일</th>
-                                    <th scope="col">사업자</th>
+                                    <th scope="col" class="w-5"></th>
+                                    <th scope="col" class="w-10"></th>
+                                    <th scope="col" class="w-10">공지유형</th>
+                                    <th scope="col" class="w-25">제목</th>
+                                    <th scope="col" class="w-10">작성자ID</th>
+                                    <th scope="col" class="w-10">작성자명</th>
+                                    <th scope="col" class="w-15">등록일</th>
+                                    <th scope="col" class="w-15">사업자</th>
                                 </tr>
                             </thead>
-                            <tbody id="pageList"></tbody>
+                            <tbody id="pageList">
+                                <tr th:each="notice : ${noticeList}">
+                                    <td th:id="${notice.idx}"><input type="checkbox" /></td>
+                                    <td>
+                                        <!-- <a th:href="@{|/system/notice/detail/${notice.idx}|}"><i class="bi bi-files"></i></a> -->
+                                        <!-- <a th:href="@{|/system/notice/detail/${notice.idx}?page=${currentPage}&size=${size}
+                                            &companyIdSearch=${selectedCompanyId != null ? selectedCompanyId : ''}
+                                            &startDateSearch=${selectedStartDate != null ? selectedStartDate.trim() : ''}
+                                            &endDateSearch=${selectedEndDate != null ? selectedEndDate.trim() : ''}|}"
+                                            class="no-underline"><i class="bi bi-files"></i></a> -->
+                                        <!-- <a th:href="@{/system/notice/detail/${notice.idx}/(page=${currentPage}, size=${size}, companyIdSearch=${selectedCompanyId},
+                                            startDateSearch=${selectedStartDate}, endDateSearch=${selectedEndDate})}"
+                                            class="no-underline"><i class="bi bi-files"></i></a> -->
+                                        <a th:href="@{/system/notice/detail/{id}(id=${notice.idx}, page=${currentPage}, size=${size}, companyIdSearch=${selectedCompanyId != null ? selectedCompanyId : ''}, 
+                                            startDateSearch=${selectedStartDate != null ? selectedStartDate : ''}, 
+                                            endDateSearch=${selectedEndDate != null ? selectedEndDate : ''})}" class="no-underline">
+                                            <i class="bi bi-files"></i>
+                                        </a>
+                                    </td>
+                                    <td th:text="${notice.typeName}"></td>
+                                    <td th:text="${notice.title}" style="text-align: left;"></td>
+                                    <td th:text="${notice.userId}"></td>
+                                    <td th:text="${notice.userName}"></td>
+                                    <td th:text="${#temporals.format(notice.regDt, 'yyyy-MM-dd HH:mm:ss')}"></td>
+                                    <td th:text="${notice.companyName}"></td>
+                                </tr>
+                                <tr th:if="${noticeList.size() == 0}">
+                                    <td colspan="8">조회된 데이터가 없습니다.</td>
+                                </tr>
+                            </tbody>
                         </table>                                
                     </div>
-                    <div class="text-center">
-                        <ul class="pagination" id="paging"></ul>
+                    <!-- paging navigation start -->
+                    <div th:if="${noticeList.size() > 0}">
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled' : ''">
+                                <a class="page-link" th:href="@{/system/notice/list(page=0, size=${size}, companyIdSearch=${selectedCompanyId},
+                                startDateSearch=${selectedStartDate}, endDateSearch=${selectedEndDate})}"><i class="bi bi-chevron-double-left"></i></a>
+                            </li>
+                            <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled' : ''">
+                                <a class="page-link" th:href="@{/system/notice/list(page=${currentPage-1}, size=${size}, companyIdSearch=${selectedCompanyId},
+                                startDateSearch=${selectedStartDate}, endDateSearch=${selectedEndDate})}"><i class="bi bi-chevron-left"></i></a>
+                            </li>
+                            <li class="page-item" th:each="i : ${#numbers.sequence(currentPage - 2, currentPage + 2)}"
+                                th:if="${i >= 0 && i < totalPages}">
+                                <a class="page-link" th:href="@{/system/notice/list(page=${i}, size=${size}, companyIdSearch=${selectedCompanyId},
+                                startDateSearch=${selectedStartDate}, endDateSearch=${selectedEndDate})}"
+                                th:text="${i+1}" th:classappend="${i == currentPage} ? 'active' : ''"></a>
+                            </li>
+                            <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled' : ''">
+                                <a class="page-link" th:href="@{/system/notice/list(page=${currentPage+1}, size=${size}, companyIdSearch=${selectedCompanyId},
+                                startDateSearch=${selectedStartDate}, endDateSearch=${selectedEndDate})}"><i class="bi bi-chevron-right"></i></a>
+                            </li>
+                            <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled' : ''">
+                                <a class="page-link" th:href="@{/system/notice/list(page=${totalPages - 1}, size=${size}, companyIdSearch=${selectedCompanyId},
+                                startDateSearch=${selectedStartDate}, endDateSearch=${selectedEndDate})}"><i class="bi bi-chevron-double-right"></i></a>
+                            </li>
+                        </ul>
                     </div>
+                    <!-- paging navigation end -->
                 </div>
                 <!-- card body:3 end -->
             </div>
@@ -91,7 +155,7 @@
     <div class="modal fade" id="dataAddModal" tabindex="-1" aria-labelledby="dataAddModalLabel" data-bs-backdrop="static" data-bs-keyboard="false">
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width: 60vw; height: 90vh;"> <!-- height: 90vh; -->
             <div class="modal-content mh-100 overflow-y-auto scrollbar">
-                <form>
+                <form th:object="${noticeDto}">
                 <!-- modal body start -->
                 <div class="modal-body">
                     <!-- 모달 내용 -->
@@ -102,23 +166,25 @@
                             <tr class="table-border-top">
                                 <th class="w-20">제목<b class="required-data">*</b></th>
                                 <td colspan="3">
-                                    <input type="text" name="" id="" class="form-control" placeholder="" autocomplete="off" required>
+                                    <input type="text" name="title" id="title" class="form-control"
+                                            th:field="*{title}" placeholder="" autocomplete="off" required>
                                 </td>
                             </tr>
                             <tr>
                                 <th class="w-20">공지유형<b class="required-data">*</b></th>
                                 <td class="w-30">
-                                    <select id="" class="form-control" required>
-                                        <option value="%">선택</option>
-                                        <option value="">test</option>
+                                    <select id="type" class="form-control" th:field="*{type}" required>
+                                        <option th:each="type : ${noticeTypeList}" th:value="${type.commonCode}"
+                                                th:text="${type.commonCodeName}"></option>
                                     </select>
                                 </td>
                                 <td colspan="2"></td>
                             </tr>
                             <tr>
-                                <th class="w-20">내용</th>
+                                <th class="w-20">내용<b class="required-data">*</b></th>
                                 <td colspan="3">
-                                    <textarea class="form-control" name="opinion" cols="" rows="10"></textarea>
+                                    <textarea class="form-control textarea-content" name="content" id="content" 
+                                            rows="10" th:field="*{content}" autocomplete="off" required></textarea>
                                 </td>
                             </tr>                 
                         </tbody>
@@ -127,8 +193,8 @@
                     </div>
                     <!-- modal body end -->
                     <div class="modal-footer justify-content-center" style="border-top: none;">
-                        <button type="button" class="btn btn-outline-grey me-2" data-bs-dismiss="modal">취소</button>
-                        <button type="submit" class="btn btn-data-add">등록</button>
+                        <button type="button" id="cancelBtn" class="btn btn-outline-grey me-2" data-bs-dismiss="modal">취소</button>
+                        <button type="submit" id="modalBtn" class="btn btn-data-add">등록</button>
                     </div>
                 </form>              
             </div>
@@ -138,4 +204,5 @@
     </div>
     <!-- Add Modal end -->
     <script type="text/javascript" th:src="@{/js/table.js}"></script>
+    <script type="text/javascript" th:src="@{/js/system/notice_management.js}"></script>
 </html>

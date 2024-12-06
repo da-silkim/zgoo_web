@@ -143,3 +143,8 @@ input[type="checkbox"] {  box-sizing: border-box; padding: 0; accent-color: #102
                 padding: 10px; border-radius: 5px; box-shadow: 0 4px 8px rgb(0, 0, 0, 0.1); z-index: 9999; white-space: nowrap;
                 font-size: 14px; font-weight: 400; color: white;}
 .info-icon:hover + .tooltip-info { display: block; }
+
+.textarea-content { height: 30vh; overflow-y: auto; resize: none; }
+.textarea-content::-webkit-scrollbar { width: 6px; height: 6px; }
+.textarea-content::-webkit-scrollbar-thumb { background-color: #B6BBC4; border-radius: 10px; }
+.textarea-content::-webkit-scrollbar-button { display: none; }
