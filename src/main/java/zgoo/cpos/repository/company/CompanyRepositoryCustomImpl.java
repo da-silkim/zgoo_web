@@ -169,4 +169,29 @@ public class CompanyRepositoryCustomImpl implements CompanyRepositoryCustom {
         return new PageImpl<>(resultList, pageable, total);
     }
 
+    @Override
+    public List<CompanyListDto> findCompanyListAll() {
+        List<CompanyListDto> companyList = queryFactory.select(Projections.fields(CompanyDto.CompanyListDto.class,
+                company.id.as("companyId"),
+                company.companyName.as("companyName"),
+                company.companyLv.as("companyLv"),
+                companyLevelCode.name.as("companyLvName"),
+                company.companyType.as("companyType"),
+                companyTypeCode.name.as("companyTypeName"),
+                relation.parentCompanyName.as("parentCompanyName"),
+                contract.contractedAt.as("contractedAt"),
+                contract.contractEnd.as("contractEnd"),
+                contract.contractStatus.as("contractStatus"),
+                contractStatusCode.name.as("contractStatName")))
+                .from(company)
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
+                .leftJoin(contract).on(company.companyContract.eq(contract))
+                .leftJoin(companyLevelCode).on(company.companyLv.eq(companyLevelCode.commonCode))
+                .leftJoin(companyTypeCode).on(company.companyType.eq(companyTypeCode.commonCode))
+                .leftJoin(contractStatusCode).on(contract.contractStatus.eq(contractStatusCode.commonCode))
+                .orderBy(company.createdAt.desc())
+                .fetch();
+
+        return companyList;
+    }
 }
