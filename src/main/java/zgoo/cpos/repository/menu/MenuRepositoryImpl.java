@@ -6,7 +6,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.CaseBuilder;
-import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
@@ -58,14 +57,6 @@ public class MenuRepositoryImpl implements MenuRepositoryCustom {
                 .where(menu.menuLv.in("0", "1"))
                 .groupBy(menu.menuCode, menu.menuName)
                 .fetch();
-
-        // for (MenuListDto menu : menuList) {
-        //     if (menu.getMenuLv().equals("0")) {
-        //         menu.setNavMenuClass(menu.getChildCnt() > 0 ? "nav-menu" : "nav-menu list-hover");
-        //     } else if (menu.getMenuLv().equals("1")) {
-        //         menu.setNavMenuClass("nav-menu");
-        //     }
-        // }
 
         return menuList;
     }

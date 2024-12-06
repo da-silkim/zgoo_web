@@ -51,16 +51,12 @@ public class Menu {
 
     public void updateMenuInfo(MenuDto.MenuRegDto menu) {
         this.modDt = LocalDateTime.now();
-        this.modDt = LocalDateTime.now();
         this.menuCode = menu.getMenuCode();
         this.parentCode = menu.getParentCode();
         this.menuUrl = menu.getMenuUrl();
         this.menuName = menu.getMenuName();
         this.menuLv = menu.getMenuLv();
         this.useYn = menu.getUseYn();
-this.iconClass = menu.getIconClass();
-this.iconClass = menu.getIconClass();
-this.iconClass = menu.getIconClass();
-this.iconClass = menu.getIconClass();
+        this.iconClass = menu.getIconClass();
     }
 }

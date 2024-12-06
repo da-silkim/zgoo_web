@@ -2,7 +2,6 @@ package zgoo.cpos.domain.users;
 
 import java.time.LocalDateTime;
 
-import groovy.transform.ToString;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -13,6 +12,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import zgoo.cpos.domain.company.Company;
 import zgoo.cpos.dto.users.UsersDto;
 

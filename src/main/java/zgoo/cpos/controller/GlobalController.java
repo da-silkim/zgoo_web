@@ -6,6 +6,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
 import zgoo.cpos.dto.menu.MenuDto;
@@ -15,7 +16,11 @@ import zgoo.cpos.service.MenuService;
 public class GlobalController {
     private MenuService menuService;
 
-    @ModelAttribute
+    public GlobalController(MenuService menuService) {
+        this.menuService = menuService;
+    }
+
+    @ModelAttribute("loginUserId")
     public void loginUser(Model model) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -24,8 +29,8 @@ public class GlobalController {
             String loginUserId = authentication.getName();
             System.out.println("loginUserId: " + loginUserId);
             model.addAttribute("loginUserId", loginUserId);
-            List<MenuDto.MenuListDto> menuList = menuService.findMenuListWithChild();
-            model.addAttribute("navList", menuList);
+            // List<MenuDto.MenuListDto> menuList = menuService.findMenuListWithChild();
+            // model.addAttribute("navList", menuList);
         }
     }
 
