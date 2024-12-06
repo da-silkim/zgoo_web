@@ -41,11 +41,11 @@
                             </span>
                             <span th:if="${previousNotice == null}">이전글이 없습니다.</span>
                         </div>
-                    </div>
-                    <button type="button" class="list-btn" 
+                        <button type="button" class="list-btn"
                             th:data-page="${currentPage}" th:data-size="${size}" th:data-companyid="${selectedCompanyId}"
                             th:data-startdate="${selectedStartDate}" th:data-enddate="${selectedEndDate}"
                             onclick="goToList(this)"> 목록 </button>
+                    </div>
                 </div>
                 <!-- card body:2 end -->
             </div>
