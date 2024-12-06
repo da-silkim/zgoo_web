@@ -353,4 +353,13 @@ public class CompanyService {
 
     }
 
+    // List 형태로 company 전체 조회
+    public List<CompanyListDto> findCompanyListAll() {
+        try {
+            return companyRepository.findCompanyListAll();
+        } catch (Exception e) {
+            log.error("[findCompanyListAll] error: {}", e.getMessage());
+            return null;
+        }
+    }
 }
