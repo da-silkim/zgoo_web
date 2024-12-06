@@ -100,7 +100,9 @@ $(document).ready(function() {
                 title: $('#title').val(),
                 content: $('#content').val()
             }
-            const idx = selectRow.find('td').eq(0).attr('id');
+            let idx;
+            if (modalCon) idx = selectRow.find('td').eq(0).attr('id');
+            
             const URL = modalCon ? `/system/notice/update/${idx}` : `/system/notice/new`;
             const TYPE = modalCon ? 'PATCH' : 'POST';
 
