@@ -20,10 +20,12 @@ import zgoo.cpos.dto.company.CompanyDto.CompanyListDto;
 import zgoo.cpos.dto.company.CompanyDto.CompanyRegDto;
 import zgoo.cpos.dto.menu.MenuAuthorityDto;
 import zgoo.cpos.dto.menu.MenuDto;
+import zgoo.cpos.dto.users.FaqDto;
 import zgoo.cpos.dto.users.NoticeDto;
 import zgoo.cpos.dto.users.UsersDto;
 import zgoo.cpos.service.CodeService;
 import zgoo.cpos.service.CompanyService;
+import zgoo.cpos.service.FaqService;
 import zgoo.cpos.service.MenuAuthorityService;
 import zgoo.cpos.service.MenuService;
 import zgoo.cpos.service.NoticeService;
@@ -40,6 +42,7 @@ public class PageController {
     private final MenuService menuService;
     private final MenuAuthorityService menuAuthorityService;
     private final NoticeService noticeService;
+    private final FaqService faqService;
 
     /*
      * 대시보드
@@ -390,8 +393,52 @@ public class PageController {
      * 고객센터 > FAQ 관리
      */
     @GetMapping("/faq")
-    public String showfaqlist(Model model) {
+    public String showfaqlist(
+            @RequestParam(value = "sectionSearch", required = false) String section,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size,
+            Model model) {
         log.info("=== FAQ List Page ===");
+
+        model.addAttribute("faqDto", new FaqDto.FaqRegDto());
+
+        try {
+            Page<FaqDto.FaqListDto> faqList;
+
+            if (section == null) {
+                faqList = this.faqService.findFaqAll(page, size);
+            } else {
+                faqList = this.faqService.searchFaqListWithPagination(section, page, size);
+            }
+
+            int totalPages = faqList.getTotalPages() == 0 ? 1 : faqList.getTotalPages();
+
+            // 검색 조건 저장
+            model.addAttribute("selectedSection", section);
+
+            // pagination
+            model.addAttribute("faqList", faqList.getContent());
+            model.addAttribute("size", String.valueOf(size));
+            model.addAttribute("currentPage", page);
+            model.addAttribute("totalPages", totalPages);
+            model.addAttribute("totalCount", faqList.getTotalElements());
+
+            List<CommCdBaseDto> faqKindList = codeService.commonCodeStringToNum("FAQKIND");    // FAQ 구분코드
+            model.addAttribute("faqKindList", faqKindList);
+
+            List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT");    // 그리드 row 수
+            model.addAttribute("showListCnt", showListCnt);
+        } catch (Exception e) {
+            e.getStackTrace();
+            model.addAttribute("selectedSection", Collections.emptyList());
+            model.addAttribute("faqList", Collections.emptyList());
+            model.addAttribute("size", Collections.emptyList());
+            model.addAttribute("currentPage", Collections.emptyList());
+            model.addAttribute("totalPages", Collections.emptyList());
+            model.addAttribute("totalCount", Collections.emptyList());
+            model.addAttribute("faqKindList", Collections.emptyList());
+            model.addAttribute("showListCnt", Collections.emptyList());
+        }
         return "pages/customer/faq";
     }
 
