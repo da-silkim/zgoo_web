@@ -71,9 +71,9 @@ public class NoticeController {
         }
     }
 
-    // 공지사항 - 글 자세히
+    // 공지사항 - 상세내용
     @GetMapping("/detail/{id}")
-    public String deatil(Model model, @PathVariable("id") Long idx,
+    public String deatilNotice(Model model, @PathVariable("id") Long idx,
                     @RequestParam(value = "page", defaultValue = "0") int page,
                     @RequestParam(value = "size", defaultValue = "10") int size,
                     @RequestParam(value = "companyIdSearch", required = false) Long companyId,
@@ -116,7 +116,7 @@ public class NoticeController {
             model.addAttribute("selectedStartDate", startDate);
             model.addAttribute("selectedEndDate", endDate);
         } catch (Exception e) {
-            log.error("[findNoticeOne] error: {}", e.getMessage());
+            log.error("[deatilNotice] error: {}", e.getMessage());
         }
 
         return "pages/system/notice_management_detail";
@@ -158,9 +158,9 @@ public class NoticeController {
             this.noticeService.deleteNotice(idx);
             return ResponseEntity.ok("공지사항이 정상적으로 삭제되었습니다."); 
         } catch (Exception e) {
-            log.error("[updateNotice] error: {}", e.getMessage());
+            log.error("[deleteNotice] error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                    .body("공지사항 수정 중 오류 발생");
+                                    .body("공지사항 삭제 중 오류 발생");
         }
     }
 }
