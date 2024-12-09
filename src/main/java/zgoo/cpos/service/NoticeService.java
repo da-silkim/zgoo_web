@@ -123,7 +123,8 @@ public class NoticeService {
     public void saveNotice(NoticeDto.NoticeRegDto dto) {
         try {
             System.out.println("공지사항 사용자ID: " + dto.getUserId());
-            Users users = this.noticeRepository.findUserOne(dto.getUserId());
+            // Users users = this.noticeRepository.findUserOne(dto.getUserId());
+            Users users = this.usersRepository.finsUserOneNotJoinedComapny(dto.getUserId());
             System.out.println("사용자 확인1: " + users.getUserId());
             Notice notice = NoticeMapper.toEntity(dto, users);
             System.out.println("사용자 확인2: " + notice.getUser().getUserId());
