@@ -1,0 +1,64 @@
+<html layout:decorate="~{fragments/layout}">
+<div layout:fragment="content" class="main-content">
+    <!-- card:1 start -->
+    <div class="card">
+        <!-- card body:1 start -->
+        <div class="card-body">
+            <div class="content-title mb-4 fw-bolder"><i class="fa-solid fa-headset me-2"></i>고객센터 > FAQ 관리</div>
+            <!-- card:2 start -->
+            <div class="card card-shadow">
+                <!-- card body:2 start -->
+                <div class="card-body">
+                    <div class="card-title"><span class="card-title-bar"></span><span>FAQ</span></div>
+                    <div class="notice-detail-container">
+                        <div>
+                            <div th:text="|[${faq.sectionName}] ${faq.title}|"></div>
+                            <div>
+                                <span th:text="|작성자: ${faq.userName} &nbsp;&nbsp;&nbsp; 등록일:  ${#temporals.format(faq.regDt, 'yyyy.MM.dd')}|"></span>
+                                <span th:text="|NO.${faq.id}|"></span>
+                            </div>
+                        </div>
+                        <div th:utext="${content}"></div>
+                        <div>
+                            <i class="bi bi-caret-up me-2"></i>
+                            <span th:if="${nextFaq != null}">
+                                <a th:href="@{/faq/detail/{id}(id=${nextFaq.id},page=${currentPage}, size=${size},
+                                    sectionSearch=${selectedSection != null ? selectedSection : ''})}"
+                                    th:text="|[${nextFaq.sectionName}] ${nextFaq.title}|" class="no-underline"></a>
+                            </span>
+                            <span th:if="${nextFaq == null}">다음글이 없습니다.</span>
+                        </div>
+                        <div>
+                            <i class="bi bi-caret-down me-2"></i>
+                            <span th:if="${previousFaq != null}">
+                                <a th:href="@{/faq/detail/{id}(id=${previousFaq.id}, page=${currentPage}, size=${size},
+                                    sectionSearch=${selectedSection != null ? selectedSection : ''})}"
+                                    th:text="|[${previousFaq.sectionName}] ${previousFaq.title}|" class="no-underline"></a>
+                            </span>
+                            <span th:if="${previousFaq == null}">이전글이 없습니다.</span>
+                        </div>
+                        <button type="button" class="list-btn"
+                            th:data-page="${currentPage}" th:data-size="${size}" th:data-section="${selectedSection}"
+                            onclick="goToList(this)"> 목록 </button>
+                    </div>
+                </div>
+                <!-- card body:2 end -->
+            </div>
+            <!-- card:2 end -->
+        </div>
+        <!-- card body:1 end -->
+    </div>
+    <!-- card:1 end -->
+    <script>
+        function goToList(btn) {
+            const urlParams = new URLSearchParams(window.location.search);
+            const selectedPage = urlParams.get('page') || 0;
+            const selectedSize = urlParams.get('size') || 10;
+            const selectedSection = urlParams.get('sectionSearch') || '';
+
+            window.location.href = "/faq?page=" + selectedPage +
+                                "&size=" + selectedSize +
+                                "&sectionSearch=" + (selectedSection);
+        }
+    </script>
+</html>
