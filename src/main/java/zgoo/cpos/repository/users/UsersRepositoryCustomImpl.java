@@ -62,6 +62,14 @@ public class UsersRepositoryCustomImpl implements UsersRepositoryCustom {
     }
 
     @Override
+    public Users finsUserOneNotJoinedComapny(String userID) {
+        return queryFactory
+            .selectFrom(users)
+            .where(users.userId.eq(userID))
+            .fetchOne();
+    }
+
+    @Override
     public List<Users> searchUsers(Long companyId, String companyType, String name) {
         log.info("Executing query to search users with companyId: {}, companyType: {}, name: {}", companyId, companyType, name);
         BooleanBuilder builder = new BooleanBuilder();
