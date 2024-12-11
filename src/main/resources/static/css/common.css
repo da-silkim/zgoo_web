@@ -91,6 +91,16 @@ input.input-add-row:focus { border: 1px solid #b8d3f0; outline: none; }
 .table-bg thead tr > th, .table-bg-v tbody tr > th { background-color: #F5F7F8; }
 .table-border-top { border-top-color: #3D3B40; border-top-style: solid; border-top-width: 2px; }
 .table-border-bottom {  border-bottom-color: #3D3B40; border-bottom-style: solid; border-bottom-width: 2px;}
+
+/* scroll table custom */
+.scroll-table-container { width: 100%; max-height: 50vh; border-top: 2px solid #3D3B40; overflow: auto; }
+.scroll-table-container > table { table-layout: fixed; border-spacing: 0; width: 100%; border-collapse: collapse; }
+.scroll-table-container > table > thead { position: sticky; top: 0; box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.2); }
+.scroll-table-container > table > tbody { max-height: 40vh; width: 100%; overflow-y: auto;}
+.scroll-table-container::-webkit-scrollbar{width: 8px; height: 6px;}
+.scroll-table-container::-webkit-scrollbar-thumb{background-color: rgb(112, 112, 112); border-radius: 10px;}
+/* .scroll-table-container::-webkit-scrollbar-button{display: none;} */
+
 /* modal */
 .modal .modal-dialog .modal-content .modal-title { font-size: 20px; font-weight: bold; display: flex; align-items: center; }
 .modal .modal-dialog .modal-content .modal-title .modal-title-bar { width: 4px; height: 30px; background: linear-gradient(#021526, #394867, #9BA4B4); display: inline-block; margin-right: 8px; }
@@ -142,6 +152,9 @@ input[type="checkbox"] {  box-sizing: border-box; padding: 0; accent-color: #102
 .textarea-content::-webkit-scrollbar { width: 6px; height: 6px; }
 .textarea-content::-webkit-scrollbar-thumb { background-color: #B6BBC4; border-radius: 10px; }
 .textarea-content::-webkit-scrollbar-button { display: none; }
+
+.title-btn-area { position: relative !important; margin-bottom: 1rem !important; }
+.title-btn-area > div { position: absolute !important; right: 0;}
 
 /* 공지사항상세 */
 .notice-detail-container { border-top: 1px solid grey; border-bottom: 1px solid grey; margin-top: 1.2rem !important; margin-bottom: 1.2rem !important; position: relative; }
