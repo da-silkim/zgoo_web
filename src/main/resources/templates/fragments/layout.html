@@ -31,19 +31,19 @@
 
 <body>
     <div class="body-content">
-        <!-- top-nav: start -->
+        <!-- haed -->
         <div th:replace="~{fragments/hheader :: headerFragment}"></div>
-        <!-- top-nav: end -->
 
-        <!-- side navbar: start -->
+        <!-- side navbar -->
         <!-- <div th:replace="~{fragments/navbar :: navbarFragment}"></div> -->
         <div th:replace="~{fragments/dynamic_navbar :: dynamicNavbarFragment}"></div>
-        <!-- side navbar: end -->
 
-        <!-- 기본 템플릿 안에 삽입될 내용: start -->
-        <th:block layout:fragment="content"></th:block>
-        <!-- 기본 템플릿 안에 삽입될 내용: end -->
+        <div class="content-wrapper">
+            <!-- 기본 템플릿 -->
+            <th:block layout:fragment="content"></th:block>
+            <!-- footer -->
+            <div th:replace="~{fragments/ffooter :: footerFragment}"></div>
+        </div>
     </div>
 </body>
-
 </html>

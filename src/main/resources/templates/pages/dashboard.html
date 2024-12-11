@@ -1,128 +1,130 @@
 <html layout:decorate="~{fragments/layout}">
 <div layout:fragment="content" class="main-content">
-    <!-- row:1 start -->
-    <div class="row main-row">
-        <div class="col-5 h-100">
-            <div class="card h-100">
-                <div class="card-body">
-                    <div class="card-title"><span class="card-title-bar"></span><span>충전기 현황</span></div>
-                    <div class="ms-1">총 충전기 대수 <b class="price">1000</b>대</div>
-                    <canvas class="w-100 h-80 m-auto p-2" id="treeChart"></canvas>
-                </div>
-            </div>
-        </div>
-        <div class="col-3 h-100">
-            <div class="card h-100">
-                <div class="card-body">
-                    <div class="card-title mb-4"><span class="card-title-bar"></span><span>가동률</span></div>
-                    <canvas class="w-80 h-80 m-auto" id="doughnutChart"></canvas>
-                </div>
-            </div>
-        </div>
-        <div class="col-4 h-100">
-            <div class="row pb-1 h-50 m-0">
+    <div class="responsive-content">
+        <!-- row:1 start -->
+        <div class="row main-row">
+            <div class="col-5 h-100">
                 <div class="card h-100">
                     <div class="card-body">
-                        <div class="card-title"><span class="card-title-bar"></span><span>매출 현황</span></div>
-                        <div class="sales-status">
-                            <div class="row text-center mb-3">
-                                <div class="col-2">급속</div>
-                                <div class="col-3 text-right price-format p-0">1500000</div>
-                                <div class="col-1">원</div>
-                                <div class="col-6 col6-text ps-0" style="color:brown;">▲ 지난달 대비&nbsp;<span class="price-format">10000</span></div>
-                            </div>
-                            <div class="row text-center">
-                                <div class="col-2">완속</div>
-                                <div class="col-3 text-right price-format p-0">50000</div>
-                                <div class="col-1">원</div>
-                                <div class="col-6 col6-text ps-0" style="color: blue;">▼ 지난달 대비&nbsp;<span class="price-format">10000</span></div>
-                            </div>
-                        </div>
+                        <div class="card-title"><span class="card-title-bar"></span><span>충전기 현황</span></div>
+                        <div class="ms-1">총 충전기 대수 <b class="price">1000</b>대</div>
+                        <canvas class="w-100 h-80 m-auto p-2" id="treeChart"></canvas>
                     </div>
                 </div>
             </div>
-            <div class="row pt-1 h-50 m-0">
+            <div class="col-3 h-100">
                 <div class="card h-100">
                     <div class="card-body">
-                        <div class="card-title"><span class="card-title-bar"></span><span>충전 현황</span></div>
-                        <div class="charge-status">
-                            <div class="row text-center mb-3">
-                                <div class="col-2">급속</div>
-                                <div class="col-2 text-right price-format p-0">100</div>
-                                <div class="col-2">kWh</div>
-                                <div class="col-6 col6-text ps-0" style="color:brown;">▲ 지난달 대비 10 kWh</div>
+                        <div class="card-title mb-4"><span class="card-title-bar"></span><span>가동률</span></div>
+                        <canvas class="w-80 h-80 m-auto" id="doughnutChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-4 h-100">
+                <div class="row pb-1 h-50 m-0">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <div class="card-title"><span class="card-title-bar"></span><span>매출 현황</span></div>
+                            <div class="sales-status">
+                                <div class="row text-center mb-3">
+                                    <div class="col-2">급속</div>
+                                    <div class="col-3 text-right price-format p-0">1500000</div>
+                                    <div class="col-1">원</div>
+                                    <div class="col-6 col6-text ps-0" style="color:brown;">▲ 지난달 대비&nbsp;<span class="price-format">10000</span></div>
+                                </div>
+                                <div class="row text-center">
+                                    <div class="col-2">완속</div>
+                                    <div class="col-3 text-right price-format p-0">50000</div>
+                                    <div class="col-1">원</div>
+                                    <div class="col-6 col6-text ps-0" style="color: blue;">▼ 지난달 대비&nbsp;<span class="price-format">10000</span></div>
+                                </div>
                             </div>
-                            <div class="row text-center">
-                                <div class="col-2">완속</div>
-                                <div class="col-2 text-right price-format p-0">50</div>
-                                <div class="col-2">kWh</div>
-                                <div class="col-6 col6-text ps-0" style="color: blue;">▼ 지난달 대비 10 kWh</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row pt-1 h-50 m-0">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <div class="card-title"><span class="card-title-bar"></span><span>충전 현황</span></div>
+                            <div class="charge-status">
+                                <div class="row text-center mb-3">
+                                    <div class="col-2">급속</div>
+                                    <div class="col-2 text-right price-format p-0">100</div>
+                                    <div class="col-2">kWh</div>
+                                    <div class="col-6 col6-text ps-0" style="color:brown;">▲ 지난달 대비 10 kWh</div>
+                                </div>
+                                <div class="row text-center">
+                                    <div class="col-2">완속</div>
+                                    <div class="col-2 text-right price-format p-0">50</div>
+                                    <div class="col-2">kWh</div>
+                                    <div class="col-6 col6-text ps-0" style="color: blue;">▼ 지난달 대비 10 kWh</div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-    <!-- row:1 end -->
-    <!-- row:2 start-->
-    <div class="row main-row">
-        <div class="col h-100">
-            <div class="card h-100">
-                <div class="card-body">
-                    <div class="card-title"><span class="card-title-bar"></span><span>충전기 설치 현황</span></div>
-                    <canvas class="w-100 h-90 mw-100 m-auto" id="barChart"></canvas>
+        <!-- row:1 end -->
+        <!-- row:2 start-->
+        <div class="row main-row">
+            <div class="col h-100">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="card-title"><span class="card-title-bar"></span><span>충전기 설치 현황</span></div>
+                        <canvas class="w-100 h-90 mw-100 m-auto" id="barChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-3 h-100">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="card-title mb-4"><span class="card-title-bar"></span><span>사용용도</span></div>
+                        <canvas class="w-80 h-80 m-auto" id="pieChart"></canvas>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="col-3 h-100">
-            <div class="card h-100">
-                <div class="card-body">
-                    <div class="card-title mb-4"><span class="card-title-bar"></span><span>사용용도</span></div>
-                    <canvas class="w-80 h-80 m-auto" id="pieChart"></canvas>
+        <!-- row:2 end -->
+        <!-- row:3 start -->
+        <div class="row main-row">
+            <div class="col-7 h-100">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="card-title"><span class="card-title-bar"></span><span>고장/장애 현황</span><span class="article-detail"><a th:href="@{/maintenance/error}">더보기<i class="bi bi-plus-circle ms-1"></i></a></span></div>
+                        <div class="py-4 px-2">
+                            <div class="table-responsive">
+                                <table class="table text-center error-status table-hover" style="min-width: 647px;">
+                                    <thead>
+                                        <tr class="table-border-top">
+                                            <th scope="col">충전소ID</th>
+                                            <th scope="col">충전기ID</th>
+                                            <th scope="col">장애코드</th>
+                                            <th scope="col">장애내용</th>
+                                            <th scope="col">발생일시</th>
+                                            <th scope="col">구분</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="errorList"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
-    <!-- row:2 end -->
-    <!-- row:3 start -->
-    <div class="row main-row">
-        <div class="col-7 h-100">
-            <div class="card h-100">
-                <div class="card-body">
-                    <div class="card-title"><span class="card-title-bar"></span><span>고장/장애 현황</span><span class="article-detail"><a th:href="@{/maintenance/error}">더보기<i class="bi bi-plus-circle ms-1"></i></a></span></div>
-                    <div class="py-4 px-2">
-                        <div class="table-responsive">
-                            <table class="table text-center error-status table-hover" style="min-width: 647px;">
-                                <thead>
-                                    <tr class="table-border-top">
-                                        <th scope="col">충전소ID</th>
-                                        <th scope="col">충전기ID</th>
-                                        <th scope="col">장애코드</th>
-                                        <th scope="col">장애내용</th>
-                                        <th scope="col">발생일시</th>
-                                        <th scope="col">구분</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="errorList"></tbody>
-                            </table>
+            <div class="col-5 h-100">
+                <div class="card h-100">
+                    <div class="card-body h-100">
+                        <div class="card-title"><span class="card-title-bar"></span><span>공지 사항</span><span class="article-detail"><a th:href="@{/system/notice}">더보기<i class="bi bi-plus-circle ms-1"></i></a></span></div>
+                        <div class="py-4 px-2 m-auto mh-100">
+                            <div id="noticeList"></div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-5 h-100">
-            <div class="card h-100">
-                <div class="card-body h-100">
-                    <div class="card-title"><span class="card-title-bar"></span><span>공지 사항</span><span class="article-detail"><a th:href="@{/system/notice}">더보기<i class="bi bi-plus-circle ms-1"></i></a></span></div>
-                    <div class="py-4 px-2 m-auto mh-100">
-                        <div id="noticeList"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <!-- row:3 end -->
     </div>
-    <!-- row:3 end -->
     <!-- JS -->
     <script type="text/javascript" th:src="@{/js/chart.js}"></script>
 </div>
