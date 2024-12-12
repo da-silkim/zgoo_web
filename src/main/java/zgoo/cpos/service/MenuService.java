@@ -25,31 +25,6 @@ public class MenuService {
 
     private final MenuRepository menuRepository;
 
-    // 메뉴 리스트 조회
-    // public List<MenuDto.MenuRegDto> findMenuList() {
-    //     try {
-    //         List<Menu> menuList= this.menuRepository.findAll();
-
-    //         if (menuList.isEmpty()) {
-    //             log.info("=== no menu found ===");
-    //             return new ArrayList<>();
-    //         }
-
-    //         // 상위메뉴명 추가
-    //         for (Menu menu : menuList) {
-    //             if (menu.getParentMenu() != null) {
-    //                 Optional<Menu> parentCode = this.menuRepository.findById(menu.getParentMenu());
-    //                 parentCode.ifPresent(value -> menu.setMenuName(value.get));
-    //             }
-    //         }
-    //         List<MenuDto.MenuRegDto> menuListDto = MenuMapper.toDtoList(menuList);
-    //         return menuListDto;
-    //     } catch (Exception e) {
-    //         log.error("메뉴 리스트 조회 중 오류 발생: {}", e.getMessage());
-    //         return new ArrayList<>();
-    //     }
-    // }
-
     // 메뉴 - 전체 조회
     public List<MenuDto.MenuListDto> findMenuList() {
         try {
@@ -62,7 +37,7 @@ public class MenuService {
             List<MenuDto.MenuListDto> menuListDto = MenuMapper.toDtoList(menuList);
             return menuListDto;
         } catch (Exception e) {
-            log.error("메뉴 리스트 조회 중 오류 발생: {}", e.getMessage());
+            log.error("[findMenuList] 메뉴 리스트 조회 중 오류 발생: {}", e.getMessage());
             return new ArrayList<>();
         }
     }
@@ -73,7 +48,7 @@ public class MenuService {
             List<MenuDto.MenuListDto> menuListDto =this.menuRepository.getMuenListWithChildCount();
             return menuListDto;
         } catch (Exception e) {
-            log.error("메뉴 리스트 조회 중 오류 발생: {}", e.getMessage());
+            log.error("[findMenuListWithChild] 메뉴 리스트 조회 중 오류 발생: {}", e.getMessage());
             return new ArrayList<>();
         }
     }
