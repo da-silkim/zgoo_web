@@ -30,4 +30,7 @@ public interface UsersRepositoryCustom {
 
     // 사용자 삭제
     Long deleteUserOne(String userId);
+
+    // 사업자 조회
+    Long findCompanyId(String userId);
 }

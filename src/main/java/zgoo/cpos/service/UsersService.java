@@ -149,4 +149,20 @@ public class UsersService {
             return Page.empty(pageable);
         }
     }
+
+    public Long findCompanyId(String userId) {
+        try {
+            Long companyId = this.usersRepository.findCompanyId(userId);
+            
+            if (companyId != null) {
+                return companyId;
+            } else {
+                log.error("[findCompanyId] companyId is null: {}", userId);
+                return 0L;
+            }
+        } catch (Exception e) {
+            log.error("[findCompanyId] error : ", e.getMessage());
+            return 0L;
+        }
+    }
 }

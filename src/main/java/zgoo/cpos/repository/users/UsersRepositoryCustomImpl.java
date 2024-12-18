@@ -218,4 +218,15 @@ public class UsersRepositoryCustomImpl implements UsersRepositoryCustom {
            
         return new PageImpl<>(usersList, pageable, totalCount);
     }
+
+    @Override
+    public Long findCompanyId(String userId) {
+        Long companyId = queryFactory
+                .select(users.company.id)
+                .from(users)
+                .where(users.userId.eq(userId))
+                .fetchOne();
+
+        return companyId;
+    }
 }
