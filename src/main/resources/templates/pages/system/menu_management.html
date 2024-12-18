@@ -24,7 +24,7 @@
                     </div>
                     <!-- 메뉴 리스트 table: start -->
                     <div class="table-responsive scroll-table-container">
-                        <table class="table text-center table-bg" style="min-width: 1044px;">
+                        <table class="table text-center table-bg table-hover" style="min-width: 1044px;">
                             <thead>
                                 <tr>
                                     <th scope="col" class="w-5"></th>
@@ -39,7 +39,7 @@
                             <tbody id="pageList">
                                 <tr th:each="menu : ${menuList}">
                                     <td><input type="checkbox" /></td>
-                                    <td th:text="${menu.menuName}"></td>
+                                    <td th:text="${menu.menuName}" class="text-start"></td>
                                     <td th:text="${menu.menuUrl}" class="text-start"></td>
                                     <td th:text="${menu.menuCode}"></td>
                                     <td th:text="${menu.parentCode}"></td>
@@ -50,7 +50,7 @@
                                     <td colspan="7">조회된 데이터가 없습니다.</td>
                                 </tr>
                             </tbody>
-                        </table>          
+                        </table>
                     </div>
                     <!-- 메뉴 리스트 table: end -->
                 </div>
@@ -61,30 +61,85 @@
             <div class="card card-shadow mt-4">
                 <!-- card body:3 start -->
                 <div class="card-body">
-                    <div class="card-title"><span class="card-title-bar"></span><span>사업장별 메뉴 접근 권한</span></div>
-                    <!-- 사업장별 메뉴 접근 권한 form: start -->
-                    <form class="position-relative">
-                        <div class="w-100 table-responsive">
-                            <table class="table text-center mt-3 table-bg table-hover">
-                                <thead>
-                                    <tr class="table-border-top">
-                                        <th scope="col">메뉴그룹(대)</th>
-                                        <th scope="col">메뉴그룹(중)</th>
-                                        <th scope="col">메뉴그룹(소)</th>
-                                        <th scope="col">조회권한</th>
-                                        <th scope="col">등록/수정 권한</th>
-                                        <th scope="col">엑셀다운로드권한</th>
-                                    </tr>
-                                    <tr>
-                                        <td colspan="6">사업자 권한 항목 클릭 시 조회됩니다.</td>
-                                    </tr>
-                                </thead>
-                                <tbody id=""></tbody>
-                            </table>                               
-                        </div>
-                        <button class="btn btn-outline-grey position-absolute" style="right: 0; top: -40px;"></i>저장</button>
-                    </form>
-                    <!-- 사업장별 메뉴 접근 권한 form: end -->
+                    <div class="card-title title-btn-area">
+                        <span class="card-title-bar"></span><span>사업장별 메뉴 접근 권한</span>
+                        <form  id="searchForm" class="d-flex align-items-center search-container">
+                                <input type="text" name="companyNameSearch" id="companyNameSearch" class="form-control" placeholder="사업자명을 입력하세요"
+                                        th:value="${selectedCompanyName}">
+                                <button type="submit" class="btn btn-outline-grey" id="companyNameSearchBtn">
+                                    <i class="bi bi-search"></i>검색</button>
+                                <button type="button" class="btn btn-outline-grey" id="resetBtn">
+                                    <i class="bi bi-arrow-repeat me-2"></i>초기화</button>
+                        </form>
+                    </div>
+                    <div class="my-3 btn-page-area">
+                        <button class="btn btn-data-add" id="addBtnSec" data-bs-toggle="modal" data-bs-target="#menuAuthorityAddModal">
+                            <i class="bi bi-plus-square"></i>등록</button>
+                        <button class="btn btn-data-edit" id="editBtnSec" data-bs-toggle="modal" data-bs-target="#menuAuthorityAddModal" disabled>
+                            <i class="fa-regular fa-pen-to-square"></i>수정</button>
+                        <button class="btn btn-data-delete" id="deleteBtnSec" disabled><i class="bi bi-trash"></i>삭제</button>
+                        <span>
+                            <span id="pageInfo">
+                                <span th:text="'Page ' + (${currentPage + 1}) + ' of ' + ${totalPages} + ' [총 ' + ${totalCount} + '건]'"></span>
+                            </span>
+                            <select class="mx-3 page-select" id="size" name="size">
+                                <option th:each="data : ${showListCnt}" th:value="${data.commonCode}"
+                                        th:text="${data.commonCodeName}" th:selected="${data.commonCode == size}"></option>
+                            </select>
+                        </span>
+                    </div>
+                    <!-- 사업장별 메뉴 접근 권한: start -->
+                    <div class="w-100 table-responsive">
+                        <table class="table text-center table-bg table-hover">
+                            <thead>
+                                <tr class="table-border-top">
+                                    <th scope="col" class="w-5"></th>
+                                    <th scope="col" class="w-95 text-start">사업자명</th>
+                                </tr>
+                            </thead>
+                            <tbody id="pageList2">
+                                <tr th:each="company : ${companyMenuList}">
+                                    <td th:id="${company.companyId}"><input type="checkbox" /></td>
+                                    <!-- <td>
+                                        <a href="#" class="no-underline">
+                                        <i class="bi bi-files detail-files"></i>
+                                    </a>
+                                    </td> -->
+                                    <td th:text="${company.companyName}" class="text-start"></td>
+                                </tr>
+                                <tr th:if="${companyMenuList.size() == 0}">
+                                    <td colspan="3">등록된 데이터가 없습니다.</td>
+                                </tr>
+                            </tbody>
+                        </table>                               
+                    </div>
+                    <!-- paging navigation start -->
+                    <div th:if="${companyMenuList.size() > 0}">
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled' : ''">
+                                <a class="page-link" th:href="@{/system/menu/list(page=0, size=${size}, companyNameSearch=${selectedCompanyName})}">
+                                    <i class="bi bi-chevron-double-left"></i></a>
+                            </li>
+                            <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled' : ''">
+                                <a class="page-link" th:href="@{/system/menu/list(page=${currentPage-1}, size=${size}, companyNameSearch=${selectedCompanyName})}">
+                                    <i class="bi bi-chevron-left"></i></a>
+                            </li>
+                            <li class="page-item" th:each="i : ${#numbers.sequence(currentPage - 2, currentPage + 2)}"
+                                th:if="${i >= 0 && i < totalPages}">
+                                <a class="page-link" th:href="@{/system/menu/list(page=${i}, size=${size}, companyNameSearch=${selectedCompanyName})}"
+                                th:text="${i+1}" th:classappend="${i == currentPage} ? 'active' : ''"></a>
+                            </li>
+                            <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled' : ''">
+                                <a class="page-link" th:href="@{/system/menu/list(page=${currentPage+1}, size=${size}, companyNameSearch=${selectedCompanyName})}">
+                                    <i class="bi bi-chevron-right"></i></a>
+                            </li>
+                            <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled' : ''">
+                                <a class="page-link" th:href="@{/system/menu/list(page=${totalPages - 1}, size=${size}, companyNameSearch=${selectedCompanyName})}">
+                                    <i class="bi bi-chevron-double-right"></i></a>
+                            </li>
+                        </ul>
+                    </div>
+                    <!-- 사업장별 메뉴 접근 권한: end -->
                 </div>
                 <!-- card body:3 end -->
             </div>
@@ -94,7 +149,7 @@
     </div>
     <!-- card:1 end -->
 
-    <!-- Group Add Modal start -->
+    <!-- Menu Add Modal start -->
     <div class="modal fade" id="menuAddModal" tabindex="-1" aria-labelledby="menuAddModalLabel" data-bs-backdrop="static"
         data-bs-keyboard="false">
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width: 60vw; height: 90vh;">
@@ -151,12 +206,12 @@
                                             required>
                                     </td>
                                     <th class="w-20">메뉴 사용여부<b class="required-data">*</b></th>
-                                    <td class="w-30">
-                                        <div style="display: inline-block;">
+                                    <td class="w-30 radio-wrapper">
+                                        <div>
                                             <input type="radio" id="useYnYes" name="useYn" th:field="*{useYn}" value="Y">
                                             <label for="useYnYes">사용</label>
                                         </div>
-                                        <div class="ms-5" style="display: inline-block;">
+                                        <div class="ms-5">
                                             <input type="radio" id="useYnNo" name="useYn" th:field="*{useYn}" value="N">
                                             <label for="useYnNo">사용 안 함</label>
                                         </div>
@@ -177,7 +232,52 @@
         </div>
         <!-- modal dialog end -->
     </div>
-    <!-- Group Add Modal end -->
+    <!-- Menu Add Modal end -->
+
+    <!-- Company Menu Authority Add Modal start -->
+    <div class="modal fade" id="menuAuthorityAddModal" tabindex="-1" aria-labelledby="menuAuthorityAddModalLabel" data-bs-backdrop="static"
+        data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width: 60vw; height: 90vh;">
+            <div class="modal-content mh-100 overflow-y-auto scrollbar">
+                <!-- modal body start -->
+                <div class="modal-body">
+                    <form>
+                        <!-- 모달 내용 -->
+                        <!-- table: start -->
+                        <div class="modal-title mb-2 position-relative">
+                            <span class="modal-title-bar"></span><span>사업장별 메뉴 권한</span>
+                            <select class="page-select position-absolute form-control" id="companyId" name="companyId" style="width: 200px; right: 0;">
+                                <option th:each="company : ${companyList}" th:value="${company.companyId}"
+                                                th:text="${company.companyName}"></option>
+                            </select>
+                        </div>
+                        <div class="table-responsive scroll-table-container">
+                            <table class="table text-center table-bg table-hover table-bordered">
+                                <thead>
+                                    <tr style="border-width: 0;">
+                                        <th scope="col" class="w-25">메뉴그룹(대)</th>
+                                        <th scope="col" class="w-25">메뉴그룹(중)</th>
+                                        <th scope="col" class="w-25">메뉴그룹(소)</th>
+                                        <th scope="col" class="w-25">메뉴사용여부</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="menuTable"></tbody>
+                            </table>
+                        </div>
+                        <!-- table: end -->
+                        <div class="modal-footer justify-content-center" style="border-top: none;">
+                            <button type="button" class="btn btn-outline-grey me-2" data-bs-dismiss="modal">취소</button>
+                            <button type="submit" id="modalBtnSec" class="btn btn-data-add">등록</button>
+                        </div>
+                    </form>
+                </div>
+                <!-- modal body end -->
+            </div>
+            <!-- modal content end -->
+        </div>
+        <!-- modal dialog end -->
+    </div>
+    <!-- Company Menu Authority Modal end -->
     <script type="text/javascript" th:src="@{/js/table.js}"></script>
     <script type="text/javascript" th:src="@{/js/system/menu_management.js}"></script>
 </div>
