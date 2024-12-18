@@ -4,7 +4,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import zgoo.cpos.domain.menu.CompanyMenuAuthority;
 import zgoo.cpos.domain.menu.Menu;
+import zgoo.cpos.dto.menu.CompanyMenuAuthorityDto;
 import zgoo.cpos.dto.menu.MenuDto;
 
 public class MenuMapper {
@@ -45,52 +47,10 @@ public class MenuMapper {
 
         return dto;
     }
-    /*
-     * Entity list >> DTO list
+
+    /* 
+     *  Entity(list) >> DTO(list)
      */
-    // public static List<MenuDto.MenuRegDto> toDtoList(List<Menu> entitylist) {
-    //     // List<MenuDto.MenuRegDto> dtolist = entitylist.stream()
-    //     //             .map(menu -> MenuDto.MenuRegDto.builder()
-    //     //                 .menuId(menu.getMenuId())
-    //     //                 .menuName(menu.getMenuName())
-    //     //                 .menuLv(menu.getMenuLv())
-    //     //                 .parentCode(menu.getParentMenu())
-    //     //                 .useYn(menu.getUseYn())
-    //     //                 .regDt(menu.getRegDt())
-    //     //                 .modDt(menu.getModDt())
-    //     //                 .build())
-    //     //             .collect(Collectors.toList());
-        
-    //     // return dtolist;
-
-    //     return entitylist.stream()
-    //             .map(menu -> MenuDto.MenuRegDto.builder()
-    //                 .menuId(menu.getMenuId())
-    //                 .menuName(menu.getMenuName())
-    //                 .menuLv(menu.getMenuLv())
-    //                 .parentCode(menu.getParentMenu())
-    //                 .useYn(menu.getUseYn())
-    //                 .regDt(menu.getRegDt())
-    //                 .modDt(menu.getModDt())
-    //                 .build())
-    //             .collect(Collectors.toList());
-    // }
-
-    // public static List<MenuDto.MenuListDto> toDtoList(List<Menu> entitylist) {
-    //     return entitylist.stream()
-    //             .map(menu -> 
-    //                 MenuDto.MenuListDto.builder()
-    //                 .menuCode(menu.getMenuCode())
-    //                 .parentCode(menu.getParentCode())
-    //                 .menuUrl(menu.getMenuUrl())
-    //                 .menuName(menu.getMenuName())
-    //                 .menuLv(menu.getMenuLv())
-    //                 .useYn(menu.getUseYn())
-    //                 .build())
-    //             .collect(Collectors.toList());
-    // }
-
-
     public static List<MenuDto.MenuListDto> toDtoList(List<Menu> entityList) {
         return entityList.stream()
                 .map(menu -> {
@@ -123,5 +83,31 @@ public class MenuMapper {
                         .build();
                 })
                 .collect(Collectors.toList());
-    }    
+    }
+
+    /* 
+     * company menu(dto >> entity)
+     */
+    public static CompanyMenuAuthority toEntityCompanyMenu(CompanyMenuAuthorityDto.CompanyMenuAuthorityBaseDto dto) {
+        CompanyMenuAuthority companyMenuAuthority = CompanyMenuAuthority.builder()
+                        .companyId(dto.getCompanyId())
+                        .menuCode(dto.getMenuCode())
+                        .useYn(dto.getUseYn())
+                        .build();
+
+        return companyMenuAuthority;
+    }
+
+    /* 
+     * company menu(dto >> entity)
+     */
+    public static CompanyMenuAuthority toEntityCompanyMenu(Long companyId, MenuDto.MenuRegDto menuDto) {
+        CompanyMenuAuthority companyMenuAuthority = CompanyMenuAuthority.builder()
+                        .companyId(companyId)
+                        .menuCode(menuDto.getMenuCode())
+                        .useYn(menuDto.getUseYn())
+                        .build();
+
+        return companyMenuAuthority;
+    }
 }

@@ -18,6 +18,7 @@ import zgoo.cpos.dto.code.CodeDto.CommCodeDto;
 import zgoo.cpos.dto.code.CodeDto.GrpCodeDto;
 import zgoo.cpos.dto.company.CompanyDto.CompanyListDto;
 import zgoo.cpos.dto.company.CompanyDto.CompanyRegDto;
+import zgoo.cpos.dto.menu.CompanyMenuAuthorityDto;
 import zgoo.cpos.dto.menu.MenuAuthorityDto;
 import zgoo.cpos.dto.menu.MenuDto;
 import zgoo.cpos.dto.users.FaqDto;
@@ -307,19 +308,70 @@ public class PageController {
      * 시스템 > 메뉴 관리
      */
     @GetMapping("/system/menu/list")
-    public String showmenulist(Model model) {
+    public String showmenulist(
+            @RequestParam(value = "companyNameSearch", required = false) String companyName,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size,
+            Model model) {
         log.info("=== Menu List Page ===");
 
         model.addAttribute("menuRegDto", new MenuDto.MenuRegDto());
 
+        log.info("companyName: {}", companyName);
         try {
             // 메뉴 list
             List<MenuDto.MenuListDto> menuList = menuService.findMenuList();
             model.addAttribute("menuList", menuList);
 
+            // 사업자 list(select option)
+            List<CompanyListDto> companyList = this.companyService.findCompanyListAll();
+            model.addAttribute("companyList", companyList);
+
+            // 사업장별 메뉴 접근 권한 list
+            // List<CompanyMenuAuthorityDto.CompanyMenuRegDto> companyMenuList = this.menuService.findCompanyDistinctList();
+            // model.addAttribute("companyMenuList", companyMenuList);
+            Page<CompanyMenuAuthorityDto.CompanyMenuRegDto> companyMenuList;
+
+            if (companyName == null || companyName.isEmpty()) {
+                log.info("[findCompanyMenuAll] companyName: {}", companyName);
+                companyMenuList = this.menuService.findCompanyMenuAll(page, size);
+            } else {
+                log.info("[searchCompanyMenuWithPagination] companyName: {}", companyName);
+                companyMenuList = this.menuService.searchCompanyMenuWithPagination(companyName, page, size);
+            }
+
+            int totalPages = companyMenuList.getTotalPages() == 0 ? 1 : companyMenuList.getTotalPages();
+
+            // 검색 조건 저장
+            model.addAttribute("selectedCompanyName", companyName);
+
+            // pagination
+            model.addAttribute("companyMenuList", companyMenuList.getContent());
+            model.addAttribute("size", String.valueOf(size));
+            model.addAttribute("currentPage", page);
+            model.addAttribute("totalPages", totalPages);
+            model.addAttribute("totalCount", companyMenuList.getTotalElements());
+
+            List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT");    // 그리드 row 수
+            model.addAttribute("showListCnt", showListCnt);
+
+            // modal에서 보여주는 메뉴 list
+            List<MenuDto.MenuAuthorityListDto> companyMenuModalList = this.menuService.findMenuListWithParentName();
+            model.addAttribute("companyMenuModalList", companyMenuModalList);
+
         } catch (Exception e) {
             e.getStackTrace();
+            model.addAttribute("menuList", Collections.emptyList());
+            model.addAttribute("companyList", Collections.emptyList());
+            model.addAttribute("companyMenuList", Collections.emptyList());
+            model.addAttribute("size", Collections.emptyList());
+            model.addAttribute("currentPage", Collections.emptyList());
+            model.addAttribute("totalPages", Collections.emptyList());
+            model.addAttribute("totalCount", Collections.emptyList());
+            model.addAttribute("showListCnt", Collections.emptyList());
+            model.addAttribute("companyMenuModalList", Collections.emptyList());
         }
+
         return "pages/system/menu_management";
     }
 
