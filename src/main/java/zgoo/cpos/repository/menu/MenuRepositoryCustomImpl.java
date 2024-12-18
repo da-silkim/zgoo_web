@@ -1,6 +1,7 @@
 package zgoo.cpos.repository.menu;
 
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,14 +13,16 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import zgoo.cpos.domain.menu.Menu;
 import zgoo.cpos.domain.menu.QMenu;
+import zgoo.cpos.dto.menu.MenuDto.MenuAuthorityListDto;
 import zgoo.cpos.dto.menu.MenuDto.MenuListDto;
 
 @Slf4j
 @RequiredArgsConstructor
-public class MenuRepositoryImpl implements MenuRepositoryCustom {
+public class MenuRepositoryCustomImpl implements MenuRepositoryCustom {
     private final JPAQueryFactory queryFactory;
     QMenu menu = QMenu.menu;
     QMenu child = new QMenu("child");
+    QMenu parent = new QMenu("parent");
 
     @Override
     public String findMenuCode(String menucode, String menulv) {
@@ -29,6 +32,22 @@ public class MenuRepositoryImpl implements MenuRepositoryCustom {
             .where(menu.menuCode.eq(menucode)
                 .and(menu.menuLv.eq(menulv)))
             .fetchOne();
+    }
+
+    @Override
+    public List<Menu> findByMenuCodeIn(Set<String> menuCodes) {
+        return queryFactory
+                .selectFrom(menu)
+                .where(menu.menuCode.in(menuCodes))  // menuCode가 menuCodes에 포함되는 메뉴들
+                .fetch();
+    }
+
+    @Override
+    public List<Menu> findByParentCode(String parentCode) {
+        return queryFactory
+            .selectFrom(menu)
+            .where(menu.parentCode.eq(parentCode))  // 부모 코드와 일치하는 메뉴들
+            .fetch();
     }
 
     @Override
@@ -54,10 +73,28 @@ public class MenuRepositoryImpl implements MenuRepositoryCustom {
                 )
                 .from(menu)
                 .leftJoin(child).on(menu.menuCode.eq(child.parentCode))
-                .where(menu.menuLv.in("0", "1"))
+                .where(menu.menuLv.in("0", "1", "2"))
                 .groupBy(menu.menuCode, menu.menuName)
                 .fetch();
 
+        return menuList;
+    }
+
+    @Override
+    public List<MenuAuthorityListDto> findMenuListWithParentName() {
+        List<MenuAuthorityListDto> menuList = queryFactory
+                .select(Projections.fields(MenuAuthorityListDto.class,
+                menu.menuCode.as("menuCode"),
+                menu.menuName.as("menuName"),
+                menu.menuUrl.as("menuUrl"),
+                menu.menuLv.as("menuLv"),
+                menu.parentCode.as("parentCode"),
+                menu.iconClass.as("iconClass"),
+                menu.useYn.as("useYn"),
+                parent.menuName.as("parentCodeName")))
+                .from(menu)
+                .leftJoin(parent).on(parent.menuCode.eq(menu.parentCode))
+                .fetch();
         return menuList;
     }
 
@@ -85,6 +122,8 @@ public class MenuRepositoryImpl implements MenuRepositoryCustom {
             .where(menu.menuCode.eq(menucode))
             .execute();
     }
+
+
 }
 
 
