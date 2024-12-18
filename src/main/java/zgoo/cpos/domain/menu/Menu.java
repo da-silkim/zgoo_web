@@ -59,4 +59,8 @@ public class Menu {
         this.useYn = menu.getUseYn();
         this.iconClass = menu.getIconClass();
     }
+
+    public void setUseYn(String useYn) {
+        this.useYn = useYn;
+    }
 }

@@ -45,4 +45,13 @@ public class MenuDto {
         private String menuLvName;
         private long childCnt;
     }
+
+    @Data
+    @NoArgsConstructor
+    @SuperBuilder
+    @EqualsAndHashCode(callSuper = true)
+    @ToString(callSuper = true)
+    public static class MenuAuthorityListDto extends MenuListDto {
+        private String parentCodeName;
+    }
 }
