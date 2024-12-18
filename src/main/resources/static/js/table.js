@@ -9,6 +9,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const editBtnSub = document.getElementById('editBtnSub');
     const deleteBtnSub = document.getElementById('deleteBtnSub');
 
+    const tableBody2 = document.getElementById('pageList2');
+    const editBtnSec = document.getElementById('editBtnSec');
+    const deleteBtnSec = document.getElementById('deleteBtnSec');
+
     function updateBtn() {
         const selectedCheckboxes = document.querySelectorAll('#pageList input[type="checkbox"]:checked');
         if (selectedCheckboxes.length === 1) {
@@ -21,6 +25,17 @@ document.addEventListener('DOMContentLoaded', () => {
             editBtn.disabled = true;
             deleteBtn.disabled = true;
             if(addBtnSub) addBtnSub.disabled = true;
+        }
+    }
+
+    function updateBtn2() {
+        const selectedCheckboxes = document.querySelectorAll('#pageList2 input[type="checkbox"]:checked');
+        if (selectedCheckboxes.length === 1) {
+            editBtnSec.disabled = false;
+            deleteBtnSec.disabled = false;
+        } else {
+            editBtnSec.disabled = true;
+            deleteBtnSec.disabled = true;
         }
     }
     
@@ -85,6 +100,44 @@ document.addEventListener('DOMContentLoaded', () => {
 
         updateBtn();
     });
+
+    // 페이지 당 테이블이 두 개 존재할 때
+    if(tableBody2) {
+        tableBody2.addEventListener('click', (event) => {
+            let checkbox, row;
+    
+            if (event.target.tagName === 'A') {
+                return;
+            }
+    
+            if (event.target.type === 'checkbox') {
+                checkbox = event.target;
+                row = checkbox.closest('tr');
+            } else {
+                row = event.target.closest('tr');
+                if (!row) return; // tr이 없을 경우 무시
+                checkbox = row.querySelector('input[type="checkbox"]');
+                if (!checkbox) return; // 체크박스가 없을 경우 무시
+                checkbox.checked = !checkbox.checked; // 체크박스 상태 반전
+            }
+    
+            const checkboxes = tableBody2.querySelectorAll('input[type="checkbox"]');
+            checkboxes.forEach(cb => {
+                if (cb !== checkbox) {
+                    cb.checked = false;
+                    cb.closest('tr').classList.remove('table-selected-active');
+                }
+            });
+    
+            if (checkbox.checked) {
+                row.classList.add('table-selected-active');
+            } else {
+                row.classList.remove('table-selected-active');
+            }
+    
+            updateBtn2();
+        });
+    }
 
     // document.getElementById('deleteBtn').addEventListener('click', () => {
     //     const checkedBox = document.querySelector('input[type="checkbox"]:checked'); // 단일 선택을 가정

@@ -2,22 +2,45 @@
 $(function () {
     // $(".side-nav-detail ul .nav-list-detail").hide();
     $(".nav-list-detail").hide();
+    $(".nav-list-sub-detail").hide();
 
     var isSubmenuOpen = false; // 서브메뉴가 열렸는지 상태 저장
+    var isSub2menuOpen = false; // 서브메뉴가 열렸는지 상태 저장
 
     // $(".nav-menu > .nav-list").click(function (e) {
     $(document).on('click', '.nav-menu > .nav-list', function (e) {
         e.preventDefault();
+        e.stopPropagation();
         $(this).siblings(".nav-list-detail").slideToggle(300);
 
         // Toggle the arrow direction
         let arrow = $(this).find(".font-ico-arrow");
         if (arrow.hasClass("fa-chevron-down")) {
             arrow.removeClass("fa-chevron-down").addClass("fa-chevron-up");
-            isSubmenuOpen = true;   // 서브메뉴가 열림
+            isSubmenuOpen = true;   // 중위메뉴가 열림
         } else {
             arrow.removeClass("fa-chevron-up").addClass("fa-chevron-down");
-            isSubmenuOpen = false;  // 서브메뉴 닫힘
+            isSubmenuOpen = false;  // 중위메뉴 닫힘
+        }
+
+        // nav-menu-sub의 하위 메뉴는 열리지 않도록 강제
+        $('.nav-menu-sub .nav-list-sub-detail').slideUp(300); // 모든 하위 메뉴 닫기
+        $('.nav-menu-sub .font-ico-arrow').removeClass("fa-chevron-up").addClass("fa-chevron-down"); // 화살표 원래대로 돌리기
+    });
+
+    $(document).on('click', '.nav-menu-sub > .nav-list', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        $(this).siblings(".nav-list-sub-detail").slideToggle(300);
+
+        // Toggle the arrow direction
+        let arrow = $(this).find(".font-ico-arrow");
+        if (arrow.hasClass("fa-chevron-down")) {
+            arrow.removeClass("fa-chevron-down").addClass("fa-chevron-up");
+            isSub2menuOpen = true;   // 하위메뉴가 열림
+        } else {
+            arrow.removeClass("fa-chevron-up").addClass("fa-chevron-down");
+            isSub2menuOpen = false;  // 하위메뉴 닫힘
         }
     });
 
@@ -28,6 +51,13 @@ $(function () {
         // 서브메뉴가 열려있으면, 열림 -> 닫힘
         if (isSubmenuOpen) {
             $('.side-nav-detail ul .nav-list-detail').slideUp(300);
+            $('.font-ico-arrow').removeClass('fa-chevron-up').addClass('fa-chevron-down');
+            // $('.nav-menu-sub .nav-list-sub-detail').slideUp(300);
+            console.log('서브메뉴 닫힘');
+        }
+
+        if (isSub2menuOpen) {
+            $('.nav-menu-sub .nav-list-sub-detail').slideUp(300);
             $('.font-ico-arrow').removeClass('fa-chevron-up').addClass('fa-chevron-down');
             console.log('서브메뉴 닫힘');
         }
@@ -40,9 +70,10 @@ function confirmSubmit(msg) {
 
 document.addEventListener('DOMContentLoaded', () => {
     $.ajax({
-        url: '/api/nav/list',
+        url: '/api/nav/menu',
         method: 'GET',
         success: function(menuList) {
+            console.log("Fetched menu list: ", menuList);
             renderMenu(menuList);
             $(".nav-list-detail").hide();
         },
@@ -54,7 +85,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 상위 메뉴 렌더링 함수
     function renderMenu(menuList) {
         menuList.forEach(function(menu) {
-            if (menu.menuLv === '0' && menu.childCnt === 0 && menu.useYn === 'Y') {
+            if (menu.menuLv === '0' && menu.childCnt === 0 && menu.useYn === 'Y' && menu.menuUrl.startsWith("/")) {
                 const parentMenuHtml = `
                     <li class="nav-menu list-hover">
                         <a href="${menu.menuUrl}">
@@ -66,7 +97,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     </li>
                 `;
                 $('#menuContainer').append(parentMenuHtml);
-            } else if (menu.menuLv === '0' && menu.childCnt != 0 && menu.useYn === 'Y') {
+            } else if (menu.menuLv === '0' && menu.childCnt != 0 && menu.useYn === 'Y' && !menu.menuUrl.startsWith("/")) {
                 const parentMenuHtml = `
                     <li class="nav-menu">
                         <span class="nav-list">
@@ -74,7 +105,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <span class="nav-list-txt">${menu.menuName}</span>
                                 <i class="fa-solid fa-chevron-down font-ico-arrow"></i>
                             </span>
-                        ${menu.childCnt > 0 ? renderSubMenu(menu, menuList) : ''}
+                        ${menu.childCnt > 0 ? renderMenuLv1(menu, menuList) : ''}
                     </li>
                 `;
                 $('#menuContainer').append(parentMenuHtml);
@@ -84,6 +115,107 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 중위 메뉴 렌더링 함수
     function renderSubMenu(parentMenu, menuList) {
+        const subMenuHtml = `
+            <ul class="nav-list-detail">
+                ${menuList.filter(function(menu) {
+                    return menu.parentCode === parentMenu.menuCode && menu.menuLv === '1' && menu.useYn === 'Y';
+                }).map(function(menu) {
+                    return `
+                        <li class="nav-list list-hover">
+                            <a href="${menu.menuUrl}">${menu.menuName}</a>
+                        </li>
+                    `;
+                }).join('')}
+            </ul>
+        `;
+        return subMenuHtml;
+    }
+
+    // 중위 메뉴 렌더링 함수
+    function renderMenuLv1(parentMenu, menuList) {
+        const subMenuHtml = `
+            <ul class="nav-list-detail">
+                ${menuList.filter(function(menu) {
+                    return menu.parentCode === parentMenu.menuCode && menu.menuLv === '1' && menu.useYn === 'Y';
+                }).map(function(menu) {
+                    if (menu.childCnt === 0) {
+                        return `
+                            <li class="nav-list list-hover">
+                                <a href="${menu.menuUrl}">${menu.menuName}</a>
+                            </li>
+                        `;
+                    } else {
+                        return `
+                            <span class="nav-menu-sub">
+                                <span class="nav-list">
+                                    <span class="nav-list-txt">${menu.menuName}</span>
+                                    <i class="fa-solid fa-chevron-down font-ico-arrow"></i>
+                                </span>
+                                ${renderMenuLv2(menu, menuList)}
+                            </span>
+                        `;
+                    }
+
+                }).join('')}
+            </ul>
+        `;
+        return subMenuHtml;
+    }
+
+    // 하위 메뉴 렌더링 함수
+    function renderMenuLv2(parentMenu, menuList) {
+        const menuLvHtml2 =  `
+            <ul class="nav-list-sub-detail">
+                ${menuList.filter(function(menu) {
+                    return menu.parentCode === parentMenu.menuCode && menu.menuLv === '2' && menu.useYn === 'Y';
+                }).map(function(menu) {
+                    return `
+                        <li class="nav-list list-hover">
+                            <a href="${menu.menuUrl}">${menu.menuName}</a>
+                        </li>
+                    `;
+                }).join('')}
+            </ul>
+        `;
+        return menuLvHtml2;
+    }
+
+    // 상위 메뉴 렌더링 함수
+    function renderMenu2(menuList) {
+        menuList.forEach(function(menu) {
+            if (menu.menuLv === '0' && menu.useYn === 'Y') {
+                // 다음 메뉴가 menuLv 1인 경우
+                if (menuList[index + 1] && menuList[index + 1].menuLv === '1') {
+                    const parentMenuHtml = `
+                        <li class="nav-menu">
+                            <span class="nav-list">
+                                <i class="${menu.iconClass}"></i>
+                                <span class="nav-list-txt">${menu.menuName}</span>
+                                <i class="fa-solid fa-chevron-down font-ico-arrow"></i>
+                            </span>
+                            ${menu.childCnt > 0 ? renderSubMenu2(menu, menuList) : ''}
+                        </li>
+                    `;
+                    $('#menuContainer').append(parentMenuHtml);
+                } else {
+                    const parentMenuHtml = `
+                        <li class="nav-menu list-hover">
+                            <a href="${menu.menuUrl}">
+                                <span class="nav-list">
+                                    <i class="${menu.iconClass}"></i>
+                                    <span class="nav-list-txt">${menu.menuName}</span>
+                                </span>
+                            </a>
+                        </li>
+                    `;
+                    $('#menuContainer').append(parentMenuHtml);
+                }
+            }
+        });
+    }
+
+    // 중위 메뉴 렌더링 함수
+    function renderSubMenu2(parentMenu, menuList) {
         const subMenuHtml = `
             <ul class="nav-list-detail">
                 ${menuList.filter(function(menu) {
