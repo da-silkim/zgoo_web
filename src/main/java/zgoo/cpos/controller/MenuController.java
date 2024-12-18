@@ -36,7 +36,7 @@ public class MenuController {
             this.menuService.saveMenu(dto);
             return ResponseEntity.ok("메뉴가 정상적으로 등록되었습니다.");
         } catch (Exception e) {
-            log.error("[메뉴 등록] 중 오류 발생: {}", e.getMessage());
+            log.error("[createMenu] error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                                  .body("메뉴 등록 중 오류 발생");
         }
@@ -64,7 +64,7 @@ public class MenuController {
             }
             
         } catch (Exception e) {
-            log.error("[메뉴 단건 조회] 중 오류 발생: {}", e.getMessage());
+            log.error("[findMenuOne] error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
@@ -78,7 +78,7 @@ public class MenuController {
             this.menuService.updateMenu(dto);
             return ResponseEntity.ok("메뉴가 정상적으로 수정되었습니다.");
         } catch (Exception e) {
-            log.error("[메뉴 수정] 중 오류 발생: {}", e.getMessage());
+            log.error("[updateMenu] error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                                   .body("메뉴 수정 중 오류 발생");
         }
