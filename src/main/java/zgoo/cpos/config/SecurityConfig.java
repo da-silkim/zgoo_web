@@ -1,22 +1,30 @@
 package zgoo.cpos.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 import jakarta.servlet.http.Cookie;
 import lombok.RequiredArgsConstructor;
+import zgoo.cpos.service.LoginHistService;
+import zgoo.cpos.util.CustomLoginSuccessHandler;
+import zgoo.cpos.util.CustomLogoutSuccessHandler;
 import zgoo.cpos.util.SHA256Encoder;
 
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
+
+    @Autowired
+    private LoginHistService loginHistService;
 
     @Bean
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -31,25 +39,7 @@ public class SecurityConfig {
                 .loginPage("/")
                 .loginProcessingUrl("/login")
                 .defaultSuccessUrl("/dashboard", true)
-                .successHandler((request, response, authentication) -> {
-                    // Remember Id checkbox
-                    String remember = request.getParameter("rememberCheckbox");
-                    if ("on".equals(remember)) {
-                        String userId = request.getParameter("userId");
-                        Cookie cookie = new Cookie("rememberedUserId", userId);
-                        cookie.setMaxAge(365 * 24 * 60 * 60);   // 1년 동안 유지
-                        cookie.setPath("/");
-                        cookie.setHttpOnly(false);
-                        response.addCookie(cookie);
-                    } else {
-                        Cookie cookie = new Cookie("rememberedUserId", null);
-                        cookie.setMaxAge(0);
-                        cookie.setPath("/");
-                        response.addCookie(cookie);
-                    }
-                    
-                    response.sendRedirect("/dashboard");
-                })
+                .successHandler(new CustomLoginSuccessHandler(loginHistService))
                 .failureHandler((request, response, exception) -> {
                     String userId = request.getParameter("userId");
                     String password = request.getParameter("password");
@@ -64,12 +54,15 @@ public class SecurityConfig {
             )
             .logout(logout -> logout
                 .logoutUrl("/logout")
-                .logoutSuccessUrl("/")
+                // .logoutSuccessUrl("/")
+                .logoutSuccessHandler(new CustomLogoutSuccessHandler(loginHistService))
                 .invalidateHttpSession(true)
                 .deleteCookies("JSESSIONID")
                 .permitAll()
             )
-            .csrf().disable();
+            .sessionManagement(session -> session
+                .invalidSessionUrl("/"))
+            .csrf(AbstractHttpConfigurer::disable);
         
         return http.build();
     }

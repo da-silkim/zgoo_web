@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import zgoo.cpos.domain.company.Company;
+import zgoo.cpos.domain.users.LoginHist;
 import zgoo.cpos.domain.users.Users;
 import zgoo.cpos.dto.users.UsersDto;
 
@@ -85,5 +86,18 @@ public class UsersMapper {
                             .build())
                         .collect(Collectors.toList());
         return dtolist;
+    }
+
+    /* 
+     * Dto >> Entity (login hist)
+     */
+    public static LoginHist loginHistToEntity(String userId) {
+        LoginHist loginHist = LoginHist.builder()
+                .userId(userId)
+                .loginDate(LocalDateTime.now())
+                .logoutDate(null)
+                .build();
+
+        return loginHist;
     }
 }
