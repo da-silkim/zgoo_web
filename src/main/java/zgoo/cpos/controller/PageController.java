@@ -18,6 +18,8 @@ import zgoo.cpos.dto.code.CodeDto.CommCodeDto;
 import zgoo.cpos.dto.code.CodeDto.GrpCodeDto;
 import zgoo.cpos.dto.company.CompanyDto.CompanyListDto;
 import zgoo.cpos.dto.company.CompanyDto.CompanyRegDto;
+import zgoo.cpos.dto.cs.CsInfoDto;
+import zgoo.cpos.dto.cs.CsInfoDto.CsInfoListDto;
 import zgoo.cpos.dto.menu.CompanyMenuAuthorityDto;
 import zgoo.cpos.dto.menu.MenuAuthorityDto;
 import zgoo.cpos.dto.menu.MenuDto;
@@ -26,6 +28,7 @@ import zgoo.cpos.dto.users.NoticeDto;
 import zgoo.cpos.dto.users.UsersDto;
 import zgoo.cpos.service.CodeService;
 import zgoo.cpos.service.CompanyService;
+import zgoo.cpos.service.CsService;
 import zgoo.cpos.service.FaqService;
 import zgoo.cpos.service.MenuAuthorityService;
 import zgoo.cpos.service.MenuService;
@@ -44,6 +47,7 @@ public class PageController {
     private final MenuAuthorityService menuAuthorityService;
     private final NoticeService noticeService;
     private final FaqService faqService;
+    private final CsService csService;
 
     /*
      * 대시보드
@@ -87,8 +91,71 @@ public class PageController {
      * 충전소관리 > 충전소리스트
      */
     @GetMapping("/station/list")
-    public String showstationlist(Model model) {
+    public String showstationlist(
+            @RequestParam(value = "companyIdSearch", required = false) Long companyId,
+            @RequestParam(value = "opSearch", required = false) String searchOp,
+            @RequestParam(value = "contentSearch", required = false) String searchContent,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size,
+            Model model) {
         log.info("=== Charging Station List Page ===");
+        log.info("companyId: {}, searchOp: {}, searchContent: {}", companyId, searchOp, searchContent);
+        model.addAttribute("csRegDto", new CsInfoDto.CsInfoRegDto());
+
+        try {
+            // 충전소 list
+            Page<CsInfoListDto> csList;
+            if (companyId == null && searchOp == null && searchContent == null) {
+                csList = this.csService.findCsInfoAll(page, size);
+            } else {
+                csList = this.csService.searchCsInfoListWithPagination(companyId, searchOp, searchContent, page, size);
+            }
+
+            // 검색 조건 저장
+            model.addAttribute("selectedCompanyId", companyId);
+            model.addAttribute("selectedOpSearch", searchOp);
+            model.addAttribute("selectedContentSearch", searchContent);
+
+            int totalPages = csList.getTotalPages() == 0 ? 1 : csList.getTotalPages(); // 전체 페이지 수
+
+            model.addAttribute("csList", csList.getContent()); // 충전소 list
+            model.addAttribute("size", String.valueOf(size)); // 페이지당 보여지는 데이터 건 수
+            model.addAttribute("currentPage", page); // 현재 페이지
+            model.addAttribute("totalPages", totalPages); // 총 페이지 수
+            model.addAttribute("totalCount", csList.getTotalElements()); // 총 데이터
+
+            // 사업자 list(select option)
+            List<CompanyListDto> companyList = this.companyService.findCompanyListAll();
+            model.addAttribute("companyList", companyList);
+            List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT"); // 그리드 row 수
+            model.addAttribute("showListCnt", showListCnt);
+            List<CommCdBaseDto> csFacility = codeService.commonCodeStringToNum("CSFACILITY");   // 충전소시설유형
+            model.addAttribute("csFacility", csFacility);
+            List<CommCdBaseDto> csFSub = codeService.commonCodeStringToNum("CSFSUB");           // 충전소시설구분
+            model.addAttribute("csFSub", csFSub);
+            List<CommCdBaseDto> opStepCd = codeService.commonCodeStringToNum("OPSTEPCD");       // 운영단계분류
+            model.addAttribute("opStepCd", opStepCd);
+            List<CommCdBaseDto> landType = codeService.commonCodeStringToNum("LANDTYPE");       // 부지구분
+            model.addAttribute("landType", landType);
+            List<CommCdBaseDto> faucetType = codeService.commonCodeStringToNum("FAUCETTYPE");   // 수전방식
+            model.addAttribute("faucetType", faucetType);
+            List<CommCdBaseDto> powerType = codeService.commonCodeStringToNum("POWERTYPE");     // 전압종류
+            model.addAttribute("powerType", powerType);
+        } catch (Exception e) {
+            e.getStackTrace();
+            model.addAttribute("csList", Collections.emptyList());
+            model.addAttribute("currentPage", Collections.emptyList());
+            model.addAttribute("totalPages", Collections.emptyList());
+            model.addAttribute("totalCount", Collections.emptyList());
+            model.addAttribute("companyList", Collections.emptyList());
+            model.addAttribute("showListCnt", Collections.emptyList());
+            model.addAttribute("csFacility", Collections.emptyList());
+            model.addAttribute("opStepCd", Collections.emptyList());
+            model.addAttribute("landType", Collections.emptyList());
+            model.addAttribute("faucetType", Collections.emptyList());
+            model.addAttribute("powerType", Collections.emptyList());
+        }
+
         return "pages/charge/cs_list";
     }
 

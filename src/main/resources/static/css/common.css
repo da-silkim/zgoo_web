@@ -181,3 +181,13 @@ table.table tbody tr.row-selected { background-color: #3D3B40 !important; color:
 .search-container { position: absolute; right: 0; bottom: 0; }
 .search-container > input:nth-child(1) { border-radius: 5px; box-sizing: border-box; height: 38px; width: 300px; }
 .search-container > button { margin-left: .5rem !important; }
+
+.detatil-container table tr { height: 54px !important;}
+/* .detatil-container table tr td span { float: left; margin-left: .5rem !important; } */
+.address-detail-container { display: flex; }
+.address-detail-container span { padding: 0 !important; }
+.input-date-container { display: flex; align-items: center; }
+
+.next-article { margin-top: 1rem !important; border-top: 1px solid rgb(190, 190, 190); }
+.previous-article { margin-bottom: 1rem !important; border-top: 1px solid rgb(190, 190, 190); border-bottom: 1px solid rgb(190, 190, 190); }
+.next-article, .previous-article { display: flex; align-items: center; height: 50px; font-size: 17px; }
