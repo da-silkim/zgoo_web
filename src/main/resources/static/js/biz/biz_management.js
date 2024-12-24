@@ -206,6 +206,8 @@ document.addEventListener("DOMContentLoaded", function () {
                     document.getElementById("headPhone").value = data.headPhone ? data.headPhone : "";
                     document.getElementById("bizType").value = data.bizType ? data.bizType : "";
                     document.getElementById("bizKind").value = data.bizKind ? data.bizKind : "";
+                    document.getElementById("companyCode").value = data.companyCode ? data.companyCode : "";
+                    document.getElementById("logoUrl").value = data.logoUrl ? data.logoUrl : "";
                     document.getElementById("zipCode").value = data.zipcode ? data.zipcode : "";
                     document.getElementById("address").value = data.address ? data.address : "";
                     document.getElementById("addressDetail").value = data.addressDetail ? data.addressDetail : "";
@@ -274,6 +276,8 @@ document.addEventListener("DOMContentLoaded", function () {
             headPhone: document.getElementById("headPhone").value,
             bizType: document.getElementById("bizType").value,
             bizKind: document.getElementById("bizKind").value,
+            companyCode: document.getElementById("companyCode").value,
+            logoUrl: document.getElementById("logoUrl").value,
             zipcode: document.getElementById("zipCode").value,
             address: document.getElementById("address").value,
             addressDetail: document.getElementById("addressDetail").value,

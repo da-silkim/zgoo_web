@@ -90,6 +90,12 @@ public class Company {
 
     private LocalDateTime updatedAt;
 
+    @Column(name = "logo_url")
+    private String logoUrl;
+
+    @Column(name = "company_code", length = 2, unique = true)
+    private String companyCode;
+
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "company_relation_info_id")
     private CompanyRelationInfo companyRelationInfo;

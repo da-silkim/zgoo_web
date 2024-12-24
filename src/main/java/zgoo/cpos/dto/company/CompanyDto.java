@@ -59,6 +59,8 @@ public class CompanyDto {
         private String address;
         private String addressDetail;
         private String consignmentPayment; // 위탁결제구분
+        private String logoUrl;
+        private String companyCode; // 사업자코드
 
         // 사업자 관계정보
         private String parentCompanyName;

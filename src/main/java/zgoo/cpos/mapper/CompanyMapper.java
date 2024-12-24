@@ -37,6 +37,8 @@ public class CompanyMapper {
                 .companyRelationInfo(rinfo)
                 .companyPG(pginfo)
                 .companyContract(contractinfo)
+                .logoUrl(dto.getLogoUrl())
+                .companyCode(dto.getCompanyCode())
                 .build();
 
         return company;

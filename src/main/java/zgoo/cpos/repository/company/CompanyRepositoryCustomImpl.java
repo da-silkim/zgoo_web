@@ -12,6 +12,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import zgoo.cpos.domain.code.QCommonCode;
+import zgoo.cpos.domain.company.Company;
 import zgoo.cpos.domain.company.QCompany;
 import zgoo.cpos.domain.company.QCompanyContract;
 import zgoo.cpos.domain.company.QCompanyRelationInfo;
@@ -194,4 +195,12 @@ public class CompanyRepositoryCustomImpl implements CompanyRepositoryCustom {
 
         return companyList;
     }
+
+        @Override
+        public Company findCompanyOne(Long id) {
+                return queryFactory
+                        .selectFrom(company)
+                        .where(company.id.eq(id))
+                        .fetchOne();
+        }
 }

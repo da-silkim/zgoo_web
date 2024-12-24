@@ -99,6 +99,8 @@ public class CompanyService {
                     .staffPhone(entity.getStaffPhone())
                     .staffEmail(entity.getStaffEmail())
                     .romaing(roamingInfo)
+                    .logoUrl(entity.getLogoUrl())
+                    .companyCode(entity.getCompanyCode())
                     .mid(Optional.ofNullable(entity.getCompanyPG())
                             .map(CompanyPG::getMid)
                             .orElse(null))
