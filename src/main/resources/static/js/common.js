@@ -266,6 +266,19 @@ function postSearch() {
             document.getElementById('address').value = addr;
             // 커서를 상세주소 필드로 이동
             document.getElementById('addressDetail').focus();
+
+            const latitude = document.getElementById('latitude');
+            const longtude = document.getElementById('longtude');
+
+            if (latitude && longtude) {
+                const geocoder = new kakao.maps.services.Geocoder();
+                geocoder.addressSearch(addr, (result, status) => {
+                    if (status === kakao.maps.services.Status.OK) {
+                        latitude.value = result[0].y;
+                        longtude.value = result[0].x;
+                    }
+                })
+            }
         }
     }).open();
 }
