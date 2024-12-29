@@ -1,0 +1,291 @@
+<html layout:decorate="~{fragments/layout}">
+<div layout:fragment="content" class="main-content">
+    <!-- card:1 start -->
+    <div class="card responsive-content">
+        <!-- card body:1 start -->
+        <div class="card-body">
+            <div class="content-title"><i class="fa-solid fa-gear font-ico me-2"></i>시스템 > 모델관리</div>
+            <!-- card:2 start -->
+            <div class="card card-shadow">
+                <!-- card body:2 start -->
+                <div class="card-body">
+                    <div class="detail-container">
+                        <!-- table:1 start -->
+                        <div class="card-title mb-2"><span class="card-title-bar"></span><span>모델 정보</span></div>
+                        <table class="table table-bg-v table-fixed w-100 text-center align-middle">
+                            <tbody>
+                                <tr class="table-border-top">
+                                    <th class="w-20">제조사<b class="required-data">*</b></th>
+                                    <td class="w-30">
+                                        <span th:text="${cpModel.manufCdName}"></span>
+                                    </td>
+                                    <th class="w-20">출력(kW)<b class="required-data">*</b></th>
+                                    <td class="w-30">
+                                        <span th:text="${cpModel.powerUnit}"></span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="w-20">모델명<b class="required-data">*</b></th>
+                                    <td class="w-30">
+                                        <span th:text="${cpModel.modelName}"></span>
+                                    </td>
+                                    <th class="w-20">모델코드<b class="required-data">*</b></th>
+                                    <td class="w-30">
+                                        <span th:text="${cpModel.modelCode}"></span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="w-20">충전기유형<b class="required-data">*</b></th>
+                                    <td class="w-30">
+                                        <span th:text="${cpModel.cpTypeName}"></span>
+                                    </td>
+                                    <th class="w-20">설치유형<b class="required-data">*</b></th>
+                                    <td class="w-30">
+                                        <span th:text="${cpModel.installationTypeName}"></span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <!-- table:1 end -->
+                        <!-- table:2 start -->
+                        <div class="card-title mb-2"><span class="card-title-bar"></span><span>커넥터 정보</span></div>
+                        <table class="table table-bg table-fixed w-100 text-center align-middle" id="connectorTable">
+                            <thead>
+                                <tr class="table-border-top" style="vertical-align: middle;">
+                                    <th scope="col" class="w-30">Connector ID</th>
+                                    <th scope="col" class="w-70">Connector Type</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="connector : ${cpModel.connector}">
+                                    <td><span th:text="${connector.connectorId}"></span></td>
+                                    <td><span th:text="${connector.connectorTypeName}"></span></td>
+                                </tr>
+                                <tr th:if="${cpModel.connector.size() == 0}">
+                                    <td colspan="2">등록된 커넥터 정보가 없습니다.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <!-- table:2 end -->
+                        <!-- table:3 start -->
+                        <div class="card-title mb-2"><span class="card-title-bar"></span><span>모델상세 정보</span></div>
+                        <table class="table table-bg-v table-fixed w-100 text-center align-middle">
+                            <tbody>
+                                <tr class="table-border-top">
+                                    <th class="w-20">AC입력전압(V)</th>
+                                    <td class="w-30">
+                                        <span th:text="${cpModel.inputVoltage}"></span>
+                                    </td>
+                                    <th class="w-20">입력주파수(Hz)</th>
+                                    <td class="w-30">
+                                        <span th:text="${cpModel.inputFrequency}"></span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="w-20">입력타입(P)</th>
+                                    <td class="w-30">
+                                        <span th:text="${cpModel.inputType}"></span>
+                                    </td>
+                                    <th class="w-20">입력전류(A)</th>
+                                    <td class="w-30">
+                                        <span th:text="${cpModel.inputCurr}"></span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="w-20">입력전원(kVA)</th>
+                                    <td class="w-30">
+                                        <span th:text="${cpModel.inputPower}"></span>
+                                    </td>
+                                    <th class="w-20">역률(PF)</th>
+                                    <td class="w-30">
+                                        <span th:text="${cpModel.powerFactorToString}"></span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="w-20">DC출력전압(V)</th>
+                                    <td class="w-30">
+                                        <span th:text="${cpModel.outputVoltage}"></span>
+                                    </td>
+                                    <th class="w-20">최대출력전류(A)</th>
+                                    <td class="w-30">
+                                        <span th:text="${cpModel.maxOutputCurr}"></span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="w-20">정격출력(kW)</th>
+                                    <td class="w-30">
+                                        <span th:text="${cpModel.ratedPower}"></span>
+                                    </td>
+                                    <th class="w-20">최고효율(%)</th>
+                                    <td class="w-30">
+                                        <span th:text="${cpModel.peakEfficiencyToString}"></span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <!-- table:3 end -->
+                        <!-- table:4 start -->
+                        <div class="card-title mb-2"><span class="card-title-bar"></span><span>모델상세 부가정보</span></div>
+                        <table class="table table-bg-v table-fixed w-100 text-center align-middle">
+                            <tbody>
+                                <tr class="table-border-top">
+                                    <th class="w-20">THDi(%)</th>
+                                    <td class="w-30">
+                                        <span th:text="${cpModel.thdi}"></span>
+                                    </td>
+                                    <th class="w-20">접지형</th>
+                                    <td class="w-30">
+                                        <span th:text="${cpModel.grdType}"></span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="w-20">작동고도(m)</th>
+                                    <td class="w-30">
+                                        <span th:text="${cpModel.opAltitude}"></span>
+                                    </td>
+                                    <th class="w-20">작동온도</th>
+                                    <td class="w-30">
+                                        <span th:text="${cpModel.opTemperature}"></span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="w-20">온도감소율</th>
+                                    <td class="w-30">
+                                        <span th:text="${cpModel.temperatureDerating}"></span>
+                                    </td>
+                                    <th class="w-20">보관온도범위(˚C)</th>
+                                    <td class="w-30">
+                                        <span th:text="${cpModel.storageTemperatureRange}"></span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="w-20">습도(%)</th>
+                                    <td class="w-30">
+                                        <span th:text="${cpModel.humidity}"></span>
+                                    </td>
+                                    <th class="w-20">치수(mm)</th>
+                                    <td class="w-30">
+                                        <span th:text="${cpModel.dimensions}"></span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="w-20">IP & IK 등급</th>
+                                    <td class="w-30">
+                                        <span th:text="${cpModel.ipNIk}"></span>
+                                    </td>
+                                    <th class="w-20">무게(kg)</th>
+                                    <td class="w-30">
+                                        <span th:text="${cpModel.weight}"></span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="w-20">재질</th>
+                                    <td class="w-30">
+                                        <span th:text="${cpModel.material}"></span>
+                                    </td>
+                                    <th class="w-20">케이블 길이(m)</th>
+                                    <td class="w-30">
+                                        <span th:text="${cpModel.cableLength}"></span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="w-20">화면</th>
+                                    <td class="w-30">
+                                        <span th:text="${cpModel.screen}"></span>
+                                    </td>
+                                    <th class="w-20">RFID Reader</th>
+                                    <td class="w-30">
+                                        <span th:text="${cpModel.rfid}"></span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="w-20">비상버튼</th>
+                                    <td class="w-30">
+                                        <span th:text="${cpModel.emergencyBtn}"></span>
+                                    </td>
+                                    <th class="w-20">통신인터페이스</th>
+                                    <td class="w-30">
+                                        <span th:text="${cpModel.communicationInterface}"></span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="w-20">언어</th>
+                                    <td class="w-30">
+                                        <span th:text="${cpModel.lang}"></span>
+                                    </td>
+                                    <th class="w-20">냉각방식</th>
+                                    <td class="w-30">
+                                        <span th:text="${cpModel.coolingMethod}"></span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="w-20">EMC</th>
+                                    <td class="w-30">
+                                        <span th:text="${cpModel.emc}"></span>
+                                    </td>
+                                    <th class="w-20">보호장치</th>
+                                    <td class="w-30">
+                                        <span th:text="${cpModel.protection}"></span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="w-20">옵션기능</th>
+                                    <td class="w-30">
+                                        <span th:text="${cpModel.opFunc}"></span>
+                                    </td>
+                                    <th class="w-20">표준</th>
+                                    <td class="w-30">
+                                        <span th:text="${cpModel.standard}"></span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="w-20">전력모듈</th>
+                                    <td class="w-30">
+                                        <span th:text="${cpModel.powerModule}"></span>
+                                    </td>
+                                    <th class="w-20">충전기</th>
+                                    <td class="w-30">
+                                        <span th:text="${cpModel.charger}"></span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <!-- table:4 end -->
+                        <button type="button" class="list-btn"
+                            th:data-page="${currentPage}" th:data-size="${size}" th:data-companyid="${selectedCompanyId}"
+                            th:data-manfcd="${selectedManfCd}" th:data-chgspeedcd="${selectedChgSpeedCd}"
+                            onclick="goToList(this)"> 목록 </button>
+                    </div>
+                </div>
+                <!-- card body:2 end -->
+            </div>
+            <!-- card:2 end -->
+        </div>
+        <!-- card body:1 end -->
+    </div>
+    <!-- card:1 end -->
+    <script>
+        // const spans = document.querySelectorAll('.table-info-check tr td > span');
+        // spans.forEach(span => {
+        //     if (!span.textContent.trim()) {
+        //         span.textContent = '정보없음';
+        //     }
+        // });
+
+        function goToList(btn) {
+            const urlParams = new URLSearchParams(window.location.search);
+            const selectedPage = urlParams.get('page') || 0;
+            const selectedSize = urlParams.get('size') || 10;
+            const selectedCompanyId = urlParams.get('companyIdSearch') || '';
+            const selectedManfCd = urlParams.get('manfCdSearch') || '';
+            const selectedChgSpeedCd = urlParams.get('chgSpeedCdSearch') || '';
+
+            window.location.href = "/system/model/list?page=" + selectedPage +
+                                "&size=" + selectedSize +
+                                "&companyIdSearch=" + (selectedCompanyId) +
+                                "&manfCdSearch=" + (selectedManfCd) +
+                                "&chgSpeedCdSearch=" + (selectedChgSpeedCd);
+        }
+    </script>
+</div>
+</html>

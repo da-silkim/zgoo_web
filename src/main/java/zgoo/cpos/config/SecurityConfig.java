@@ -11,7 +11,6 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
-import jakarta.servlet.http.Cookie;
 import lombok.RequiredArgsConstructor;
 import zgoo.cpos.service.LoginHistService;
 import zgoo.cpos.util.CustomLoginSuccessHandler;

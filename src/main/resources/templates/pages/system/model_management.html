@@ -11,35 +11,43 @@
                 <div class="card-body">
                     <div class="card-title"><span class="card-title-bar"></span><span>검색조건</span></div>
                     <!-- form start -->
-                    <form class="position-relative">
+                    <form id="searchForm" class="position-relative">
                         <!-- row:1 start -->
                         <div class="row mb-3 row-cols-2 row-cols-lg-3 g-2">
                             <div class="col d-flex align-items-center">
-                                <label for="business" class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">사업자</label>
-                                <select id="business" class="mx-3 form-control">
-                                    <option value='%'>(선택)</option>
-                                    <option value="">test1</option>
+                                <label for="companyIdSearch" class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">사업자</label>
+                                <select id="companyIdSearch" name="companyIdSearch" class="mx-3 form-control">
+                                    <option th:value="null">선택</option>
+                                    <option th:each="company : ${companyList}" th:value="${company.companyId}"
+                                                th:text="${company.companyName}"
+                                                th:selected="${company.companyId == selectedCompanyId}"></option>
                                 </select>
                             </div>
                             <div class="col d-flex align-items-center">
-                                <label for="business" class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">제조사</label>
-                                <select id="business" class="mx-3 form-control">
-                                    <option value='%'>(선택)</option>
-                                    <option value="">test1</option>
+                                <label for="manfCdSearch" class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">제조사</label>
+                                <select id="manfCdSearch" name="manfCdSearch" class="mx-3 form-control">
+                                    <option th:value="null">선택</option>
+                                    <option th:each="data : ${manfCd}" th:value="${data.commonCode}"
+                                                th:text="${data.commonCodeName}"
+                                                th:selected="${data.commonCode == selectedManfCd}"></option>
                                 </select>
                             </div>
                             <div class="col d-flex align-items-center">
-                                <label for="business" class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">충전기 유형</label>
-                                <select id="business" class="mx-3 form-control">
-                                    <option value='%'>(선택)</option>
-                                    <option value="">test1</option>
+                                <label for="chgSpeedCdSearch" class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">충전기 유형</label>
+                                <select id="chgSpeedCdSearch" name="chgSpeedCdSearch" class="mx-3 form-control">
+                                    <option th:value="null">선택</option>
+                                    <option th:each="data : ${chgSpeedCd}" th:value="${data.commonCode}"
+                                                th:text="${data.commonCodeName}"
+                                                th:selected="${data.commonCode == selectedChgSpeedCd}"></option>
                                 </select>
                             </div>
                         </div>
                         <!-- row:1 end -->
                         <div class="search-btn">
-                            <button type="button" class="btn btn-outline-grey me-2" data-bs-dismiss="modal"><i class="bi bi-search me-2"></i>검색</button>
-                            <button type="button" class="btn btn-outline-grey me-2" data-bs-dismiss="modal"><i class="bi bi-arrow-repeat me-2"></i>초기화</button>
+                            <button type="button" class="btn btn-outline-grey me-2" id="searchBtn">
+                                <i class="bi bi-search me-2"></i>검색</button>
+                            <button type="button" class="btn btn-outline-grey me-2" id="resetBtn">
+                                <i class="bi bi-arrow-repeat me-2"></i>초기화</button>
                         </div>
                     </form>
                     <!-- form end -->
@@ -51,41 +59,90 @@
             <div class="card card-shadow mt-4">
                 <!-- card body:3 start -->
                 <div class="card-body">
-                    <div class="position-relative">
-                        <button class="btn btn-data-add" data-bs-toggle="modal" data-bs-target="#dataAddModal"><i class="bi bi-plus-square me-2"></i>등록</button>
-                        <button class="btn btn-data-edit" id="editBtn" disabled><i class="fa-regular fa-pen-to-square me-2"></i>수정</button>
-                        <button class="btn btn-data-delete" id="deleteBtn" disabled><i class="bi bi-trash me-2"></i>삭제</button>
-                        <span class="position-absolute" style="right: 0; bottom: 0;">
-                            <span id="page-info"></span>
-                            <select class="mx-3 page-select" id="" name="">
-                                <option value='%'>10개</option>
-                                <option value="">30개</option>
-                                <option value="">50개</option>
+                    <div class="btn-page-area">
+                        <button class="btn btn-data-add" id="addBtn" data-bs-toggle="modal" data-bs-target="#dataAddModal">
+                            <i class="bi bi-plus-square"></i>등록</button>
+                        <button class="btn btn-data-edit" id="editBtn" data-bs-toggle="modal" data-bs-target="#dataAddModal" disabled>
+                            <i class="fa-regular fa-pen-to-square"></i>수정</button>
+                        <button class="btn btn-data-delete" id="deleteBtn" disabled><i class="bi bi-trash"></i>삭제</button>
+                        <span>
+                            <span id="pageInfo">
+                                <span th:text="'Page ' + (${currentPage + 1}) + ' of ' + ${totalPages} + ' [총 ' + ${totalCount} + '건]'"></span>
+                            </span>
+                            <select class="mx-3 page-select" id="size" name="size">
+                                <option th:each="data : ${showListCnt}" th:value="${data.commonCode}"
+                                        th:text="${data.commonCodeName}" th:selected="${data.commonCode == size}"></option>
                             </select>
                         </span>
                     </div>
                     <div class="w-100 table-responsive" >
-                        <table class="table text-center mt-3 table-bg table-hover">
+                        <table class="table text-center mt-3 table-bg table-hover" style="min-width: 1020px;">
                             <thead>
                                 <tr class="table-border-top">
                                     <th scope="col"></th>
+                                    <th scope="col"></th>
                                     <th scope="col">사업자</th>
                                     <th scope="col">제조사</th>
+                                    <th scope="col">모델코드</th>
                                     <th scope="col">모델명</th>
                                     <th scope="col">출력(kW)</th>
-                                    <th scope="col">충전방식</th>
-                                    <th scope="col">사용여부</th>
                                     <th scope="col">충전기유형</th>
-                                    <th scope="col">커넥터타입</th>
                                     <th scope="col">등록일시</th>
                                 </tr>
                             </thead>
-                            <tbody id="pageList"></tbody>
+                            <tbody id="pageList">
+                                <tr th:each="model : ${modelList}">
+                                    <td th:id="${model.modelId}"><input type="checkbox" /></td>
+                                    <td>
+                                        <a th:href="@{/system/model/detail/{modelId}(modelId=${model.modelId}, page=${currentPage}, size=${size},
+                                            companyIdSearch=${selectedCompanyId != null ? selectedCompanyId : ''}, 
+                                            manfCdSearch=${selectedManfCd != null ? selectedManfCd : ''}, 
+                                            chgSpeedCdSearch=${selectedChgSpeedCd != null ? selectedChgSpeedCd : ''})}" class="no-underline">
+                                            <i class="bi bi-files detail-files"></i>
+                                        </a>
+                                    </td>
+                                    <td th:text="${model.companyName}"></td>
+                                    <td th:text="${model.manufCdName}"></td>
+                                    <td th:text="${model.modelCode}"></td>
+                                    <td th:text="${model.modelName}"></td>
+                                    <td th:text="${model.powerUnit}"></td>
+                                    <td th:text="${model.cpTypeName}"></td>
+                                    <td th:text="${#temporals.format(model.regDt,'yyyy-MM-dd HH:mm:ss')}"></td>
+                                </tr>
+                                <tr th:if="${modelList.size() == 0}">
+                                    <td colspan="9">조회된 데이터가 없습니다.</td>
+                                </tr>
+                            </tbody>
                         </table>                                
                     </div>
-                    <div class="text-center">
-                        <ul class="pagination" id="paging"></ul>
+                    <!-- paging navigation start -->
+                    <div th:if="${modelList.size() > 0}">
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled' : ''">
+                                <a class="page-link" th:href="@{/system/model/list(page=0, size=${size}, companyIdSearch=${selectedCompanyId},
+                                manfCdSearch=${selectedManfCd}, chgSpeedCdSearch=${selectedChgSpeedCd})}"><i class="bi bi-chevron-double-left"></i></a>
+                            </li>
+                            <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled' : ''">
+                                <a class="page-link" th:href="@{/system/model/list(page=${currentPage-1}, size=${size}, companyIdSearch=${selectedCompanyId},
+                                manfCdSearch=${selectedManfCd}, chgSpeedCdSearch=${selectedChgSpeedCd})}"><i class="bi bi-chevron-left"></i></a>
+                            </li>
+                            <li class="page-item" th:each="i : ${#numbers.sequence(currentPage - 2, currentPage + 2)}"
+                                th:if="${i >= 0 && i < totalPages}">
+                                <a class="page-link" th:href="@{/system/model/list(page=${i}, size=${size}, companyIdSearch=${selectedCompanyId},
+                                manfCdSearch=${selectedManfCd}, chgSpeedCdSearch=${selectedChgSpeedCd})}"
+                                th:text="${i+1}" th:classappend="${i == currentPage} ? 'active' : ''"></a>
+                            </li>
+                            <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled' : ''">
+                                <a class="page-link" th:href="@{/system/model/list(page=${currentPage+1}, size=${size}, companyIdSearch=${selectedCompanyId},
+                                manfCdSearch=${selectedManfCd}, chgSpeedCdSearch=${selectedChgSpeedCd})}"><i class="bi bi-chevron-right"></i></a>
+                            </li>
+                            <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled' : ''">
+                                <a class="page-link" th:href="@{/system/model/list(page=${totalPages - 1}, size=${size}, companyIdSearch=${selectedCompanyId},
+                                manfCdSearch=${selectedManfCd}, chgSpeedCdSearch=${selectedChgSpeedCd})}"><i class="bi bi-chevron-double-right"></i></a>
+                            </li>
+                        </ul>
                     </div>
+                    <!-- paging navigation end -->
                 </div>
                 <!-- card body:3 end -->
             </div>
@@ -96,13 +153,13 @@
     <!-- card:1 end -->
 
     <!-- Add Modal start -->
-    <div class="modal fade" id="dataAddModal" tabindex="-1" aria-labelledby="dataAddModalLabel" data-bs-backdrop="static" data-bs-keyboard="false">
-        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width: 60vw; height: 90vh;"> <!-- height: 90vh; -->
+    <div class="modal fade" id="dataAddModal" tabindex="-1" aria-labelledby="dataAddModalLabel"
+        data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width: 60vw; height: 90vh;">
             <div class="modal-content mh-100 overflow-y-auto scrollbar">
-                <!-- modal body start -->
-                <div class="modal-body">
-                    <form>
-                        <!-- 모달 내용 -->
+                <form th:object="${cpModelDto}">
+                    <!-- modal body start -->
+                    <div class="modal-body">
                         <!-- table:1 start -->
                         <div class="modal-title mb-2"><span class="modal-title-bar"></span><span>모델 정보</span></div>
                         <table class="table table-bg-v table-fixed w-100 text-center align-middle">
@@ -110,39 +167,41 @@
                                 <tr class="table-border-top">
                                     <th class="w-20">제조사<b class="required-data">*</b></th>
                                     <td class="w-30">
-                                        <select id="" class="form-control" required>
-                                            <option value='%'>(선택)</option>
-                                            <option value="">test</option>
+                                        <select id="manufCd" name="manufCd" class="form-control" th:field="*{manufCd}" required>
+                                            <option th:each="data : ${manfCd}" th:value="${data.commonCode}"
+                                                    th:text="${data.commonCodeName}" ></option>
                                         </select>
                                     </td>
-                                    <th class="w-20">출력(KW)<b class="required-data">*</b></th>
+                                    <th class="w-20">출력(kW)<b class="required-data">*</b></th>
                                     <td class="w-30">
-                                        <input type="number" name="" id="" class="form-control" placeholder="" required>
+                                        <input type="number" name="powerUnit" id="powerUnit" class="form-control" th:field="*{powerUnit}" required>
                                     </td>
                                 </tr>
                                 <tr>
                                     <th class="w-20">모델명<b class="required-data">*</b></th>
                                     <td class="w-30">
-                                        <input type="text" name="" id="" class="form-control" placeholder="모델명을 입력해주세요." required>
+                                        <input type="text" name="modelName" id="modelName" class="form-control" th:field="*{modelName}"
+                                            placeholder="모델명을 입력해주세요." required>
                                     </td>
                                     <th class="w-20">모델코드<b class="required-data">*</b></th>
                                     <td class="w-30">
-                                        <input type="text" name="" id="" class="form-control" placeholder="모델코드를 입력해주세요." required>
+                                        <input type="text" name="modelCode" id="modelCode" class="form-control" th:field="*{modelCode}"
+                                            placeholder="모델코드를 입력해주세요." required>
                                     </td>
                                 </tr>
                                 <tr>
                                     <th class="w-20">충전기유형<b class="required-data">*</b></th>
                                     <td class="w-30">
-                                        <select id="" class="form-control" required>
-                                            <option value='%'>(선택)</option>
-                                            <option value="">test</option>
+                                        <select id="cpType" name="cpType" class="form-control" th:field="*{cpType}" required>
+                                            <option th:each="data : ${chgSpeedCd}" th:value="${data.commonCode}"
+                                                    th:text="${data.commonCodeName}" ></option>
                                         </select>
                                     </td>
                                     <th class="w-20">설치유형<b class="required-data">*</b></th>
                                     <td class="w-30">
-                                        <select id="" class="form-control" required>
-                                            <option value='%'>(선택)</option>
-                                            <option value="">test</option>
+                                        <select id="installationType" name="installationType" class="form-control" th:field="*{installationType}" required>
+                                            <option th:each="data : ${chgTypeCd}" th:value="${data.commonCode}"
+                                                    th:text="${data.commonCodeName}" ></option>
                                         </select>
                                     </td>
                                 </tr>
@@ -150,22 +209,31 @@
                         </table>
                         <!-- table:1 end -->
                         <!-- table:2 start -->
-                        <div class="modal-title mb-2"><span class="modal-title-bar"></span><span>커넥터 정보</span></div>
-                        <table class="table table-bg table-fixed w-100 text-center align-middle">
+                        <div class="modal-title mb-2 position-relative">
+                            <span class="modal-title-bar"></span><span>커넥터 정보</span>
+                            <span class="ms-5 position-absolute" style="margin-left: 4px; right: 0;">
+                                <button type="button" class="btn btn-outline-grey me-2" onclick="addRow()">+ 추가</button>
+                                <button type="button" class="btn btn-outline-grey" onclick="deleteRow()">- 삭제</button>
+                            </span>
+                        </div>
+                        <table class="table table-bg table-fixed w-100 text-center align-middle" id="connectorTable">
                             <thead>
-                                <tr>
+                                <tr class="table-border-top">
                                     <th scope="col"></th>
-                                    <th scope="col" class="w-15">순번</th>
                                     <th scope="col" class="w-40">Connector ID</th>
                                     <th scope="col" class="w-40">Connector Type</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td><input type="checkbox"></td>
-                                    <td>1</td>
-                                    <td>01</td>
-                                    <td>DC콤보</td>
+                                <tr class="connector-row">
+                                    <td><input type="checkbox" class="single-checkbox"></td>
+                                    <td><input type="text" class="input-add-row connectorId"></td>
+                                    <td>
+                                        <select class="form-control connectorType" required>
+                                            <option th:each="data : ${connType}" th:value="${data.commonCode}"
+                                                    th:text="${data.commonCodeName}" ></option>
+                                        </select>
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
@@ -177,69 +245,265 @@
                                 <tr class="table-border-top">
                                     <th class="w-20">AC입력전압(V)</th>
                                     <td class="w-30">
-                                        <input type="number" name="" id="" class="form-control" placeholder="">
+                                        <input type="text" name="inputVoltage" id="inputVoltage" class="form-control" th:field="*{inputVoltage}">
                                     </td>
                                     <th class="w-20">입력주파수(Hz)</th>
                                     <td class="w-30">
-                                        <input type="number" name="" id="" class="form-control" placeholder="">
+                                        <input type="text" name="inputFrequency" id="inputFrequency" class="form-control" th:field="*{inputFrequency}">
                                     </td>
                                 </tr>
                                 <tr>
                                     <th class="w-20">입력타입(P)</th>
                                     <td class="w-30">
-                                        <input type="text" name="" id="" class="form-control" placeholder="">
+                                        <input type="text" name="inputType" id="inputType" class="form-control" th:field="*{inputType}">
                                     </td>
                                     <th class="w-20">입력전류(A)</th>
                                     <td class="w-30">
-                                        <input type="number" name="" id="" class="form-control" placeholder="">
+                                        <input type="text" name="inputCurr" id="inputCurr"class="form-control" th:field="*{inputCurr}" >
                                     </td>
                                 </tr>
                                 <tr>
                                     <th class="w-20">입력전원(kVA)</th>
                                     <td class="w-30">
-                                        <input type="text" name="" id="" class="form-control" placeholder="">
+                                        <input type="text" name="inputPower" id="inputPower" class="form-control" th:field="*{inputPower}">
                                     </td>
                                     <th class="w-20">역률(PF)</th>
                                     <td class="w-30">
-                                        <input type="text" name="" id="" class="form-control" placeholder="">
+                                        <input type="text" name="powerFactor" id="powerFactor" class="form-control" th:field="*{powerFactor}">
                                     </td>
                                 </tr>
                                 <tr>
                                     <th class="w-20">DC출력전압(V)</th>
                                     <td class="w-30">
-                                        <input type="text" name="" id="" class="form-control" placeholder="">
+                                        <input type="text" name="outputVoltage" id="outputVoltage" class="form-control" th:field="*{outputVoltage}">
                                     </td>
                                     <th class="w-20">최대출력전류(A)</th>
                                     <td class="w-30">
-                                        <input type="text" name="" id="" class="form-control" placeholder="">
+                                        <input type="text" name="maxOutputCurr" id="maxOutputCurr" class="form-control" th:field="*{maxOutputCurr}">
                                     </td>
                                 </tr>
                                 <tr>
                                     <th class="w-20">정격출력(kW)</th>
                                     <td class="w-30">
-                                        <input type="text" name="" id="" class="form-control" placeholder="">
+                                        <input type="text" name="ratedPower" id="ratedPower" class="form-control" th:field="*{ratedPower}">
                                     </td>
                                     <th class="w-20">최고효율(%)</th>
                                     <td class="w-30">
-                                        <input type="text" name="" id="" class="form-control" placeholder="">
+                                        <input type="number" name="peakEfficiency" id="peakEfficiency" class="form-control" th:field="*{peakEfficiency}">
                                     </td>
                                 </tr>
                             </tbody>
                         </table>
                         <!-- table:3 end -->
-                        <!-- modal body end -->
-                        <div class="modal-footer justify-content-center" style="border-top: none;">
-                        <button type="button" class="btn btn-outline-grey me-2" data-bs-dismiss="modal">취소</button>
-                        <button type="submit" class="btn btn-outline-grey">등록</button>
+                        <!-- table:4 start -->
+                        <div class="accordion" id="accordionModelDetail">
+                            <div class="accordion-item position-relative">
+                                <div class="modal-title mb-2"><span class="modal-title-bar"></span><span>모델상세 부가정보</span></div>
+                                <button class="accordion-button-custom" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne"></button>
+                                <div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#accordionModelDetail">
+                                    <div class="accordion-body" style="padding: 0 !important;">
+                                        <table class="table table-bg-v table-fixed w-100 text-center align-middle">
+                                            <tbody>
+                                                <tr class="table-border-top">
+                                                    <th class="w-20">THDi(%)</th>
+                                                    <td class="w-30">
+                                                        <input type="text" name="thdi" id="thdi" class="form-control" th:field="*{thdi}">
+                                                    </td>
+                                                    <th class="w-20">접지형</th>
+                                                    <td class="w-30">
+                                                        <input type="text" name="grdType" id="grdType" class="form-control" th:field="*{grdType}">
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th class="w-20">작동고도(m)</th>
+                                                    <td class="w-30">
+                                                        <input type="text" name="opAltitude" id="opAltitude" class="form-control" th:field="*{opAltitude}">
+                                                    </td>
+                                                    <th class="w-20">작동온도</th>
+                                                    <td class="w-30">
+                                                        <input type="text" name="opTemperature" id="opTemperature" class="form-control" th:field="*{opTemperature}">
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th class="w-20">온도감소율</th>
+                                                    <td class="w-30">
+                                                        <input type="text" name="temperatureDerating" id="temperatureDerating" class="form-control" th:field="*{temperatureDerating}">
+                                                    </td>
+                                                    <th class="w-20">보관온도범위(˚C)</th>
+                                                    <td class="w-30">
+                                                        <input type="text" name="storageTemperatureRange" id="storageTemperatureRange" class="form-control" th:field="*{storageTemperatureRange}">
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th class="w-20">습도(%)</th>
+                                                    <td class="w-30">
+                                                        <input type="text" name="humidity" id="humidity" class="form-control" th:field="*{humidity}">
+                                                    </td>
+                                                    <th class="w-20">치수(mm)</th>
+                                                    <td class="w-30">
+                                                        <input type="text" name="dimensions" id="dimensions" class="form-control" th:field="*{dimensions}">
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th class="w-20">IP & IK 등급</th>
+                                                    <td class="w-30">
+                                                        <input type="text" name="ipNIk" id="ipNIk" class="form-control" th:field="*{ipNIk}">
+                                                    </td>
+                                                    <th class="w-20">무게(kg)</th>
+                                                    <td class="w-30">
+                                                        <input type="text" name="weight" id="weight" class="form-control" th:field="*{weight}">
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th class="w-20">재질</th>
+                                                    <td class="w-30">
+                                                        <input type="text" name="material" id="material" class="form-control" th:field="*{material}">
+                                                    </td>
+                                                    <th class="w-20">케이블 길이(m)</th>
+                                                    <td class="w-30">
+                                                        <input type="text" name="cableLength" id="cableLength" class="form-control" th:field="*{cableLength}">
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th class="w-20">화면</th>
+                                                    <td class="w-30">
+                                                        <input type="text" name="screen" id="screen" class="form-control" th:field="*{screen}">
+                                                    </td>
+                                                    <th class="w-20">RFID Reader</th>
+                                                    <td class="w-30">
+                                                        <input type="text" name="rfid" id="rfid" class="form-control" th:field="*{rfid}">
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th class="w-20">비상버튼</th>
+                                                    <td class="w-30">
+                                                        <input type="text" name="emergencyBtn" id="emergencyBtn" class="form-control" th:field="*{emergencyBtn}">
+                                                    </td>
+                                                    <th class="w-20">통신인터페이스</th>
+                                                    <td class="w-30">
+                                                        <input type="text" name="communicationInterface" id="communicationInterface" class="form-control" th:field="*{communicationInterface}">
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th class="w-20">언어</th>
+                                                    <td class="w-30">
+                                                        <input type="text" name="lang" id="lang" class="form-control" th:field="*{lang}">
+                                                    </td>
+                                                    <th class="w-20">냉각방식</th>
+                                                    <td class="w-30">
+                                                        <input type="text" name="coolingMethod" id="coolingMethod" class="form-control" th:field="*{coolingMethod}">
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th class="w-20">EMC</th>
+                                                    <td class="w-30">
+                                                        <input type="text" name="emc" id="emc" class="form-control" th:field="*{emc}">
+                                                    </td>
+                                                    <th class="w-20">보호장치</th>
+                                                    <td class="w-30">
+                                                        <input type="text" name="protection" id="protection" class="form-control" th:field="*{protection}">
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th class="w-20">옵션기능</th>
+                                                    <td class="w-30">
+                                                        <input type="text" name="opFunc" id="opFunc" class="form-control" th:field="*{opFunc}">
+                                                    </td>
+                                                    <th class="w-20">표준</th>
+                                                    <td class="w-30">
+                                                        <input type="text" name="standard" id="standard" class="form-control" th:field="*{standard}">
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th class="w-20">전력모듈</th>
+                                                    <td class="w-30">
+                                                        <input type="text" name="powerModule" id="powerModule" class="form-control" th:field="*{powerModule}">
+                                                    </td>
+                                                    <th class="w-20">충전기</th>
+                                                    <td class="w-30">
+                                                        <input type="text" name="charger" id="charger" class="form-control" th:field="*{charger}">
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                  </div>
+                            </div>
                         </div>
-                    </form> 
-                </div>                                             
+                        <!-- table:4 end -->
+                        <!-- modal body end -->
+                        <div class="modal-footer justify-content-center border-top-none">
+                            <button type="button" id="modalCalcelBtn" class="btn btn-outline-grey me-2" data-bs-dismiss="modal">취소</button>
+                            <button type="submit" id="modalBtn" class="btn btn-data-add">등록</button>
+                        </div>
+                    </div>
+                </form>
             </div>
             <!-- modal content end -->
         </div>
         <!-- modal dialog end -->
     </div>
     <!-- Add Modal end -->
+    <script type="text/javascript">
+        function addRow() {
+            const table = document.getElementById('connectorTable').getElementsByTagName('tbody')[0];
+            const newRow = table.insertRow();
+
+            newRow.classList.add("connector-row");
+            newRow.insertCell(0).innerHTML = '<input type="checkbox" class="single-checkbox">';
+            newRow.insertCell(1).innerHTML = '<input type="text" class="input-add-row connectorId">';
+
+            const selectCell = newRow.insertCell(2);
+            const selectElement = document.createElement('select');
+            // selectElement.name = 'connectorType';
+            selectElement.classList.add('form-control', 'connectorType');
+            selectElement.required = true;
+
+            connTypeData.forEach(function(data) {
+                const option = document.createElement('option');
+                option.value = data.commonCode;
+                option.textContent = data.commonCodeName;
+                selectElement.appendChild(option);
+            });
+
+            selectCell.appendChild(selectElement);
+
+            applySingleCheckboxSelection();
+        }
+
+        function deleteRow() {
+            const table = document.getElementById('connectorTable').getElementsByTagName("tbody")[0];
+            const rows = table.getElementsByTagName("tr");
+
+            for (var i = rows.length - 1; i >= 0; i--) {
+                var checkbox = rows[i].getElementsByTagName("input")[0];
+                if (checkbox && checkbox.checked) {
+                    table.deleteRow(i);
+                }
+            }
+        }
+
+        function applySingleCheckboxSelection() {
+            var checkboxes = document.querySelectorAll('.single-checkbox');
+
+            checkboxes.forEach(function (checkbox) {
+                checkbox.addEventListener('change', function () {
+                    // 체크된 checkbox 외의 모든 checkbox 해제
+                    if (this.checked) {
+                        checkboxes.forEach(function (otherCheckbox) {
+                            if (otherCheckbox !== checkbox) {
+                                otherCheckbox.checked = false;
+                            }
+                        });
+                    }
+                });
+            });
+        }
+    </script>
+    <script th:inline="javascript">
+        var connTypeData = /*[[${connType}]]*/ [];
+    </script>    
     <script type="text/javascript" th:src="@{/js/table.js}"></script>
+    <script type="text/javascript" th:src="@{/js/system/model_management.js}"></script>
 </div>
 </html>

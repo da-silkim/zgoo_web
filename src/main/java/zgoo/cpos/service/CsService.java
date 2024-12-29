@@ -165,7 +165,7 @@ public class CsService {
     public void updateCsKepcoContractInfo(CsInfo csInfo, CsInfoRegDto dto) {
         try {
             if (csInfo.getCsKepcoContractInfo() == null) {
-                log.info("No informateion CsKepcoContractInfo.. create new cs kepco info start");
+                log.info("No information CsKepcoContractInfo.. create new cs kepco info start");
 
                 CsKepcoContractInfo kepco = CsMapper.toEntityKepco(dto);
                 csInfo = csInfo.toBuilder()

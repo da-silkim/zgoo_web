@@ -18,6 +18,8 @@ import zgoo.cpos.dto.code.CodeDto.CommCodeDto;
 import zgoo.cpos.dto.code.CodeDto.GrpCodeDto;
 import zgoo.cpos.dto.company.CompanyDto.CompanyListDto;
 import zgoo.cpos.dto.company.CompanyDto.CompanyRegDto;
+import zgoo.cpos.dto.cp.CpModelDto;
+import zgoo.cpos.dto.cp.CpModelDto.CpModelListDto;
 import zgoo.cpos.dto.cs.CsInfoDto;
 import zgoo.cpos.dto.cs.CsInfoDto.CsInfoListDto;
 import zgoo.cpos.dto.menu.CompanyMenuAuthorityDto;
@@ -28,6 +30,7 @@ import zgoo.cpos.dto.users.NoticeDto;
 import zgoo.cpos.dto.users.UsersDto;
 import zgoo.cpos.service.CodeService;
 import zgoo.cpos.service.CompanyService;
+import zgoo.cpos.service.CpModelService;
 import zgoo.cpos.service.CsService;
 import zgoo.cpos.service.FaqService;
 import zgoo.cpos.service.MenuAuthorityService;
@@ -48,6 +51,7 @@ public class PageController {
     private final NoticeService noticeService;
     private final FaqService faqService;
     private final CsService csService;
+    private final CpModelService cpModelService;
 
     /*
      * 대시보드
@@ -181,8 +185,63 @@ public class PageController {
      * 시스템 > 모델관리
      */
     @GetMapping("/system/model/list")
-    public String showmodellist(Model model) {
+    public String showmodellist(
+            @RequestParam(value = "companyIdSearch", required = false) Long companyId,
+            @RequestParam(value = "manfCdSearch", required = false) String manfCode,
+            @RequestParam(value = "chgSpeedCdSearch", required = false) String chgSpeedCode,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size,
+            Model model) {
         log.info("=== Model List Page ===");
+        model.addAttribute("cpModelDto", new CpModelDto.CpModelRegDto());
+        
+        try {
+            // 충전기 모델 list
+            Page<CpModelListDto> modelList;
+            if (companyId == null && manfCode == null && chgSpeedCode == null) {
+                modelList = this.cpModelService.findCpModelAll(page, size);
+            } else {
+                modelList = this.cpModelService.searchCpModelWithPagination(companyId, manfCode, chgSpeedCode, page, size);
+            }
+
+            model.addAttribute("selectedCompanyId", companyId);
+            model.addAttribute("selectedManfCd", manfCode);
+            model.addAttribute("selectedChgSpeedCd", chgSpeedCode);
+
+            int totalPages = modelList.getTotalPages() == 0 ? 1 : modelList.getTotalPages(); // 전체 페이지 수
+
+            model.addAttribute("modelList", modelList.getContent()); // 충전기 모델 list
+            model.addAttribute("size", String.valueOf(size)); // 페이지당 보여지는 데이터 건 수
+            model.addAttribute("currentPage", page); // 현재 페이지
+            model.addAttribute("totalPages", totalPages); // 총 페이지 수
+            model.addAttribute("totalCount", modelList.getTotalElements()); // 총 데이터
+
+            // 사업자 list(select option)
+            List<CompanyListDto> companyList = this.companyService.findCompanyListAll();
+            model.addAttribute("companyList", companyList);
+            List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT"); // 그리드 row 수
+            model.addAttribute("showListCnt", showListCnt);
+            List<CommCdBaseDto> manfCd = codeService.commonCodeStringToNum("CGMANFCD");         // 충전기제조사
+            model.addAttribute("manfCd", manfCd);
+            List<CommCdBaseDto> chgTypeCd = codeService.commonCodeStringToNum("CHGINTTYPECD");  // 충전기설치유형
+            model.addAttribute("chgTypeCd", chgTypeCd);
+            List<CommCdBaseDto> chgSpeedCd = codeService.commonCodeStringToNum("CHGSPEEDCD");   // 충전기속도구분(충전기유형)
+            model.addAttribute("chgSpeedCd", chgSpeedCd);
+            List<CommCdBaseDto> connType = codeService.commonCodeStringToNum("CONNTYPE");       // 커넥터타입
+            model.addAttribute("connType", connType);
+        } catch (Exception e) {
+            e.getStackTrace();
+            model.addAttribute("modelList", Collections.emptyList());
+            model.addAttribute("currentPage", Collections.emptyList());
+            model.addAttribute("totalPages", Collections.emptyList());
+            model.addAttribute("totalCount", Collections.emptyList());
+            model.addAttribute("companyList", Collections.emptyList());
+            model.addAttribute("showListCnt", Collections.emptyList());
+            model.addAttribute("manfCd", Collections.emptyList());
+            model.addAttribute("chgTypeCd", Collections.emptyList());
+            model.addAttribute("chgSpeedCd", Collections.emptyList());
+            model.addAttribute("connType", Collections.emptyList());
+        }
         return "pages/system/model_management";
     }
 
