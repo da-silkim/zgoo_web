@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import zgoo.cpos.dto.code.ChgErrorCodeDto;
+import zgoo.cpos.dto.code.ChgErrorCodeDto.ChgErrorCodeListDto;
 import zgoo.cpos.dto.code.CodeDto.CommCdBaseDto;
 import zgoo.cpos.dto.code.CodeDto.CommCodeDto;
 import zgoo.cpos.dto.code.CodeDto.GrpCodeDto;
@@ -28,6 +30,7 @@ import zgoo.cpos.dto.menu.MenuDto;
 import zgoo.cpos.dto.users.FaqDto;
 import zgoo.cpos.dto.users.NoticeDto;
 import zgoo.cpos.dto.users.UsersDto;
+import zgoo.cpos.service.ChgErrorCodeService;
 import zgoo.cpos.service.CodeService;
 import zgoo.cpos.service.CompanyService;
 import zgoo.cpos.service.CpModelService;
@@ -52,6 +55,7 @@ public class PageController {
     private final FaqService faqService;
     private final CsService csService;
     private final CpModelService cpModelService;
+    private final ChgErrorCodeService chgErrorCodeService;
 
     /*
      * 대시보드
@@ -526,8 +530,47 @@ public class PageController {
      * 시스템 > 에러코드관리
      */
     @GetMapping("/system/errcode/list")
-    public String showerrcodelist(Model model) {
+    public String showerrcodelist(
+            @RequestParam(value = "manfCdSearch", required = false) String manfCode,
+            @RequestParam(value = "opSearch", required = false) String searchOp,
+            @RequestParam(value = "contentSearch", required = false) String searchContent,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size,
+            Model model) {
         log.info("=== Errcode List Page ===");
+        log.info("manfCode: {}, searchOp: {}, searchContent: {}", manfCode, searchOp, searchContent);
+        model.addAttribute("errCdDto", new ChgErrorCodeDto.ChgErrorCodeRegDto());
+
+        try {
+            // 에러코드 list
+            Page<ChgErrorCodeListDto> errcdList = this.chgErrorCodeService.findErrorCodeWithPagination(manfCode, searchOp, searchContent, page, size);
+
+            // 검색 조건 저장
+            model.addAttribute("selectedManfCd", manfCode);
+            model.addAttribute("selectedOpSearch", searchOp);
+            model.addAttribute("selectedContentSearch", searchContent);
+
+            int totalPages = errcdList.getTotalPages() == 0 ? 1 : errcdList.getTotalPages(); // 전체 페이지 수
+
+            model.addAttribute("errcdList", errcdList.getContent()); // 에러코드 list
+            model.addAttribute("size", String.valueOf(size)); // 페이지당 보여지는 데이터 건 수
+            model.addAttribute("currentPage", page); // 현재 페이지
+            model.addAttribute("totalPages", totalPages); // 총 페이지 수
+            model.addAttribute("totalCount", errcdList.getTotalElements()); // 총 데이터
+
+            List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT"); // 그리드 row 수
+            model.addAttribute("showListCnt", showListCnt);
+            List<CommCdBaseDto> manfCd = codeService.commonCodeStringToNum("CGMANFCD");         // 충전기제조사
+            model.addAttribute("manfCd", manfCd);
+        } catch (Exception e) {
+            e.getStackTrace();
+            model.addAttribute("errcdList", Collections.emptyList());
+            model.addAttribute("currentPage", Collections.emptyList());
+            model.addAttribute("totalPages", Collections.emptyList());
+            model.addAttribute("totalCount", Collections.emptyList());
+            model.addAttribute("showListCnt", Collections.emptyList());
+            model.addAttribute("manfCd", Collections.emptyList());
+        }
         return "pages/system/errcode_management";
     }
 
