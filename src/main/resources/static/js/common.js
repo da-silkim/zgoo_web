@@ -325,6 +325,32 @@ function addHyphen(input) {
     }
 }
 
+function addHyphenBizNo(input) {
+    let value = input.value.replace(/\D/g, '');
+    let formattedValue = '';
+
+    if (value.length <= 3) {
+        formattedValue = value;
+    } else if (value.length <= 5) {
+        formattedValue = value.substring(0, 3) + '-' + value.substring(3);
+    } else {
+        formattedValue = value.substring(0, 3) + '-' + value.substring(3, 5) + '-' + value.substring(5);
+    }
+
+    input.value = formattedValue.length <= 12 ? formattedValue : formattedValue.substring(0, 12);
+}
+
+function maskCardNum(cardNumber) {
+    return cardNumber.replace(/^(\d{4})-(\d{2})\d{2}-\d{4}-(\d{4})$/, "$1-$2**-****-$3");
+}
+
+function maxLengthNum(input, len) {
+    input.value = input.value.replace(/\D/g, '');
+
+    if (input.value.length > len) {
+        input.value = input.value.substring(0, len);
+    }
+}
 
 // Regular expression
 // 1. email

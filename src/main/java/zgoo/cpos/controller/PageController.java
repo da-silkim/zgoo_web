@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import zgoo.cpos.dto.biz.BizInfoDto.BizInfoListDto;
+import zgoo.cpos.dto.biz.BizInfoDto.BizInfoRegDto;
 import zgoo.cpos.dto.code.ChgErrorCodeDto;
 import zgoo.cpos.dto.code.ChgErrorCodeDto.ChgErrorCodeListDto;
 import zgoo.cpos.dto.code.CodeDto.CommCdBaseDto;
@@ -30,6 +32,7 @@ import zgoo.cpos.dto.menu.MenuDto;
 import zgoo.cpos.dto.users.FaqDto;
 import zgoo.cpos.dto.users.NoticeDto;
 import zgoo.cpos.dto.users.UsersDto;
+import zgoo.cpos.service.BizService;
 import zgoo.cpos.service.ChgErrorCodeService;
 import zgoo.cpos.service.CodeService;
 import zgoo.cpos.service.CompanyService;
@@ -56,6 +59,7 @@ public class PageController {
     private final CsService csService;
     private final CpModelService cpModelService;
     private final ChgErrorCodeService chgErrorCodeService;
+    private final BizService bizService;
 
     /*
      * 대시보드
@@ -799,8 +803,49 @@ public class PageController {
      * 업체관리 > 법인관리
      */
     @GetMapping("/corp/list")
-    public String showcorplist(Model model) {
+    public String showcorplist(
+            @RequestParam(value = "companyIdSearch", required = false) Long companyId,
+            @RequestParam(value = "opSearch", required = false) String searchOp,
+            @RequestParam(value = "contentSearch", required = false) String searchContent,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size,
+            Model model) {
         log.info("=== Corp managment List Page ===");
+        model.addAttribute("bizRegDto", new BizInfoRegDto());
+
+        try {
+            // 법인 list
+            Page<BizInfoListDto> bizList = this.bizService.findBizInfoWithPagination(companyId, searchOp, searchContent, page, size);
+
+            // 검색 조건 저장
+            model.addAttribute("selectedCompanyId", companyId);
+            model.addAttribute("selectedOpSearch", searchOp);
+            model.addAttribute("selectedContentSearch", searchContent);
+
+            int totalPages = bizList.getTotalPages() == 0 ? 1 : bizList.getTotalPages(); // 전체 페이지 수
+
+            model.addAttribute("bizList", bizList.getContent()); // 법인 list
+            model.addAttribute("size", String.valueOf(size)); // 페이지당 보여지는 데이터 건 수
+            model.addAttribute("currentPage", page); // 현재 페이지
+            model.addAttribute("totalPages", totalPages); // 총 페이지 수
+            model.addAttribute("totalCount", bizList.getTotalElements()); // 총 데이터
+
+            List<CompanyListDto> companyList = this.companyService.findCompanyListAll();
+            model.addAttribute("companyList", companyList);
+            List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT"); // 그리드 row 수
+            model.addAttribute("showListCnt", showListCnt);
+            List<CommCdBaseDto> creditCardList = codeService.commonCodeStringToNum("CREDITCARDCD"); // 카드사코드
+            model.addAttribute("creditCardList", creditCardList);
+        } catch (Exception e) {
+            e.getStackTrace();
+            model.addAttribute("bizList", Collections.emptyList());
+            model.addAttribute("currentPage", Collections.emptyList());
+            model.addAttribute("totalPages", Collections.emptyList());
+            model.addAttribute("totalCount", Collections.emptyList());
+            model.addAttribute("companyList", Collections.emptyList());
+            model.addAttribute("showListCnt", Collections.emptyList());
+            model.addAttribute("creditCardList", Collections.emptyList());
+        }
         return "pages/biz/corporation_management";
     }
 

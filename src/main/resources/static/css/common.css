@@ -25,6 +25,9 @@ input[type='radio']:checked { background-color: #102C57 !important;}
 input.input-add-row{ border: none; outline: none; width: 100%; }
 input.input-add-row:focus { border: 1px solid #b8d3f0; outline: none; }
 
+input.input-add-row-bb{ border: none; border-bottom: 1px solid grey; outline: none; width: 100%; }
+/* input.input-add-row-bb:focus { border: 1px solid #b8d3f0; outline: none; } */
+
 .scrollbar::-webkit-scrollbar{width: 6px; height: 6px;}
 .scrollbar::-webkit-scrollbar-thumb{background-color: darkgrey; border-radius: 10px;}
 .scrollbar::-webkit-scrollbar-button{display: none;}
@@ -191,3 +194,7 @@ table.table tbody tr.row-selected { background-color: #3D3B40 !important; color:
 .next-article { margin-top: 1rem !important; border-top: 1px solid rgb(190, 190, 190); }
 .previous-article { margin-bottom: 1rem !important; border-top: 1px solid rgb(190, 190, 190); border-bottom: 1px solid rgb(190, 190, 190); }
 .next-article, .previous-article { display: flex; align-items: center; height: 50px; font-size: 17px; }
+
+.card-num-container { display: flex; align-items: center; justify-content: space-between; width: 100%; }
+.card-num-container input { width: 60px; text-align: center; }
+.card-num-container span { margin: 0 5px; }
