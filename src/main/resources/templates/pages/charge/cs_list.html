@@ -116,25 +116,25 @@
                         <ul class="pagination justify-content-center">
                             <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled' : ''">
                                 <a class="page-link" th:href="@{/station/list(page=0, size=${size}, companyIdSearch=${selectedCompanyId},
-                                opSearch=${selectedSearchOp}, contentSearch=${selectedSearchContent})}"><i class="bi bi-chevron-double-left"></i></a>
+                                opSearch=${selectedOpSearch}, contentSearch=${selectedContentSearch})}"><i class="bi bi-chevron-double-left"></i></a>
                             </li>
                             <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled' : ''">
                                 <a class="page-link" th:href="@{/station/list(page=${currentPage-1}, size=${size}, companyIdSearch=${selectedCompanyId},
-                                opSearch=${selectedSearchOp}, contentSearch=${selectedSearchContent})}"><i class="bi bi-chevron-left"></i></a>
+                                opSearch=${selectedOpSearch}, contentSearch=${selectedContentSearch})}"><i class="bi bi-chevron-left"></i></a>
                             </li>
                             <li class="page-item" th:each="i : ${#numbers.sequence(currentPage - 2, currentPage + 2)}"
                                 th:if="${i >= 0 && i < totalPages}">
                                 <a class="page-link" th:href="@{/station/list(page=${i}, size=${size}, companyIdSearch=${selectedCompanyId},
-                                opSearch=${selectedSearchOp}, contentSearch=${selectedSearchContent})}"
+                                opSearch=${selectedOpSearch}, contentSearch=${selectedContentSearch})}"
                                 th:text="${i+1}" th:classappend="${i == currentPage} ? 'active' : ''"></a>
                             </li>
                             <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled' : ''">
                                 <a class="page-link" th:href="@{/station/list(page=${currentPage+1}, size=${size}, companyIdSearch=${selectedCompanyId},
-                                opSearch=${selectedSearchOp}, contentSearch=${selectedSearchContent})}"><i class="bi bi-chevron-right"></i></a>
+                                opSearch=${selectedOpSearch}, contentSearch=${selectedContentSearch})}"><i class="bi bi-chevron-right"></i></a>
                             </li>
                             <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled' : ''">
                                 <a class="page-link" th:href="@{/station/list(page=${totalPages - 1}, size=${size}, companyIdSearch=${selectedCompanyId},
-                                opSearch=${selectedSearchOp}, contentSearch=${selectedSearchContent})}"><i class="bi bi-chevron-double-right"></i></a>
+                                opSearch=${selectedOpSearch}, contentSearch=${selectedContentSearch})}"><i class="bi bi-chevron-double-right"></i></a>
                             </li>
                         </ul>
                     </div>

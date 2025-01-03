@@ -193,8 +193,8 @@
                             <span th:if="${nextCsInfo != null}">
                                 <a th:href="@{/station/list/detail/{stationId}(stationId=${nextCsInfo.stationId},page=${currentPage}, size=${size},
                                     companyIdSearch=${selectedCompanyId != null ? selectedCompanyId : ''},
-                                    opSearch=${selectedSearchOp != null ? selectedSearchOp : ''},
-                                    contentSearch=${selectedSearchContent != null ? selectedSearchContent : ''})}"
+                                    opSearch=${selectedOpSearch != null ? selectedOpSearch : ''},
+                                    contentSearch=${selectedContentSearch != null ? selectedContentSearch : ''})}"
                                     th:text="|[${nextCsInfo.stationId}] ${nextCsInfo.stationName}(${nextCsInfo.companyName})|" class="no-underline"></a>
                             </span>
                             <span th:if="${nextCsInfo == null}">다음글이 없습니다.</span>
@@ -204,15 +204,15 @@
                             <span th:if="${previousCsInfo != null}">
                                 <a th:href="@{/station/list/detail/{stationId}(stationId=${previousCsInfo.stationId}, page=${currentPage}, size=${size},
                                     companyIdSearch=${selectedCompanyId != null ? selectedCompanyId : ''},
-                                    opSearch=${selectedSearchOp != null ? selectedSearchOp : ''},
-                                    contentSearch=${selectedSearchContent != null ? selectedSearchContent : ''})}"
+                                    opSearch=${selectedOpSearch != null ? selectedOpSearch : ''},
+                                    contentSearch=${selectedContentSearch != null ? selectedContentSearch : ''})}"
                                     th:text="|[${previousCsInfo.stationId}] ${previousCsInfo.stationName}(${previousCsInfo.companyName})|" class="no-underline"></a>
                             </span>
                             <span th:if="${previousCsInfo == null}">이전글이 없습니다.</span>
                         </div> -->
                         <button type="button" class="list-btn"
                             th:data-page="${currentPage}" th:data-size="${size}" th:data-companyid="${selectedCompanyId}"
-                            th:data-startdate="${selectedSearchOp}" th:data-enddate="${selectedSearchContent}"
+                            th:data-startdate="${selectedOpSearch}" th:data-enddate="${selectedContentSearch}"
                             onclick="goToList(this)"> 목록 </button>
                     </div>
                 </div>

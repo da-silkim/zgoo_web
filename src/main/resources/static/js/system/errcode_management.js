@@ -23,13 +23,13 @@ $(document).ready(function() {
         const urlParams = new URLSearchParams(window.location.search);
         const selectedSize = document.getElementById("size").value;
         const selectedManfCd = urlParams.get('manfCdSearch') || '';
-        const selectedSearchOp = urlParams.get('opSearch') || '';
-        const selectedSearchContent = urlParams.get('contentSearch') || '';
+        const selectedOpSearch = urlParams.get('opSearch') || '';
+        const selectedContentSearch = urlParams.get('contentSearch') || '';
 
         window.location.href = "/system/errcode/list?page=0&size=" + selectedSize +
                                "&manfCdSearch=" + (selectedManfCd) +
-                               "&opSearch=" + (selectedSearchOp) +
-                               "&contentSearch=" + (selectedSearchContent);
+                               "&opSearch=" + (selectedOpSearch) +
+                               "&contentSearch=" + (selectedContentSearch);
     });
 
     $('#pageList').on('click', 'tr', function() {
