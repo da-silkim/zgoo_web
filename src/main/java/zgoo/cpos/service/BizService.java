@@ -15,6 +15,7 @@ import zgoo.cpos.dto.biz.BizInfoDto.BizInfoRegDto;
 import zgoo.cpos.mapper.BizMapper;
 import zgoo.cpos.repository.biz.BizRepository;
 import zgoo.cpos.repository.company.CompanyRepository;
+import zgoo.cpos.util.AESUtil;
 
 @Service
 @RequiredArgsConstructor
@@ -28,13 +29,26 @@ public class BizService {
         Pageable pageable = PageRequest.of(page, size);
 
         try {
+            Page<BizInfoListDto> bizList;
+
             if (companyId == null && (searchOp == null || searchOp.isEmpty()) && (searchContent == null || searchContent.isEmpty())) {
                 log.info("Executing the [findBizWithPagination]");
-                return this.bizRepository.findBizWithPagination(pageable);
+                bizList = this.bizRepository.findBizWithPagination(pageable);
             } else {
                 log.info("Executing the [searchBizWithPagination]");
-                return this.bizRepository.searchBizWithPagination(companyId, searchOp, searchContent, pageable);
+                bizList = this.bizRepository.searchBizWithPagination(companyId, searchOp, searchContent, pageable);
             }
+
+            // 카드번호, TID 복호화
+            bizList.forEach(bizDto -> {
+                try {
+                    decryptCardNumAndTid(bizDto);
+                } catch (Exception e) {
+                    log.error("Error decrypting card number or TID: {}", e.getMessage(), e);
+                }
+            });
+
+            return bizList;
         } catch (Exception e) {
             log.error("[findBizInfoWithPagination] error: {}", e.getMessage(), e);
             return Page.empty(pageable);
@@ -45,6 +59,16 @@ public class BizService {
     public BizInfoRegDto findBizOne(Long bizId) {
         try {
             BizInfoRegDto biz = this.bizRepository.findBizOne(bizId);
+
+            // AES256 카드번호, TID 복호화
+            decryptCardNumAndTidRegDto(biz);
+            if (biz.getCardNum() != null && biz.getCardNum().length() == 16) {
+                biz.setCardNum1(biz.getCardNum().substring(0, 4));
+                biz.setCardNum2(biz.getCardNum().substring(4, 8));
+                biz.setCardNum3(biz.getCardNum().substring(8, 12));
+                biz.setCardNum4(biz.getCardNum().substring(12, 16));
+            }
+
             return biz;
         } catch (Exception e) {
             log.error("[findBizOne] error : {}", e.getMessage());
@@ -57,6 +81,9 @@ public class BizService {
         try {
             Company company = this.companyRepository.findById(dto.getCompanyId())
                 .orElseThrow(() -> new IllegalArgumentException("company not found with id: " + dto.getCompanyId()));
+            
+            // AES256 카드번호, TID 암호화
+            encryptCardNumAndTidRegDto(dto);
             BizInfo biz = BizMapper.toEntity(dto, company);
             this.bizRepository.save(biz);
         } catch (Exception e) {
@@ -70,6 +97,8 @@ public class BizService {
         BizInfo biz = this.bizRepository.findById(bizId)
             .orElseThrow(() -> new IllegalArgumentException("biz info not found with id: " + bizId));
         try {
+            // AES256 카드번호, TID 암호화
+            encryptCardNumAndTidRegDto(dto);
             biz.updateBizInfo(dto);
         } catch (Exception e) {
             log.error("[updateBizInfo] error: {}", e.getMessage());
@@ -88,5 +117,23 @@ public class BizService {
         } catch (Exception e) {
             log.error("[deleteBiz] error: {}", e.getMessage());
         }
+    }
+
+    // 카드번호, TID 복호화 + 카드번호 마스킹
+    private void decryptCardNumAndTid(BizInfoListDto bizDto) throws Exception {
+        bizDto.setCardNum(bizRepository.maskCardNum(AESUtil.decrypt(bizDto.getCardNum())));
+        bizDto.setTid(AESUtil.decrypt(bizDto.getTid()));
+    }
+
+    // 카드번호, TID 복호화
+    private void decryptCardNumAndTidRegDto(BizInfoRegDto bizDto) throws Exception {
+        bizDto.setCardNum(AESUtil.decrypt(bizDto.getCardNum()));
+        bizDto.setTid(AESUtil.decrypt(bizDto.getTid()));
+    }
+
+    // 카드번호, TID 암호화
+    private void encryptCardNumAndTidRegDto(BizInfoRegDto bizDto) throws Exception {
+        bizDto.setCardNum(AESUtil.encrypt(bizDto.getCardNum()));
+        bizDto.setTid(AESUtil.encrypt(bizDto.getTid()));
     }
 }

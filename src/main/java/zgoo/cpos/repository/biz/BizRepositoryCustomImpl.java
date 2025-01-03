@@ -46,10 +46,6 @@ public class BizRepositoryCustomImpl implements BizRepositoryCustom {
             .limit(pageable.getPageSize())
             .fetch();
 
-        for (BizInfoListDto bizDto : bizList) {
-            bizDto.setCardNum(maskCardNum(bizDto.getCardNum()));
-        }
-
         long totalCount = queryFactory
             .select(biz.count())
             .from(biz)
@@ -94,10 +90,6 @@ public class BizRepositoryCustomImpl implements BizRepositoryCustom {
             .limit(pageable.getPageSize())
             .fetch();
 
-        for (BizInfoListDto bizDto : bizList) {
-            bizDto.setCardNum(maskCardNum(bizDto.getCardNum()));
-        }
-
         long totalCount = queryFactory
             .select(biz.count())
             .from(biz)
@@ -107,7 +99,8 @@ public class BizRepositoryCustomImpl implements BizRepositoryCustom {
         return new PageImpl<>(bizList, pageable, totalCount);
     }
 
-    private String maskCardNum(String cardNum) {
+    @Override
+    public String maskCardNum(String cardNum) {
         if (cardNum == null || cardNum.length() != 16) {
             return cardNum;
         }
@@ -127,13 +120,6 @@ public class BizRepositoryCustomImpl implements BizRepositoryCustom {
             .from(biz)
             .where(biz.id.eq(bizId))
             .fetchOne();
-
-        if (bizDto.getCardNum() != null && bizDto.getCardNum().length() == 16) {
-            bizDto.setCardNum1(bizDto.getCardNum().substring(0, 4));
-            bizDto.setCardNum2(bizDto.getCardNum().substring(4, 8));
-            bizDto.setCardNum3(bizDto.getCardNum().substring(8, 12));
-            bizDto.setCardNum4(bizDto.getCardNum().substring(12, 16));
-        }
 
         return bizDto;
     }
