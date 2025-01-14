@@ -154,7 +154,7 @@
                     <!-- 모달 내용 -->
                     <div class="modal-title mb-2 position-relative">
                         <span class="modal-title-bar"></span><span>사용자 정보</span>
-                        <span class="position-absolute" style="right: 0;">
+                        <span class="tooltip-container">
                             <i class="bi bi-info-circle info-icon"></i>
                             <div class="tooltip-info" >
                                 - 아이디는 영문자로 시작하고 6~20자의 영문자 및 숫자로 구성되어야 합니다.<br>
@@ -194,7 +194,7 @@
                                 <td class="w-30 input-info-group">
                                     <input type="password" name="password" id="password" class="form-control"
                                             th:field="*{password}" autocomplete="off" required>
-                                    <div class="info-eyes"><i class="bi bi-eye"></i></i></div>
+                                    <div class="info-eyes"><i class="bi bi-eye"></i></div>
                                 </td>
                             </tr>
                             <tr>
@@ -205,7 +205,7 @@
                                 </td>
                                 <th class="w-20">전화번호</th>
                                 <td class="w-30">
-                                    <input type="text" name="phone" id="phone" class="form-control" maxlength="13" oninput="addHyphen(this)"
+                                    <input type="text" name="phone" id="phone" class="form-control" maxlength="13" oninput="phoneFormat(this)"
                                             th:field="*{phone}" autocomplete="off">
                                 </td>
                             </tr>

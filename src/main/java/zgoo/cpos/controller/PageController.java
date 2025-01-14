@@ -26,6 +26,8 @@ import zgoo.cpos.dto.cp.CpModelDto;
 import zgoo.cpos.dto.cp.CpModelDto.CpModelListDto;
 import zgoo.cpos.dto.cs.CsInfoDto;
 import zgoo.cpos.dto.cs.CsInfoDto.CsInfoListDto;
+import zgoo.cpos.dto.member.MemberDto;
+import zgoo.cpos.dto.member.MemberDto.MemberListDto;
 import zgoo.cpos.dto.menu.CompanyMenuAuthorityDto;
 import zgoo.cpos.dto.menu.MenuAuthorityDto;
 import zgoo.cpos.dto.menu.MenuDto;
@@ -39,6 +41,7 @@ import zgoo.cpos.service.CompanyService;
 import zgoo.cpos.service.CpModelService;
 import zgoo.cpos.service.CsService;
 import zgoo.cpos.service.FaqService;
+import zgoo.cpos.service.MemberService;
 import zgoo.cpos.service.MenuAuthorityService;
 import zgoo.cpos.service.MenuService;
 import zgoo.cpos.service.NoticeService;
@@ -60,6 +63,7 @@ public class PageController {
     private final CpModelService cpModelService;
     private final ChgErrorCodeService chgErrorCodeService;
     private final BizService bizService;
+    private final MemberService memberService;
 
     /*
      * 대시보드
@@ -85,8 +89,56 @@ public class PageController {
      * 회원관리 > 회원리스트
      */
     @GetMapping("/member/list")
-    public String showmemlist(Model model) {
+    public String showmemlist(
+            @RequestParam(value = "companyIdSearch", required = false) Long companyId,
+            @RequestParam(value = "idTagSearch", required = false) String idTag,
+            @RequestParam(value = "nameSearch", required = false) String name,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size,
+            Model model) {
         log.info("=== Member List Page ===");
+        model.addAttribute("memRegDto", new MemberDto.MemberRegDto());
+
+        try {
+            // 회원리스트
+            Page<MemberListDto> memberList = this.memberService.findMemberInfoWithPagination(companyId, idTag, name, page, size);
+
+            // 검색 조건 저장
+            model.addAttribute("selectedCompanyId", companyId);
+            model.addAttribute("selectedIdTag", idTag);
+            model.addAttribute("selectedName", name);
+
+            int totalPages = memberList.getTotalPages() == 0 ? 1 : memberList.getTotalPages(); // 전체 페이지 수
+
+            model.addAttribute("memberList", memberList.getContent()); // 에러코드 list
+            model.addAttribute("size", String.valueOf(size)); // 페이지당 보여지는 데이터 건 수
+            model.addAttribute("currentPage", page); // 현재 페이지
+            model.addAttribute("totalPages", totalPages); // 총 페이지 수
+            model.addAttribute("totalCount", memberList.getTotalElements()); // 총 데이터
+
+            List<CompanyListDto> companyList = this.companyService.findCompanyListAll();    // 사업자 list
+            model.addAttribute("companyList", companyList);
+            List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT");    // 그리드 row 수
+            model.addAttribute("showListCnt", showListCnt);
+            List<CommCdBaseDto> memStatList = codeService.commonCodeStringToNum("MEMSTATCD");    // 회원상태코드
+            model.addAttribute("memStatList", memStatList);
+            List<CommCdBaseDto> bizTypeList = codeService.commonCodeStringToNum("BIZTYPECD");    // 사업자구분코드
+            model.addAttribute("bizTypeList", bizTypeList);
+            List<CommCdBaseDto> creditCardList = codeService.commonCodeStringToNum("CREDITCARDCD"); // 카드사코드
+            model.addAttribute("creditCardList", creditCardList);
+        } catch (Exception e) {
+            e.getStackTrace();
+            model.addAttribute("memberList", Collections.emptyList());
+            model.addAttribute("size", Collections.emptyList());
+            model.addAttribute("currentPage", Collections.emptyList());
+            model.addAttribute("totalPages", Collections.emptyList());
+            model.addAttribute("totalCount", Collections.emptyList());
+            model.addAttribute("companyList", Collections.emptyList());
+            model.addAttribute("showListCnt", Collections.emptyList());
+            model.addAttribute("memStatList", Collections.emptyList());
+            model.addAttribute("bizTypeList", Collections.emptyList());
+            model.addAttribute("creditCardList", Collections.emptyList());
+        }
         return "pages/member/member_list";
     }
 

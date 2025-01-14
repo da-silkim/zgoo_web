@@ -11,30 +11,36 @@
                 <div class="card-body">
                     <div class="card-title"><span class="card-title-bar"></span><span>검색조건</span></div>
                     <!-- form start -->
-                    <form class="position-relative">
-                    <!-- row:1 start -->
-                    <div class="row mb-3 row-cols-2 row-cols-lg-3 g-2">
-                        <div class="col d-flex align-items-center">
-                            <label for="business" class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">사업자</label>
-                            <select id="business" class="mx-3 form-control">
-                                <option value='%'>(선택)</option>
-                                <option value="">test1</option>
-                            </select>
+                    <form id="searchForm" class="position-relative" th:action="@{/member/list}" method="get">
+                        <!-- row: start -->
+                        <div class="row mb-3 row-cols-2 row-cols-lg-3 g-2">
+                            <div class="col d-flex align-items-center">
+                                <label for="companyIdSearch" class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">사업자</label>
+                                <select id="companyIdSearch" name="companyIdSearch" class="mx-3 form-control">
+                                    <option th:value="null">선택</option>
+                                    <option th:each="company : ${companyList}" th:value="${company.companyId}"
+                                                th:text="${company.companyName}"
+                                                th:selected="${company.companyId == selectedCompanyId}"></option>
+                                </select>
+                            </div>
+                            <div class="col d-flex align-items-center">
+                                <label for="idTagSearch" class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">회원카드번호</label>
+                                <input type="text" name="idTagSearch" id="idTagSearch" class="mx-3 form-control"
+                                    placeholder="회원카드번호를 입력해주세요." th:value="${selectedIdTag}" autocomplete="off">
+                            </div>
+                            <div class="col d-flex align-items-center">
+                                <label for="nameSearch" class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">사용자명</label>
+                                <input type="text" name="nameSearch" id="nameSearch" class="mx-3 form-control"
+                                    placeholder="사용자명을 입력해주세요." th:value="${selectedName}" autocomplete="off">
+                            </div>
                         </div>
-                        <div class="col d-flex align-items-center">
-                            <label for="memberCardNum" class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">회원카드번호</label>
-                            <input type="text" name="memberCardNum" id="memberCardNum" class="mx-3 form-control" placeholder="회원카드번호를 입력해주세요." autocomplete="off">
+                        <!-- row: end -->
+                        <div class="search-btn">
+                            <button type="button" class="btn btn-outline-grey me-2" id="searchBtn">
+                                <i class="bi bi-search me-2"></i>검색</button>
+                            <button type="button" class="btn btn-outline-grey me-2" id="resetBtn">
+                                <i class="bi bi-arrow-repeat me-2"></i>초기화</button>
                         </div>
-                        <div class="col d-flex align-items-center">
-                            <label for="userName" class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">사용자명</label>
-                            <input type="text" name="userName" id="userName" class="mx-3 form-control" placeholder="사용자명을 입력해주세요." autocomplete="off">
-                        </div>
-                    </div>
-                    <div class="search-btn">
-                        <button type="button" class="btn btn-outline-grey me-2" data-bs-dismiss="modal"><i class="bi bi-search me-2"></i>검색</button>
-                        <button type="button" class="btn btn-outline-grey me-2" data-bs-dismiss="modal"><i class="bi bi-arrow-repeat me-2"></i>초기화</button>
-                    </div>
-                    <!-- row:1 end -->
                     </form>
                 </div>
                 <!-- card body:2 end -->
@@ -44,17 +50,20 @@
             <div class="card card-shadow mt-4">
                 <!-- card body:3 start -->
                 <div class="card-body">
-                    <div class="position-relative">
-                        <button class="btn btn-data-add" data-bs-toggle="modal" data-bs-target="#dataAddModal"><i class="bi bi-plus-square me-2"></i>등록</button>
-                        <button class="btn btn-data-edit" id="editBtn" disabled><i class="fa-regular fa-pen-to-square me-2"></i>수정</button>
+                    <div class="btn-page-area">
+                        <button class="btn btn-data-add" id="addBtn" data-bs-toggle="modal" data-bs-target="#dataAddModal">
+                            <i class="bi bi-plus-square me-2"></i>등록</button>
+                        <button class="btn btn-data-edit" id="editBtn" data-bs-toggle="modal" data-bs-target="#dataAddModal" disabled>
+                            <i class="fa-regular fa-pen-to-square me-2"></i>수정</button>
                         <button class="btn btn-data-delete" id="deleteBtn" disabled><i class="bi bi-trash me-2"></i>삭제</button>
                         <button class="btn btn-excel" onclick="excelDownload()">엑셀다운로드</button>
-                        <span class="position-absolute" style="right: 0; bottom: 0;">
-                            <span id="page-info"></span>
-                            <select class="mx-3 page-select" id="" name="">
-                                <option value='%'>10개</option>
-                                <option value="">test1</option> 
-                                <option value="">test2</option> 
+                        <span>
+                            <span id="pageInfo">
+                                <span th:text="'Page ' + (${currentPage + 1}) + ' of ' + ${totalPages} + ' [총 ' + ${totalCount} + '건]'"></span>
+                            </span>
+                            <select class="mx-3 page-select" id="size" name="size">
+                                <option th:each="data : ${showListCnt}" th:value="${data.commonCode}"
+                                        th:text="${data.commonCodeName}" th:selected="${data.commonCode == size}"></option>
                             </select>
                         </span>
                     </div>
@@ -62,6 +71,7 @@
                         <table class="table text-center mt-3 table-bg table-hover">
                             <thead>
                                 <tr class="table-border-top">
+                                    <th scope="col"></th>
                                     <th scope="col"></th>
                                     <th scope="col">사업자</th>
                                     <th scope="col">회원번호</th>
@@ -71,16 +81,64 @@
                                     <th scope="col">휴대전화</th>
                                     <th scope="col">이메일</th>
                                     <th scope="col">개인/법인</th>
-                                    <th scope="col">차량번호</th>
                                     <th scope="col">가입일자</th>
                                 </tr>
                             </thead>
-                            <tbody id="pageList"></tbody>
-                        </table>                                
+                            <tbody id="pageList">
+                                <tr th:each="member : ${memberList}">
+                                    <td th:id="${member.memberId}"><input type="checkbox" /></td>
+                                    <td>
+                                        <a th:href="@{/member/detail/{memberId}(memberId=${member.memberId}, page=${currentPage}, size=${size},
+                                            companyIdSearch=${selectedCompanyId != null ? selectedCompanyId : ''}, 
+                                            idTagSearch=${selectedIdTag != null ? selectedIdTag : ''}, 
+                                            nameSearch=${selectedName != null ? selectedName : ''})}" class="no-underline">
+                                            <i class="bi bi-files detail-files"></i>
+                                        </a>
+                                    </td>
+                                    <td th:text="${member.companyName}"></td>
+                                    <td th:text="${member.name}"></td>
+                                    <td th:text="${member.memLoginId}"></td>
+                                    <td th:text="${member.name}"></td>
+                                    <td th:text="${member.idTag}"></td>
+                                    <td th:text="${member.phoneNo}"></td>
+                                    <td th:text="${member.email}"></td>
+                                    <td th:text="${member.bizTypeName}"></td>
+                                    <td th:text="${#temporals.format(member.joinedDt, 'yyyy-MM-dd HH:mm:ss')}"></td>
+                                </tr>
+                                <tr th:if="${memberList.size() == 0}">
+                                    <td colspan="11">조회된 데이터가 없습니다.</td>
+                                </tr>
+                            </tbody>
+                        </table>                 
                     </div>
-                    <div class="text-center">
-                        <ul class="pagination" id="paging"></ul>
+                    <!-- paging navigation start -->
+                    <div th:if="${memberList.size() > 0}">
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled' : ''">
+                                <a class="page-link" th:href="@{/member/list(page=0, size=${size}, companyIdSearch=${selectedCompanyId},
+                                idTagSearch=${selectedIdTag}, nameSearch=${selectedName})}"><i class="bi bi-chevron-double-left"></i></a>
+                            </li>
+                            <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled' : ''">
+                                <a class="page-link" th:href="@{/member/list(page=${currentPage-1}, size=${size}, companyIdSearch=${selectedCompanyId},
+                                idTagSearch=${selectedIdTag}, nameSearch=${selectedName})}"><i class="bi bi-chevron-left"></i></a>
+                            </li>
+                            <li class="page-item" th:each="i : ${#numbers.sequence(currentPage - 2, currentPage + 2)}"
+                                th:if="${i >= 0 && i < totalPages}">
+                                <a class="page-link" th:href="@{/member/list(page=${i}, size=${size}, companyIdSearch=${selectedCompanyId},
+                                idTagSearch=${selectedIdTag}, nameSearch=${selectedName})}"
+                                th:text="${i+1}" th:classappend="${i == currentPage} ? 'active' : ''"></a>
+                            </li>
+                            <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled' : ''">
+                                <a class="page-link" th:href="@{/member/list(page=${currentPage+1}, size=${size}, companyIdSearch=${selectedCompanyId},
+                                idTagSearch=${selectedIdTag}, nameSearch=${selectedName})}"><i class="bi bi-chevron-right"></i></a>
+                            </li>
+                            <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled' : ''">
+                                <a class="page-link" th:href="@{/member/list(page=${totalPages - 1}, size=${size}, companyIdSearch=${selectedCompanyId},
+                                idTagSearch=${selectedIdTag}, nameSearch=${selectedName})}"><i class="bi bi-chevron-double-right"></i></a>
+                            </li>
+                        </ul>
                     </div>
+                    <!-- paging navigation end -->
                 </div>
                 <!-- card body:3 end -->
             </div>
@@ -91,241 +149,473 @@
     <!-- card:1 end -->
 
     <!-- Add Modal start -->
-    <div class="modal fade" id="dataAddModal" tabindex="-1" aria-labelledby="dataAddModalLabel">
-        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width: 60vw; height: 90vh;"> <!-- height: 90vh; -->
+    <div class="modal fade" id="dataAddModal" tabindex="-1" aria-labelledby="dataAddModalLabel"
+        data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width: 60vw; height: 90vh;">
             <div class="modal-content mh-100 overflow-y-auto scrollbar">
-                <form>
-                <!-- modal body start -->
-                <div class="modal-body">
-                    <!-- 모달 내용 -->
-                    <div class="modal-title mb-2"><span class="modal-title-bar"></span><span>회원 정보</span></div>
-                    <!-- table:1 start -->
-                    <table class="table table-bg-v table-fixed w-100 text-center align-middle">
-                        <tbody>
-                            <tr class="table-border-top">
-                                <th class="w-20">사업자명<b class="required-data">*</b></th>
-                                <td class="w-30">
-                                    <select id="businessName" class="form-control" required>
-                                        <option value='%'>(선택)</option>
-                                        <option value="">test1</option>
-                                        <option value="">test2</option>
-                                    </select>
-                                </td>
-                                <th class="w-20">사업자구분<b class="required-data">*</b></th>
-                                <td class="w-30">
-                                    <select id="businessType" class="form-control" required>
-                                        <option value='%'>(선택)</option>
-                                        <option value="">test1</option>
-                                        <option value="">test2</option>
-                                    </select>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th class="w-20">이름<b class="required-data">*</b></th>
-                                <td class="w-30">
-                                    <input type="text" name="userName" id="userName" class="form-control" placeholder="홍길동" autocomplete="off" required>
-                                </td>
-                                <th class="w-20">휴대전화<b class="required-data">*</b></th>
-                                <td class="w-30">
-                                    <input type="number" name="phoneNum" id="phoneNum" class="form-control" maxlength="11" placeholder="휴대전화번호를 입력해주세요." autocomplete="off" required>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th class="w-20">사용자ID<b class="required-data">*</b></th>
-                                <td class="w-30">
-                                    <input type="text" name="userID" id="userID" class="form-control" placeholder="" required disabled>
-                                </td>
-                                <th class="w-20">회원카드번호<b class="required-data">*</b></th>
-                                <td class="w-30">
-                                    <div class="mb-2 display-input-btn">
-                                        <input type="number" name="memberCardNum" id="memberCardNum" class="form-control" placeholder="회원카드번호를 입력해주세요." required>
-                                        <button class="btn btn-outline-grey flex-btn" id="duplicateBtn">중복체크</button>
+                <form id="memberForm" th:object="${memRegDto}">
+                    <!-- modal body start -->
+                    <div class="modal-body">
+                        <!-- 모달 내용 -->
+                        <div class="modal-title mb-2 position-relative">
+                            <span class="modal-title-bar"></span><span>회원 정보</span>
+                            <span class="tooltip-container">
+                                <i class="bi bi-info-circle info-icon"></i>
+                                <div class="tooltip-info" >
+                                    - 아이디는 영문자로 시작하고 6~20자의 영문자 및 숫자로 구성되어야 합니다.<br>
+                                    - 비밀번호는 8~16자의 영문자, 숫자, 특수문자를 최소 하나씩 포함해야 합니다.<br>
+                                </div>
+                            </span>
+                        </div>
+                        <!-- table:1 start -->
+                        <table class="table table-bg-v table-fixed w-100 text-center align-middle">
+                            <tbody>
+                                <tr class="table-border-top">
+                                    <th class="w-15">사업자명<b class="required-data">*</b></th>
+                                    <td class="w-35">
+                                        <select id="companyId" class="form-control" th:field="*{companyId}" required>
+                                            <option th:each="company : ${companyList}" th:value="${company.companyId}"
+                                                    th:text="${company.companyName}"></option>
+                                        </select>
+                                    </td>
+                                    <th class="w-15">사업자구분<b class="required-data">*</b></th>
+                                    <td class="w-35">
+                                        <div class="display-input-btn">
+                                            <select id="bizType" class="form-control w-50" th:field="*{bizType}" required>
+                                                <option th:each="data : ${bizTypeList}" th:value="${data.commonCode}"
+                                                        th:text="${data.commonCodeName}"></option>
+                                            </select>
+                                            <input type="text" name="bizNameInput" id="bizNameInput" class="form-control" disabled required>
+                                            <input type="text" name="bizId" id="bizId" class="form-control" hidden>
+                                            <button type="button" class="btn btn-outline-grey flex-btn ms-0" id="bizSearchBtn">찾기</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>이름<b class="required-data">*</b></th>
+                                    <td>
+                                        <input type="text" name="name" id="name" class="form-control" autocomplete="off" required>
+                                    </td>
+                                    <th>휴대전화<b class="required-data">*</b></th>
+                                    <td>
+                                        <input type="text" name="phoneNo" id="phoneNo" class="form-control" oninput="phoneFormat(this)"
+                                            autocomplete="off" required>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>사용자ID<b class="required-data">*</b></th>
+                                    <td>
+                                        <div class="display-input-btn">
+                                            <input type="text" name="memLoginId" id="memLoginId" class="form-control" autocomplete="off" required>
+                                            <button type="button" class="btn btn-outline-grey flex-btn ms-0" id="duplicateMemLoginIdBtn">중복체크</button>
+                                        </div>
+                                    </td>
+                                    <th>비밀번호<b class="required-data">*</b></th>
+                                    <td>
+                                        <div class="input-info-group" id="passwordContainer">
+                                            <input type="password" name="password" id="password" class="form-control"
+                                            autocomplete="off" required>
+                                        <div class="info-eyes"><i class="bi bi-eye"></i></div>
+                                        </div>
+                                        <button type="button" class="btn btn-outline-grey flex-btn ms-0 w-100" id="passwordEditBtn" hidden>비밀번호 변경</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>회원카드번호<b class="required-data">*</b></th>
+                                    <td>
+                                        <input type="number" name="idTag" id="idTag" th:field="*{idTag}" class="form-control"
+                                                autocomplete="off" disabled required>
+                                    </td>
+                                    <th scope="row">회원상태<b class="required-data">*</b></th>
+                                    <td>
+                                        <select id="userState" class="form-control" th:field="*{userState}" required>
+                                            <option th:each="data : ${memStatList}" th:value="${data.commonCode}"
+                                                    th:text="${data.commonCodeName}"></option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>이메일<b class="required-data">*</b></th>
+                                    <td>
+                                        <input type="email" name="email" id="email" class="form-control" autocomplete="off" required>
+                                    </td>
+                                    <th>생년월일<b class="required-data">*</b></th>
+                                    <td>
+                                        <input type="date" min="1930-01-01" max="2199-12-31" name="birth" id="birth" class="form-control" required>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>주소<b class="required-data">*</b></th>
+                                    <td colspan="3">
+                                        <div class="address-container mb-2 display-input-btn">
+                                            <input type="text" name="zipCode" id="zipCode" class="form-control w-25" placeholder="" disabled>
+                                            <button type="button" class="btn btn-outline-grey flex-btn ms-0" id="postBtn" onclick="postSearch()">주소 검색</button>
+                                        </div>
+                                        <input type="text" name="address" id="address" class="form-control mb-2" autocomplete="off" disabled>
+                                        <input type="text" name="addressDetail" id="addressDetail" class="form-control" placeholder="상세 주소" autocomplete="off">
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <!-- table:1 end -->
+                        <!-- table:2 start -->
+                        <div id="bizInfoContainer">
+                            <div class="modal-title mb-2 position-relative">
+                                <span class="modal-title-bar"></span><span>법인 정보</span>
+                                <span class="tooltip-container">
+                                    <i class="bi bi-info-circle info-icon"></i>
+                                    <div class="tooltip-info" >
+                                        법인 조회 시 자동 입력되는 항목입니다.
                                     </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th class="w-20">이메일<b class="required-data">*</b></th>
-                                <td class="w-30">
-                                    <input type="email" name="email" id="email" class="form-control" placeholder="이메일을 입력해주세요." autocomplete="off" required>
-                                </td>
-                                <th class="w-20">생년월일<b class="required-data">*</b></th>
-                                <td class="w-30">
-                                    <input type="date" min="1970-01-01" max="2199-12-31" name="dateNum" id="dateNum" class="form-control" required>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th class="w-20">주소<b class="required-data">*</b></th>
-                                <td class="w-30" colspan="3">
-                                    <div class="address-container mb-2 display-input-btn">
-                                        <input type="text" name="postCode" id="postCode" class="form-control w-25" placeholder="" disabled>
-                                        <button class="btn btn-outline-grey flex-btn" id="postBtn" onclick="postSearch()">주소 검색</button>
-                                    </div>
-                                    <input type="text" name="address" id="address" class="form-control mb-2" placeholder="" autocomplete="off" disabled>
-                                    <input type="text" name="addressDetail" id="addressDetail" class="form-control" placeholder="상세 주소" autocomplete="off">
-                                </td>
-                            </tr>
-                            <tr>
-                                <th class="w-20" scope="row">회원상태<b class="required-data">*</b></th>
-                                <td class="w-30">
-                                    <select id="userState" class="form-control" required>
-                                        <option value='%'>(선택)</option>
-                                        <option value="">정상회원</option>
-                                        <option value="">탈퇴</option>
-                                        <option value="">휴먼</option> 
-                                    </select>
-                                </td>
-                                <td colspan="2"></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <!-- table:1 end -->
-                    <!-- table:2 start -->
-                    <div class="modal-title mb-2"><span class="modal-title-bar"></span><span>법인 정보</span></div>
-                    <table class="table table-bg-v table-fixed w-100 text-center align-middle">
-                        <tbody>
-                            <tr class="table-border-top">
-                                <th class="w-20">법인명<b class="required-data">*</b></th>
-                                <td class="w-30">
-                                    <input type="text" name="userName" id="userName" class="form-control" placeholder="" autocomplete="off" required disabled>
-                                </td>
-                                <th class="w-20">사업자번호<b class="required-data">*</b></th>
-                                <td class="w-30">
-                                    <input type="number" name="phoneNum" id="phoneNum" class="form-control" maxlength="11" placeholder="사업자번호를 입력해주세요." autocomplete="off" required disabled>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th class="w-20">결제카드 등록여부<b class="required-data">*</b></th>
-                                <td class="w-30">
-                                    <input type="text" name="userName" id="userName" class="form-control" placeholder="" autocomplete="off" required disabled>
-                                </td>
-                                <th class="w-20">토큰키 등록여부<b class="required-data">*</b></th>
-                                <td class="w-30">
-                                    <input type="text" name="tokenYN" id="tokenYN" class="form-control" maxlength="11" placeholder="" autocomplete="off" required disabled>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <!-- table:2 end -->
-                    <!-- table:2 start -->
-                    <div class="modal-title mb-2"><span class="modal-title-bar"></span><span>차량 정보</span></div>
-                    <table class="table table-bg table-fixed w-100 text-center align-middle">
-                        <thead>
-                            <tr class="table-border-top">
-                                <th scope="col" class="w-20">개인/법인</th>
-                                <th scope="col" class="w-25">차량번호</th>
-                                <th scope="col" class="w-25">차량모델</th>
-                                <th scope="col" class="w-30">등록일시</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>법인</td>
-                                <td>123가 1234</td>
-                                <td>IONIC6</td>
-                                <td>2024-01-01 12:10:00</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <!-- table:2 end -->
-                    <!-- table:3 start -->
-                    <div class="modal-title mb-2"><span class="modal-title-bar"></span><span>결제 카드</span></div>
-                    <table class="table table-bg table-hover table-fixed w-100 text-center align-middle">
-                        <thead>
-                            <tr class="table-border-top">
-                                <th scope="col" class="w-20">카드사</th>
-                                <th scope="col" class="w-25">카드번호</th>
-                                <th scope="col" class="w-30">TID</th>
-                                <th scope="col" class="w-25">등록일시</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>하나</td>
-                                <td>1111222233334444</td>
-                                <td>123456789123456789</td>
-                                <td>2024-01-01 12:10:00</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <!-- table:3 end -->
-                    <!-- table:4 start -->
-                    <div class="modal-title mb-2"><span class="modal-title-bar"></span><span>약관정보</span></div>
-                    <table class="table table-bg table-hover table-fixed w-100 text-center align-middle">
-                        <thead>
-                            <tr class="table-border-top">
-                                <th scope="col" class="w-20">구분</th>
-                                <th scope="col" class="w-40">약관내용</th>
-                                <th scope="col" class="w-40">동의여부</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>필수</td>
-                                <td>개인정보 활용동의서</td>
-                                <td>
-                                    <input type="radio" name="privateCheck" id="privateY" class="mx-3" value="1" checked>
-                                    <label for="privateY">동의</label>
-                                    <input type="radio" name="privateCheck" id="privateN" class="mx-3" value="0">
-                                    <label for="privateN">미동의</label>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>필수</td>
-                                <td>멤버십 서비스 이용약관</td>
-                                <td>
-                                    <input type="radio" name="memServiceCheck" id="memServiceY" class="mx-3" value="1" checked>
-                                    <label for="memServiceY">동의</label>
-                                    <input type="radio" name="memServiceCheck" id="memServiceN" class="mx-3" value="0">
-                                    <label for="memServiceN">미동의</label>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>선택</td>
-                                <td>마케팅 수신 동의</td>
-                                <td>
-                                    <input type="radio" name="marketingCheck" id="marketingY" class="mx-3" value="1" checked>
-                                    <label for="marketingY">동의</label>
-                                    <input type="radio" name="marketingCheck" id="marketingN" class="mx-3" value="0">
-                                    <label for="marketingN">미동의</label>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>선택</td>
-                                <td>이메일 수신 동의</td>
-                                <td>
-                                    <input type="radio" name="emailCheck" id="emailY" class="mx-3" value="1" checked>
-                                    <label for="emailY">동의</label>
-                                    <input type="radio" name="emailCheck" id="emailN" class="mx-3" value="0">
-                                    <label for="emailN">미동의</label>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>선택</td>
-                                <td>SMS 수신 동의</td>
-                                <td>
-                                    <input type="radio" name="smsCheck" id="smsY" class="mx-3" value="1" checked>
-                                    <label for="smsY">동의</label>
-                                    <input type="radio" name="smsCheck" id="smsN" class="mx-3" value="0">
-                                    <label for="smsN">미동의</label>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <!-- table:4 end -->
+                                </span>
+                            </div>
+                            <table class="table table-bg-v table-fixed w-100 text-center align-middle">
+                                <tbody>
+                                    <tr class="table-border-top">
+                                        <th class="w-20">법인명</th>
+                                        <td class="w-30">
+                                            <input type="text" name="bizName" id="bizName" class="form-control" autocomplete="off" required disabled>
+                                        </td>
+                                        <th class="w-20">사업자번호</th>
+                                        <td class="w-30">
+                                            <input type="text" name="bizNo" id="bizNo" class="form-control"autocomplete="off" required disabled>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th class="w-20">결제카드 등록여부</th>
+                                        <td class="w-30">
+                                            <input type="text" name="cardYn" id="cardYn" class="form-control" autocomplete="off" required disabled>
+                                        </td>
+                                        <th class="w-20">토큰키 등록여부</th>
+                                        <td class="w-30">
+                                            <input type="text" name="tidYn" id="tidYn" class="form-control" autocomplete="off" required disabled>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- table:2 end -->
+                        <!-- table:3 start -->
+                        <div class="modal-title mb-2 position-relative">
+                            <span class="modal-title-bar"></span><span>차량 정보</span>
+                            <span class="table-row-control-container">
+                                <button type="button" class="btn btn-outline-grey me-2" onclick="addRow('carTable')">+ 추가</button>
+                                <button type="button" class="btn btn-outline-grey" onclick="deleteRow('carTable')">- 삭제</button>
+                            </span>
+                        </div>
+                        <table class="table table-bg table-fixed w-100 text-center align-middle" id="carTable">
+                            <thead>
+                                <tr class="table-border-top">
+                                    <th scope="col" class="w-5"></th>
+                                    <th scope="col" class="w-20">개인/법인</th>
+                                    <th scope="col" class="w-30">차량번호</th>
+                                    <th scope="col" class="w-45">차량모델</th>
+                                </tr>
+                            </thead>
+                            <tbody id="carTableBody">
+                                <!-- <tr>
+                                    <td><input type="checkbox" class="single-checkbox"></td>
+                                    <td>
+                                        <select class="form-control connectorType" required>
+                                            <option th:each="data : ${bizTypeList}" th:value="${data.commonCode}"
+                                                    th:text="${data.commonCodeName}" ></option>
+                                        </select>
+                                    </td>
+                                    <td><input type="text" class="input-add-row carNum"></td>
+                                    <td><input type="text" class="input-add-row model"></td>
+                                </tr> -->
+                            </tbody>
+                        </table>
+                        <!-- table:3 end -->
+                        <!-- table:4 start -->
+                        <div id="cardInfoContainer" hidden>
+                            <div class="modal-title mb-2 position-relative">
+                                <span class="modal-title-bar"></span><span>결제 카드</span>
+                                <span class="table-row-control-container">
+                                    <button type="button" class="btn btn-outline-grey me-2" onclick="addRow('cardTable')">+ 추가</button>
+                                    <button type="button" class="btn btn-outline-grey" onclick="deleteRow('cardTable')">- 삭제</button>
+                                </span>
+                            </div>
+                            <table class="table table-bg table-fixed w-100 text-center align-middle" id="cardTable">
+                                <thead>
+                                    <tr class="table-border-top">
+                                        <th scope="col" class="w-5"></th>
+                                        <th scope="col" class="w-20">카드사</th>
+                                        <th scope="col" class="w-30">카드번호</th>
+                                        <th scope="col" class="w-30">TID</th>
+                                        <th scope="col" class="w-15">대표카드</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="cardTableBody">
+                                    <!-- <tr>
+                                        <td><input type="checkbox" class="single-checkbox"></td>
+                                        <td>
+                                            <select class="form-control connectorType" required>
+                                                <option th:each="data : ${creditCardList}" th:value="${data.commonCode}"
+                                                        th:text="${data.commonCodeName}" ></option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <div class="card-num-container">
+                                                <input type="number" id="cardNum1" name="cardNum1" class="input-add-row-bb" oninput="maxLengthNum(this, 4)"
+                                                    autocomplete="off">
+                                                <span>-</span>
+                                                <input type="number" id="cardNum2" name="cardNum2" class="input-add-row-bb" oninput="maxLengthNum(this, 4)"
+                                                    autocomplete="off">
+                                                <span>-</span>
+                                                <input type="password" id="cardNum3" name="cardNum3" class="input-add-row-bb" oninput="maxLengthNum(this, 4)"
+                                                    autocomplete="off">
+                                                <span>-</span>
+                                                <input type="password" id="cardNum4" name="cardNum4" class="input-add-row-bb" oninput="maxLengthNum(this, 4)"
+                                                    autocomplete="off">
+                                            </div>
+                                        </td>
+                                        <td><input type="text" id="tid" name="tid" class="input-add-row tid" autocomplete="off"></td>
+                                        <td>
+                                            <input type="radio" name="representativeCard" class="mx-3 representativeCard">
+                                        </td>
+                                    </tr> -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- table:4 end -->
+                        <!-- table:5 start -->
+                        <div class="modal-title mb-2"><span class="modal-title-bar"></span><span>약관정보</span></div>
+                        <table class="table table-bg table-hover table-fixed w-100 text-center align-middle" id="conditionTable">
+                            <thead>
+                                <tr class="table-border-top">
+                                    <th scope="col" class="w-20">구분</th>
+                                    <th scope="col" class="w-40">약관내용</th>
+                                    <th scope="col" class="w-40">동의여부</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="condition-row">
+                                    <td class="condition-section">필수</td>
+                                    <td class="condition-code" id="PI">개인정보 활용동의서</td>
+                                    <td>
+                                        <input type="radio" name="privateCheck" id="privateY" class="mx-3" value="Y" checked>
+                                        <label for="privateY">동의</label>
+                                        <input type="radio" name="privateCheck" id="privateN" class="mx-3" value="N">
+                                        <label for="privateN">미동의</label>
+                                    </td>
+                                </tr>
+                                <tr class="condition-row">
+                                    <td class="condition-section">필수</td>
+                                    <td class="condition-code" id="MS">멤버십 서비스 이용약관</td>
+                                    <td>
+                                        <input type="radio" name="memServiceCheck" id="memServiceY" class="mx-3" value="Y" checked>
+                                        <label for="memServiceY">동의</label>
+                                        <input type="radio" name="memServiceCheck" id="memServiceN" class="mx-3" value="N">
+                                        <label for="memServiceN">미동의</label>
+                                    </td>
+                                </tr>
+                                <tr class="condition-row">
+                                    <td class="condition-section">선택</td>
+                                    <td class="condition-code" id="MK">마케팅 수신 동의</td>
+                                    <td>
+                                        <input type="radio" name="marketingCheck" id="marketingY" class="mx-3" value="Y" checked>
+                                        <label for="marketingY">동의</label>
+                                        <input type="radio" name="marketingCheck" id="marketingN" class="mx-3" value="0">
+                                        <label for="marketingN">미동의</label>
+                                    </td>
+                                </tr>
+                                <tr class="condition-row">
+                                    <td class="condition-section">선택</td>
+                                    <td class="condition-code" id="ES">이메일 수신 동의</td>
+                                    <td>
+                                        <input type="radio" name="emailCheck" id="emailY" class="mx-3" value="Y" checked>
+                                        <label for="emailY">동의</label>
+                                        <input type="radio" name="emailCheck" id="emailN" class="mx-3" value="N">
+                                        <label for="emailN">미동의</label>
+                                    </td>
+                                </tr>
+                                <tr class="condition-row">
+                                    <td class="condition-section">선택</td>
+                                    <td class="condition-code" id="SS">SMS 수신 동의</td>
+                                    <td>
+                                        <input type="radio" name="smsCheck" id="smsY" class="mx-3" value="Y" checked>
+                                        <label for="smsY">동의</label>
+                                        <input type="radio" name="smsCheck" id="smsN" class="mx-3" value="N">
+                                        <label for="smsN">미동의</label>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <!-- table:5 end -->
                     </div>
                     <!-- modal body end -->
                     <div class="modal-footer justify-content-center border-top-none">
                         <button type="button" class="btn btn-outline-grey me-2" data-bs-dismiss="modal">취소</button>
-                        <button type="submit" class="btn btn-data-add">등록</button>
+                        <button type="submit" id="modalBtn" class="btn btn-data-add">등록</button>
                     </div>
-                </form>                      
+                </form>
             </div>
             <!-- modal content end -->
         </div>
         <!-- modal dialog end -->
     </div>
     <!-- Add Modal end -->
-    <script type="text/javascript" th:src="@{/js/pagingtest.js}"></script>
+
+    <!-- Biz Search Modal start -->
+    <div class="modal fade" id="bizSearchModal" tabindex="-1" aria-labelledby="bizSearchModalLabel" style="z-index: 1056;"
+        data-bs-backdrop="static" data-bs-keyboard="false" role="dialog">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width: 60vw; height: 90vh;">
+            <div class="modal-content h-100 overflow-y-auto scrollbar">
+                <div class="modal-body position-relative">
+                    <div class="modal-title mb-2"><span class="modal-title-bar"></span><span>법인 조회</span></div>
+                    <div id="bizSearchContainer" class="mt-3 mb-5 d-flex align-items-center">
+                        <input type="text" name="bizNameSearch" id="bizNameSearch" class="form-control" placeholder="법인명을 입력하세요"
+                                th:value="null" style="width: 500px;">
+                        <button type="button" class="btn btn-outline-grey ms-2" id="bizNameSearchBtn">
+                            <i class="bi bi-search"></i>검색</button>
+                    </div>
+                    <span style="font-size: 18px; font-weight: 600;">검색결과</span>
+                    <div class="w-100 table-responsive">
+                        <table class="table text-center table-bg table-hover" id="bizTable">
+                            <thead>
+                                <tr class="table-border-top">
+                                    <th scope="col" class="w-40">법인명</th>
+                                    <th scope="col" class="w-40">사업자번호</th>
+                                    <th scope="col" class="w-20"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="bizSearchList">
+                                <tr><td colspan="3">등록된 데이터가 없습니다.</td></tr>
+                            </tbody>
+                        </table>                               
+                    </div>
+                    <button type="button" class="btn btn-outline-grey me-2 position-absolute" style="bottom: 0; left: 50%; transform: translateY(-50%);" data-bs-dismiss="modal">닫기</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Biz Search Modal start -->
+
+    <!-- Edit Password Modal start -->
+    <div class="modal fade" id="editPasswordModal" tabindex="-1" aria-labelledby="editPasswordLabel" style="z-index: 1056;"
+        data-bs-backdrop="static" data-bs-keyboard="false" role="dialog">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width: 60vw;">
+            <div class="modal-content overflow-y-auto scrollbar password-content">
+                <form id="passwordForm">
+                    <div class="modal-body">
+                        <div class="modal-title"><span class="modal-title-bar"></span><span>비밀번호 변경</span></div>
+                        <div>※영문자, 숫자, 특수문자를 최소 하나씩 포함하여 8자 이상 16자 이내로 새 비밀번호를 설정해 주세요.</div>
+                        <div>
+                            <span>현재 비밀번호</span>
+                            <input type="password" name="existPassword" id="existPassword" class="form-control" autocomplete="off" required />
+                            <span>새 비밀번호</span>
+                            <input type="password" name="newPassword" id="newPassword" class="form-control" autocomplete="off" required />
+                            <span>새 비밀번호 확인</span>
+                            <input type="password" name="newPasswordCheck" id="newPasswordCheck" class="form-control" autocomplete="off" required />
+                        </div>
+                    </div>
+                    <div class="modal-footer justify-content-center border-top-none">
+                        <button type="button" class="btn btn-outline-grey me-2" data-bs-dismiss="modal">취소</button>
+                        <button type="button" id="passwordModalBtn" class="btn btn-data-add">변경</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- Edit Password Modal start -->
+
     <script type="text/javascript" th:src="@{/js/table.js}"></script>
+    <script type="text/javascript" th:src="@{/js/member/member_list.js}"></script>
+    <script type="text/javascript">
+        function addRow(tableId) {
+            const table = document.getElementById(tableId).getElementsByTagName('tbody')[0];
+            const newRow = table.insertRow();
+    
+            if (tableId === 'carTable') {
+                newRow.classList.add("car-row");
+                newRow.insertCell(0).innerHTML = '<input type="checkbox" class="single-checkbox">';
+
+                const selectCell = newRow.insertCell(1);
+                const selectElement = document.createElement('select');
+                selectElement.classList.add('form-control', 'carType');
+                selectElement.required = true;
+
+                bizTypeList.forEach(function(data) {
+                    const option = document.createElement('option');
+                    option.value = data.commonCode;
+                    option.textContent = data.commonCodeName;
+                    selectElement.appendChild(option);
+                });
+
+                selectCell.appendChild(selectElement);
+
+                newRow.insertCell(2).innerHTML = '<input type="text" class="input-add-row text-center carNum">';
+                newRow.insertCell(3).innerHTML = '<input type="text" class="input-add-row text-center model">';
+            } else if (tableId === 'cardTable') {
+                newRow.classList.add("card-row");
+                newRow.insertCell(0).innerHTML = '<input type="checkbox" class="single-checkbox">';
+
+                const selectCell = newRow.insertCell(1);
+                const selectElement = document.createElement('select');
+                selectElement.classList.add('form-control', 'fnCode');
+                selectElement.required = true;
+
+                creditCardList.forEach(function(data) {
+                    const option = document.createElement('option');
+                    option.value = data.commonCode;
+                    option.textContent = data.commonCodeName;
+                    selectElement.appendChild(option);
+                });
+
+                selectCell.appendChild(selectElement);
+
+                newRow.insertCell(2).innerHTML = `<div class="card-num-container">
+                                            <input type="number" class="input-add-row-bb cardNum1" oninput="maxLengthNum(this, 4)"
+                                                autocomplete="off">
+                                            <span>-</span>
+                                            <input type="number" class="input-add-row-bb cardNum2" oninput="maxLengthNum(this, 4)"
+                                                autocomplete="off">
+                                            <span>-</span>
+                                            <input type="password" class="input-add-row-bb cardNum3" oninput="maxLengthNum(this, 4)"
+                                                autocomplete="off">
+                                            <span>-</span>
+                                            <input type="password" class="input-add-row-bb cardNum4" oninput="maxLengthNum(this, 4)"
+                                                autocomplete="off">
+                                        </div>`;
+                newRow.insertCell(3).innerHTML = '<input type="text" class="input-add-row text-center tid">';
+                newRow.insertCell(4).innerHTML = '<input type="radio" name="representativeCard" class="mx-3 representativeCard">';
+            }
+    
+            applySingleCheckboxSelection(tableId);
+        }
+    
+        function deleteRow(tableId) {
+            const table = document.getElementById(tableId).getElementsByTagName("tbody")[0];
+            const rows = table.getElementsByTagName("tr");
+    
+            for (var i = rows.length - 1; i >= 0; i--) {
+                var checkbox = rows[i].getElementsByTagName("input")[0];
+                if (checkbox && checkbox.checked) {
+                    table.deleteRow(i);
+                }
+            }
+        }
+    
+        function applySingleCheckboxSelection(tableId) {
+            var checkboxes = document.querySelectorAll(`#${tableId} .single-checkbox`);
+    
+            checkboxes.forEach(function (checkbox) {
+                checkbox.addEventListener('change', function () {
+                    if (this.checked) {
+                        checkboxes.forEach(function (otherCheckbox) {
+                            if (otherCheckbox !== checkbox) {
+                                otherCheckbox.checked = false;
+                            }
+                        });
+                    }
+                });
+            });
+        }
+    </script>   
+    <script th:inline="javascript">
+        var creditCardList = /*[[${creditCardList}]]*/ [];
+        var bizTypeList = /*[[${bizTypeList}]]*/ [];
+    </script>  
 </div>
 </html>
