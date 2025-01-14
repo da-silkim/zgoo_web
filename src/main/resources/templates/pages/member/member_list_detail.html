@@ -1,0 +1,203 @@
+<html layout:decorate="~{fragments/layout}">
+<div layout:fragment="content" class="main-content">
+    <!-- card:1 start -->
+    <div class="card responsive-content">
+        <!-- card body:1 start -->
+        <div class="card-body">
+            <div class="content-title"><i class="fa-solid fa-user-tie font-ico me-2"></i>회원관리 > 회원 리스트</div>
+            <!-- card:2 start -->
+            <div class="card card-shadow">
+                <!-- card body:2 start -->
+                <div class="card-body">
+                    <div class="detail-container">
+                        <!-- table:1 start -->
+                        <div class="card-title mb-2"><span class="card-title-bar"></span><span>회원 정보</span></div>
+                        <table class="table table-bg-v table-fixed w-100 text-center align-middle">
+                            <tbody>
+                                <tr class="table-border-top">
+                                    <th class="w-20">사업자명<b class="required-data">*</b></th>
+                                    <td class="w-30">
+                                        <span th:text="${member.companyName}"></span>
+                                    </td>
+                                    <th class="w-20">사업자구분<b class="required-data">*</b></th>
+                                    <td class="w-30">
+                                        <span th:text="${member.bizTypeName}"></span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>이름<b class="required-data">*</b></th>
+                                    <td>
+                                        <span th:text="${member.name}"></span>
+                                    </td>
+                                    <th>휴대전화<b class="required-data">*</b></th>
+                                    <td>
+                                        <span th:text="${member.phoneNo}"></span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>사용자ID<b class="required-data">*</b></th>
+                                    <td>
+                                        <span th:text="${member.memLoginId}"></span>
+                                    </td>
+                                    <td colspan="2"></td>
+                                </tr>
+                                <tr>
+                                    <th>회원카드번호<b class="required-data">*</b></th>
+                                    <td>
+                                        <span th:text="${member.idTag}"></span>
+                                    </td>
+                                    <th scope="row">회원상태<b class="required-data">*</b></th>
+                                    <td>
+                                        <span th:text="${member.userStateName}"></span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>이메일<b class="required-data">*</b></th>
+                                    <td>
+                                        <span th:text="${member.email}"></span>
+                                    </td>
+                                    <th>생년월일<b class="required-data">*</b></th>
+                                    <td>
+                                        <span th:text="${member.birth}"></span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>주소<b class="required-data">*</b></th>
+                                    <td colspan="3">
+                                        <div class="address-detail-container">
+                                            <span th:text="'[' + ${member.zipCode} + '] ' + ${member.address}"></span>
+                                            <span th:if="${member.addressDetail != null and !member.addressDetail.isEmpty()}" th:text="', ' + ${member.addressDetail}"></span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <!-- table:1 end -->
+                        <!-- table:2 start -->
+                        <div th:if="${biz != null}">
+                            <div class="card-title mb-2"><span class="card-title-bar"></span><span>법인 정보</span></div>
+                            <table class="table table-bg-v table-fixed w-100 text-center align-middle">
+                                <tbody>
+                                    <tr class="table-border-top">
+                                        <th class="w-20">법인명</th>
+                                        <td class="w-30">
+                                            <span th:text="${biz.bizName}"></span>
+                                        </td>
+                                        <th class="w-20">사업자번호</th>
+                                        <td class="w-30">
+                                            <span th:text="${biz.bizNo}"></span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th class="w-20">결제카드 등록여부</th>
+                                        <td class="w-30">
+                                            <span th:text="${biz.cardYn}"></span>
+                                        </td>
+                                        <th class="w-20">토큰키 등록여부</th>
+                                        <td class="w-30">
+                                            <span th:text="${biz.tidYn}"></span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- table:2 end -->
+                        <!-- table:3 start -->
+                        <div class="card-title mb-2"><span class="card-title-bar"></span><span>차량 정보</span></div>
+                        <table class="table table-bg table-fixed w-100 text-center align-middle">
+                            <thead>
+                                <tr class="table-border-top vertical-align-middle">
+                                    <th scope="col" class="w-20">개인/법인</th>
+                                    <th scope="col" class="w-30">차량번호</th>
+                                    <th scope="col" class="w-50">차량모델</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="car : ${member.car}">
+                                    <td><span th:text="${car.carTypeName}"></span></td>
+                                    <td><span th:text="${car.carNum}"></span></td>
+                                    <td><span th:text="${car.model}"></span></td>
+                                </tr>
+                                <tr th:if="${member.car.size() == 0}">
+                                    <td colspan="3">등록된 차량 정보가 없습니다.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <!-- table:3 end -->
+                        <!-- table:4 start -->
+                        <div th:if="${biz == null}">
+                            <div class="card-title mb-2"><span class="card-title-bar"></span><span>결제 카드</span></div>
+                            <table class="table table-bg table-fixed w-100 text-center align-middle">
+                                <thead>
+                                    <tr class="table-border-top vertical-align-middle">
+                                        <th scope="col" class="w-20">카드사</th>
+                                        <th scope="col" class="w-30">카드번호</th>
+                                        <th scope="col" class="w-35">TID</th>
+                                        <th scope="col" class="w-15">대표카드</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="card : ${member.card}">
+                                        <td><span th:text="${card.fnCodeName}"></span></td>
+                                        <td><span th:text="${card.cardNum}"></span></td>
+                                        <td><span th:text="${card.tidCheck}"></span></td>
+                                        <td><span th:text="${card.representativeCardCheck}"></span></td>
+                                    </tr>
+                                    <tr th:if="${member.card.size() == 0}">
+                                        <td colspan="4">등록된 결제카드 정보가 없습니다.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- table:4 end -->
+                        <!-- table:5 start -->
+                        <div class="card-title mb-2"><span class="card-title-bar"></span><span>약관 정보</span></div>
+                        <table class="table table-bg table-fixed w-100 text-center align-middle">
+                            <thead>
+                                <tr class="table-border-top vertical-align-middle">
+                                    <th scope="col" class="w-20">구분</th>
+                                    <th scope="col" class="w-40">약관내용</th>
+                                    <th scope="col" class="w-40">동의여부</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="condition : ${member.condition}">
+                                    <td><span th:text="${condition.section}"></span></td>
+                                    <td><span th:text="${condition.conditionCodeName}"></span></td>
+                                    <td><span th:text="${condition.agreeYnCheck}"></span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <!-- table:5 end -->
+                        <button type="button" class="list-btn"
+                            th:data-page="${currentPage}" th:data-size="${size}" th:data-companyid="${selectedCompanyId}"
+                            th:data-idtag="${selectedIdTag}" th:data-name="${selectedName}"
+                            onclick="goToList(this)"> 목록 </button>
+                    </div>
+                </div>
+                <!-- card body:2 end -->
+            </div>
+            <!-- card:2 end -->
+        </div>
+        <!-- card body:1 end -->
+    </div>
+    <!-- card:1 end -->
+
+    <script type="text/javascript">
+        function goToList(btn) {
+            const urlParams = new URLSearchParams(window.location.search);
+            const selectedPage = urlParams.get('page') || 0;
+            const selectedSize = urlParams.get('size') || 10;
+            const selectedCompanyId = urlParams.get('companyIdSearch') || '';
+            const selectedIdTag = urlParams.get('idTagSearch') || '';
+            const selectedName = urlParams.get('nameSearch') || '';
+
+            window.location.href = "/member/list?page=" + selectedPage +
+                                "&size=" + selectedSize +
+                                "&companyIdSearch=" + (selectedCompanyId) +
+                                "&idTagSearch=" + (selectedIdTag) +
+                                "&nameSearch=" + (selectedName);
+        }
+    </script>   
+</div>
+</html>
