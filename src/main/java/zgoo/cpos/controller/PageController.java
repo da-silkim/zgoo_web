@@ -20,8 +20,10 @@ import zgoo.cpos.dto.code.ChgErrorCodeDto.ChgErrorCodeListDto;
 import zgoo.cpos.dto.code.CodeDto.CommCdBaseDto;
 import zgoo.cpos.dto.code.CodeDto.CommCodeDto;
 import zgoo.cpos.dto.code.CodeDto.GrpCodeDto;
+import zgoo.cpos.dto.company.CompanyDto.BaseCompnayDto;
 import zgoo.cpos.dto.company.CompanyDto.CompanyListDto;
 import zgoo.cpos.dto.company.CompanyDto.CompanyRegDto;
+import zgoo.cpos.dto.company.CompanyDto.CpPlanDto;
 import zgoo.cpos.dto.cp.CpModelDto;
 import zgoo.cpos.dto.cp.CpModelDto.CpModelListDto;
 import zgoo.cpos.dto.cs.CsInfoDto;
@@ -29,6 +31,8 @@ import zgoo.cpos.dto.cs.CsInfoDto.CsInfoListDto;
 import zgoo.cpos.dto.menu.CompanyMenuAuthorityDto;
 import zgoo.cpos.dto.menu.MenuAuthorityDto;
 import zgoo.cpos.dto.menu.MenuDto;
+import zgoo.cpos.dto.tariff.TariffDto.TariffPolicyDto;
+import zgoo.cpos.dto.tariff.TariffDto.TariffRegDto;
 import zgoo.cpos.dto.users.FaqDto;
 import zgoo.cpos.dto.users.NoticeDto;
 import zgoo.cpos.dto.users.UsersDto;
@@ -42,6 +46,7 @@ import zgoo.cpos.service.FaqService;
 import zgoo.cpos.service.MenuAuthorityService;
 import zgoo.cpos.service.MenuService;
 import zgoo.cpos.service.NoticeService;
+import zgoo.cpos.service.TariffService;
 import zgoo.cpos.service.UsersService;
 
 @Controller
@@ -60,6 +65,7 @@ public class PageController {
     private final CpModelService cpModelService;
     private final ChgErrorCodeService chgErrorCodeService;
     private final BizService bizService;
+    private final TariffService tariffService;
 
     /*
      * 대시보드
@@ -141,17 +147,17 @@ public class PageController {
             model.addAttribute("companyList", companyList);
             List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT"); // 그리드 row 수
             model.addAttribute("showListCnt", showListCnt);
-            List<CommCdBaseDto> csFacility = codeService.commonCodeStringToNum("CSFACILITY");   // 충전소시설유형
+            List<CommCdBaseDto> csFacility = codeService.commonCodeStringToNum("CSFACILITY"); // 충전소시설유형
             model.addAttribute("csFacility", csFacility);
-            List<CommCdBaseDto> csFSub = codeService.commonCodeStringToNum("CSFSUB");           // 충전소시설구분
+            List<CommCdBaseDto> csFSub = codeService.commonCodeStringToNum("CSFSUB"); // 충전소시설구분
             model.addAttribute("csFSub", csFSub);
-            List<CommCdBaseDto> opStepCd = codeService.commonCodeStringToNum("OPSTEPCD");       // 운영단계분류
+            List<CommCdBaseDto> opStepCd = codeService.commonCodeStringToNum("OPSTEPCD"); // 운영단계분류
             model.addAttribute("opStepCd", opStepCd);
-            List<CommCdBaseDto> landType = codeService.commonCodeStringToNum("LANDTYPE");       // 부지구분
+            List<CommCdBaseDto> landType = codeService.commonCodeStringToNum("LANDTYPE"); // 부지구분
             model.addAttribute("landType", landType);
-            List<CommCdBaseDto> faucetType = codeService.commonCodeStringToNum("FAUCETTYPE");   // 수전방식
+            List<CommCdBaseDto> faucetType = codeService.commonCodeStringToNum("FAUCETTYPE"); // 수전방식
             model.addAttribute("faucetType", faucetType);
-            List<CommCdBaseDto> powerType = codeService.commonCodeStringToNum("POWERTYPE");     // 전압종류
+            List<CommCdBaseDto> powerType = codeService.commonCodeStringToNum("POWERTYPE"); // 전압종류
             model.addAttribute("powerType", powerType);
         } catch (Exception e) {
             e.getStackTrace();
@@ -202,14 +208,15 @@ public class PageController {
             Model model) {
         log.info("=== Model List Page ===");
         model.addAttribute("cpModelDto", new CpModelDto.CpModelRegDto());
-        
+
         try {
             // 충전기 모델 list
             Page<CpModelListDto> modelList;
             if (companyId == null && manfCode == null && chgSpeedCode == null) {
                 modelList = this.cpModelService.findCpModelAll(page, size);
             } else {
-                modelList = this.cpModelService.searchCpModelWithPagination(companyId, manfCode, chgSpeedCode, page, size);
+                modelList = this.cpModelService.searchCpModelWithPagination(companyId, manfCode, chgSpeedCode, page,
+                        size);
             }
 
             model.addAttribute("selectedCompanyId", companyId);
@@ -229,13 +236,13 @@ public class PageController {
             model.addAttribute("companyList", companyList);
             List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT"); // 그리드 row 수
             model.addAttribute("showListCnt", showListCnt);
-            List<CommCdBaseDto> manfCd = codeService.commonCodeStringToNum("CGMANFCD");         // 충전기제조사
+            List<CommCdBaseDto> manfCd = codeService.commonCodeStringToNum("CGMANFCD"); // 충전기제조사
             model.addAttribute("manfCd", manfCd);
-            List<CommCdBaseDto> chgTypeCd = codeService.commonCodeStringToNum("CHGINTTYPECD");  // 충전기설치유형
+            List<CommCdBaseDto> chgTypeCd = codeService.commonCodeStringToNum("CHGINTTYPECD"); // 충전기설치유형
             model.addAttribute("chgTypeCd", chgTypeCd);
-            List<CommCdBaseDto> chgSpeedCd = codeService.commonCodeStringToNum("CHGSPEEDCD");   // 충전기속도구분(충전기유형)
+            List<CommCdBaseDto> chgSpeedCd = codeService.commonCodeStringToNum("CHGSPEEDCD"); // 충전기속도구분(충전기유형)
             model.addAttribute("chgSpeedCd", chgSpeedCd);
-            List<CommCdBaseDto> connType = codeService.commonCodeStringToNum("CONNTYPE");       // 커넥터타입
+            List<CommCdBaseDto> connType = codeService.commonCodeStringToNum("CONNTYPE"); // 커넥터타입
             model.addAttribute("connType", connType);
         } catch (Exception e) {
             e.getStackTrace();
@@ -388,7 +395,8 @@ public class PageController {
         model.addAttribute("noticeDto", new NoticeDto.NoticeRegDto());
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        LocalDate startDateSearch = (startDate != null && !startDate.isEmpty()) ? LocalDate.parse(startDate, formatter) : null;
+        LocalDate startDateSearch = (startDate != null && !startDate.isEmpty()) ? LocalDate.parse(startDate, formatter)
+                : null;
         LocalDate endDateSearch = (endDate != null && !endDate.isEmpty()) ? LocalDate.parse(endDate, formatter) : null;
 
         try {
@@ -397,11 +405,12 @@ public class PageController {
             model.addAttribute("companyList", companyList);
 
             Page<NoticeDto.NoticeListDto> noticeList;
-            
+
             if (companyId == null && startDate == null && endDate == null) {
                 noticeList = this.noticeService.findNoticeAll(page, size);
             } else {
-                noticeList = this.noticeService.searchNoticeListwithPagination(companyId, startDateSearch, endDateSearch, page, size);
+                noticeList = this.noticeService.searchNoticeListwithPagination(companyId, startDateSearch,
+                        endDateSearch, page, size);
             }
 
             int totalPages = noticeList.getTotalPages() == 0 ? 1 : noticeList.getTotalPages();
@@ -421,7 +430,7 @@ public class PageController {
             List<CommCdBaseDto> noticeTypeList = codeService.commonCodeStringToNum("NOTICETYPECD"); // 공지유형
             model.addAttribute("noticeTypeList", noticeTypeList);
 
-            List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT");    // 그리드 row 수
+            List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT"); // 그리드 row 수
             model.addAttribute("showListCnt", showListCnt);
 
         } catch (Exception e) {
@@ -462,7 +471,8 @@ public class PageController {
             model.addAttribute("companyList", companyList);
 
             // 사업장별 메뉴 접근 권한 list
-            // List<CompanyMenuAuthorityDto.CompanyMenuRegDto> companyMenuList = this.menuService.findCompanyDistinctList();
+            // List<CompanyMenuAuthorityDto.CompanyMenuRegDto> companyMenuList =
+            // this.menuService.findCompanyDistinctList();
             // model.addAttribute("companyMenuList", companyMenuList);
             Page<CompanyMenuAuthorityDto.CompanyMenuRegDto> companyMenuList;
 
@@ -486,7 +496,7 @@ public class PageController {
             model.addAttribute("totalPages", totalPages);
             model.addAttribute("totalCount", companyMenuList.getTotalElements());
 
-            List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT");    // 그리드 row 수
+            List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT"); // 그리드 row 수
             model.addAttribute("showListCnt", showListCnt);
 
             // modal에서 보여주는 메뉴 list
@@ -516,11 +526,13 @@ public class PageController {
     public String showautoritylist(Model model) {
         log.info("=== Authority List Page ===");
 
-        // model.addAttribute("companyAuthorityList", new MenuAuthorityDto.CompanyAuthorityListDto());
+        // model.addAttribute("companyAuthorityList", new
+        // MenuAuthorityDto.CompanyAuthorityListDto());
 
         try {
             // 사업자 권한 list
-            List<MenuAuthorityDto.CompanyAuthorityListDto> companyAuthorityList = menuAuthorityService.findCompanyAuthorityList();
+            List<MenuAuthorityDto.CompanyAuthorityListDto> companyAuthorityList = menuAuthorityService
+                    .findCompanyAuthorityList();
             // log.info("사업자 권한 확인 >> {}", companyAuthorityList.toString());
             model.addAttribute("companyAuthorityList", companyAuthorityList);
 
@@ -547,7 +559,8 @@ public class PageController {
 
         try {
             // 에러코드 list
-            Page<ChgErrorCodeListDto> errcdList = this.chgErrorCodeService.findErrorCodeWithPagination(manfCode, searchOp, searchContent, page, size);
+            Page<ChgErrorCodeListDto> errcdList = this.chgErrorCodeService.findErrorCodeWithPagination(manfCode,
+                    searchOp, searchContent, page, size);
 
             // 검색 조건 저장
             model.addAttribute("selectedManfCd", manfCode);
@@ -564,7 +577,7 @@ public class PageController {
 
             List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT"); // 그리드 row 수
             model.addAttribute("showListCnt", showListCnt);
-            List<CommCdBaseDto> manfCd = codeService.commonCodeStringToNum("CGMANFCD");         // 충전기제조사
+            List<CommCdBaseDto> manfCd = codeService.commonCodeStringToNum("CGMANFCD"); // 충전기제조사
             model.addAttribute("manfCd", manfCd);
         } catch (Exception e) {
             e.getStackTrace();
@@ -582,8 +595,67 @@ public class PageController {
      * 시스템 > 요금제관리
      */
     @GetMapping("/system/tariff/list")
-    public String showtarifflist(Model model) {
+    public String showtarifflist(@RequestParam(value = "companyIdSearch", required = false) Long companyId,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size,
+            Model model) {
         log.info("=== Tariff List Page ===");
+        log.info("== companyId: {}, page: {}, size: {}", companyId, page, size);
+
+        // 요금제 등록폼 전달
+        model.addAttribute("tariffRegDto", new TariffRegDto());
+
+        Page<TariffPolicyDto> tariffpolicyList;
+
+        try {
+
+            log.info("=== Tariff DB search result >>>");
+
+            // tariff policy list 조회
+            // check null and call the approrpiate search method
+            if (companyId != null) {
+                log.info("Searching by companyId: {}", companyId);
+                tariffpolicyList = tariffService.searchTariffPolicyByCompanyId(page, size, companyId);
+            } else {
+                log.info("Fetching all Tariff >> ");
+                tariffpolicyList = tariffService.searchTariffPolicyAll(page, size);
+
+            }
+
+            // page 처리
+            int totalPages = tariffpolicyList.getTotalPages() == 0 ? 1 : tariffpolicyList.getTotalPages(); // 전체 페이지 수
+            model.addAttribute("tariffpolicyList", tariffpolicyList.getContent()); // 사용자 list
+            model.addAttribute("size", String.valueOf(size)); // 페이지당 보여지는 데이터 건 수
+            model.addAttribute("currentPage", page); // 현재 페이지
+            model.addAttribute("totalPages", totalPages); // 총 페이지 수
+            model.addAttribute("totalCount", tariffpolicyList.getTotalElements()); // 총 데이터
+            log.info("==TariffList_PageInfo >> totalPages:{}, totalCount:{}", totalPages,
+                    tariffpolicyList.getTotalElements());
+
+            // select options 조회
+            // 사업자 리스트
+            List<BaseCompnayDto> companyList = companyService.searchAllCompanyForSelectOpt();
+            log.info("== selectOption >> companyList : {}", companyList.toString());
+            model.addAttribute("companyList", companyList);
+            // 요금제 리스트(cpPlanPolicy)
+            List<CpPlanDto> planList = tariffService.searchPlanPolicyAll();
+            log.info("== selectOption >> planPolicy count : {}", planList.size());
+            model.addAttribute("planList", planList);
+            // grid row count
+            List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT");
+            model.addAttribute("showListCnt", showListCnt);
+            // 요금제 적용상태 코드 리스트
+            List<CommCdBaseDto> tariffStatCodeList = codeService.commonCodeStringToNum("TARIFFSTATCD");
+            model.addAttribute("tariffStatCodeList", tariffStatCodeList);
+
+        } catch (Exception e) {
+            log.error("Error occurred while fetching tariff list: {}", e.getMessage(), e);
+            tariffpolicyList = Page.empty();
+
+            model.addAttribute("companyList", Collections.emptyList());
+            model.addAttribute("planList", Collections.emptyList());
+            model.addAttribute("showListCnt", Collections.emptyList());
+        }
         return "pages/system/tariff_management";
     }
 
@@ -648,10 +720,10 @@ public class PageController {
             model.addAttribute("totalPages", totalPages);
             model.addAttribute("totalCount", faqList.getTotalElements());
 
-            List<CommCdBaseDto> faqKindList = codeService.commonCodeStringToNum("FAQKIND");    // FAQ 구분코드
+            List<CommCdBaseDto> faqKindList = codeService.commonCodeStringToNum("FAQKIND"); // FAQ 구분코드
             model.addAttribute("faqKindList", faqKindList);
 
-            List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT");    // 그리드 row 수
+            List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT"); // 그리드 row 수
             model.addAttribute("showListCnt", showListCnt);
         } catch (Exception e) {
             e.getStackTrace();
@@ -815,7 +887,8 @@ public class PageController {
 
         try {
             // 법인 list
-            Page<BizInfoListDto> bizList = this.bizService.findBizInfoWithPagination(companyId, searchOp, searchContent, page, size);
+            Page<BizInfoListDto> bizList = this.bizService.findBizInfoWithPagination(companyId, searchOp, searchContent,
+                    page, size);
 
             // 검색 조건 저장
             model.addAttribute("selectedCompanyId", companyId);

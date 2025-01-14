@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 
 import zgoo.cpos.domain.company.Company;
 import zgoo.cpos.dto.company.CompanyDto;
+import zgoo.cpos.dto.company.CompanyDto.BaseCompnayDto;
 import zgoo.cpos.dto.company.CompanyDto.CompanyListDto;
 
 public interface CompanyRepositoryCustom {
@@ -29,4 +30,8 @@ public interface CompanyRepositoryCustom {
 
     // 사업자 단건 조회
     Company findCompanyOne(Long id);
+
+    // select option 조회 (사업자)
+    List<BaseCompnayDto> findAllCompanyForSelectOpt();
+
 }

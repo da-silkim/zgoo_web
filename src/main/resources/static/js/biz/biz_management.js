@@ -262,7 +262,7 @@ document.addEventListener("DOMContentLoaded", function () {
         $('#companyModalBtn').text(btnMsg);
     });
 
-    // 'Modal' - '등록/수정정' 버튼 클릭 이벤트 처리
+    // 'Modal' - '등록/수정' 버튼 클릭 이벤트 처리
     document.getElementById("companyModalBtn").addEventListener("click", function () {
 
         // 폼 요소 가져오기

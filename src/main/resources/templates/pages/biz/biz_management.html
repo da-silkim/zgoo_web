@@ -16,7 +16,7 @@
                             <div class="col d-flex align-items-center p-0 search-border">
                                 <label for="companyIdSearch"
                                     class="d-flex justify-content-center align-items-center flex-shrink-0 col-form-label font-weight-bold text-center w-25"
-                                    style="background-color: #F5F5F5; height: 54px;">사업자명<b>*</b></label>
+                                    style="background-color: #F5F5F5; height: 54px;">사업자<b>*</b></label>
                                 <select id="companyIdSearch" class="mx-3 form-control" name="companyIdSearch" required>
                                     <option th:value="*{null}" th:text="'(없음)'"></option>
                                     <option th:each="company : ${companyList}" th:value="${company.companyId}"

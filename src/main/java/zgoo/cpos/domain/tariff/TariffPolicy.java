@@ -1,38 +1,66 @@
 package zgoo.cpos.domain.tariff;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
-import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.ToString;
-import zgoo.cpos.type.TariffPolicyId;
+import zgoo.cpos.domain.company.CpPlanPolicy;
+import zgoo.cpos.dto.tariff.TariffDto.TariffPolicyDto;
 
 @Entity
-@Table(name = "tariff_policy")
-@NoArgsConstructor
+@Table(name = "TARIFF_POLICY")
 @Getter
-@Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@Builder
 @ToString
 public class TariffPolicy {
 
-    @EmbeddedId
-    private TariffPolicyId id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "tariff_id")
+    private Long id;
 
-    @Column(nullable = false)
-    private LocalDateTime applyDate;
+    @JoinColumn(name = "policy_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    private CpPlanPolicy policy;
 
-    @Column(nullable = false, length = 1)
-    private String applyCode;
+    @Column(name = "apply_date")
+    private LocalDateTime apply_date;
 
-    @OneToMany(mappedBy = "tariffPolicy", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Tariff> tariffs;
+    @Column(name = "apply_code")
+    private String apply_code;
+
+    @Column(name = "regDt")
+    private LocalDateTime regDt;
+
+    /**
+     * update logic
+     */
+    public void updateApplyCode(String code) {
+        this.apply_code = code;
+    }
+
+    public void updateApplyDate(LocalDateTime updateDate) {
+        this.apply_date = updateDate;
+    }
+
+    public void updateTariffPolicy(TariffPolicyDto dto) {
+        this.apply_date = dto.getApplyDate();
+        this.apply_code = dto.getApplyCode();
+    }
+
 }
