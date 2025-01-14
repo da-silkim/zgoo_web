@@ -1,5 +1,7 @@
 package zgoo.cpos.service;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -76,14 +78,42 @@ public class BizService {
         }
     }
 
+    // 법인 단건 조회(회원 리스트에서 사용)
+    public BizInfoRegDto findBizOneCustom(Long bizId) {
+        try {
+            BizInfoRegDto biz = this.bizRepository.findBizOneCustom(bizId);
+            return biz;
+        } catch (Exception e) {
+            log.error("[findBizOneCustom] error : {}", e.getMessage());
+            return null;
+        }
+    }
+
+    // 법인명으로 조회
+    public List<BizInfoRegDto> findBizList(String bizName) {
+        try {
+            List<BizInfoRegDto> bizList = this.bizRepository.findBizByBizName(bizName);
+            return bizList;
+        } catch (Exception e) {
+            log.error("[findBizList] error : {}", e.getMessage());
+            return null;
+        }
+    }
+
     // 법인 정보 저장
     public void saveBiz(BizInfoRegDto dto) {
         try {
             Company company = this.companyRepository.findById(dto.getCompanyId())
                 .orElseThrow(() -> new IllegalArgumentException("company not found with id: " + dto.getCompanyId()));
             
-            // AES256 카드번호, TID 암호화
-            encryptCardNumAndTidRegDto(dto);
+            if (dto.getCardNum() == null || dto.getCardNum().isEmpty()) {
+                // 카드번호가 null이면 카드사 null 처리
+                dto.setFnCode(null);
+            } else {
+                // AES256 카드번호, TID 암호화
+                encryptCardNumAndTidRegDto(dto);
+            }
+
             BizInfo biz = BizMapper.toEntity(dto, company);
             this.bizRepository.save(biz);
         } catch (Exception e) {
@@ -96,9 +126,16 @@ public class BizService {
     public void updateBizInfo(Long bizId, BizInfoRegDto dto) {
         BizInfo biz = this.bizRepository.findById(bizId)
             .orElseThrow(() -> new IllegalArgumentException("biz info not found with id: " + bizId));
+
         try {
-            // AES256 카드번호, TID 암호화
-            encryptCardNumAndTidRegDto(dto);
+            if (dto.getCardNum() == null || dto.getCardNum().isEmpty()) {
+                // 카드번호가 null이면 카드사 null 처리
+                dto.setFnCode(null);
+            } else {
+                // AES256 카드번호, TID 암호화
+                encryptCardNumAndTidRegDto(dto);
+            }
+            
             biz.updateBizInfo(dto);
         } catch (Exception e) {
             log.error("[updateBizInfo] error: {}", e.getMessage());
@@ -131,9 +168,13 @@ public class BizService {
         bizDto.setTid(AESUtil.decrypt(bizDto.getTid()));
     }
 
-    // 카드번호, TID 암호화
+    // 카드번호, TID 암호화(값이 있을 경우에만 암호화 처리)
     private void encryptCardNumAndTidRegDto(BizInfoRegDto bizDto) throws Exception {
-        bizDto.setCardNum(AESUtil.encrypt(bizDto.getCardNum()));
-        bizDto.setTid(AESUtil.encrypt(bizDto.getTid()));
+        if (bizDto.getCardNum() != null && !bizDto.getCardNum().isEmpty()) {
+            bizDto.setCardNum(AESUtil.encrypt(bizDto.getCardNum()));
+        }
+        if (bizDto.getTid() != null && !bizDto.getTid().isEmpty()) {
+            bizDto.setTid(AESUtil.encrypt(bizDto.getTid()));
+        }
     }
 }
