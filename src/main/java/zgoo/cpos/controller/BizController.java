@@ -1,8 +1,14 @@
 package zgoo.cpos.controller;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -40,6 +46,46 @@ public class BizController {
         } catch (Exception e) {
             log.error("[findBizInfoOne] error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    // 법인 단건 조회(회원 리스트에서 사용)
+    @GetMapping("/get/custom/{bizId}")
+    public ResponseEntity<BizInfoRegDto> findBizOneCustom(@PathVariable("bizId") Long bizId) {
+        log.info("=== find biz info(custom) ===");
+
+        try {
+            BizInfoRegDto bizOne = this.bizService.findBizOneCustom(bizId);
+            return ResponseEntity.ok(bizOne);
+        } catch (Exception e) {
+            log.error("[findBizInfoOne] error: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    // 법인명으로 조회
+    @GetMapping("/search/{bizName}")
+    public ResponseEntity<?> findBizList(@PathVariable("bizName") String bizName,
+            Model model) {
+        log.info("=== find biz info by bizName ===");
+
+        Map<String, Object> response = new HashMap<>();
+
+        try {
+            List<BizInfoRegDto> bizList = this.bizService.findBizList(bizName);
+
+            if (bizList == null || bizList.isEmpty()) {
+                response.put("message", "조회된 데이터가 없습니다.");
+                response.put("bizList", Collections.emptyList());
+                return ResponseEntity.ok(response);
+            }
+
+            response.put("bizList", bizList);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            log.error("[findBizInfoOne] error: {}", e.getMessage());
+            response.put("message", "서버 오류가 발생했습니다. 다시 시도해 주세요.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
 

@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
@@ -122,5 +123,50 @@ public class BizRepositoryCustomImpl implements BizRepositoryCustom {
             .fetchOne();
 
         return bizDto;
+    }
+
+    @Override
+    public BizInfoRegDto findBizOneCustom(Long bizId) {
+        BizInfoRegDto bizDto = queryFactory.select(Projections.bean(BizInfoRegDto.class,
+            biz.id.as("bizId"),
+            biz.bizNo.as("bizNo"),
+            biz.bizName.as("bizName"),
+            biz.tid.as("tid"),
+            biz.cardNum.as("cardNum")))
+            .from(biz)
+            .where(biz.id.eq(bizId))
+            .orderBy(biz.regDt.desc())
+            .fetchOne();
+
+        if (bizDto.getTid() != null && !bizDto.getTid().isEmpty()) {
+            bizDto.setTidYn("Y");
+        } else {
+            bizDto.setTidYn("N");
+        }
+        if (bizDto.getCardNum() != null && !bizDto.getCardNum().isEmpty()) {
+            bizDto.setCardYn("Y");
+        } else {
+            bizDto.setCardYn("N");
+        }
+
+        return bizDto;
+    }
+
+    @Override
+    public List<BizInfoRegDto> findBizByBizName(String bizName) {
+        List<BizInfoRegDto> bizList = queryFactory.select(Projections.fields(BizInfoRegDto.class,
+            biz.id.as("bizId"),
+            biz.bizNo.as("bizNo"),
+            biz.bizName.as("bizName"),
+            biz.tid.as("tid"),
+            biz.cardNum.as("cardNum"),
+            biz.fnCode.as("fnCode"),
+            biz.regDt.as("regDt")))
+            .from(biz)
+            .where(biz.bizName.contains(bizName))
+            .orderBy(biz.regDt.desc())
+            .fetch();
+
+        return bizList;
     }
 }
