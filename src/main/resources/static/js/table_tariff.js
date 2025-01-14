@@ -12,9 +12,13 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateBtn() {
         const selectedCheckboxes = document.querySelectorAll('#pageList input[type="checkbox"]:checked');
         if (selectedCheckboxes.length === 1) {
-            // 체크된 항목이 하나일 때 버튼 활성화
-            editBtn.disabled = false;
-            deleteBtn.disabled = false;
+            // Find the corresponding row for the selected checkbox
+            const selectedRow = selectedCheckboxes[0].closest('tr');
+            const applyCode = selectedRow.cells[5]?.innerText.trim(); // Get applyCode from the 6th cell
+
+            // Enable buttons only if applyCode is "적용예정"
+            editBtn.disabled = applyCode !== "적용예정";
+            deleteBtn.disabled = false; // Allow deletion regardless of applyCode
             if (addBtnSub) addBtnSub.disabled = false;
         } else {
             // 체크된 항목이 없거나 두 개 이상일 때 버튼 비활성화

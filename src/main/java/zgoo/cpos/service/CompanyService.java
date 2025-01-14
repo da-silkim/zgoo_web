@@ -20,6 +20,7 @@ import zgoo.cpos.domain.company.CompanyPG;
 import zgoo.cpos.domain.company.CompanyRelationInfo;
 import zgoo.cpos.domain.company.CompanyRoaming;
 import zgoo.cpos.dto.company.CompanyDto;
+import zgoo.cpos.dto.company.CompanyDto.BaseCompnayDto;
 import zgoo.cpos.dto.company.CompanyDto.CompanyListDto;
 import zgoo.cpos.dto.company.CompanyDto.CompanyRegDto;
 import zgoo.cpos.dto.company.CompanyDto.CompanyRoamingtDto;
@@ -64,6 +65,10 @@ public class CompanyService {
     public Page<CompanyListDto> searchCompanyByLevel(String companyLevel, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         return companyRepository.findCompanyListByLv(companyLevel, pageable);
+    }
+
+    public List<BaseCompnayDto> searchAllCompanyForSelectOpt() {
+        return companyRepository.findAllCompanyForSelectOpt();
     }
 
     // 조회 - 사업자ID(업데이트 항목 조회시 사용)

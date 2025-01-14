@@ -1,14 +1,18 @@
 package zgoo.cpos.mapper;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import zgoo.cpos.domain.company.Company;
 import zgoo.cpos.domain.company.CompanyContract;
 import zgoo.cpos.domain.company.CompanyPG;
 import zgoo.cpos.domain.company.CompanyRelationInfo;
 import zgoo.cpos.domain.company.CompanyRoaming;
+import zgoo.cpos.domain.company.CpPlanPolicy;
 import zgoo.cpos.dto.company.CompanyDto.CompanyRegDto;
 import zgoo.cpos.dto.company.CompanyDto.CompanyRoamingtDto;
+import zgoo.cpos.dto.company.CompanyDto.CpPlanDto;
 
 public class CompanyMapper {
     /*
@@ -112,4 +116,30 @@ public class CompanyMapper {
     /*
      * roaming(entity >> dto)
      */
+
+    /*
+     * cpPolicyPlan(dto >> entity)
+     */
+    public static CpPlanPolicy toEntityCpPolicyPlan(CpPlanDto dto, Company company) {
+        return CpPlanPolicy.builder()
+                .company(company)
+                .name(dto.getPlanName())
+                .build();
+    }
+
+    /*
+     * Entity List >> Dto list(cpPolicyPlan)
+     */
+    public static List<CpPlanDto> toDtoListCpPolicyPlan(List<CpPlanPolicy> entitylist) {
+        List<CpPlanDto> dtolist = entitylist.stream()
+                .map(eninfo -> CpPlanDto.builder()
+                        .policyId(eninfo.getId())
+                        .companyId(eninfo.getCompany().getId())
+                        .planName(eninfo.getName())
+                        .build())
+                .collect(Collectors.toList());
+
+        return dtolist;
+    }
+
 }

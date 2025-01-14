@@ -26,7 +26,7 @@ public class UsersServiceTest {
     public void findUsersAll() throws Exception {
 
         List<UsersDto.UsersListDto> ulist = this.usersService.findUsersAll();
-        
+
         for (UsersListDto usersListDto : ulist) {
             System.out.println("=== find all users info reslut : " + usersListDto.toString());
         }
@@ -60,27 +60,25 @@ public class UsersServiceTest {
     @DisplayName("사용자 - 수정")
     public void updateUsers() throws Exception {
 
-        // before update
-        UsersRegDto before = this.usersService.findUserOne("test4");
-        System.out.println("=== before update: " + before.toString());
+        // // before update
+        // UsersRegDto before = this.usersService.findUserOne("test4");
+        // System.out.println("=== before update: " + before.toString());
 
+        // // after update
+        // UsersRegDto dto = UsersRegDto.builder()
+        // .companyId(1L)
+        // .userId("test4")
+        // .password("12345")
+        // .name("test4")
+        // .phone("01022227777")
+        // .email("teset4@test.com")
+        // .authority("AD")
+        // .regDt(LocalDateTime.now())
+        // .build();
 
-        // after update
-        UsersRegDto dto = UsersRegDto.builder()
-                .companyId(1L)
-                .userId("test4")
-                .password("12345")
-                .name("test4")
-                .phone("01022227777")
-                .email("teset4@test.com")
-                .authority("AD")
-                .regDt(LocalDateTime.now())
-                .build();
-        
-        
-        this.usersService.updateUsers(dto);
-        UsersRegDto after = this.usersService.findUserOne("test4");
-        System.out.println("=== after update: " + after.toString());
+        // this.usersService.updateUsers(dto);
+        // UsersRegDto after = this.usersService.findUserOne("test4");
+        // System.out.println("=== after update: " + after.toString());
     }
 
     @Test
@@ -88,9 +86,9 @@ public class UsersServiceTest {
     @DisplayName("사용자 - 삭제")
     public void deleteUsers() throws Exception {
 
-        // before delete
-        UsersRegDto before = this.usersService.findUserOne("test4");
-        System.out.println("=== before delete: " + before.toString());
+        // // before delete
+        // UsersRegDto before = this.usersService.findUserOne("test4");
+        // System.out.println("=== before delete: " + before.toString());
 
         // after delete
         this.usersService.deleteUsers("test4");

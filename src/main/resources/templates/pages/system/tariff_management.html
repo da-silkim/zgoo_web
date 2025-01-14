@@ -4,26 +4,33 @@
     <div class="card">
         <!-- card body:1 start -->
         <div class="card-body">
-            <div class="content-title mb-4 fw-bolder" style="font-size: 20px;"><i class="fa-solid fa-gear font-ico me-2"></i>시스템 > 요금제 관리</div>
+            <div class="content-title mb-4 fw-bolder" style="font-size: 20px;"><i
+                    class="fa-solid fa-gear font-ico me-2"></i>시스템 > 요금제 관리</div>
             <!-- card:2 start -->
             <div class="card card-shadow">
                 <!-- card body:2 start -->
                 <div class="card-body">
                     <div class="card-title"><span class="card-title-bar"></span><span>검색조건</span></div>
                     <!-- form start -->
-                    <form class="position-relative">
+                    <form id="searchForm" class="position-relative" th:action="@{/system/tariff/list}" method="get">
                         <!-- row:1 start -->
                         <div class="row mb-3 row-cols-2 row-cols-lg-3 g-2">
                             <div class="col d-flex align-items-center">
-                                <label for="" class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">사업자</label>
-                                <select id="" class="mx-3 form-control">
-                                    <option value='%'>(선택)</option>
+                                <label for="companyIdSearch"
+                                    class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">사업자</label>
+                                <select id="companyIdSearch" class="mx-3 form-control" name="companyIdSearch" required>
+                                    <option th:value="*{null}" th:text="'(없음)'"></option>
+                                    <option th:each="company : ${companyList}" th:value="${company.companyId}"
+                                        th:text="${company.companyName}"
+                                        th:selected="${company.companyId == selectedCompanyId}"></option>
                                 </select>
                             </div>
                         </div>
                         <div class="search-btn">
-                            <button type="button" class="btn btn-outline-grey me-2" data-bs-dismiss="modal"><i class="bi bi-search me-2"></i>검색</button>
-                            <button type="button" class="btn btn-outline-grey me-2" data-bs-dismiss="modal"><i class="bi bi-arrow-repeat me-2"></i>초기화</button>
+                            <button type="button" class="btn btn-outline-grey me-2" id="tariffSearchBtn"><i
+                                    class="bi bi-search me-2"></i>검색</button>
+                            <button type="button" class="btn btn-outline-grey me-2" id="resetBtn"><i
+                                    class="bi bi-arrow-repeat me-2"></i>초기화</button>
                         </div>
                         <!-- row:1 end -->
                     </form>
@@ -36,18 +43,25 @@
                 <!-- card body:3 start -->
                 <div class="card-body">
                     <div class="card-title">
-                        <span class="card-title-bar"></span><span>요금제 정보</span>
+                        <span class="card-title-bar"></span><span>요금제</span>
                     </div>
                     <div class="mt-3 position-relative">
-                        <button class="btn btn-data-add" data-bs-toggle="modal" data-bs-target="#dataAddModal"><i class="bi bi-plus-square me-2"></i>등록</button>
-                        <button class="btn btn-data-edit" id="editBtn" data-bs-toggle="modal" data-bs-target="#dataAddModal" disabled><i class="fa-regular fa-pen-to-square me-2"></i>수정</button>
-                        <button class="btn btn-data-delete" id="deleteBtn" disabled><i class="bi bi-trash me-2"></i>삭제</button>
+                        <button class="btn btn-data-add" id="addBtn" data-bs-toggle="modal"
+                            data-bs-target="#planAddModal"><i class="bi bi-plus-square me-2"></i>등록</button>
+                        <button class="btn btn-data-edit" id="editBtn" data-bs-toggle="modal"
+                            data-bs-target="#planAddModal" disabled><i
+                                class="fa-regular fa-pen-to-square me-2"></i>수정</button>
+                        <button class="btn btn-data-delete" id="deleteBtn" disabled><i
+                                class="bi bi-trash me-2"></i>삭제</button>
+
                         <span class="position-absolute" style="right: 0; bottom: 0;">
-                            <span id="page-info"></span>
-                            <select class="mx-3 page-select" id="" name="">
-                                <option value='%'>10개</option>
-                                <option value="">30개</option>
-                                <option value="">50개</option>
+                            <span id="pageInfo">
+                                <span
+                                    th:text="'Page ' + (${currentPage + 1}) + ' of ' + ${totalPages} + ' [총 ' + ${totalCount} + '건]'"></span>
+                            </span>
+                            <select class="mx-3 page-select" id="size" name="size">
+                                <option th:each="data : ${showListCnt}" th:value="${data.commonCode}"
+                                    th:text="${data.commonCodeName}" th:selected="${data.commonCode == size}"></option>
                             </select>
                         </span>
                     </div>
@@ -57,30 +71,73 @@
                             <thead>
                                 <tr class="table-border-top">
                                     <th scope="col"></th>
+                                    <th scope="col" style="display:none;">ID</th>
                                     <th scope="col">사업자</th>
                                     <th scope="col">요금제명</th>
                                     <th scope="col">적용시작일시</th>
-                                    <th scope="col">적용마감일시</th>
+                                    <th scope="col">적용상태</th>
                                 </tr>
                             </thead>
-                            <tbody></tbody>
-                        </table>                                
+                            <tbody id="pageList">
+                                <tr th:each="tpolicy : ${tariffpolicyList}">
+                                    <td><input type="checkbox" /></td>
+                                    <td style="display:none;" th:text="${tpolicy.tariffId}"></td>
+                                    <td th:text="${tpolicy.companyName}"></td>
+                                    <td th:text="${tpolicy.policyName}"></td>
+                                    <td th:text="${#temporals.format(tpolicy.applyDate,'yyyy-MM-dd HH:mm:ss')}"></td>
+                                    <td th:text="${tpolicy.applyCodeName}"></td>
+                                </tr>
+                                <tr th:if="${tariffpolicyList.size() == 0}">
+                                    <td colspan="9">조회된 데이터가 없습니다.</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
-                    <div class="text-center">
-                        <ul class="pagination" id=""></ul>
+                    <!-- paging navigation start -->
+                    <div th:if="${tariffpolicyList.size() > 0}">
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled' : ''">
+                                <a class="page-link"
+                                    th:href="@{/system/tariff/list(page=0, size=${size}, companyIdSearch=${selectedCompanyId})}"><i
+                                        class="bi bi-chevron-double-left"></i></a>
+                            </li>
+                            <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled' : ''">
+                                <a class="page-link"
+                                    th:href="@{/biz/list(page=${currentPage-1}, size=${size}, companyIdSearch=${selectedCompanyId})}"><i
+                                        class="bi bi-chevron-left"></i></a>
+                            </li>
+                            <li class="page-item" th:each="i : ${#numbers.sequence(currentPage - 2, currentPage + 2)}"
+                                th:if="${i >= 0 && i < totalPages}">
+                                <a class="page-link"
+                                    th:href="@{/biz/list(page=${i}, size=${size}, companyIdSearch=${selectedCompanyId})}"
+                                    th:text="${i+1}" th:classappend="${i == currentPage} ? 'active' : ''"></a>
+                            <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled' : ''">
+                                <a class="page-link"
+                                    th:href="@{/biz/list(page=${currentPage+1}, size=${size}, companyIdSearch=${selectedCompanyId})}"><i
+                                        class="bi bi-chevron-right"></i></a>
+                            </li>
+                            <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled' : ''">
+                                <a class="page-link"
+                                    th:href="@{/biz/list(page=${totalPages - 1}, size=${size}, companyIdSearch=${selectedCompanyId})}"><i
+                                        class="bi bi-chevron-double-right"></i></a>
+                            </li>
+                        </ul>
+                    </div>
+                    <!-- paging navigation end -->
+                    <div class="card-title">
+                        <span class="card-title-bar"></span><span>요금 정보</span>
                     </div>
                     <!-- 사업자 요금제 단가정보 리스트 table -->
                     <div class="w-100 table-responsive position-relative mt-4">
                         <table class="table text-center mt-3 table-bg table-hover">
                             <thead>
                                 <tr class="table-border-top">
-                                    <th scope="col" colspan="3"></th>
+                                    <th scope="col" colspan="2"></th>
                                     <th scope="col" colspan="2">완속</th>
                                     <th scope="col" colspan="2">급속</th>
                                 </tr>
                                 <tr>
                                     <th scope="col"></th>
-                                    <th scope="col">ID</th>
                                     <th scope="col">시간</th>
                                     <th scope="col">회원</th>
                                     <th scope="col">비회원</th>
@@ -88,8 +145,8 @@
                                     <th scope="col">비회원</th>
                                 </tr>
                             </thead>
-                            <tbody></tbody>
-                        </table>                                
+                            <tbody id="pageListSub"></tbody>
+                        </table>
                     </div>
                 </div>
                 <!-- card body:3 end -->
@@ -101,65 +158,67 @@
     <!-- card:1 end -->
 
     <!-- Add Modal start -->
-    <div class="modal fade" id="dataAddModal" tabindex="-1" aria-labelledby="dataAddModalLabel" data-bs-backdrop="static" data-bs-keyboard="false">
-        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width: 60vw; height: 90vh;"> <!-- height: 90vh; -->
+    <div class="modal fade" id="planAddModal" tabindex="-1" aria-labelledby="planAddModalLabel"
+        data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width: 60vw; height: 90vh;">
+            <!-- height: 90vh; -->
             <div class="modal-content mh-100 overflow-y-auto scrollbar">
-                <form>
+                <form th:object="${tariffRegDto}">
                     <!-- modal body start -->
                     <div class="modal-body">
                         <!-- 모달 내용 -->
-                        <div class="modal-title mb-2"><span class="modal-title-bar"></span><span>요금제</span></div>
+                        <div class="modal-title mb-2"><span class="modal-title-bar"></span><span id="modalTitle">요금제
+                                등록</span></div>
                         <!-- table:1 start -->
                         <table class="table table-bg-v table-fixed w-100 text-center align-middle">
-                            <tbody>
+                            <tbody id="planModalTable">
                                 <tr class="table-border-top">
                                     <th class="w-20">사업자<b class="required-data">*</b></th>
                                     <td class="w-30">
-                                        <select id="businessName" class="form-control" required>
-                                            <option value='%'>(선택)</option>
+                                        <select id="modalCompany" name="modalCompany" class="form-control" required>
+                                            <option th:each="company : ${companyList}" th:value="${company.companyId}"
+                                                th:text="${company.companyName}" th:field="*{companyId}">
+                                            </option>
                                         </select>
                                     </td>
                                     <th class="w-20">요금제명<b class="required-data">*</b></th>
                                     <td class="w-30">
                                         <div class="display-input-btn">
-                                            <select id="" class="form-control" style="width: 40%;" required>
-                                                <option value='%'>(선택)</option>
-                                            </select>
-                                            <input type="text" name="" id="" class="form-control" placeholder="요금제명을 입력해주세요." autocomplete="off" required>
+                                            <input type="text" name="modalPlanTextbox" id="modalPlanTextbox"
+                                                class="form-control" placeholder="요금제명을 입력해주세요." autocomplete="off"
+                                                required>
                                         </div>
                                     </td>
                                 </tr>
                                 <tr>
                                     <th class="w-20">적용시작일자<b class="required-data">*</b></th>
                                     <td class="w-30">
-                                        <input type="date" min="1970-01-01" max="2199-12-31" name="" id="" class="form-control" required>
+                                        <input type="date" min="1970-01-01" max="2199-12-31" name="applyStartDate"
+                                            id="applyStartDate" class="form-control" th:field="*{applyStartDate}"
+                                            required>
                                     </td>
-                                    <th class="w-20">적용마감일자<b class="required-data">*</b></th>
+                                    <th class="w-20">적용상태<b class="required-data">*</b></th>
                                     <td class="w-30">
-                                        <input type="date" min="1970-01-01" max="2199-12-31" name="" id="" class="form-control" required>
+                                        <select id="modalTariffStatCode" name="modalTariffStatCode" class="form-control"
+                                            required>
+                                            <option th:value="*{null}" th:text="'(없음)'"></option>
+                                            <option th:each="status:${tariffStatCodeList}"
+                                                th:value="${status.commonCode}" th:text="${status.commonCodeName}">
+                                        </select>
                                     </td>
                                 </tr>
                             </tbody>
                         </table>
                         <!-- table:1 end -->
-
-                        <div class="w-100 table-responsive position-relative mt-4">
-                            <span class="" style="float: right;">
-                                <label>적용상태구분</label>
-                                <select id="" class="page-select mb-1" required>
-                                    <option value='%'>(선택)</option>
-                                </select>
-                            </span>
+                        <div class="w-150 table-responsive position-relative mt-4">
                             <table class="table text-center mt-3 table-bg table-hover">
                                 <thead>
                                     <tr class="table-border-top">
-                                        <th scope="col" colspan="3"></th>
+                                        <th scope="col" colspan="1"></th>
                                         <th scope="col" colspan="2">완속</th>
                                         <th scope="col" colspan="2">급속</th>
                                     </tr>
                                     <tr>
-                                        <th scope="col"></th>
-                                        <th scope="col">ID</th>
                                         <th scope="col">시간</th>
                                         <th scope="col">회원</th>
                                         <th scope="col">비회원</th>
@@ -167,22 +226,27 @@
                                         <th scope="col">비회원</th>
                                     </tr>
                                 </thead>
-                                <tbody></tbody>
-                            </table>                              
+                                <tbody id="modalTariffInfoTable"></tbody>
+                            </table>
                         </div>
                         <!-- 모달 내용 끝 -->
                     </div>
                     <!-- modal body end -->
                     <div class="modal-footer justify-content-center border-top-none">
                         <button type="button" class="btn btn-outline-grey me-2" data-bs-dismiss="modal">취소</button>
-                        <button type="submit" class="btn btn-data-add">등록</button>
+                        <button type="submit" id="planModalBtn" class="btn btn-data-add">등록</button>
                     </div>
-                </form>               
+                </form>
             </div>
             <!-- modal content end -->
         </div>
         <!-- modal dialog end -->
     </div>
     <!-- Add Modal end -->
+    <!-- TariffInfo Add Modal end -->
+    <script type="text/javascript" th:src="@{/js/table_tariff.js}"></script>
+    <script type="text/javascript" th:src="@{/js/system/tariff_management.js}"></script>
+
 </div>
+
 </html>

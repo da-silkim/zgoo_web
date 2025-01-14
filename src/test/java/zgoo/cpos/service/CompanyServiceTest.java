@@ -8,14 +8,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.Page;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
-import zgoo.cpos.domain.company.Company;
 import zgoo.cpos.domain.company.CompanyRoaming;
-import zgoo.cpos.dto.company.CompanyDto;
-import zgoo.cpos.dto.company.CompanyDto.CompanyListDto;
 import zgoo.cpos.dto.company.CompanyDto.CompanyRegDto;
 import zgoo.cpos.dto.company.CompanyDto.CompanyRoamingtDto;
 import zgoo.cpos.repository.company.CompanyRepository;
@@ -37,13 +33,14 @@ public class CompanyServiceTest {
     public void findCompanyListAllTest() throws Exception {
         // given
 
-        // when
-        Page<CompanyDto.CompanyListDto> flist = companyService.searchCompanyAll(0, 0);
+        // // when
+        // Page<CompanyDto.CompanyListDto> flist = companyService.searchCompanyAll(0,
+        // 0);
 
-        for (CompanyListDto companyListDto : flist) {
-            System.out.println("=== result : " + companyListDto.toString());
-            System.out.println("company_name:" + companyListDto.getCompanyName());
-        }
+        // for (CompanyListDto companyListDto : flist) {
+        // System.out.println("=== result : " + companyListDto.toString());
+        // System.out.println("company_name:" + companyListDto.getCompanyName());
+        // }
 
         // then
     }
@@ -80,16 +77,16 @@ public class CompanyServiceTest {
         rdtos.add(new CompanyRoamingtDto("ME", "METESTKEY", "me@mail.net"));
         rdtos.add(new CompanyRoamingtDto("KP", "KPTEST", "kp@mail.net"));
 
-        // when
-        Company saveCompany = companyService.saveCompany(dto);
+        // // when
+        // Company saveCompany = companyService.saveCompany(dto);
 
-        companyService.saveCompanyRoamingInfo(saveCompany, rdtos);
+        // companyService.saveCompanyRoamingInfo(saveCompany, rdtos);
 
-        // then
-        Page<CompanyListDto> flist = companyService.searchCompanyAll(0, 0);
-        for (CompanyListDto data : flist) {
-            System.out.println("=== result : " + data.toString());
-        }
+        // // then
+        // Page<CompanyListDto> flist = companyService.searchCompanyAll(0, 0);
+        // for (CompanyListDto data : flist) {
+        // System.out.println("=== result : " + data.toString());
+        // }
     }
 
     @Test

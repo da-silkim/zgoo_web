@@ -97,4 +97,14 @@ public class CompanyDto {
         private String institutionEmail;
     }
 
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class CpPlanDto {
+        private Long policyId;
+        private Long companyId;
+        private String planName;
+    }
+
 }
