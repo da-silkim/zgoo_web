@@ -8,14 +8,12 @@ import org.springframework.data.domain.Pageable;
 
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import zgoo.cpos.domain.biz.QBizInfo;
 import zgoo.cpos.domain.code.QCommonCode;
-import zgoo.cpos.domain.company.QCompany;
 import zgoo.cpos.dto.biz.BizInfoDto.BizInfoListDto;
 import zgoo.cpos.dto.biz.BizInfoDto.BizInfoRegDto;
 
@@ -24,7 +22,6 @@ import zgoo.cpos.dto.biz.BizInfoDto.BizInfoRegDto;
 public class BizRepositoryCustomImpl implements BizRepositoryCustom {
     private final JPAQueryFactory queryFactory;
     QBizInfo biz = QBizInfo.bizInfo;
-    QCompany company = QCompany.company;
     QCommonCode fnCodeName = new QCommonCode("fnCode");
 
     @Override
@@ -37,10 +34,8 @@ public class BizRepositoryCustomImpl implements BizRepositoryCustom {
             biz.cardNum.as("cardNum"),
             biz.fnCode.as("fnCode"),
             biz.regDt.as("regDt"),
-            company.companyName.as("companyName"),
             fnCodeName.name.as("fnCodeName")))
             .from(biz)
-            .leftJoin(company).on(biz.company.eq(company))
             .leftJoin(fnCodeName).on(biz.fnCode.eq(fnCodeName.commonCode))
             .orderBy(biz.regDt.desc())
             .offset(pageable.getOffset())
@@ -56,13 +51,9 @@ public class BizRepositoryCustomImpl implements BizRepositoryCustom {
     }
 
     @Override
-    public Page<BizInfoListDto> searchBizWithPagination(Long companyId, String searchOp, String searchContent,
+    public Page<BizInfoListDto> searchBizWithPagination(String searchOp, String searchContent,
             Pageable pageable) {
         BooleanBuilder builder = new BooleanBuilder();
-
-        if (companyId != null) {
-            builder.and(biz.company.id.eq(companyId));
-        }
 
         if (searchOp != null && (searchContent != null && !searchContent.isEmpty())) {
             if (searchOp.equals("bizName")) {
@@ -80,10 +71,8 @@ public class BizRepositoryCustomImpl implements BizRepositoryCustom {
             biz.cardNum.as("cardNum"),
             biz.fnCode.as("fnCode"),
             biz.regDt.as("regDt"),
-            company.companyName.as("companyName"),
             fnCodeName.name.as("fnCodeName")))
             .from(biz)
-            .leftJoin(company).on(biz.company.eq(company))
             .leftJoin(fnCodeName).on(biz.fnCode.eq(fnCodeName.commonCode))
             .orderBy(biz.regDt.desc())
             .where(builder)
@@ -112,7 +101,6 @@ public class BizRepositoryCustomImpl implements BizRepositoryCustom {
     public BizInfoRegDto findBizOne(Long bizId) {
         BizInfoRegDto bizDto = queryFactory.select(Projections.fields(BizInfoRegDto.class,
             biz.id.as("bizId"),
-            biz.company.id.as("companyId"),
             biz.bizNo.as("bizNo"),
             biz.bizName.as("bizName"),
             biz.tid.as("tid"),

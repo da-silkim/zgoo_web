@@ -18,7 +18,6 @@ public class BizInfoDto {
     @NoArgsConstructor
     public static class BizInfoRegDto {
         private Long bizId;
-        private Long companyId;
         private String bizNo;
         private String bizName;
         private String tid;
@@ -42,6 +41,5 @@ public class BizInfoDto {
     @ToString(callSuper = true)
     public static class BizInfoListDto extends BizInfoRegDto {
         private String fnCodeName;   // 카드사 코드명
-        private String companyName;  // 사업자명
     }
 }

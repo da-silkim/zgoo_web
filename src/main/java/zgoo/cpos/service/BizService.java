@@ -11,12 +11,10 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import zgoo.cpos.domain.biz.BizInfo;
-import zgoo.cpos.domain.company.Company;
 import zgoo.cpos.dto.biz.BizInfoDto.BizInfoListDto;
 import zgoo.cpos.dto.biz.BizInfoDto.BizInfoRegDto;
 import zgoo.cpos.mapper.BizMapper;
 import zgoo.cpos.repository.biz.BizRepository;
-import zgoo.cpos.repository.company.CompanyRepository;
 import zgoo.cpos.util.AESUtil;
 
 @Service
@@ -24,21 +22,20 @@ import zgoo.cpos.util.AESUtil;
 @Slf4j
 public class BizService {
     private final BizRepository bizRepository;
-    private final CompanyRepository companyRepository;
 
     // 법인 정보 조회
-    public Page<BizInfoListDto> findBizInfoWithPagination(Long companyId, String searchOp, String searchContent, int page, int size) {
+    public Page<BizInfoListDto> findBizInfoWithPagination(String searchOp, String searchContent, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
 
         try {
             Page<BizInfoListDto> bizList;
 
-            if (companyId == null && (searchOp == null || searchOp.isEmpty()) && (searchContent == null || searchContent.isEmpty())) {
+            if ((searchOp == null || searchOp.isEmpty()) && (searchContent == null || searchContent.isEmpty())) {
                 log.info("Executing the [findBizWithPagination]");
                 bizList = this.bizRepository.findBizWithPagination(pageable);
             } else {
                 log.info("Executing the [searchBizWithPagination]");
-                bizList = this.bizRepository.searchBizWithPagination(companyId, searchOp, searchContent, pageable);
+                bizList = this.bizRepository.searchBizWithPagination(searchOp, searchContent, pageable);
             }
 
             // 카드번호, TID 복호화
@@ -103,8 +100,6 @@ public class BizService {
     // 법인 정보 저장
     public void saveBiz(BizInfoRegDto dto) {
         try {
-            Company company = this.companyRepository.findById(dto.getCompanyId())
-                .orElseThrow(() -> new IllegalArgumentException("company not found with id: " + dto.getCompanyId()));
             
             if (dto.getCardNum() == null || dto.getCardNum().isEmpty()) {
                 // 카드번호가 null이면 카드사 null 처리
@@ -114,7 +109,7 @@ public class BizService {
                 encryptCardNumAndTidRegDto(dto);
             }
 
-            BizInfo biz = BizMapper.toEntity(dto, company);
+            BizInfo biz = BizMapper.toEntity(dto);
             this.bizRepository.save(biz);
         } catch (Exception e) {
             log.error("[saveBiz] error: {}", e.getMessage());

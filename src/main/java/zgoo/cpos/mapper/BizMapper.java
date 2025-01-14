@@ -11,9 +11,8 @@ public class BizMapper {
     /* 
      * dto >> entity
      */
-    public static BizInfo toEntity(BizInfoRegDto dto, Company company) {
+    public static BizInfo toEntity(BizInfoRegDto dto) {
         BizInfo biz = BizInfo.builder()
-                .company(company)
                 .bizNo(dto.getBizNo())
                 .bizName(dto.getBizName())
                 .tid(dto.getTid())

@@ -15,7 +15,7 @@ public interface BizRepositoryCustom {
     Page<BizInfoListDto> findBizWithPagination(Pageable pageable);
 
     // 법인 검색 조회
-    Page<BizInfoListDto> searchBizWithPagination(Long companyId, String searchOp, String searchContent, Pageable pageable);
+    Page<BizInfoListDto> searchBizWithPagination(String searchOp, String searchContent, Pageable pageable);
 
     // 카드결제번호 마스킹
     String maskCardNum(String cardNum);

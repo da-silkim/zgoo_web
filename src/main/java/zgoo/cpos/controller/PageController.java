@@ -931,7 +931,6 @@ public class PageController {
      */
     @GetMapping("/corp/list")
     public String showcorplist(
-            @RequestParam(value = "companyIdSearch", required = false) Long companyId,
             @RequestParam(value = "opSearch", required = false) String searchOp,
             @RequestParam(value = "contentSearch", required = false) String searchContent,
             @RequestParam(value = "page", defaultValue = "0") int page,
@@ -942,11 +941,10 @@ public class PageController {
 
         try {
             // 법인 list
-            Page<BizInfoListDto> bizList = this.bizService.findBizInfoWithPagination(companyId, searchOp, searchContent,
+            Page<BizInfoListDto> bizList = this.bizService.findBizInfoWithPagination(searchOp, searchContent,
                     page, size);
 
             // 검색 조건 저장
-            model.addAttribute("selectedCompanyId", companyId);
             model.addAttribute("selectedOpSearch", searchOp);
             model.addAttribute("selectedContentSearch", searchContent);
 

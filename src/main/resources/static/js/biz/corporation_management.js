@@ -25,12 +25,10 @@ $(document).ready(function() {
     $('#size').on('change', function() {
         const urlParams = new URLSearchParams(window.location.search);
         const selectedSize = document.getElementById("size").value;
-        const selectedCompanyId = urlParams.get('companyIdSearch') || '';
         const selectedManfCd = urlParams.get('manfCdSearch') || '';
         const selectedChgSpeedCd = urlParams.get('chgSpeedCdSearch') || '';
 
         window.location.href = "/corp/list?page=0&size=" + selectedSize +
-                               "&companyIdSearch=" + (selectedCompanyId) +
                                "&manfCdSearch=" + (selectedManfCd) +
                                "&chgSpeedCdSearch=" + (selectedChgSpeedCd);
     });
@@ -45,8 +43,6 @@ $(document).ready(function() {
         modalCon = false;
         btnMsg = "등록";
         $('#modalBtn').text(btnMsg);
-        $('#companyId').prop('disabled', false);
-        $('#companyId').prop('selectedIndex', 0);
         $('#bizName').val('');
         $('#bizNo').val('');
         deleteCardInfo();
@@ -66,15 +62,12 @@ $(document).ready(function() {
         modalCon = true;
         btnMsg = "수정";
         $('#modalBtn').text(btnMsg);
-        $('#companyId').prop('disabled', true);
         $.ajax({
             type: 'GET',
             url: `/corp/get/${bizId}`,
             contentType: "application/json",
             dataType: 'json',
             success: function(data) {
-                console.log('수정할 데이터' + data.companyId);
-                $('#companyId').val(data.companyId || '');
                 $('#bizName').val(data.bizName || '');
                 $('#bizNo').val(data.bizNo || '');
                 $('#fnCode').val(data.fnCode || '');
@@ -117,7 +110,6 @@ $(document).ready(function() {
         console.log('카드번호: ' + updateCardNum());
         if (confirmSubmit(btnMsg)) {
             const DATA = {
-                companyId: $('#companyId').val(),
                 bizName: $('#bizName').val(),
                 bizNo: $('#bizNo').val(),
                 fnCode: $('#fnCode').val(),
