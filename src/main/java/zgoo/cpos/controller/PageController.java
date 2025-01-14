@@ -599,7 +599,68 @@ public class PageController {
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "10") int size,
             Model model) {
+
+    public String showtarifflist(@RequestParam(value = "companyIdSearch", required = false) Long companyId,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size,
+            Model model) {
         log.info("=== Tariff List Page ===");
+        log.info("== companyId: {}, page: {}, size: {}", companyId, page, size);
+
+        // 요금제 등록폼 전달
+        model.addAttribute("tariffRegDto", new TariffRegDto());
+
+        Page<TariffPolicyDto> tariffpolicyList;
+
+        try {
+
+            log.info("=== Tariff DB search result >>>");
+
+            // tariff policy list 조회
+            // check null and call the approrpiate search method
+            if (companyId != null) {
+                log.info("Searching by companyId: {}", companyId);
+                tariffpolicyList = tariffService.searchTariffPolicyByCompanyId(page, size, companyId);
+            } else {
+                log.info("Fetching all Tariff >> ");
+                tariffpolicyList = tariffService.searchTariffPolicyAll(page, size);
+
+            }
+
+            // page 처리
+            int totalPages = tariffpolicyList.getTotalPages() == 0 ? 1 : tariffpolicyList.getTotalPages(); // 전체 페이지 수
+            model.addAttribute("tariffpolicyList", tariffpolicyList.getContent()); // 사용자 list
+            model.addAttribute("size", String.valueOf(size)); // 페이지당 보여지는 데이터 건 수
+            model.addAttribute("currentPage", page); // 현재 페이지
+            model.addAttribute("totalPages", totalPages); // 총 페이지 수
+            model.addAttribute("totalCount", tariffpolicyList.getTotalElements()); // 총 데이터
+            log.info("==TariffList_PageInfo >> totalPages:{}, totalCount:{}", totalPages,
+                    tariffpolicyList.getTotalElements());
+
+            // select options 조회
+            // 사업자 리스트
+            List<BaseCompnayDto> companyList = companyService.searchAllCompanyForSelectOpt();
+            log.info("== selectOption >> companyList : {}", companyList.toString());
+            model.addAttribute("companyList", companyList);
+            // 요금제 리스트(cpPlanPolicy)
+            List<CpPlanDto> planList = tariffService.searchPlanPolicyAll();
+            log.info("== selectOption >> planPolicy count : {}", planList.size());
+            model.addAttribute("planList", planList);
+            // grid row count
+            List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT");
+            model.addAttribute("showListCnt", showListCnt);
+            // 요금제 적용상태 코드 리스트
+            List<CommCdBaseDto> tariffStatCodeList = codeService.commonCodeStringToNum("TARIFFSTATCD");
+            model.addAttribute("tariffStatCodeList", tariffStatCodeList);
+
+        } catch (Exception e) {
+            log.error("Error occurred while fetching tariff list: {}", e.getMessage(), e);
+            tariffpolicyList = Page.empty();
+
+            model.addAttribute("companyList", Collections.emptyList());
+            model.addAttribute("planList", Collections.emptyList());
+            model.addAttribute("showListCnt", Collections.emptyList());
+        }
         log.info("== companyId: {}, page: {}, size: {}", companyId, page, size);
 
         // 요금제 등록폼 전달
