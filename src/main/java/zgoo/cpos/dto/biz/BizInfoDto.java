@@ -30,6 +30,9 @@ public class BizInfoDto {
         private String cardNum2;
         private String cardNum3;
         private String cardNum4;
+
+        private String cardYn;
+        private String tidYn;
     }
 
     @Data

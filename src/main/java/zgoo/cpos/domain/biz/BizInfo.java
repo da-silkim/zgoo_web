@@ -38,7 +38,7 @@ public class BizInfo {
     @Column(name = "biz_name")
     private String bizName;
 
-    @Column(name = "tid", unique = true)
+    @Column(name = "tid")
     private String tid;
 
     @Column(name = "card_num")
