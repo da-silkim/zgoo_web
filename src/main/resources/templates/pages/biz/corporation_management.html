@@ -198,6 +198,7 @@
                                     <!-- <td><input type="checkbox" class="single-checkbox"></td> -->
                                     <td>
                                         <select id="fnCode" name="fnCode" class="form-control" required>
+                                            <option th:value="null" th:text="선택"></option>
                                             <option th:each="data : ${creditCardList}" th:value="${data.commonCode}"
                                                     th:text="${data.commonCodeName}" ></option>
                                         </select>

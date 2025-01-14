@@ -264,7 +264,6 @@ function postSearch() {
 
             document.getElementById('zipCode').value = data.zonecode;
             document.getElementById('address').value = addr;
-            // 커서를 상세주소 필드로 이동
             document.getElementById('addressDetail').focus();
 
             const latitude = document.getElementById('latitude');
@@ -303,26 +302,18 @@ function maxLengthCheck(object) {
     }
 }
 
-function addHyphen(input) {
-    let value = input.value.replace(/\D/g, '');  // 숫자만 추출
-    let formattedValue = '';
+function phoneFormat(input) {
+    let value = input.value.replace(/[^0-9]/g, '');
 
-    if (value.length <= 3) {
-        formattedValue = value;
-    } else if (value.length <= 6) {
-        formattedValue = value.substring(0, 3) + '-' + value.substring(3);
-    } else if (value.length <= 10) {
-        formattedValue = value.substring(0, 3) + '-' + value.substring(3, 6) + '-' + value.substring(6);
-    } else {
-        formattedValue = value.substring(0, 3) + '-' + value.substring(3, 7) + '-' + value.substring(7, 11);
+    if (value.startsWith('02')) {
+        if (value.length > 10) {
+            value = value.slice(0, 10);
+        }
+    } else if (value.length > 11) {
+        value = value.slice(0, 11);
     }
 
-    // maxlength을 넘지 않도록 체크
-    if (formattedValue.length <= 13) {
-        input.value = formattedValue;
-    } else {
-        input.value = formattedValue.substring(0, 13);
-    }
+    input.value = value.replace(/(^02|^0[0-9]{2})([0-9]{3,4})([0-9]{4})/, `$1-$2-$3`);
 }
 
 function addHyphenBizNo(input) {

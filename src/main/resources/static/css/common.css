@@ -151,10 +151,11 @@ table.table tbody tr.row-selected { background-color: #3D3B40 !important; color:
 .input-info-group .info-eyes { position: absolute; top: 50%; right: 18px; transform: translateY(-50%); font-size: 18px; color: #9BA4B4; cursor: pointer; }
 
 /* tooltip information */
-.tooltip-info { display: none; position: absolute; right:0; background: rgb(12, 12, 12);
+.tooltip-container { position: absolute !important; right: 0; }
+.tooltip-container .tooltip-info { display: none; position: absolute; right:0; background: rgb(12, 12, 12);
                 padding: 10px; border-radius: 5px; box-shadow: 0 4px 8px rgb(0, 0, 0, 0.1); z-index: 9999; white-space: nowrap;
                 font-size: 14px; font-weight: 400; color: white;}
-.info-icon:hover + .tooltip-info { display: block; }
+.tooltip-container .info-icon:hover + .tooltip-info { display: block; }
 
 .textarea-content { height: 30vh; overflow-y: auto; resize: none; }
 .textarea-content::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -198,3 +199,10 @@ table.table tbody tr.row-selected { background-color: #3D3B40 !important; color:
 .card-num-container { display: flex; align-items: center; justify-content: space-between; width: 100%; }
 .card-num-container input { width: 60px; text-align: center; }
 .card-num-container span { margin: 0 5px; }
+
+.table-row-control-container { margin-left: 4px; right: 0; position: absolute; }
+
+.password-content { height: 100% !important; background-color: rgba(169, 169, 169, 0.5) !important; }
+.password-content > form { background-color: white; margin: auto; border-radius: 15px; }
+.password-content .modal-body > div:nth-child(2) { margin-top: 1rem !important; margin-bottom: 1rem !important; }
+.password-content .modal-body > div:nth-child(3) { padding: 2rem 4rem; border-top: 2px solid grey; border-bottom: 1px solid grey; }
