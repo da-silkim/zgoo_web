@@ -21,7 +21,7 @@ import zgoo.cpos.domain.biz.BizInfo;
 import zgoo.cpos.domain.company.Company;
 import zgoo.cpos.dto.member.MemberDto.MemberRegDto;
 
-@Table(name = "member")
+@Table(name = "MEMBER")
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @ToString

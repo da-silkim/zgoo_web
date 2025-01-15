@@ -29,7 +29,9 @@ import zgoo.cpos.dto.cp.CpModelDto.CpModelListDto;
 import zgoo.cpos.dto.cs.CsInfoDto;
 import zgoo.cpos.dto.cs.CsInfoDto.CsInfoListDto;
 import zgoo.cpos.dto.member.MemberDto;
+import zgoo.cpos.dto.member.VocDto;
 import zgoo.cpos.dto.member.MemberDto.MemberListDto;
+import zgoo.cpos.dto.member.VocDto.VocListDto;
 import zgoo.cpos.dto.menu.CompanyMenuAuthorityDto;
 import zgoo.cpos.dto.menu.MenuAuthorityDto;
 import zgoo.cpos.dto.menu.MenuDto;
@@ -51,6 +53,7 @@ import zgoo.cpos.service.MenuService;
 import zgoo.cpos.service.NoticeService;
 import zgoo.cpos.service.TariffService;
 import zgoo.cpos.service.UsersService;
+import zgoo.cpos.service.VocService;
 
 @Controller
 @Slf4j
@@ -70,6 +73,7 @@ public class PageController {
     private final BizService bizService;
     private final TariffService tariffService;
     private final MemberService memberService;
+    private final VocService vocService;
 
 
     /*
@@ -736,8 +740,52 @@ public class PageController {
      * 고객센터 > 1:1 문의
      */
     @GetMapping("/voc")
-    public String showvoclist(Model model) {
+    public String showvoclist(
+            @RequestParam(value = "typeSearch", required = false) String type,
+            @RequestParam(value = "replyStatSearch", required = false) String replyStat,
+            @RequestParam(value = "nameSearch", required = false) String name,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size,
+            Model model) {
         log.info("=== VOC List Page ===");
+        model.addAttribute("vocAnswerDto", new VocDto.VocAnswerDto());
+
+        try {
+            Page<VocListDto> vocList = this.vocService.findVocInfoWithPagination(type, replyStat, name, page, size);
+
+            // 검색 조건 저장
+            model.addAttribute("selectedType", type);
+            model.addAttribute("selectedReplyStat", replyStat);
+            model.addAttribute("selectedName", name);
+
+            int totalPages = vocList.getTotalPages() == 0 ? 1 : vocList.getTotalPages(); // 전체 페이지 수
+
+            model.addAttribute("vocList", vocList.getContent()); // 1:1문의 list
+            model.addAttribute("size", String.valueOf(size)); // 페이지당 보여지는 데이터 건 수
+            model.addAttribute("currentPage", page); // 현재 페이지
+            model.addAttribute("totalPages", totalPages); // 총 페이지 수
+            model.addAttribute("totalCount", vocList.getTotalElements()); // 총 데이터
+
+            List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT");    // 그리드 row 수
+            model.addAttribute("showListCnt", showListCnt);
+            List<CommCdBaseDto> vocTypeList = codeService.commonCodeStringToNum("VOCTYPE"); // 문의유형
+            model.addAttribute("vocTypeList", vocTypeList);
+            List<CommCdBaseDto> vocStatList = codeService.commonCodeStringToNum("VOCSTAT"); // 조치상태
+            model.addAttribute("vocStatList", vocStatList);
+            List<CommCdBaseDto> vocPathList = codeService.commonCodeStringToNum("VOCPATH"); // 문의경로
+            model.addAttribute("vocPathList", vocPathList);
+        } catch (Exception e) {
+            e.getStackTrace();
+            model.addAttribute("memberList", Collections.emptyList());
+            model.addAttribute("size", Collections.emptyList());
+            model.addAttribute("currentPage", Collections.emptyList());
+            model.addAttribute("totalPages", Collections.emptyList());
+            model.addAttribute("totalCount", Collections.emptyList());
+            model.addAttribute("showListCnt", Collections.emptyList());
+            model.addAttribute("vocTypeList", Collections.emptyList());
+            model.addAttribute("vocStatList", Collections.emptyList());
+        }
+
         return "pages/customer/voc";
     }
 
