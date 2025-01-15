@@ -74,7 +74,6 @@
                                     <th scope="col"></th>
                                     <th scope="col"></th>
                                     <th scope="col">사업자</th>
-                                    <th scope="col">회원번호</th>
                                     <th scope="col">사용자명</th>
                                     <th scope="col">사용자ID</th>
                                     <th scope="col">회원카드번호</th>
@@ -98,7 +97,6 @@
                                     <td th:text="${member.companyName}"></td>
                                     <td th:text="${member.name}"></td>
                                     <td th:text="${member.memLoginId}"></td>
-                                    <td th:text="${member.name}"></td>
                                     <td th:text="${member.idTag}"></td>
                                     <td th:text="${member.phoneNo}"></td>
                                     <td th:text="${member.email}"></td>
@@ -106,7 +104,7 @@
                                     <td th:text="${#temporals.format(member.joinedDt, 'yyyy-MM-dd HH:mm:ss')}"></td>
                                 </tr>
                                 <tr th:if="${memberList.size() == 0}">
-                                    <td colspan="11">조회된 데이터가 없습니다.</td>
+                                    <td colspan="10">조회된 데이터가 없습니다.</td>
                                 </tr>
                             </tbody>
                         </table>                 
