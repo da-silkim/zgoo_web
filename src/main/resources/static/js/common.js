@@ -62,6 +62,16 @@ $(function () {
             console.log('서브메뉴 닫힘');
         }
     });
+
+    // editPasswordModal이 열릴 때 블러 처리
+    $('#editPasswordModal').on('show.bs.modal', function () {
+        $('#dataAddModal .modal-content').addClass('blur-background');
+    });
+
+    // editPasswordModal이 닫힐 때 블러 해제
+    $('#editPasswordModal').on('hidden.bs.modal', function () {
+        $('#dataAddModal .modal-content').removeClass('blur-background');
+    });
 });
 
 function confirmSubmit(msg) {

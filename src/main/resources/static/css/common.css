@@ -202,7 +202,8 @@ table.table tbody tr.row-selected { background-color: #3D3B40 !important; color:
 
 .table-row-control-container { margin-left: 4px; right: 0; position: absolute; }
 
-.password-content { height: 100% !important; background-color: rgba(169, 169, 169, 0.5) !important; }
-.password-content > form { background-color: white; margin: auto; border-radius: 15px; }
+/* .password-content { height: 100% !important; background-color: rgba(169, 169, 169, 0.5) !important; } */
+.password-content > form { background-color: white; border-radius: 15px; }
 .password-content .modal-body > div:nth-child(2) { margin-top: 1rem !important; margin-bottom: 1rem !important; }
 .password-content .modal-body > div:nth-child(3) { padding: 2rem 4rem; border-top: 2px solid grey; border-bottom: 1px solid grey; }
+.blur-background { filter: blur(1px); transition: filter 0.3s; }
