@@ -56,4 +56,8 @@ public class Users {
         this.phone = user.getPhone();
         this.authority = user.getAuthority();
     }
+
+    public void updatePasswordInfo(String password) {
+        this.password = password;
+    }
 }

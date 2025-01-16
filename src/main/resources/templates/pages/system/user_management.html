@@ -191,10 +191,13 @@
                                             th:field="*{name}" autocomplete="off" required>
                                 </td>
                                 <th class="w-20">비밀번호<b class="required-data">*</b></th>
-                                <td class="w-30 input-info-group">
-                                    <input type="password" name="password" id="password" class="form-control"
-                                            th:field="*{password}" autocomplete="off" required>
-                                    <div class="info-eyes"><i class="bi bi-eye"></i></div>
+                                <td class="w-30">
+                                    <div class="input-info-group" id="passwordContainer">
+                                        <input type="password" name="password" id="password" class="form-control"
+                                                th:field="*{password}" autocomplete="off" required>
+                                        <div class="info-eyes"><i class="bi bi-eye"></i></div>
+                                    </div>
+                                    <button type="button" class="btn btn-outline-grey flex-btn ms-0 w-100" id="passwordEditBtn" hidden>비밀번호 변경</button>
                                 </td>
                             </tr>
                             <tr>
@@ -235,6 +238,35 @@
         <!-- modal dialog end -->
     </div>
     <!-- Add Modal end -->
+
+    <!-- Edit Password Modal start -->
+    <div class="modal fade" id="editPasswordModal" tabindex="-1" aria-labelledby="editPasswordLabel" style="z-index: 1056;"
+        data-bs-backdrop="static" data-bs-keyboard="false" role="dialog">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width: 50vw;">
+            <div class="modal-content overflow-y-auto scrollbar password-content">
+                <form id="passwordForm">
+                    <div class="modal-body">
+                        <div class="modal-title"><span class="modal-title-bar"></span><span>비밀번호 변경</span></div>
+                        <div>※영문자, 숫자, 특수문자를 최소 하나씩 포함하여 8자 이상 16자 이내로 새 비밀번호를 설정해 주세요.</div>
+                        <div>
+                            <span>현재 비밀번호</span>
+                            <input type="password" name="existPassword" id="existPassword" class="form-control" autocomplete="off" required />
+                            <span>새 비밀번호</span>
+                            <input type="password" name="newPassword" id="newPassword" class="form-control" autocomplete="off" required />
+                            <span>새 비밀번호 확인</span>
+                            <input type="password" name="newPasswordCheck" id="newPasswordCheck" class="form-control" autocomplete="off" required />
+                        </div>
+                    </div>
+                    <div class="modal-footer justify-content-center border-top-none">
+                        <button type="button" class="btn btn-outline-grey me-2" data-bs-dismiss="modal">취소</button>
+                        <button type="button" id="passwordModalBtn" class="btn btn-data-add">변경</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- Edit Password Modal start -->
+     
     <script type="text/javascript" th:src="@{/js/table.js}"></script>
     <script type="text/javascript" th:src="@{/js/system/user_management.js}"></script>
 </div>

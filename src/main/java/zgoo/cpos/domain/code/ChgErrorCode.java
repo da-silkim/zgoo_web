@@ -30,7 +30,7 @@ public class ChgErrorCode {
     @Column(name = "errcd_id")
     private Long id;
 
-    @Column(name = "err_code", unique = true)
+    @Column(name = "err_code")
     private String errCode;
 
     @Column(name = "menuf_code")

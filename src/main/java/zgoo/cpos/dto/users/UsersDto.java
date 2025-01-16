@@ -3,6 +3,7 @@ package zgoo.cpos.dto.users;
 import java.time.LocalDateTime;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -49,5 +50,15 @@ public class UsersDto {
     public static class UsersRegDto extends BaseUsersDto {
         private Long companyId;
         private LocalDateTime regDt;
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class UsersPasswordDto {
+        private String existPassword;
+        private String newPassword;
+        private String newPasswordCheck;
     }
 }

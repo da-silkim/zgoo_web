@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import zgoo.cpos.domain.company.Company;
 import zgoo.cpos.domain.users.Users;
 import zgoo.cpos.dto.users.UsersDto;
+import zgoo.cpos.dto.users.UsersDto.UsersPasswordDto;
 import zgoo.cpos.mapper.UsersMapper;
 import zgoo.cpos.repository.company.CompanyRepository;
 import zgoo.cpos.repository.users.UsersRepository;
@@ -163,6 +164,39 @@ public class UsersService {
         } catch (Exception e) {
             log.error("[findCompanyId] error : ", e.getMessage());
             return 0L;
+        }
+    }
+
+    // 비밀번호 변경
+    @Transactional
+    public Integer updateUsersPasswordInfo(String userId, UsersPasswordDto dto) {
+        Users user = this.usersRepository.findUserOne(userId);
+
+        try {
+            if (user == null) {
+                return -1;
+            }
+
+            dto.setExistPassword(EncryptionUtils.encryptSHA256(dto.getExistPassword()));
+
+            // 1. 현재 비밀번호 일치여부
+            if (!user.getPassword().equals(dto.getExistPassword())) {
+                log.info("[updateUsersPasswordInfo] doesn't match the current password");
+                return 0;
+            }
+            // 2. 새 비밀번호 == 새 비밀번호 확인 값이 같은지 체크
+            if (!dto.getNewPassword().equals(dto.getNewPasswordCheck())) {
+                log.info("[updateUsersPasswordInfo] two password values do not match");  
+                return 2;
+            }
+            // password SHA-256
+            dto.setNewPassword(EncryptionUtils.encryptSHA256(dto.getNewPassword()));
+            user.updatePasswordInfo(dto.getNewPassword());
+            log.info("[updateUsersPasswordInfo] password change complete");
+            return 1;
+        } catch (Exception e) {
+            log.error("[updateUsersPasswordInfo] error: {}", e.getMessage());
+            return null;
         }
     }
 }

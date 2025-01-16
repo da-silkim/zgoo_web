@@ -3,6 +3,9 @@ $(document).ready(function() {
     let selectRow; isDuplicateCheck = false, userIdCheck = false;
     let btnMsg = "등록";
 
+    var passwordContainer = document.getElementById('passwordContainer');
+    var passwordEditBtn = document.getElementById('passwordEditBtn');
+
     // 초기화
     $('#resetBtn').on('click', function() {
         window.location.replace('/system/user/list');
@@ -48,21 +51,15 @@ $(document).ready(function() {
         modalCon = false;
         btnMsg = "등록";
         $('#modalBtn').text(btnMsg);
-
-        // 사업자, 사용자ID, 권한, 중복버튼 => 활성화
+        $('#userForm')[0].reset();
         $('#companyId').prop('disabled', false);
         $('#userId').prop('disabled', false);
         $('#authority').prop('disabled', false);
         $('#duplicateBtn').prop('disabled', false);
-
-        // modal form 초기화
         $('#companyId').prop('selectedIndex', 0);
-        $('#userId').val('');
-        $('#name').val('');
-        $('#password').val('');
-        $('#email').val('');
-        $('#phone').val('');
         $('#authority').prop('selectedIndex', 0);
+        passwordContainer.hidden = false;
+        passwordEditBtn.hidden = true;
     });
 
     // 사용자 - 수정
@@ -70,24 +67,23 @@ $(document).ready(function() {
         modalCon = true;
         btnMsg = "수정";
         $('#modalBtn').text(btnMsg);
-
-        // 사업자, 사용자ID, 권한, 중복버튼 => 비활성화
+        $('#userForm')[0].reset();
         $('#companyId').prop('disabled', true);
         $('#userId').prop('disabled', true);
         $('#authority').prop('disabled', true);
         $('#duplicateBtn').prop('disabled', true);
+        passwordContainer.hidden = true;
+        passwordEditBtn.hidden = false;
 
         const $userId = selectRow.find('td').eq(3).text();
         // console.log('userId: ' + $userId);
 
-        // 선택된 행에 대한 사용자 정보 불러오기
         $.ajax({
             type: 'GET',
             url: `/system/user/get/${$userId}`,
             contentType: "application/json",
             dataType: 'json',
             success: function(data) {
-                // console.log("사용자 정보 불러오기: ", data);
                 $('#companyId').val(data.companyId || '');
                 $('#userId').val(data.userId || '');
                 $('#name').val(data.name || '');
@@ -244,6 +240,53 @@ $(document).ready(function() {
             $(this).find('.bi-eye-slash').attr('class', 'bi bi-eye');
             passwordField.attr('type', 'password');
         }
+    });
+
+    document.getElementById('passwordEditBtn').addEventListener('click', function () {
+        $('#passwordForm')[0].reset();
+        var editPasswordModal = new bootstrap.Modal(document.getElementById('editPasswordModal'), {
+            backdrop: 'static',
+            keyboard: false
+        });
+        editPasswordModal.show();
+    });
+
+    document.getElementById('passwordModalBtn').addEventListener('click', function () {
+        var editPasswordModal = bootstrap.Modal.getInstance(document.getElementById('editPasswordModal'));
+        const existPassword = $('#existPassword').val();
+        const newPassword = $('#newPassword').val();
+        const newPasswordCheck = $('#newPasswordCheck').val();
+
+        var form = document.getElementById('passwordForm');
+        if (!form.checkValidity()) { 
+            alert('값을 모두 입력해주세요.');
+            return;
+        }
+
+        const DATA = {
+            existPassword: existPassword,
+            newPassword: newPassword,
+            newPasswordCheck: newPasswordCheck
+        }
+        
+        if (!isPasswordSpecial(newPassword)) { return; }
+
+        var userId = $('#userId').val();
+        $.ajax({
+            url: `/system/user/update/password/${userId}`,
+            method: 'PATCH',
+            contentType: 'application/json',
+            data: JSON.stringify(DATA),
+            success: function(response) {
+                if (response.state === 1) {
+                    editPasswordModal.hide();
+                }
+                alert(response.message);
+            },
+            error: function(error) {
+                alert(error);
+            }
+        });
     });
 });
 

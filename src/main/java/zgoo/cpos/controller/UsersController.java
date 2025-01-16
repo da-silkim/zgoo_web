@@ -20,6 +20,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import zgoo.cpos.dto.users.UsersDto;
+import zgoo.cpos.dto.users.UsersDto.UsersPasswordDto;
 import zgoo.cpos.service.UsersService;
 
 @Controller
@@ -137,6 +138,32 @@ public class UsersController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 사용자 정보를 찾을 수 없습니다.");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("사용자 정보 삭제 중 오류 발생");
+        }
+    }
+
+    // 비밀번호 변경
+    @PatchMapping("/update/password/{userId}")
+    public ResponseEntity<Map<String, Object>> updateUsersPassword(@PathVariable("userId") String userId, @RequestBody UsersPasswordDto dto) {
+        log.info("=== update user password info ===");
+
+        Map<String, Object> response = new HashMap<>();
+
+        try {
+            Integer result = this.usersService.updateUsersPasswordInfo(userId, dto);
+
+            switch (result) {
+                case 0-> response.put("message", "현재 비밀번호와 값이 일치하지 않습니다.");
+                case 1 -> response.put("message", "비밀번호가 변경되었습니다.");
+                case 2 -> response.put("message", "새 비밀번호 값이 일치하지 않습니다.");
+                default -> response.put("message", "비밀번호 변경에 실패했습니다.");
+            };
+
+            response.put("state", result);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            log.error("[updateUsersPassword] error: {}", e.getMessage());
+            response.put("message", "비밀번호 변경 중 오류 발생");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
 }

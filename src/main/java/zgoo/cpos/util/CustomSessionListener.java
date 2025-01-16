@@ -1,6 +1,5 @@
 package zgoo.cpos.util;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import jakarta.servlet.http.HttpSession;
@@ -13,7 +12,6 @@ import zgoo.cpos.service.LoginHistService;
 @RequiredArgsConstructor
 public class CustomSessionListener implements HttpSessionListener {
 
-    @Autowired
     private final LoginHistService loginHistService;
 
     @Override

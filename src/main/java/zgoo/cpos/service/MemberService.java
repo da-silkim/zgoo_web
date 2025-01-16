@@ -385,13 +385,13 @@ public class MemberService {
             }
             // 2. 새 비밀번호 == 새 비밀번호 확인 값이 같은지 체크
             if (!dto.getNewPassword().equals(dto.getNewPasswordCheck())) {
-                log.info("[updateMemberPasswordInfo] password change complete");
+                log.info("[updateMemberPasswordInfo] two password values do not match");                
                 return 2;
             }
             // password SHA-256
             dto.setNewPassword(EncryptionUtils.encryptSHA256(dto.getNewPassword()));
             member.updatePasswordInfo(dto.getNewPassword());
-            log.info("[updateMemberPasswordInfo] two password values do not match");
+            log.info("[updateMemberPasswordInfo] password change complete");
             return 1;
         } catch (Exception e) {
             log.error("[updateMemberPasswordInfo] error: {}", e.getMessage());
