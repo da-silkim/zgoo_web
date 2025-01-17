@@ -29,8 +29,8 @@ import zgoo.cpos.dto.cp.CpModelDto.CpModelListDto;
 import zgoo.cpos.dto.cs.CsInfoDto;
 import zgoo.cpos.dto.cs.CsInfoDto.CsInfoListDto;
 import zgoo.cpos.dto.member.MemberDto;
-import zgoo.cpos.dto.member.VocDto;
 import zgoo.cpos.dto.member.MemberDto.MemberListDto;
+import zgoo.cpos.dto.member.VocDto;
 import zgoo.cpos.dto.member.VocDto.VocListDto;
 import zgoo.cpos.dto.menu.CompanyMenuAuthorityDto;
 import zgoo.cpos.dto.menu.MenuAuthorityDto;
@@ -244,6 +244,10 @@ public class PageController {
             Model model) {
 
         log.info("=== Charger List Page ===");
+        log.info("== companyId: {}, page: {}, size: {}", companyId, page, size);
+
+        // TODO: 충전기 등록폼 전달
+
         log.info("== companyId: {}, page: {}, size: {}", companyId, page, size);
 
         // TODO: 충전기 등록폼 전달
@@ -774,7 +778,7 @@ public class PageController {
             model.addAttribute("totalPages", totalPages); // 총 페이지 수
             model.addAttribute("totalCount", vocList.getTotalElements()); // 총 데이터
 
-            List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT");    // 그리드 row 수
+            List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT"); // 그리드 row 수
             model.addAttribute("showListCnt", showListCnt);
             List<CommCdBaseDto> vocTypeList = codeService.commonCodeStringToNum("VOCTYPE"); // 문의유형
             model.addAttribute("vocTypeList", vocTypeList);
