@@ -32,7 +32,7 @@ public class CpInfo {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "station_id")
-    private CsInfo csid;
+    private CsInfo stationId;
 
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "cpmodem_id")
@@ -43,8 +43,6 @@ public class CpInfo {
     private TariffPolicy tariffInfo;
 
     private String chargerName;
-    private String modelCode;
-    private String cpType;
     private String serialNo;
     private String fwVersion;
     private String commonType;
@@ -52,6 +50,7 @@ public class CpInfo {
     private LocalDate installDate;
     private String protocol;
     private String location;
+    private String modelCode;
     private String useYn;
     private String reason;
 }

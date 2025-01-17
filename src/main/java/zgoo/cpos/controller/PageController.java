@@ -71,7 +71,6 @@ public class PageController {
     private final TariffService tariffService;
     private final MemberService memberService;
 
-
     /*
      * 대시보드
      */
@@ -108,7 +107,8 @@ public class PageController {
 
         try {
             // 회원리스트
-            Page<MemberListDto> memberList = this.memberService.findMemberInfoWithPagination(companyId, idTag, name, page, size);
+            Page<MemberListDto> memberList = this.memberService.findMemberInfoWithPagination(companyId, idTag, name,
+                    page, size);
 
             // 검색 조건 저장
             model.addAttribute("selectedCompanyId", companyId);
@@ -123,13 +123,13 @@ public class PageController {
             model.addAttribute("totalPages", totalPages); // 총 페이지 수
             model.addAttribute("totalCount", memberList.getTotalElements()); // 총 데이터
 
-            List<CompanyListDto> companyList = this.companyService.findCompanyListAll();    // 사업자 list
+            List<CompanyListDto> companyList = this.companyService.findCompanyListAll(); // 사업자 list
             model.addAttribute("companyList", companyList);
-            List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT");    // 그리드 row 수
+            List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT"); // 그리드 row 수
             model.addAttribute("showListCnt", showListCnt);
-            List<CommCdBaseDto> memStatList = codeService.commonCodeStringToNum("MEMSTATCD");    // 회원상태코드
+            List<CommCdBaseDto> memStatList = codeService.commonCodeStringToNum("MEMSTATCD"); // 회원상태코드
             model.addAttribute("memStatList", memStatList);
-            List<CommCdBaseDto> bizTypeList = codeService.commonCodeStringToNum("BIZTYPECD");    // 사업자구분코드
+            List<CommCdBaseDto> bizTypeList = codeService.commonCodeStringToNum("BIZTYPECD"); // 사업자구분코드
             model.addAttribute("bizTypeList", bizTypeList);
             List<CommCdBaseDto> creditCardList = codeService.commonCodeStringToNum("CREDITCARDCD"); // 카드사코드
             model.addAttribute("creditCardList", creditCardList);
@@ -234,8 +234,16 @@ public class PageController {
      * 충전기관리 > 충전기리스트
      */
     @GetMapping("/charger/list")
-    public String showchargerlist(Model model) {
+    public String showchargerlist(@RequestParam(value = "companyIdSearch", required = false) Long companyId,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size,
+            Model model) {
+
         log.info("=== Charger List Page ===");
+        log.info("== companyId: {}, page: {}, size: {}", companyId, page, size);
+
+        // TODO: 충전기 등록폼 전달
+
         return "pages/charge/cp_list";
     }
 

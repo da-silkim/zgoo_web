@@ -15,6 +15,13 @@ INSERT INTO menu (menu_url, menu_name, menu_lv, parent_code, menu_code,use_yn, i
 VALUES ('STATION', '충전소관리', '0', null, 'D0000', 'Y', 'fa-solid fa-charging-station font-ico', now(), null);
 INSERT INTO menu (menu_url, menu_name, menu_lv, parent_code, menu_code,use_yn, icon_class, reg_dt, mod_dt)
 VALUES ('/station/list', '충전소리스트', '1', 'D0000', 'D0100', 'Y', null, now(), null);
+
+INSERT INTO menu (menu_url, menu_name, menu_lv, parent_code, menu_code,use_yn, icon_class, reg_dt, mod_dt)
+VALUES ('CHARGER', '충전기관리', '0', null, 'E0000', 'Y', 'fa-solid fa-plug font-ico', now(), null);
+INSERT INTO menu (menu_url, menu_name, menu_lv, parent_code, menu_code,use_yn, icon_class, reg_dt, mod_dt)
+VALUES ('/charger/list', '충전기리스트', '1', 'E0000', 'E0100', 'Y', null, now(), null);
+
+
 INSERT INTO menu (menu_url, menu_name, menu_lv, parent_code, menu_code,use_yn, icon_class, reg_dt, mod_dt)
 VALUES ('CHARGING', '충전현황', '0', null, 'F0000', 'Y', 'fa-solid fa-battery-full', now(), null);
 INSERT INTO menu (menu_url, menu_name, menu_lv, parent_code, menu_code,use_yn, icon_class, reg_dt, mod_dt)
@@ -72,24 +79,26 @@ VALUES
 ('1', '5', 'C0200', 'Y'),
 ('1', '6', 'D0000', 'Y'),
 ('1', '7', 'D0100', 'Y'),
-('1', '8', 'F0000', 'Y'),
-('1', '9', 'F0100', 'Y'),
-('1', '10', 'G0000', 'Y'),
-('1', '11', 'G0100', 'Y'),
-('1', '12', 'G0200', 'Y'),
-('1', '13', 'G0300', 'Y'),
-('1', '14', 'G0400', 'Y'),
-('1', '15', 'G0500', 'Y'),
-('1', '16', 'G0600', 'Y'),
-('1', '17', 'G0700', 'Y'),
-('1', '18', 'G0800', 'Y'),
-('1', '19', 'H0000', 'Y'),
-('1', '20', 'H0100', 'Y'),
-('1', '21', 'I0000', 'Y'),
-('1', '22', 'I0100', 'Y'),
-('1', '23', 'J0000', 'Y'),
-('1', '24', 'J0100', 'Y'),
-('1', '25', 'J0200', 'Y'),
-('1', '26', 'N0000', 'Y'),
-('1', '27', 'N0100', 'Y'),
-('1', '28', 'N0200', 'Y');
+('1', '8', 'E0000', 'Y'),
+('1', '9', 'E0100', 'Y'),
+('1', '10', 'F0000', 'Y'),
+('1', '11', 'F0100', 'Y'),
+('1', '12', 'G0000', 'Y'),
+('1', '13', 'G0100', 'Y'),
+('1', '14', 'G0200', 'Y'),
+('1', '15', 'G0300', 'Y'),
+('1', '16', 'G0400', 'Y'),
+('1', '17', 'G0500', 'Y'),
+('1', '18', 'G0600', 'Y'),
+('1', '19', 'G0700', 'Y'),
+('1', '20', 'G0800', 'Y'),
+('1', '21', 'H0000', 'Y'),
+('1', '22', 'H0100', 'Y'),
+('1', '23', 'I0000', 'Y'),
+('1', '24', 'I0100', 'Y'),
+('1', '25', 'J0000', 'Y'),
+('1', '26', 'J0100', 'Y'),
+('1', '27', 'J0200', 'Y'),
+('1', '28', 'N0000', 'Y'),
+('1', '29', 'N0100', 'Y'),
+('1', '30', 'N0200', 'Y');
