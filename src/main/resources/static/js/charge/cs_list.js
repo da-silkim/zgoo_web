@@ -59,6 +59,7 @@ $(document).ready(function() {
         event.preventDefault();
         modalCon = false;
         btnMsg = "등록";
+        $('#csForm')[0].reset();
         $('#modalBtn').show();
         $('#modalCancel').show();
         $("#modalClose").attr("hidden", true);
@@ -68,42 +69,10 @@ $(document).ready(function() {
         $('#openStartTime').prop('disabled', false);
         $('#openEndTime').prop('disabled', false);
         $('#openingAllTime').prop('checked', false);
-        $('#opStatus').prop('selectedIndex', 2);
+        $('#opStatus').val('OPERATING');
         $('#companyId').prop('disabled', false);
         $('#stationName').prop('disabled', false);
         $('#duplicateBtn').prop('disabled', false);
-
-        // form 초기화
-        $('#companyId').prop('selectedIndex', 0);
-        $('#stationName').val('');
-        $('#stationId').val('');
-        $('#stationType').prop('selectedIndex', 0);
-        $('#facilityType').prop('selectedIndex', 0);
-        $('#asNum').val('');
-        $('#opStatus').prop('selectedIndex', 0);
-        $('#zipCode').val('');
-        $('#address').val('');
-        $('#addressDetail').val('');
-        $('#latitude').val('');
-        $('#longtude').val('');
-        $('#openStartTime').val('');
-        $('#openEndTime').val('');
-        $('#parkingFeeNo').prop('checked', true);
-        $('#institutionName').val('');
-        $('#landType').prop('selectedIndex', 0);
-        $('#staffName').val('');
-        $('#staffPhone').val('');
-        $('#contractDate').val('');
-        $('#startDate').val('');
-        $('#endDate').val('');
-        $('#landUseRate').val('');
-        $('#billDate').val('');
-        $('#kepcoCustNo').val('');
-        $('#openingDate').val('');
-        $('#contPower').val('');
-        $('#rcvCapacityMethod').val('');
-        $('#rcvCapacity').val('');
-        $('#voltageType').val('');
     });
 
     $('#editBtn').on('click', function(event) {

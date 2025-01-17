@@ -154,7 +154,7 @@
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width: 60vw; height: 90vh;">
             <div class="modal-content mh-100 overflow-y-auto scrollbar">
                 <!-- form start -->
-                <form th:object="${csRegDto}">
+                <form id="csForm" th:object="${csRegDto}">
                     <!-- modal body start -->
                     <div class="modal-body">
                         <!-- table:1 start -->
@@ -216,7 +216,7 @@
                                     <td class="w-30">
                                         <select id="opStatus" name="opStatus" class="form-control attr-control" required>
                                             <option th:each="data : ${opStepCd}" th:value="${data.commonCode}"
-                                                    th:text="${data.commonCodeName}" ></option>
+                                                    th:text="${data.commonCodeName}"></option>
                                         </select>
                                     </td>
                                 </tr>
@@ -313,12 +313,11 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="w-20">부지사용료율<b class="required-data">*</b></th>
-                                    <td class="d-flex align-items-center">
+                                    <th class="w-20">부지사용료율(%)<b class="required-data">*</b></th>
+                                    <td>
                                         <input type="number" name="landUseRate" id="landUseRate" class="form-control attr-control" maxlength="3" autocomplete="off">
-                                        <span class="mx-2 flex-shrink-0 font-weight-bold">%</span>
                                     </td>
-                                    <th class="w-20">계산서 발행일<b class="required-data">*</b></th>
+                                    <th class="w-20">계산서 발행일</th>
                                     <td class="w-30">
                                         <input type="date" min="1970-01-01" max="2199-12-31" name="billDate"
                                             id="billDate" class="form-control attr-control" required>
@@ -343,7 +342,7 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="w-20">계약전력<b class="required-data">*</b></th>
+                                    <th class="w-20">계약전력(kW)<b class="required-data">*</b></th>
                                     <td class="d-flex align-items-center">
                                         <input type="number" name="contPower" id="contPower" class="form-control attr-control" required>
                                     </td>
@@ -357,11 +356,11 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="w-20">수전용량</th>
+                                    <th class="w-20">수전용량(kVA)</th>
                                     <td class="w-30">
                                         <input type="number" name="rcvCapacity" id="rcvCapacity" class="form-control attr-control">
                                     </td>
-                                    <th class="w-20">전압종류</th>
+                                    <th class="w-20">가입요금제</th>
                                     <td class="w-30">
                                         <select id="voltageType" name="voltageType" class="form-control attr-control" required>
                                             <option th:value="null">(선택)</option>

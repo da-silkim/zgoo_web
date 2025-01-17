@@ -16,6 +16,10 @@ VALUES ('STATION', '충전소관리', '0', null, 'D0000', 'Y', 'fa-solid fa-char
 INSERT INTO menu (menu_url, menu_name, menu_lv, parent_code, menu_code,use_yn, icon_class, reg_dt, mod_dt)
 VALUES ('/station/list', '충전소리스트', '1', 'D0000', 'D0100', 'Y', null, now(), null);
 INSERT INTO menu (menu_url, menu_name, menu_lv, parent_code, menu_code,use_yn, icon_class, reg_dt, mod_dt)
+VALUES ('CHARGER', '충전기관리', '0', null, 'E0000', 'Y', 'fa-solid fa-plug font-ico', now(), null);
+INSERT INTO menu (menu_url, menu_name, menu_lv, parent_code, menu_code,use_yn, icon_class, reg_dt, mod_dt)
+VALUES ('/charger/list', '충전기리스트', '1', 'E0000', 'E0100', 'Y', null, now(), null);
+INSERT INTO menu (menu_url, menu_name, menu_lv, parent_code, menu_code,use_yn, icon_class, reg_dt, mod_dt)
 VALUES ('CHARGING', '충전현황', '0', null, 'F0000', 'Y', 'fa-solid fa-battery-full', now(), null);
 INSERT INTO menu (menu_url, menu_name, menu_lv, parent_code, menu_code,use_yn, icon_class, reg_dt, mod_dt)
 VALUES ('/charging/list', '실시간 충전 리스트', '1', 'F0000', 'F0100', 'Y', null, now(), null);
@@ -92,4 +96,6 @@ VALUES
 ('1', '25', 'J0200', 'Y'),
 ('1', '26', 'N0000', 'Y'),
 ('1', '27', 'N0100', 'Y'),
-('1', '28', 'N0200', 'Y');
+('1', '28', 'N0200', 'Y'),
+('1', '29', 'E0000', 'Y'),
+('1', '30', 'E0100', 'Y');
