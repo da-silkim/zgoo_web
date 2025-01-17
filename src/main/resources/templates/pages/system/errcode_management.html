@@ -149,6 +149,7 @@
                                     <th class="w-20">제조사<b class="required-data">*</b></th>
                                     <td class="w-30">
                                         <select id="menufCode" name="menufCode" class="form-control" required>
+                                            <option th:value="DFT">없음(공통)</option>
                                             <option th:each="data : ${manfCd}" th:value="${data.commonCode}"
                                                     th:text="${data.commonCodeName}" ></option>
                                         </select>

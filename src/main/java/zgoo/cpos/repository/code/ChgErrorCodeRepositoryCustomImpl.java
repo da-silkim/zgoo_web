@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
@@ -32,7 +33,7 @@ public class ChgErrorCodeRepositoryCustomImpl implements ChgErrorCodeRepositoryC
             errorCode.errName.as("errName"),
             errorCode.menufCode.as("menufCode"),
             errorCode.regDt.as("regDt"),
-            manufCdName.name.as("menufCodeName")))
+            Expressions.stringTemplate("IF({0} = 'DFT', '없음', {1})", errorCode.menufCode, manufCdName.name).as("menufCodeName")))
             .from(errorCode)
             .leftJoin(manufCdName).on(errorCode.menufCode.eq(manufCdName.commonCode))
             .orderBy(errorCode.regDt.desc())
@@ -71,7 +72,7 @@ public class ChgErrorCodeRepositoryCustomImpl implements ChgErrorCodeRepositoryC
             errorCode.errName.as("errName"),
             errorCode.menufCode.as("menufCode"),
             errorCode.regDt.as("regDt"),
-            manufCdName.name.as("menufCodeName")))
+            Expressions.stringTemplate("IF({0} = 'DFT', '없음', {1})", errorCode.menufCode, manufCdName.name).as("menufCodeName")))
             .from(errorCode)
             .leftJoin(manufCdName).on(errorCode.menufCode.eq(manufCdName.commonCode))
             .orderBy(errorCode.regDt.desc())
