@@ -4,7 +4,7 @@
   "settings": {
     "width": 4000,
     "height": 4000,
-    "scrollTop": -300,
+    "scrollTop": -600,
     "scrollLeft": -999,
     "zoomLevel": 1,
     "show": 501,
@@ -6103,11 +6103,11 @@
       "OuIUrW54LmUYKoBpojT4t": {
         "id": "OuIUrW54LmUYKoBpojT4t",
         "tableId": "63hUVVU2kf7EBclIvI9Oi",
-        "name": "cp_type",
+        "name": "max_ch",
         "comment": "",
-        "dataType": "CHAR",
+        "dataType": "INTEGER",
         "default": "",
-        "options": 0,
+        "options": 8,
         "ui": {
           "keys": 0,
           "widthName": 60,
@@ -6116,7 +6116,7 @@
           "widthDefault": 60
         },
         "meta": {
-          "updateAt": 1732505506014,
+          "updateAt": 1736996428857,
           "createAt": 1732505497373
         }
       },
@@ -9354,34 +9354,6 @@
           "createAt": 1732512052715
         }
       },
-      "8xdwMQEexNN0gk0_e2rCS": {
-        "id": "8xdwMQEexNN0gk0_e2rCS",
-        "identification": true,
-        "relationshipType": 16,
-        "startRelationshipType": 2,
-        "start": {
-          "tableId": "63hUVVU2kf7EBclIvI9Oi",
-          "columnIds": [
-            "jXK_m4o3PPdbVakyELt3N"
-          ],
-          "x": 1830,
-          "y": 1026,
-          "direction": 2
-        },
-        "end": {
-          "tableId": "DuQzoVavcfw2Rk4XlTbIq",
-          "columnIds": [
-            "rJs1LNG2hX8Qv5eJqob4x"
-          ],
-          "x": 1911,
-          "y": 929,
-          "direction": 1
-        },
-        "meta": {
-          "updateAt": 1732513347744,
-          "createAt": 1732513347744
-        }
-      },
       "E0YXH5PCRs5cgiJfEkIuB": {
         "id": "E0YXH5PCRs5cgiJfEkIuB",
         "identification": false,
@@ -12040,8 +12012,9 @@
       1732505497372,
       -1,
       {
-        "name": 1732505503465,
-        "dataType": 1732505506014
+        "name": 1736996417364,
+        "dataType": 1736996428122,
+        "options(notNull)": 1736996428856
       }
     ],
     "KEPHUjpj9KjidVdxn3_yl": [
@@ -12454,12 +12427,6 @@
         "comment": 1732513347743,
         "options(primaryKey)": 1736837474656
       }
-    ],
-    "8xdwMQEexNN0gk0_e2rCS": [
-      "relationshipEntities",
-      1732513347743,
-      1736837429852,
-      {}
     ],
     "DGwgVO3CLCDZSrZsYB2Kv": [
       "tableEntities",

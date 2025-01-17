@@ -30,9 +30,6 @@ public class CpStatus {
     private String chargerId;
 
     @Column(nullable = false)
-    private String availability;
-
-    @Column(nullable = false)
     private String connectionYn;
 
     private LocalDateTime lastBootTime;
