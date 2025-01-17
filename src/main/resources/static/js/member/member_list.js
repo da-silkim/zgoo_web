@@ -234,7 +234,7 @@ $(document).ready(function() {
         $('#bizType').prop('selectedIndex', 0);
         $('#bizSearchBtn').prop('disabled', false);
         $('#memLoginId').prop('disabled', false);
-        // $('#idTag').prop('disabled', false);
+        $('#userState').val('MSTNORMAL');
         $('#duplicateMemLoginIdBtn').prop('disabled', false);
         passwordContainer.hidden = false;
         passwordEditBtn.hidden = true;
