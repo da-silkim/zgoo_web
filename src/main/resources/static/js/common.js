@@ -96,7 +96,20 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderMenu(menuList) {
         menuList.forEach(function(menu) {
             if (menu.menuLv === '0' && menu.childCnt === 0 && menu.useYn === 'Y' && menu.menuUrl.startsWith("/")) {
-                const parentMenuHtml = `
+                var parentMenuHtml = '';
+                if (menu.menuUrl === '/map') {
+                    parentMenuHtml = `
+                    <li class="nav-menu list-hover">
+                            <a href="#" onclick="openMap('${menu.menuUrl}')">
+                                <span class="nav-list">
+                                    <i class="${menu.iconClass}"></i>
+                                    <span class="nav-list-txt">${menu.menuName}</span>
+                                </span>
+                            </a>
+                        </li>
+                    `;
+                } else {
+                    parentMenuHtml = `
                     <li class="nav-menu list-hover">
                         <a href="${menu.menuUrl}">
                             <span class="nav-list">
@@ -106,6 +119,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         </a>
                     </li>
                 `;
+                }
+                
                 $('#menuContainer').append(parentMenuHtml);
             } else if (menu.menuLv === '0' && menu.childCnt != 0 && menu.useYn === 'Y' && !menu.menuUrl.startsWith("/")) {
                 const parentMenuHtml = `
@@ -402,4 +417,8 @@ function isPasswordSpecial(asValue) {
     }
 
 	return result;
+}
+
+function openMap(menuUrl) {
+    window.open(menuUrl, '/map', 'mapPopup', 'width=600,height=400,scrollbars=yes,resizable=yes');
 }
