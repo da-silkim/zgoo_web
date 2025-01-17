@@ -28,6 +28,7 @@ public class CpModelDto {
         private String manufCd;
         private String installationType;
         private String cpType;
+        private String dualYn;
         private LocalDateTime regDt;
     }
 

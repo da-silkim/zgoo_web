@@ -157,7 +157,7 @@
         data-bs-backdrop="static" data-bs-keyboard="false">
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width: 60vw; height: 90vh;">
             <div class="modal-content mh-100 overflow-y-auto scrollbar">
-                <form th:object="${cpModelDto}">
+                <form id="cpModelForm" th:object="${cpModelDto}">
                     <!-- modal body start -->
                     <div class="modal-body">
                         <!-- table:1 start -->
@@ -203,6 +203,17 @@
                                             <option th:each="data : ${chgTypeCd}" th:value="${data.commonCode}"
                                                     th:text="${data.commonCodeName}" ></option>
                                         </select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="w-20">듀얼채널여부<b class="required-data">*</b></th>
+                                    <td colspan="3">
+                                        <div class="display-radio">
+                                            <input type="radio" name="dualYn" id="dualYes" class="attr-control" value="Y">
+                                            <label for="dualYes">Y</label>
+                                            <input type="radio" name="dualYn" id="dualNo" class="attr-control" value="N" checked>
+                                            <label for="dualNo">N</label>
+                                        </div>
                                     </td>
                                 </tr>
                             </tbody>

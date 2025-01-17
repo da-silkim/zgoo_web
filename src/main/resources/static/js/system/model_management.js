@@ -42,50 +42,12 @@ $(document).ready(function() {
         modalCon = false;
         btnMsg = "등록";
         $('#modalBtn').text(btnMsg);
+        $('#cpModelForm')[0].reset();
         $('#collapseOne').collapse('hide');
-        // form 초기화
         $('#manufCd').prop('selectedIndex', 0);
-        $('#powerUnit').val('');
-        $('#modelName').val('');
-        $('#modelCode').val('');
         $('#cpType').prop('selectedIndex', 0);
         $('#installationType').prop('selectedIndex', 0);
         $('#connectorTable tbody').empty();
-        addRow();
-        $('#inputVoltage').val('');
-        $('#inputFrequency').val('');
-        $('#inputType').val('');
-        $('#inputCurr').val('');
-        $('#inputPower').val('');
-        $('#powerFactor').val('');
-        $('#outputVoltage').val('');
-        $('#maxOutputCurr').val('');
-        $('#ratedPower').val('');
-        $('#peakEfficiency').val('');
-        $('#thdi').val('');
-        $('#grdType').val('');
-        $('#opAltitude').val('');
-        $('#opTemperature').val('');
-        $('#temperatureDerating').val('');
-        $('#storageTemperatureRange').val('');
-        $('#humidity').val('');
-        $('#dimensions').val('');
-        $('#ipNIk').val('');
-        $('#weight').val('');
-        $('#material').val('');
-        $('#cableLength').val('');
-        $('#screen').val('');
-        $('#rfid').val('');
-        $('#emergencyBtn').val('');
-        $('#communicationInterface').val('');
-        $('#lang').val('');
-        $('#coolingMethod').val('');
-        $('#emc').val('');
-        $('#protection').val('');
-        $('#opFunc').val('');
-        $('#standard').val('');
-        $('#powerModule').val('');
-        $('#charger').val('');
     });
 
     $('#editBtn').on('click', function(event) {
@@ -93,6 +55,7 @@ $(document).ready(function() {
         modalCon = true;
         btnMsg = "수정";
         $('#modalBtn').text(btnMsg);
+        $('#cpModelForm')[0].reset();
         $('#collapseOne').collapse('hide');
         modelId = selectRow.find('td').eq(0).attr('id');
         $.ajax({
@@ -107,6 +70,12 @@ $(document).ready(function() {
                 $('#modelCode').val(data.modelCode || '');
                 $('#cpType').val(data.cpType || '');
                 $('#installationType').val(data.installationType || '');
+
+                if (data.dualYn === 'Y') {
+                    $('#dualYes').prop('checked', true);
+                } else {
+                    $('#dualNo').prop('checked', true);
+                }
 
                 const tableBody = document.querySelector("#connectorTable tbody");
                 tableBody.innerHTML = "";
@@ -204,10 +173,9 @@ $(document).ready(function() {
 
         const connectorInfoList = getConnectorList();
 
-        // connectorInfoList가 null이면 유효성 검사 실패
         if (!connectorInfoList) {
             alert("모든 Connector ID는 필수 항목입니다. 값을 입력해주세요.");
-            return;  // Ajax 요청을 중단
+            return;
         }
 
         if (confirmSubmit(btnMsg)) {
@@ -218,6 +186,7 @@ $(document).ready(function() {
                 modelCode: $('#modelCode').val(),
                 cpType: $('#cpType').val(),
                 installationType: $('#installationType').val(),
+                dualYn: $('input[name="dualYn"]:checked').val(),
                 connector: getConnectorList(),
                 inputVoltage: $('#inputVoltage').val(),
                 inputFrequency: $('#inputFrequency').val(),
@@ -277,18 +246,17 @@ $(document).ready(function() {
     function getConnectorList() {
         const connectorRows = document.querySelectorAll("#connectorTable .connector-row");
         const connectorInfoList = [];
-        var isValid = true;  // 유효성 플래그
+        var isValid = true;
 
         connectorRows.forEach(row => {
             const connectorId = row.querySelector(".connectorId").value;
             const connectorType = row.querySelector(".connectorType").value;
 
             if (!connectorId || connectorId.trim() === "") {
-                isValid = false;  // 유효하지 않음
-                return;  // 더 이상 진행하지 않고 루프를 중단함
+                isValid = false;
+                return;
             }
 
-            // 각 행의 데이터를 객체로 추가
             connectorInfoList.push({
                 connectorId: connectorId,
                 connectorType: connectorType
@@ -296,7 +264,7 @@ $(document).ready(function() {
         });
 
         if (!isValid) {
-            return null;  // 유효하지 않으면 null 반환
+            return null;
         }
 
         console.log("커넥터 정보:", connectorInfoList);

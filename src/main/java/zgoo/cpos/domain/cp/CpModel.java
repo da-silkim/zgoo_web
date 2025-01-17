@@ -32,13 +32,13 @@ public class CpModel {
     @Column(name = "model_id")
     private Long id;
 
-    @Column(name = "model_code")
+    @Column(name = "model_code", nullable = false)
     private String modelCode;
 
     @Column(name = "model_name")
     private String modelName;
 
-    @Column(name = "manuf_cd")
+    @Column(name = "manuf_cd", nullable = false)
     private String manufCd;
 
     @Column(name = "power_unit")
@@ -47,7 +47,7 @@ public class CpModel {
     @Column(name = "installation_type")
     private String installationType;
 
-    @Column(name = "cp_type")
+    @Column(name = "cp_type", nullable = false)
     private String cpType;
 
     @Column(name = "reg_dt")
@@ -55,6 +55,9 @@ public class CpModel {
 
     @Column(name = "mod_dt")
     private LocalDateTime modDt;
+
+    @Column(name = "dual_yn", nullable = false)
+    private String dualYn;
 
     @Column(name = "user_id")
     private String userId;
@@ -70,6 +73,7 @@ public class CpModel {
         this.powerUnit = dto.getPowerUnit();
         this.installationType = dto.getInstallationType();
         this.cpType = dto.getCpType();
+        this.dualYn = dto.getDualYn();
         this.modDt = LocalDateTime.now();
     }
 }

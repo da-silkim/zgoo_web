@@ -24,6 +24,7 @@ public class CpModelMapper {
                 .powerUnit(dto.getPowerUnit())
                 .installationType(dto.getInstallationType())
                 .cpType(dto.getCpType())
+                .dualYn(dto.getDualYn())
                 .regDt(LocalDateTime.now())
                 .userId(dto.getUserId())
                 .build();
