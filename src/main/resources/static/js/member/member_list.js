@@ -25,7 +25,7 @@ $(document).ready(function() {
                 var bizSearchList = document.getElementById('bizSearchList');
                 bizSearchList.innerHTML = '';
                 if (response.bizList.length === 0) {
-                    bizSearchList.innerHTML = '<tr><td colspan="3">등록된 데이터가 없습니다.</td></tr>';
+                    bizSearchList.innerHTML = '<tr><td colspan="3">조회된 데이터가 없습니다.</td></tr>';
                     return;
                 }
 
@@ -236,6 +236,8 @@ $(document).ready(function() {
         $('#memLoginId').prop('disabled', false);
         $('#userState').val('MSTNORMAL');
         $('#duplicateMemLoginIdBtn').prop('disabled', false);
+        $('#bizNameSearch').val('');
+        document.getElementById('bizSearchList').innerHTML = '<tr><td colspan="3">조회된 데이터가 없습니다.</td></tr>';
         passwordContainer.hidden = false;
         passwordEditBtn.hidden = true;
     });

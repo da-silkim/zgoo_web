@@ -19,7 +19,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import zgoo.cpos.domain.users.Users;
-import zgoo.cpos.dto.member.VocDto.VocAnswerDto;
+import zgoo.cpos.dto.member.VocDto.VocRegDto;
 import zgoo.cpos.domain.member.Member;
 
 @Table(name = "VOC")
@@ -65,17 +65,20 @@ public class Voc {
     @Column(name = "channel")
     private String channel;
 
+    @Column(name = "reg_user_id")
+    private String regUserId;
+
+    @Column(name = "reply_user_id")
+    private String replyUserId;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private Users user;
-
-    public void updateVocAnswer(VocAnswerDto dto) {
+    public void updateVocAnswer(VocRegDto dto) {
         this.replyStat = dto.getReplyStat();
         this.replyContent = dto.getReplyContent();
+        this.replyUserId = dto.getReplyUserId();
         this.replyDt = LocalDateTime.now();
     }
 }

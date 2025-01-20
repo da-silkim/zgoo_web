@@ -748,7 +748,7 @@ public class PageController {
             @RequestParam(value = "size", defaultValue = "10") int size,
             Model model) {
         log.info("=== VOC List Page ===");
-        model.addAttribute("vocAnswerDto", new VocDto.VocAnswerDto());
+        model.addAttribute("vocRegDto", new VocDto.VocRegDto());
 
         try {
             Page<VocListDto> vocList = this.vocService.findVocInfoWithPagination(type, replyStat, name, page, size);
@@ -784,6 +784,7 @@ public class PageController {
             model.addAttribute("showListCnt", Collections.emptyList());
             model.addAttribute("vocTypeList", Collections.emptyList());
             model.addAttribute("vocStatList", Collections.emptyList());
+            model.addAttribute("vocPathList", Collections.emptyList());
         }
 
         return "pages/customer/voc";

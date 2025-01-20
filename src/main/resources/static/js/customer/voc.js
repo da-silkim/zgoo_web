@@ -1,11 +1,18 @@
 $(document).ready(function() {
-    let selectRow;
+    let modalCon = false, selectRow;
     var vocId;
 
     $(document).on('dblclick', '#vocTable tbody tr', function() {
         selectRow = $(this);
+        modalCon = true;
         vocId = selectRow.find('td').eq(0).attr('id');
         
+        $('#vocForm')[0].reset();
+        $('#type').prop('disabled', true);
+        $('#title').prop('disabled', true);
+        $('#memSearchBtn').hide();
+        $('#content').attr('readonly', true);
+
         const modal = new bootstrap.Modal(document.getElementById('dataAddModal'));
         modal.show();
 
@@ -18,7 +25,7 @@ $(document).ready(function() {
                 if (data.vocInfo && Object.keys(data.vocInfo).length !== 0) {
                     $('#vocId').val(data.vocInfo.vocId || '');
                     $('#channelName').val(data.vocInfo.channelName || '');
-                    $('#typeName').val(data.vocInfo.typeName || '');
+                    $('#type').val(data.vocInfo.type || '');
                     $('#phoneNo').val(data.vocInfo.phoneNo || '');
                     $('#regDt').val(formatDate(new Date(data.vocInfo.regDt)) || '');
                     $('#name').val(data.vocInfo.name || '');
@@ -63,23 +70,54 @@ $(document).ready(function() {
                                "&nameSearch=" + selectedName;
     });
 
+    $('#addBtn').on('click', function(event) {
+        event.preventDefault();
+        modalCon = false;
+
+        $('#vocForm')[0].reset();
+        $('#type').prop('disabled', false);
+        $('#title').prop('disabled', false);
+        $('#memName').val('');
+        $('#memPhone').val('');
+        $('#memSearchBtn').show();
+        $('#content').removeAttr('readonly');
+        document.getElementById('memSearchList').innerHTML = '<tr><td colspan="4">조회된 데이터가 없습니다.</td></tr>';
+    });
+
     $('#modalBtn').on('click', function(event) {
         event.preventDefault();
 
+
         const replyContent = $('#replyContent').val();
-        if (!replyContent || replyContent.trim() === "") {
-            alert("답변을 입력해주세요.");
-            return;
+        if (modalCon) {
+            if (!replyContent || replyContent.trim() === "") {
+                alert("답변을 입력해주세요.");
+                return;
+            }
+        } else {
+            const memberId = $('#memberId').val();
+            if (!memberId) {
+                alert("회원정보를 검색해주세요.");
+                return;
+            }
         }
+        
 
         if(confirmSubmit("저장")) {
             const DATA = {
+                memberId: $('#memberId').val(),
+                type: $('#type').val(),
+                title: $('#title').val(),
+                content: $('#content').val(),
                 replyContent: replyContent
             }
 
+            const URL = modalCon ? `/voc/update/${vocId}` : '/voc/new/call';
+            const TYPE = modalCon ? 'PATCH' : 'POST';
+
             $.ajax({
-                type: 'PATCH',
-                url: `/voc/update/${vocId}`,
+                type: TYPE,
+                url: URL,
                 data: JSON.stringify(DATA),
                 contentType: "application/json",
                 success: function(response) {
@@ -90,6 +128,78 @@ $(document).ready(function() {
                     alert(error);
                 }
             });
+        }
+    });
+    
+    $('#memSearchModal').on('show.bs.modal', function () {
+        $('#dataAddModal .modal-content').addClass('blur-background');
+    });
+
+    $('#memSearchModal').on('hidden.bs.modal', function () {
+        $('#dataAddModal .modal-content').removeClass('blur-background');
+    });
+    
+    $('#memSearchBtn').on('click', function() {
+        var memSearchModal = new bootstrap.Modal(document.getElementById('memSearchModal'), {
+            backdrop: 'static',
+            keyboard: false
+        });
+        memSearchModal.show();
+    });
+
+    $('#memInfoSearchBtn').on('click', function() {
+        $.ajax({
+            url: `/voc/search/member`,
+            method: 'GET',
+            data: {
+                memName: $('#memName').val(),
+                memPhone: $('#memPhone').val()
+            },
+            success: function(response) {
+                var memSearchList = document.getElementById('memSearchList');
+                memSearchList.innerHTML = '';
+                if (response.memberList.length === 0) {
+                    memSearchList.innerHTML = '<tr><td colspan="4">조회된 데이터가 없습니다.</td></tr>';
+                    return;
+                }
+
+                response.memberList.forEach(function (mem) {
+                    var row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td id='${mem.memberId}'>${mem.name}</td>
+                        <td>${mem.phoneNo}</td>
+                        <td>${mem.idTag}</td>
+                        <td><button type="button" class="btn btn-outline-grey select-mem-btn" data-member-id="${mem.memberId}">선택</button></td>
+                    `;
+                    memSearchList.appendChild(row);
+                });
+            },
+            error: function(xhr) {
+                var response = JSON.parse(xhr.responseText);
+                alert(response.message);
+            }
+        });
+    });
+
+    $('#memSearchList').on('click', function(e) {
+        if (e.target.classList.contains('select-mem-btn')) {
+            var memberId = e.target.getAttribute('data-member-id');
+            $.ajax({
+                url: `/member/get/${memberId}`,
+                method: 'GET',
+                contentType: 'application/json',
+                dataType: 'json',
+                success: function(response) {
+                    $('#memberId').val(response.memberInfo.memberId || '');
+                    $('#name').val(response.memberInfo.name || '');
+                    $('#phoneNo').val(response.memberInfo.phoneNo || '');
+                },
+                error: function(error) {
+                    alert(error);
+                }
+            });
+            var memSearchModal = bootstrap.Modal.getInstance(document.getElementById('memSearchModal'));
+            memSearchModal.hide();
         }
     });
 });
