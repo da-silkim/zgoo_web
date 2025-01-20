@@ -261,4 +261,41 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
 
         return memberDetailDto;
     }
+
+    @Override
+    public List<MemberListDto> findMemberList(String name, String phoneNo) {
+        BooleanBuilder builder = new BooleanBuilder();
+
+        if (name != null && !name.isEmpty()) {
+            builder.and(member.name.contains(name));
+        }
+
+        if (phoneNo != null && !phoneNo.isEmpty()) {
+            builder.and(member.phoneNo.contains(phoneNo));
+        }
+
+        List<MemberListDto> memberList = queryFactory.select(Projections.fields(MemberListDto.class,
+            member.id.as("memberId"),
+            member.bizType.as("bizType"),
+            member.name.as("name"),
+            member.phoneNo.as("phoneNo"),
+            member.memLoginId.as("memLoginId"),
+            member.idTag.as("idTag"),
+            member.userState.as("userState"),
+            member.email.as("email"),
+            member.birth.as("birth"),
+            member.zipCode.as("zipCode"),
+            member.address.as("address"),
+            member.addressDetail.as("addressDetail"),
+            company.id.as("companyId"),
+            company.companyName.as("companyName"),
+            bizTypeName.name.as("bizTypeName")))
+            .from(member)
+            .leftJoin(company).on(member.company.eq(company))
+            .leftJoin(bizTypeName).on(member.bizType.eq(bizTypeName.commonCode))
+            .where(builder)
+            .fetch();
+
+        return memberList;
+    }
 }

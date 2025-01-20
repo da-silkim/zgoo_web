@@ -207,3 +207,14 @@ table.table tbody tr.row-selected { background-color: #3D3B40 !important; color:
 .password-content .modal-body > div:nth-child(2) { margin-top: 1rem !important; margin-bottom: 1rem !important; }
 .password-content .modal-body > div:nth-child(3) { padding: 2rem 4rem; border-top: 2px solid grey; border-bottom: 1px solid grey; }
 .blur-background { filter: blur(1px); transition: filter 0.3s; }
+
+.biz-search-content, .mem-search-content { min-height: 76vh; }
+.biz-search-content .modal-body, .mem-search-content .modal-body { padding-bottom: 60px; position: relative; }
+.biz-search-content .modal-body > div:nth-child(2) { margin-top: 1rem !important; margin-bottom: 3rem !important; display: flex !important; align-items: center !important; }
+.biz-search-content .modal-body > div:nth-child(2) > input { width: 500px; }
+.biz-search-content .modal-body span:nth-of-type(1), .mem-search-content .modal-body span:nth-of-type(1) { font-size: 18px; font-weight: 600; }
+#bizTable, #memTable { text-align: center !important;}
+#bizTable tbody tr td, #memTable tbody tr td { vertical-align: middle; }
+#bizModalBtn, #memModalBtn { position: absolute; bottom: 0; left: 50%; transform: translateY(-35%); }
+#memSearchBtn, #memInfoSearchBtn { position: absolute; right: 0; top: -6px; }
+.small-font { font-weight: 300; font-size: small; }

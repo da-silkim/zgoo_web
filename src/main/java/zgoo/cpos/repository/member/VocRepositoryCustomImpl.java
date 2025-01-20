@@ -17,7 +17,7 @@ import zgoo.cpos.domain.company.QCompany;
 import zgoo.cpos.domain.member.QMember;
 import zgoo.cpos.domain.member.QVoc;
 import zgoo.cpos.domain.users.QUsers;
-import zgoo.cpos.dto.member.VocDto.VocAnswerDto;
+import zgoo.cpos.dto.member.VocDto.VocRegDto;
 import zgoo.cpos.dto.member.VocDto.VocListDto;
 
 @Slf4j
@@ -48,9 +48,10 @@ public class VocRepositoryCustomImpl implements VocRepositoryCustom {
             .from(voc)
             .leftJoin(member).on(voc.member.eq(member))
             .leftJoin(member).on(voc.member.id.eq(member.id))
-            .leftJoin(user).on(voc.user.eq(user))
             .leftJoin(typeName).on(voc.type.eq(typeName.commonCode))
             .leftJoin(replyStatName).on(voc.replyStat.eq(replyStatName.commonCode))
+            .where(voc.delYn.eq("N"))
+            .orderBy(voc.regDt.desc())
             .offset(pageable.getOffset())
             .limit(pageable.getPageSize())
             .fetch();
@@ -66,6 +67,7 @@ public class VocRepositoryCustomImpl implements VocRepositoryCustom {
     @Override
     public Page<VocListDto> searchVocWithPagination(String type, String replyStat, String name, Pageable pageable) {
         BooleanBuilder builder = new BooleanBuilder();
+        builder.and(voc.delYn.eq("N"));
 
         if (type != null && !type.isEmpty()) {
             builder.and(voc.type.contains(type));
@@ -92,7 +94,6 @@ public class VocRepositoryCustomImpl implements VocRepositoryCustom {
             replyStatName.name.as("replyStatName")))
             .from(voc)
             .leftJoin(member).on(voc.member.eq(member))
-            .leftJoin(user).on(voc.user.eq(user))
             .leftJoin(typeName).on(voc.type.eq(typeName.commonCode))
             .leftJoin(replyStatName).on(voc.replyStat.eq(replyStatName.commonCode))
             .where(builder)
@@ -112,8 +113,8 @@ public class VocRepositoryCustomImpl implements VocRepositoryCustom {
     }
 
     @Override
-    public VocAnswerDto findVocOne(Long vocId) {
-        VocAnswerDto vocDto = queryFactory.select(Projections.fields(VocAnswerDto.class,
+    public VocRegDto findVocOne(Long vocId) {
+        VocRegDto vocDto = queryFactory.select(Projections.fields(VocRegDto.class,
             voc.id.as("vocId"),
             voc.type.as("type"),
             voc.title.as("title"),
@@ -126,8 +127,7 @@ public class VocRepositoryCustomImpl implements VocRepositoryCustom {
             member.phoneNo.as("phoneNo"),
             typeName.name.as("typeName"),
             replyStatName.name.as("replyStatName"),
-            channelName.name.as("channelName")
-            ))
+            channelName.name.as("channelName")))
             .from(voc)
             .leftJoin(member).on(voc.member.eq(member))
             .leftJoin(typeName).on(voc.type.eq(typeName.commonCode))

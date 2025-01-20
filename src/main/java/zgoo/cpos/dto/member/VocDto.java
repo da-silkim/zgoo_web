@@ -18,12 +18,18 @@ public class VocDto {
     @EqualsAndHashCode
     @NoArgsConstructor
     public static class VocBaseDto {
-        private Long memberId;
-        private Long userId;
         private Long vocId;
+        private Long userId;
+        private Long memberId;
+        private String name;
+        private String type;
         private String title;
+        private String phoneNo;
         private String content;
         private String replyStat;
+        private LocalDateTime regDt;
+        private LocalDateTime replyDt;
+
     }
 
     @Data
@@ -33,11 +39,7 @@ public class VocDto {
     @ToString(callSuper = true)
     public static class VocListDto extends VocBaseDto {
         private String typeName;
-        private String name;
-        private String phoneNo;
         private String replyStatName;
-        private LocalDateTime regDt;
-        private LocalDateTime replyDt;
     }
 
     @Data
@@ -47,19 +49,11 @@ public class VocDto {
     @EqualsAndHashCode(callSuper = true)
     @ToString(callSuper = true)
     public static class VocRegDto extends VocBaseDto {
-        private String type;
         private String delYn;
         private String channel;
-    }
-
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @SuperBuilder(toBuilder = true)
-    @EqualsAndHashCode(callSuper = true)
-    @ToString(callSuper = true)
-    public static class VocAnswerDto extends VocListDto {
         private String channelName;
         private String replyContent;
+        private String regUserId;
+        private String replyUserId;
     }
 }

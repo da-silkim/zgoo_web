@@ -27,4 +27,7 @@ public interface MemberRepositoryCustom {
     // 회원 상세 조회
     MemberDetailDto findMemberDetailOne(Long memberId, List<MemberCreditCardDto> cardInfo, List<MemberCarDto> carInfo, List<MemberConditionDto> conditionInfo);
     MemberDetailDto findBizMemberDetailOne(Long memberId, List<MemberCarDto> carInfo, List<MemberConditionDto> conditionInfo);
+
+    // 회원정보 검색(1:1문의에서 사용)
+    List<MemberListDto> findMemberList(String name, String phoneNo);
 }
