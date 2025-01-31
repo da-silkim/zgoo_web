@@ -46,6 +46,11 @@ INSERT INTO menu (menu_url, menu_name, menu_lv, parent_code, menu_code,use_yn, i
 VALUES ('/system/errcode/list', '에러코드 관리', '1', 'G0000', 'G0700','Y',  null,  now(), null);
 INSERT INTO menu (menu_url, menu_name, menu_lv, parent_code, menu_code,use_yn, icon_class, reg_dt, mod_dt)
 VALUES ('/system/tariff/list', '요금제 관리', '1', 'G0000', 'G0800','Y',  null,  now(), null);
+
+
+INSERT INTO menu (menu_url, menu_name, menu_lv, parent_code, menu_code,use_yn, icon_class, reg_dt, mod_dt)
+VALUES ('/system/condition', '약관관리', '1', 'G0000', 'G0900','Y',  null,  now(), null);
+
 INSERT INTO menu (menu_url, menu_name, menu_lv, parent_code, menu_code,use_yn, icon_class, reg_dt, mod_dt)
 VALUES ('MAINTENANCE', '유지보수', '0', null, 'H0000', 'Y', 'fa-solid fa-wrench font-ico', now(), null);
 INSERT INTO menu (menu_url, menu_name, menu_lv, parent_code, menu_code,use_yn, icon_class, reg_dt, mod_dt)
@@ -92,13 +97,14 @@ VALUES
 ('1', '18', 'G0600', 'Y'),
 ('1', '19', 'G0700', 'Y'),
 ('1', '20', 'G0800', 'Y'),
-('1', '21', 'H0000', 'Y'),
-('1', '22', 'H0100', 'Y'),
-('1', '23', 'I0000', 'Y'),
-('1', '24', 'I0100', 'Y'),
-('1', '25', 'J0000', 'Y'),
-('1', '26', 'J0100', 'Y'),
-('1', '27', 'J0200', 'Y'),
-('1', '28', 'N0000', 'Y'),
-('1', '29', 'N0100', 'Y'),
-('1', '30', 'N0200', 'Y');
+('1', '21', 'G0900', 'Y'),
+('1', '22', 'H0000', 'Y'),
+('1', '23', 'H0100', 'Y'),
+('1', '24', 'I0000', 'Y'),
+('1', '25', 'I0100', 'Y'),
+('1', '26', 'J0000', 'Y'),
+('1', '27', 'J0100', 'Y'),
+('1', '28', 'J0200', 'Y'),
+('1', '29', 'N0000', 'Y'),
+('1', '30', 'N0100', 'Y'),
+('1', '31', 'N0200', 'Y');

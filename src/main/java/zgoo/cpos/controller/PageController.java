@@ -730,6 +730,15 @@ public class PageController {
         return "pages/system/tariff_management";
     }
 
+    /* 
+     * 시스템 > 약관관리
+     */
+    @GetMapping("/system/condition")
+    public String showcondition(Model model) {
+        log.info("=== Condition List Page ===");
+        return "pages/system/condition_management";
+    }
+
     /*
      * 유지보수 > 장애관리
      */

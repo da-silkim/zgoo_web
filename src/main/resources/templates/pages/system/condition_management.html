@@ -1,0 +1,217 @@
+<html layout:decorate="~{fragments/layout}">
+<div layout:fragment="content" class="main-content">
+    <!-- card:1 start -->
+    <div class="card responsive-content">
+        <!-- card body:1 start -->
+        <div class="card-body">
+            <div class="content-title"><i class="fa-solid fa-gear font-ico me-2"></i>시스템 > 약관 관리</div>
+            <!-- card:2 start -->
+            <div class="card card-shadow mt-4">
+                <!-- card body:2 start -->
+                <div class="card-body">
+                    <div class="card-title title-btn-area">
+                        <span class="card-title-bar"></span><span>약관</span>
+                        <div>
+                            <button class="btn btn-data-add" id="addBtn" data-bs-toggle="modal"
+                                data-bs-target="#conAddModal">
+                                <i class="bi bi-plus-square me-2"></i>등록</button>
+                            <button class="btn btn-data-edit" id="editBtn" data-bs-toggle="modal"
+                                data-bs-target="#conAddModal" disabled><i
+                                    class="fa-regular fa-pen-to-square me-2"></i>수정</button>
+                            <button class="btn btn-data-delete" id="deleteBtn" disabled><i
+                                    class="bi bi-trash me-2"></i>삭제</button>
+                        </div>
+                    </div>
+                    <div class="table-responsive scroll-table-container">
+                        <table class="table text-center table-bg table-hover">
+                            <thead>
+                                <tr>
+                                    <th class="w-5"></th>
+                                    <th class="w-15">필수여부</th>
+                                    <th class="w-30">약관명</th>
+                                    <th class="w-25">약관코드</th>
+                                    <th class="w-25">수정일시</th>
+                                </tr>
+                            </thead>
+                            <tbody id="pageList">
+                                <tr>
+                                    <td><input type="checkbox"/> </td>
+                                    <td>필수</td>
+                                    <td>개인정보 처리 방침</td>
+                                    <td>X0001</td>
+                                    <td>2025-01-31</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <!-- card body:2 end -->
+            </div>
+            <!-- card:2 end -->
+            <!-- card:3 start -->
+            <div class="card card-shadow mt-4">
+                <!-- card body:3 start -->
+                <div class="card-body">
+                    <div class="card-title title-btn-area">
+                        <span class="card-title-bar"></span><span>약관 개정 히스토리</span>
+                        <div>
+                            <button class="btn btn-data-add" id="addBtnSub" data-bs-toggle="modal"
+                                data-bs-target="#conHistAddModal" disabled>
+                                <i class="bi bi-plus-square me-2"></i>등록</button>
+                            <button class="btn btn-data-edit" id="editBtnSub" data-bs-toggle="modal"
+                                data-bs-target="#conHistAddModal" disabled><i
+                                    class="fa-regular fa-pen-to-square me-2"></i>수정</button>
+                            <button class="btn btn-data-delete" id="deleteBtnSub" disabled><i
+                                    class="bi bi-trash me-2"></i>삭제</button>
+                        </div>
+                    </div>
+                    <div class="table-responsive scroll-table-container">
+                        <table class="table text-center table-bg table-hover" style="min-width: 1220px;">
+                            <thead>
+                                <tr>
+                                    <th class="w-5"></th>
+                                    <th class="w-10"></th>
+                                    <th class="w-20">수정일시</th>
+                                    <th class="w-20">적용일시</th>
+                                    <th class="w-15">버전</th>
+                                    <th class="w-30">메모</th>
+                                </tr>
+                            </thead>
+                            <tbody id="pageListSub">
+                                <tr>
+                                    <td colspan="6">약관 선택 시 조회됩니다.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <!-- card body:3 end -->
+            </div>
+            <!-- card:3 end -->
+        </div>
+        <!-- card body:1 end -->
+    </div>
+    <!-- card:1 end -->
+
+    <!-- Condition Add Modal start -->
+    <div class="modal fade" id="conAddModal" tabindex="-1" aria-labelledby="conAddModalLabel" data-bs-backdrop="static"
+        data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width: 60vw; height: 90vh;">
+            <div class="modal-content mh-100 overflow-y-auto scrollbar">
+                <!-- modal body start -->
+                <div class="modal-body">
+                    <form>
+                        <!-- 모달 내용 -->
+                        <!-- table: start -->
+                        <div class="modal-title mb-2"><span class="modal-title-bar"></span><span>약관 정보</span></div>
+                        <table class="table table-bg-v table-fixed w-100 text-center align-middle">
+                            <tbody>
+                                <tr class="table-border-top">
+                                    <th class="w-20">필수여부<b class="required-data">*</b></th>
+                                    <td class="w-30">
+                                        <div class="display-radio">
+                                            <input type="radio" name="sectionYn" id="sectionYes" class="attr-control" value="Y" checked>
+                                            <label for="sectionYes">필수</label>
+                                            <input type="radio" name="sectionYn" id="sectionNo" class="attr-control" value="N">
+                                            <label for="sectionNo">선택</label>
+                                        </div>
+                                    </td>
+                                    <th class="w-20">약관코드<b class="required-data">*</b></th>
+                                    <td class="w-30">
+                                        <input type="text" name="conditionCode" id="conditionCode" class="form-control"
+                                            placeholder="약관코드를 입력해주세요." autocomplete="off" required>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>약관명<b class="required-data">*</b></th>
+                                    <td colspan="3">
+                                        <input type="text" name="conditionName" id="conditionName" class="form-control"
+                                            placeholder="약관명을 입력해주세요." autocomplete="off" required>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <!-- table: end -->
+                        <div class="modal-footer justify-content-center border-top-none">
+                            <button type="button" class="btn btn-outline-grey me-2" data-bs-dismiss="modal">취소</button>
+                            <button type="submit" id="modalBtn" class="btn btn-data-add">등록</button>
+                        </div>
+                    </form>
+                </div>
+                <!-- modal body end -->
+            </div>
+            <!-- modal content end -->
+        </div>
+        <!-- modal dialog end -->
+    </div>
+    <!-- Condition Add Modal end -->
+
+    <!-- Condition Hist Add Modal start -->
+    <div class="modal fade" id="conHistAddModal" tabindex="-1" aria-labelledby="conHistAddModalLabel"
+        data-bs-backdrop="static" data-bs-keyboard="false">
+        <!-- condition hist dialog start -->
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width: 60vw; height: 90vh;">
+            <!-- condition hist content start -->
+            <div class="modal-content mh-100 overflow-y-auto scrollbar">
+                <!-- condition hist body start -->
+                <div class="modal-body">
+                    <form>
+                        <div class="modal-title mb-2"><span class="modal-title-bar"></span><span>약관 개정 히스토리</span></div>
+                        <table class="table table-bg-v table-fixed w-100 text-center align-middle">
+                            <tbody>
+                                <tr class="table-border-top">
+                                    <th class="w-20">약관코드</th>
+                                    <td class="w-30">
+                                        <input type="text" name="conditionCodeM" id="conditionCodeM"
+                                            class="form-control" disabled>
+                                    </td>
+                                    <th class="w-20">약관명</th>
+                                    <td class="w-30">
+                                        <input type="text" name="conditionNameM" id="conditionNameM"
+                                            class="form-control" disabled>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="w-20">적용일시<b class="required-data">*</b></th>
+                                    <td class="w-30">
+                                        <input type="date" min="1970-01-01" max="2199-12-31" name="applyDate"
+                                            id="applyDate" class="form-control attr-control" required>
+                                    </td>
+                                    <th class="w-20">버전<b class="required-data">*</b></th>
+                                    <td class="w-30">
+                                        <input type="text" name="version" id="version"
+                                            class="form-control" required>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="w-20">약관내용<b class="required-data">*</b></th>
+                                    <td colspan="3">
+                                        <textarea class="form-control resize-none" name="content" id="content" rows="10"
+                                            autocomplete="off" required></textarea>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="w-20">메모</th>
+                                    <td colspan="3">
+                                        <input type="text" name="memo" id="memo"
+                                            class="form-control" required>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="modal-footer justify-content-center border-top-none">
+                            <button type="button" class="btn btn-outline-grey me-2" data-bs-dismiss="modal">취소</button>
+                            <button type="button" id="histModalBtn" class="btn btn-data-add">등록</button>
+                        </div>
+                    </form>
+                </div>
+                <!-- condition hist body end -->
+            </div>
+            <!--condition hist content end-->
+        </div>
+        <!-- condition hist dialog end -->
+    </div>
+    <!-- Condition Hist Add Modal end -->
+    <script type="text/javascript" th:src="@{/js/table.js}"></script>
+</div>
+</html>
