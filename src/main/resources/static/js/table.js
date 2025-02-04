@@ -18,14 +18,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const selectedCheckboxes = document.querySelectorAll('#pageList input[type="checkbox"]:checked');
         if (selectedCheckboxes.length === 1) {
             // 체크된 항목이 하나일 때 버튼 활성화
-            editBtn.disabled = false;
-            deleteBtn.disabled = false;
+            if (editBtn) editBtn.disabled = false;
+            if (deleteBtn) deleteBtn.disabled = false;
             if (addBtnSub) addBtnSub.disabled = false;
             if (addBtnSub) addBtnSub.disabled = false;
         } else {
             // 체크된 항목이 없거나 두 개 이상일 때 버튼 비활성화
-            editBtn.disabled = true;
-            deleteBtn.disabled = true;
+            if (editBtn) editBtn.disabled = true;
+            if (deleteBtn) deleteBtn.disabled = true;
             if (addBtnSub) addBtnSub.disabled = true;
         }
     }
@@ -33,11 +33,11 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateBtn2() {
         const selectedCheckboxes = document.querySelectorAll('#pageList2 input[type="checkbox"]:checked');
         if (selectedCheckboxes.length === 1) {
-            editBtnSec.disabled = false;
-            deleteBtnSec.disabled = false;
+            if (editBtnSec) editBtnSec.disabled = false;
+            if (deleteBtnSec) deleteBtnSec.disabled = false;
         } else {
-            editBtnSec.disabled = true;
-            deleteBtnSec.disabled = true;
+            if (editBtnSec) editBtnSec.disabled = true;
+            if (deleteBtnSec) deleteBtnSec.disabled = true;
         }
     }
 
@@ -46,12 +46,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const selectedCheckboxes = document.querySelectorAll('#pageListSub input[type="checkbox"]:checked');
         if (selectedCheckboxes.length === 1) {
             // 체크된 항목이 하나일 때 버튼 활성화
-            editBtnSub.disabled = false;
-            deleteBtnSub.disabled = false;
+            if (editBtnSub) editBtnSub.disabled = false;
+            if (deleteBtnSub) deleteBtnSub.disabled = false;
         } else {
             // 체크된 항목이 없거나 두 개 이상일 때 버튼 비활성화
-            editBtnSub.disabled = true;
-            deleteBtnSub.disabled = true;
+            if (editBtnSub) editBtnSub.disabled = true;
+            if (deleteBtnSub) deleteBtnSub.disabled = true;
         }
     }
 

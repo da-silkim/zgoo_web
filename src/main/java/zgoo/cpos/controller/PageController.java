@@ -605,6 +605,14 @@ public class PageController {
             // log.info("사업자 권한 확인 >> {}", companyAuthorityList.toString());
             model.addAttribute("companyAuthorityList", companyAuthorityList);
 
+
+            // 사업자 list(select option)
+            List<CompanyListDto> companyList = this.companyService.findCompanyListAll();
+            model.addAttribute("companyList", companyList);
+
+            List<CommCdBaseDto> authorityList = codeService.commonCodeMenuAuthority("MENUACCLV"); // 메뉴권한
+            model.addAttribute("authorityList", authorityList);
+
         } catch (Exception e) {
             e.getStackTrace();
         }

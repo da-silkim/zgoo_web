@@ -153,6 +153,11 @@ public class CodeService {
         return commonCodeRepository.commonCodeStringSort(grpcd);
     }
 
+    // 공통코드 - 메뉴권한
+    public List<CommCdBaseDto> commonCodeMenuAuthority(String grpcd) {
+        return commonCodeRepository.commonCodeMenuAuthority(grpcd);
+    }
+
     // // 공통코드 entity -> dto
     // private CommonCdDto convertToDto(CommonCode commonCode) {
     // return CommonCdDto.builder()

@@ -144,4 +144,17 @@ public class CommonCodeRepositoryCustomImpl implements CommonCodeRepositoryCusto
                                 )
                                 .fetch();
         }
+
+        @Override
+        public List<CommCdBaseDto> commonCodeMenuAuthority(String grpcode) {
+                return queryFactory
+                                .select(Projections.fields(CommCdBaseDto.class,
+                                                commonCode.group.grpCode.as("grpCode"),
+                                                commonCode.commonCode.as("commonCode"),
+                                                commonCode.name.as("commonCodeName")))
+                                .from(commonCode)
+                                .where(commonCode.group.grpCode.eq(grpcode)
+                                        .and(commonCode.commonCode.ne("SU")))
+                                .fetch();
+        }
 }

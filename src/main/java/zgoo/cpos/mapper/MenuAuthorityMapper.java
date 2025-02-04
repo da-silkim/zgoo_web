@@ -1,11 +1,16 @@
 package zgoo.cpos.mapper;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import com.querydsl.core.Tuple;
 
+import zgoo.cpos.domain.company.Company;
+import zgoo.cpos.domain.menu.Menu;
+import zgoo.cpos.domain.menu.MenuAuthority;
 import zgoo.cpos.dto.menu.MenuAuthorityDto;
+import zgoo.cpos.dto.menu.MenuAuthorityDto.MenuAuthorityBaseDto;
 
 public class MenuAuthorityMapper {
     /*
@@ -22,5 +27,21 @@ public class MenuAuthorityMapper {
                 .collect(Collectors.toList());
 
         return dtolist;
+    }
+
+    /* 
+     * dto >> entity
+     */
+    public static MenuAuthority toEntity(MenuAuthorityBaseDto dto, Company company, Menu menu) {
+        MenuAuthority menuAuthority = MenuAuthority.builder()
+                .company(company)
+                .menu(menu)
+                .authority(dto.getAuthority())
+                .modYn(dto.getModYn())
+                .readYn(dto.getReadYn())
+                .excelYn(dto.getExcelYn())
+                .regAt(LocalDateTime.now())
+                .build();
+        return menuAuthority;
     }
 }

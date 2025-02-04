@@ -218,3 +218,6 @@ table.table tbody tr.row-selected { background-color: #3D3B40 !important; color:
 #bizModalBtn, #memModalBtn { position: absolute; bottom: 0; left: 50%; transform: translateY(-35%); }
 #memSearchBtn, #memInfoSearchBtn { position: absolute; right: 0; top: -6px; }
 .small-font { font-weight: 300; font-size: small; }
+
+#currAuthority { font-size: 14px; color: grey; }
+#saveBtn { position: absolute; right: 0; top: -50px; }

@@ -9,30 +9,38 @@
             <div class="card card-shadow">
                 <!-- card body:2 start -->
                 <div class="card-body">
-                    <div class="card-title"><span class="card-title-bar"></span><span>사업자 권한 리스트</span></div>
+                    <div class="card-title title-btn-area">
+                        <span class="card-title-bar"></span><span>사업자 권한 리스트</span>
+                        <div class="d-flex align-items-center search-container">
+                            <label for="companyIdSearch">사업자</label>
+                            <select id="companyIdSearch" name="companyIdSearch" class="mx-3 form-control" style="width: 230px;">
+                                <option th:value="null">선택</option>
+                                <option th:each="company : ${companyList}" th:value="${company.companyId}"
+                                            th:text="${company.companyName}"></option>
+                            </select>
+                        </div>
+                    </div>
                     <!-- 사업자 권한 리스트 table: start -->
                     <div class="table-responsive scroll-table-container mt-3">
                         <table class="table text-center table-bg table-hover">
                             <thead>
                                 <tr>
-                                    <th scope="col" class="w-5"></th>
-                                    <th scope="col" class="w-35">사업자</th>
+                                    <th scope="col" class="w-40">사업자</th>
                                     <th scope="col" class="w-25">권한그룹ID</th>
                                     <th scope="col" class="w-35">권한그룹명</th>
                                 </tr>
                             </thead>
                             <tbody id="pageList">
-                                <tr th:each="comAuth : ${companyAuthorityList}">
-                                    <td><input type="checkbox" /></td>
-                                    <td th:text="${comAuth.companyName}"></td>
-                                    <td th:text="${comAuth.authority}"></td>
-                                    <td th:text="${comAuth.authorityName}"></td>
+                                <tr th:each="authority : ${authorityList}">
+                                    <td class="companyName"></td>
+                                    <td th:text="${authority.commonCode}" th:value="${authority.commonCode}"></td>
+                                    <td th:text="${authority.commonCodeName}"></td>
                                 </tr>
-                                <tr th:if="${companyAuthorityList.size() == 0}">
-                                    <td colspan="4">조회된 데이터가 없습니다.</td>
+                                <tr th:if="${authorityList.size() == 0}">
+                                    <td colspan="3">조회된 데이터가 없습니다.</td>
                                 </tr>
                             </tbody>
-                        </table>                        
+                        </table>
                     </div>
                     <div class="text-center">
                         <ul class="pagination" id="paging"></ul>
@@ -48,14 +56,14 @@
                 <div class="card-body">
                     <div class="card-title">
                         <span class="card-title-bar"></span><span>메뉴별 접근 권한</span>
-                        <span class="ms-3" id="currAuthority" style="font-size: 14px; color: grey;"></span>
+                        <span class="ms-3" id="currAuthority"></span>
                     </div>
                     <!-- 메뉴별 접근 권한 form: start -->
                     <form class="position-relative">                        
-                        <div class="w-100 table-responsive">
-                            <table class="table text-center mt-3 table-bg table-hover">
+                        <div class="table-responsive scroll-table-container mt-3">
+                            <table class="table text-center table-bg table-hover">
                                 <thead>
-                                    <tr class="table-border-top">
+                                    <tr>
                                         <th scope="col">메뉴그룹(대)</th>
                                         <th scope="col">메뉴그룹(중)</th>
                                         <th scope="col">메뉴그룹(소)</th>
@@ -63,14 +71,15 @@
                                         <th scope="col">등록/수정 권한</th>
                                         <th scope="col">엑셀다운로드권한</th>
                                     </tr>
-                                    <tr>
-                                        <td colspan="6">사업자 권한 항목 클릭 시 조회됩니다.</td>
-                                    </tr>
                                 </thead>
-                                <tbody id=""></tbody>
-                            </table>                               
+                                <tbody id="authorityTable">
+                                    <tr>
+                                        <td colspan="6">사업자 선택 후 권한 항목 클릭 시 조회됩니다.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
-                        <button class="btn btn-outline-grey position-absolute" style="right: 0; top: -40px;"></i>저장</button>
+                        <button type="button" class="btn btn-outline-grey" id="saveBtn" disabled></i>저장</button>
                     </form>
                     <!-- 메뉴별 접근 권한 form: end -->
                 </div>
