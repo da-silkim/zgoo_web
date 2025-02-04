@@ -18,7 +18,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import zgoo.cpos.domain.company.Company;
-import zgoo.cpos.type.MenuAuthorityKey;
+import zgoo.cpos.dto.menu.MenuAuthorityDto.MenuAuthorityBaseDto;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -28,9 +28,6 @@ import zgoo.cpos.type.MenuAuthorityKey;
 @AllArgsConstructor
 public class MenuAuthority {
 
-    // @EmbeddedId
-    // private MenuAuthorityKey id;
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "menuauthority_id")
@@ -38,15 +35,6 @@ public class MenuAuthority {
 
     @Column(name = "authority")
     private String authority;
-
-    @Column(name = "top_menu")
-    private String topMenu;
-
-    @Column(name = "mid_menu")
-    private String midMenu;
-
-    @Column(name = "low_menu")
-    private String lowMenu;
 
     @Column(name = "mod_yn")
     private String modYn;
@@ -66,7 +54,18 @@ public class MenuAuthority {
     @Column(name = "mod_at")
     private LocalDateTime modAt;
 
-    @JoinColumn(name = "company_id", insertable = false, updatable = false)
+    @JoinColumn(name = "company_id")
     @ManyToOne(fetch = FetchType.LAZY)
     private Company company;
+
+    @JoinColumn(name = "menu_code")
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Menu menu;
+
+    public void updateMenuAuthority(MenuAuthorityBaseDto dto) {
+        this.modYn = dto.getModYn();
+        this.readYn = dto.getReadYn();
+        this.excelYn = dto.getExcelYn();
+        this.modAt = LocalDateTime.now();
+    }
 }

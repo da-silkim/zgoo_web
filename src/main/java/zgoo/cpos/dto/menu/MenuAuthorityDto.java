@@ -17,9 +17,10 @@ public class MenuAuthorityDto {
     @EqualsAndHashCode
     @NoArgsConstructor
     public static class MenuAuthorityBaseDto {
-        private String topMenu;
-        private String midMenu;
-        private String lowMenu;
+        private Long menuAuthortyId;
+        private Long companyId;
+        private String menuCode;
+        private String authority;
         private String modYn;
         private String readYn;
         private String excelYn;
@@ -43,7 +44,11 @@ public class MenuAuthorityDto {
     @ToString(callSuper = true)
     public static class MenuAuthorityListDto extends MenuAuthorityBaseDto {
         private String modUserId;
-        private String authority;
+        private String menuName;
+        private String menuUrl;
+        private String menuLv;
+        private String parentCode;
+        private String parentCodeName;
         private LocalDateTime regAt;
         private LocalDateTime modAt;
     }
