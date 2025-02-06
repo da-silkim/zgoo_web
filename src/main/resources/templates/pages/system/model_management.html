@@ -58,22 +58,23 @@
             <!-- card:3 start -->
             <div class="card card-shadow mt-4">
                 <!-- card body:3 start -->
-                <div class="card-body">
-                    <div class="btn-page-area">
+                <div class="card-body btn-page-container">
+                    <div class="btn-container" th:if="${menuAuthority.authority == 'SU' or menuAuthority.modYn == 'Y'}">
                         <button class="btn btn-data-add" id="addBtn" data-bs-toggle="modal" data-bs-target="#dataAddModal">
                             <i class="bi bi-plus-square"></i>등록</button>
-                        <button class="btn btn-data-edit" id="editBtn" data-bs-toggle="modal" data-bs-target="#dataAddModal" disabled>
+                        <button class="btn btn-data-edit" id="editBtn" data-bs-toggle="modal" data-bs-target="#dataAddModal"disabled>
                             <i class="fa-regular fa-pen-to-square"></i>수정</button>
-                        <button class="btn btn-data-delete" id="deleteBtn" disabled><i class="bi bi-trash"></i>삭제</button>
-                        <span>
-                            <span id="pageInfo">
-                                <span th:text="'Page ' + (${currentPage + 1}) + ' of ' + ${totalPages} + ' [총 ' + ${totalCount} + '건]'"></span>
-                            </span>
-                            <select class="mx-3 page-select" id="size" name="size">
-                                <option th:each="data : ${showListCnt}" th:value="${data.commonCode}"
-                                        th:text="${data.commonCodeName}" th:selected="${data.commonCode == size}"></option>
-                            </select>
+                        <button class="btn btn-data-delete" id="deleteBtn" disabled>
+                            <i class="bi bi-trash"></i>삭제</button>
+                    </div>
+                    <div class="page-container">
+                        <span id="pageInfo">
+                            <span th:text="'Page ' + (${currentPage + 1}) + ' of ' + ${totalPages} + ' [총 ' + ${totalCount} + '건]'"></span>
                         </span>
+                        <select class="mx-3 page-select" id="size" name="size">
+                            <option th:each="data : ${showListCnt}" th:value="${data.commonCode}"
+                                    th:text="${data.commonCodeName}" th:selected="${data.commonCode == size}"></option>
+                        </select>
                     </div>
                     <div class="w-100 table-responsive" >
                         <table class="table text-center mt-3 table-bg table-hover" style="min-width: 1020px;">
@@ -514,7 +515,6 @@
     <script th:inline="javascript">
         var connTypeData = /*[[${connType}]]*/ [];
     </script>    
-    <script type="text/javascript" th:src="@{/js/table.js}"></script>
     <script type="text/javascript" th:src="@{/js/system/model_management.js}"></script>
 </div>
 </html>

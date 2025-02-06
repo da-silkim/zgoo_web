@@ -19,6 +19,7 @@ public class MenuAuthorityDto {
     public static class MenuAuthorityBaseDto {
         private Long menuAuthortyId;
         private Long companyId;
+        private String companyName;
         private String menuCode;
         private String authority;
         private String modYn;

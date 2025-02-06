@@ -41,14 +41,17 @@
             <div class="card card-shadow mt-4">
                 <!-- card body:3 start -->
                 <div class="card-body">
-                    <div class="card-title"><span class="card-title-bar"></span><span>장애 등록 현황</span></div>
-                    <div class="mt-3 position-relative">
-                        <button class="btn btn-data-add" id="addBtn" data-bs-toggle="modal" data-bs-target="#dataAddModal">
-                            <i class="bi bi-plus-square me-2"></i>등록</button>
-                        <button class="btn btn-data-edit" id="editBtn" data-bs-toggle="modal" data-bs-target="#dataAddModal" disabled>
-                            <i class="fa-regular fa-pen-to-square me-2"></i>수정</button>
-                        <button class="btn btn-data-delete" id="deleteBtn" disabled><i class="bi bi-trash me-2"></i>삭제</button>
-                        <span class="position-absolute" style="right: 0; bottom: 0;">
+                    <div class="card-title"><span class="card-title-bar"></span><span>FAQ</span></div>
+                    <div class="mt-3 btn-page-area">
+                        <div th:if="${menuAuthority.authority == 'SU' or menuAuthority.modYn == 'Y'}">
+                            <button class="btn btn-data-add" id="addBtn" data-bs-toggle="modal" data-bs-target="#dataAddModal">
+                                <i class="bi bi-plus-square me-2"></i>등록</button>
+                            <button class="btn btn-data-edit" id="editBtn" data-bs-toggle="modal" data-bs-target="#dataAddModal" disabled>
+                                <i class="fa-regular fa-pen-to-square me-2"></i>수정</button>
+                            <button class="btn btn-data-delete" id="deleteBtn" disabled>
+                                <i class="bi bi-trash me-2"></i>삭제</button>
+                        </div>
+                        <span>
                             <span id="pageInfo">
                                 <span th:text="'Page ' + (${currentPage + 1}) + ' of ' + ${totalPages} + ' [총 ' + ${totalCount} + '건]'"></span>
                             </span>
@@ -185,7 +188,6 @@
         <!-- modal dialog end -->
     </div>
     <!-- Add Modal end -->
-    <script type="text/javascript" th:src="@{/js/table.js}"></script>
     <script type="text/javascript" th:src="@{/js/customer/faq.js}"></script>
 </div>
 </html>

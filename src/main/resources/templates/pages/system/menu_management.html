@@ -11,15 +11,13 @@
                 <div class="card-body">
                     <div class="card-title title-btn-area">
                         <span class="card-title-bar"></span><span>메뉴 리스트</span>
-                        <div>
-                            <button class="btn btn-data-add" id="addBtn" data-bs-toggle="modal"
-                                data-bs-target="#menuAddModal">
+                        <div th:if="${menuAuthority.authority == 'SU' or menuAuthority.modYn == 'Y'}">
+                            <button class="btn btn-data-add" id="addBtn" data-bs-toggle="modal" data-bs-target="#menuAddModal">
                                 <i class="bi bi-plus-square me-2"></i>등록</button>
-                            <button class="btn btn-data-edit" id="editBtn" data-bs-toggle="modal"
-                                data-bs-target="#menuAddModal" disabled><i
-                                    class="fa-regular fa-pen-to-square me-2"></i>수정</button>
-                            <button class="btn btn-data-delete" id="deleteBtn" disabled><i
-                                    class="bi bi-trash me-2"></i>삭제</button>
+                            <button class="btn btn-data-edit" id="editBtn" data-bs-toggle="modal" data-bs-target="#menuAddModal" disabled>
+                                <i class="fa-regular fa-pen-to-square me-2"></i>수정</button>
+                            <button class="btn btn-data-delete" id="deleteBtn" disabled>
+                                <i class="bi bi-trash me-2"></i>삭제</button>
                         </div>
                     </div>
                     <!-- 메뉴 리스트 table: start -->
@@ -73,11 +71,14 @@
                         </form>
                     </div>
                     <div class="my-3 btn-page-area">
-                        <button class="btn btn-data-add" id="addBtnSec" data-bs-toggle="modal" data-bs-target="#menuAuthorityAddModal">
-                            <i class="bi bi-plus-square"></i>등록</button>
-                        <button class="btn btn-data-edit" id="editBtnSec" data-bs-toggle="modal" data-bs-target="#menuAuthorityAddModal" disabled>
-                            <i class="fa-regular fa-pen-to-square"></i>수정</button>
-                        <button class="btn btn-data-delete" id="deleteBtnSec" disabled><i class="bi bi-trash"></i>삭제</button>
+                        <div th:if="${menuAuthority.authority == 'SU' or menuAuthority.modYn == 'Y'}">
+                            <button class="btn btn-data-add" id="addBtnSec" data-bs-toggle="modal" data-bs-target="#menuAuthorityAddModal">
+                                <i class="bi bi-plus-square"></i>등록</button>
+                            <button class="btn btn-data-edit" id="editBtnSec" data-bs-toggle="modal" data-bs-target="#menuAuthorityAddModal" disabled>
+                                <i class="fa-regular fa-pen-to-square"></i>수정</button>
+                            <button class="btn btn-data-delete" id="deleteBtnSec" disabled>
+                                <i class="bi bi-trash"></i>삭제</button>
+                        </div>
                         <span>
                             <span id="pageInfo">
                                 <span th:text="'Page ' + (${currentPage + 1}) + ' of ' + ${totalPages} + ' [총 ' + ${totalCount} + '건]'"></span>
@@ -278,7 +279,6 @@
         <!-- modal dialog end -->
     </div>
     <!-- Company Menu Authority Modal end -->
-    <script type="text/javascript" th:src="@{/js/table.js}"></script>
     <script type="text/javascript" th:src="@{/js/system/menu_management.js}"></script>
 </div>
 </html>

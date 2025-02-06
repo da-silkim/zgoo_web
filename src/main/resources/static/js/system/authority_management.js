@@ -1,6 +1,6 @@
 $(document).ready(function() {
     var companyId, currCompany, currAuthority, currAuthorityName;
-    
+
     $('#companyIdSearch').on('change', function() {
         companyId = $(this).val();
         console.log("companyId: "+companyId);
@@ -22,44 +22,37 @@ $(document).ready(function() {
     });
 
     $('#pageList').on('click', 'tr', function() {
-        if (companyId != null && companyId.trim() != "") {
-            document.getElementById('saveBtn').disabled = false;
-        }
-        // currCompany = $(this).find('td').eq(1).text();
-        // currAuthority = $(this).find('td').eq(2).text();
-        // currAuthorityName = $(this).find('td').eq(3).text();
-        // companyId = $(this).find('td').eq(1).attr('value');
-        // const authority = $(this).find('td').eq(2).attr('value');
+        companyId = $(this).find('td').eq(0).attr('value');
         currCompany = $(this).find('td').eq(0).text();
         currAuthority = $(this).find('td').eq(1).text();
         currAuthorityName = $(this).find('td').eq(2).text();
         const authority = $(this).find('td').eq(1).attr('value');
 
+        if (!companyId || companyId.trim() === "") {
+            renderAuthorityTable();
+            return;
+        }
+
         $('#currAuthority').empty();
         $('#authorityTable').empty();
+        $('#currAuthority').append(`
+            <span>
+                사업자명: ${currCompany} | 권한그룹ID: ${currAuthority} | 권한그룹명: ${currAuthorityName}
+            </span>
+        `);
 
-        if (companyId != null && companyId.trim() != "") {
-            $('#currAuthority').append(`
-                <span>
-                    사업자명: ${currCompany} | 권한그룹ID: ${currAuthority} | 권한그룹명: ${currAuthorityName}
-                </span>
-            `);
-
-            $.ajax({
-                type: 'GET',
-                url: `/system/authority/get/${companyId}/${authority}`,
-                contentType: "application/json",
-                dataType: 'json',
-                success: function(response) {
-                    renderMenuTable(response.authorityList);
-                },
-                error: function(error) {
-                    alert(error);
-                }
-            });
-        } else {
-            renderAuthorityTable();
-        }
+        $.ajax({
+            type: 'GET',
+            url: `/system/authority/get/${companyId}/${authority}`,
+            contentType: "application/json",
+            dataType: 'json',
+            success: function(response) {
+                renderMenuTable(response.authorityList);
+            },
+            error: function(error) {
+                alert(error);
+            }
+        });
     });
 
     function renderAuthorityTable() {
@@ -102,13 +95,49 @@ $(document).ready(function() {
                 row += `<tr id="${menu.menuCode}">`;
             }
 
+            let isEditable = false;
+            let isReadOnly = false;
+
+            if (menuAuthority.authority === 'SU') {
+                document.getElementById('saveBtn').disabled = false;
+                isEditable = true;
+            } else if (menuAuthority.authority === 'AD') {
+                console.log("관리자 companyId: " + menuAuthority.companyId);
+
+                if (companyId === String(menuAuthority.companyId)) {
+                    console.log("관리자, 해당사업자");
+
+                    if (currAuthority === 'AD') {
+                        document.getElementById('saveBtn').disabled = true;
+                        isReadOnly = true;
+                    } else {
+                        document.getElementById('saveBtn').disabled = false;
+                        isEditable = true;
+                    }
+                } else {
+                    console.log("관리자, 해당사업자X");
+                    document.getElementById('saveBtn').disabled = true;
+                    isReadOnly = true;
+                }
+            } else {
+                isReadOnly = true;
+            }
+
             row += `<td class="text-start">${topMenu}</td>
                     <td class="text-start">${midMenu}</td>
-                    <td class="text-start">${lowMenu}</td>
-                    <td><input type="text" class="text-center" name="readYn_${index}" value="${menu.readYn}"></td>
-                    <td><input type="text" class="text-center" name="modYn_${index}" value="${menu.modYn}"></td>
-                    <td><input type="text" class="text-center" name="excelYn_${index}" value="${menu.excelYn}"></td>
-                </tr>`;
+                    <td class="text-start">${lowMenu}</td>`;
+
+            if (isEditable) {
+                row += `<td><input type="text" class="text-center" name="readYn_${index}" value="${menu.readYn}"></td>
+                        <td><input type="text" class="text-center" name="modYn_${index}" value="${menu.modYn}"></td>
+                        <td><input type="text" class="text-center" name="excelYn_${index}" value="${menu.excelYn}"></td>
+                    </tr>`;
+            } else if (isReadOnly) {
+                row += `<td class="text-center" name="readYn_${index}" value="${menu.readYn}">${menu.readYn}</td>
+                        <td class="text-center" name="modYn_${index}" value="${menu.modYn}">${menu.modYn}</td>
+                        <td class="text-center" name="excelYn_${index}" value="${menu.excelYn}">${menu.excelYn}</td>
+                    </tr>`;
+            }
 
             authorityTable.append(row);
         });
@@ -116,7 +145,6 @@ $(document).ready(function() {
 
     $('#saveBtn').on('click', function(event) {
         event.preventDefault();
-        // console.log("companyId : " + companyId);
 
         if (confirmSubmit("저장")) {
 
@@ -128,15 +156,9 @@ $(document).ready(function() {
                 var modYn = $('input[name="modYn_' + index + '"]').val();
                 var excelYn = $('input[name="excelYn_' + index + '"]').val();
 
-                if (readYn != 'Y' || readYn != 'N' || modYn != 'Y' || modYn != 'N' || excelYn != 'Y' || excelYn != 'N') {
+                if ((readYn != 'Y' && readYn != 'N') || (modYn != 'Y' && modYn != 'N') || (excelYn != 'Y' && excelYn != 'N')) {
                     checkedYn = true;
                 }
-
-                // console.log("menuCode" + index + ": " + menuCode);
-                // console.log("readYn : " + readYn);
-                // console.log("modYn : " + modYn);
-                // console.log("excelYn : " + excelYn);
-                // console.log("=========================");
 
                 menuAuthorities.push({
                     companyId: companyId,

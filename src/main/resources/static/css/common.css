@@ -168,6 +168,11 @@ table.table tbody tr.row-selected { background-color: #3D3B40 !important; color:
 .btn-page-area { position: relative; }
 .btn-page-area button > i { margin-right: .5rem !important; }
 .btn-page-area > span { position: absolute; right: 0; bottom: 0; }
+.btn-page-container { position: relative; }
+.btn-container { position: absolute; top: 16px; }
+.btn-container button > i { margin-right: .5rem !important; }
+.btn-container > div:nth-child(1), .btn-page-area > div:nth-child(1) { display: inline-block; }
+.page-container { float: right; height: 38px; display: flex; align-items: flex-end; }
 
 /* 공지사항상세 */
 .notice-detail-container { border-top: 1px solid grey; border-bottom: 1px solid grey; margin-top: 1.2rem !important; margin-bottom: 1.2rem !important; position: relative; }

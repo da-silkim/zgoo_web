@@ -34,15 +34,13 @@
                 <div class="card-body">
                     <div class="card-title title-btn-area">
                         <span class="card-title-bar"></span><span>그룹코드</span>
-                        <div>
-                            <button class="btn btn-data-add" id="addBtn" data-bs-toggle="modal"
-                                data-bs-target="#grpAddModal">
+                        <div th:if="${menuAuthority.authority == 'SU' or menuAuthority.modYn == 'Y'}">
+                            <button class="btn btn-data-add" id="addBtn" data-bs-toggle="modal" data-bs-target="#grpAddModal">
                                 <i class="bi bi-plus-square me-2"></i>등록</button>
-                            <button class="btn btn-data-edit" id="editBtn" data-bs-toggle="modal"
-                                data-bs-target="#grpAddModal" disabled><i
-                                    class="fa-regular fa-pen-to-square me-2"></i>수정</button>
-                            <button class="btn btn-data-delete" id="deleteBtn" disabled><i
-                                    class="bi bi-trash me-2"></i>삭제</button>
+                            <button class="btn btn-data-edit" id="editBtn" data-bs-toggle="modal" data-bs-target="#grpAddModal" disabled>
+                                <i class="fa-regular fa-pen-to-square me-2"></i>수정</button>
+                            <button class="btn btn-data-delete" id="deleteBtn" disabled>
+                                <i class="bi bi-trash me-2"></i>삭제</button>
                         </div>
                     </div>
                     <div class="table-responsive scroll-table-container">
@@ -77,15 +75,13 @@
                 <div class="card-body">
                     <div class="card-title title-btn-area">
                         <span class="card-title-bar"></span><span>공통코드</span>
-                        <div>
-                            <button class="btn btn-data-add" id="addBtnSub" data-bs-toggle="modal"
-                                data-bs-target="#commonAddModal" disabled>
+                        <div th:if="${menuAuthority.authority == 'SU' or menuAuthority.modYn == 'Y'}">
+                            <button class="btn btn-data-add" id="addBtnSub" data-bs-toggle="modal" data-bs-target="#commonAddModal" disabled>
                                 <i class="bi bi-plus-square me-2"></i>등록</button>
-                            <button class="btn btn-data-edit" id="editBtnSub" data-bs-toggle="modal"
-                                data-bs-target="#commonAddModal" disabled><i
-                                    class="fa-regular fa-pen-to-square me-2"></i>수정</button>
-                            <button class="btn btn-data-delete" id="deleteBtnSub" disabled><i
-                                    class="bi bi-trash me-2"></i>삭제</button>
+                            <button class="btn btn-data-edit" id="editBtnSub" data-bs-toggle="modal" data-bs-target="#commonAddModal" disabled>
+                                <i class="fa-regular fa-pen-to-square me-2"></i>수정</button>
+                            <button class="btn btn-data-delete" id="deleteBtnSub" disabled>
+                                <i class="bi bi-trash me-2"></i>삭제</button>
                         </div>
                     </div>
                     <div class="table-responsive scroll-table-container">
@@ -229,7 +225,6 @@
         <!-- common modal dialog end -->
     </div>
     <!-- Common Add Modal end -->
-    <script type="text/javascript" th:src="@{/js/table.js}"></script>
     <script type="text/javascript" th:src="@{/js/system/code_management.js}"></script>
 </div>
 </html>

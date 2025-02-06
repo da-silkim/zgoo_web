@@ -11,7 +11,8 @@
                 <div class="card-body">
                     <div class="card-title title-btn-area">
                         <span class="card-title-bar"></span><span>사업자 권한 리스트</span>
-                        <div class="d-flex align-items-center search-container">
+                        <div class="d-flex align-items-center search-container" id="companySearchContainer"
+                            th:if="${menuAuthority.authority == 'SU'}">
                             <label for="companyIdSearch">사업자</label>
                             <select id="companyIdSearch" name="companyIdSearch" class="mx-3 form-control" style="width: 230px;">
                                 <option th:value="null">선택</option>
@@ -32,7 +33,10 @@
                             </thead>
                             <tbody id="pageList">
                                 <tr th:each="authority : ${authorityList}">
-                                    <td class="companyName"></td>
+                                    <td class="companyName"
+                                        th:value="${menuAuthority.authority == 'SU'} ? null : ${menuAuthority.companyId}"
+                                        th:text="${menuAuthority.authority == 'SU'} ? '' : ${menuAuthority.companyName}">
+                                    </td>
                                     <td th:text="${authority.commonCode}" th:value="${authority.commonCode}"></td>
                                     <td th:text="${authority.commonCodeName}"></td>
                                 </tr>
@@ -41,9 +45,6 @@
                                 </tr>
                             </tbody>
                         </table>
-                    </div>
-                    <div class="text-center">
-                        <ul class="pagination" id="paging"></ul>
                     </div>
                     <!-- 사업자 권한 리스트 table: end -->
                 </div>
@@ -79,7 +80,8 @@
                                 </tbody>
                             </table>
                         </div>
-                        <button type="button" class="btn btn-outline-grey" id="saveBtn" disabled></i>저장</button>
+                        <button type="button" class="btn btn-outline-grey" id="saveBtn"
+                            th:if="${menuAuthority.authority == 'SU' or menuAuthority.authority == 'AD'}" disabled></i>저장</button>
                     </form>
                     <!-- 메뉴별 접근 권한 form: end -->
                 </div>
@@ -90,7 +92,6 @@
         <!-- card body:1 end -->
     </div>
     <!-- card:1 end -->
-    <script type="text/javascript" th:src="@{/js/table.js}"></script>
     <script type="text/javascript" th:src="@{/js/system/authority_management.js}"></script>
 </div>
 </html>

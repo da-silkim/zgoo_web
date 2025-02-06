@@ -13,6 +13,7 @@ import zgoo.cpos.domain.company.QCompany;
 import zgoo.cpos.domain.menu.MenuAuthority;
 import zgoo.cpos.domain.menu.QMenu;
 import zgoo.cpos.domain.menu.QMenuAuthority;
+import zgoo.cpos.dto.menu.MenuAuthorityDto.MenuAuthorityBaseDto;
 import zgoo.cpos.dto.menu.MenuAuthorityDto.MenuAuthorityListDto;
 
 @Slf4j
@@ -46,6 +47,7 @@ public class MenuAuthorityRepositoryCustomImpl implements MenuAuthorityRepositor
                 menuAuthority.menu.menuName.as("menuName"),
                 menuAuthority.menu.menuUrl.as("menuUrl"),
                 menuAuthority.menu.menuLv.as("menuLv"),
+                menuAuthority.authority.as("authority"),
                 menuAuthority.modYn.as("modYn"),
                 menuAuthority.readYn.as("readYn"),
                 menuAuthority.excelYn.as("excelYn"),
@@ -105,5 +107,25 @@ public class MenuAuthorityRepositoryCustomImpl implements MenuAuthorityRepositor
                 .and(menuAuthority.menu.menuCode.eq(menuCode))
                 .and(menuAuthority.authority.eq(authority)))
             .fetchOne();
+    }
+
+    @Override
+    public MenuAuthorityBaseDto findUserMenuAuthority(Long companyId, String authority, String menuCode) {
+        MenuAuthorityBaseDto dto = queryFactory
+            .select(Projections.fields(MenuAuthorityBaseDto.class,
+                menuAuthority.authority.as("authority"),
+                menuAuthority.menu.menuCode.as("menuCode"),
+                menuAuthority.readYn.as("readYn"),
+                menuAuthority.modYn.as("modYn"),
+                menuAuthority.excelYn.as("excelYn"),
+                menuAuthority.company.id.as("companyId"),
+                menuAuthority.company.companyName.as("companyName")))
+            .from(menuAuthority)
+            .leftJoin(company).on(company.id.eq(menuAuthority.company.id))
+            .where(company.id.eq(companyId)
+                .and(menuAuthority.menu.menuCode.eq(menuCode))
+                .and(menuAuthority.authority.eq(authority)))
+            .fetchOne();
+        return dto;
     }
 }

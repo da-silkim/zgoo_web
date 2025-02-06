@@ -1,5 +1,6 @@
 package zgoo.cpos.controller;
 
+import java.security.Principal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
@@ -9,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import lombok.RequiredArgsConstructor;
@@ -35,6 +37,7 @@ import zgoo.cpos.dto.member.VocDto.VocListDto;
 import zgoo.cpos.dto.menu.CompanyMenuAuthorityDto;
 import zgoo.cpos.dto.menu.MenuAuthorityDto;
 import zgoo.cpos.dto.menu.MenuDto;
+import zgoo.cpos.dto.menu.MenuAuthorityDto.MenuAuthorityBaseDto;
 import zgoo.cpos.dto.tariff.TariffDto.TariffPolicyDto;
 import zgoo.cpos.dto.tariff.TariffDto.TariffRegDto;
 import zgoo.cpos.dto.users.FaqDto;
@@ -105,7 +108,7 @@ public class PageController {
             @RequestParam(value = "nameSearch", required = false) String name,
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "10") int size,
-            Model model) {
+            Model model, Principal principal) {
         log.info("=== Member List Page ===");
         model.addAttribute("memRegDto", new MemberDto.MemberRegDto());
 
@@ -137,6 +140,8 @@ public class PageController {
             model.addAttribute("bizTypeList", bizTypeList);
             List<CommCdBaseDto> creditCardList = codeService.commonCodeStringToNum("CREDITCARDCD"); // 카드사코드
             model.addAttribute("creditCardList", creditCardList);
+            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(), "C0100");
+            model.addAttribute("menuAuthority", menuAuthority);
         } catch (Exception e) {
             e.getStackTrace();
             model.addAttribute("memberList", Collections.emptyList());
@@ -172,7 +177,7 @@ public class PageController {
             @RequestParam(value = "contentSearch", required = false) String searchContent,
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "10") int size,
-            Model model) {
+            Model model, Principal principal) {
         log.info("=== Charging Station List Page ===");
         log.info("companyId: {}, searchOp: {}, searchContent: {}", companyId, searchOp, searchContent);
         model.addAttribute("csRegDto", new CsInfoDto.CsInfoRegDto());
@@ -216,6 +221,8 @@ public class PageController {
             model.addAttribute("faucetType", faucetType);
             List<CommCdBaseDto> powerType = codeService.commonCodeStringToNum("POWERTYPE"); // 전압종류
             model.addAttribute("powerType", powerType);
+            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(), "D0100");
+            model.addAttribute("menuAuthority", menuAuthority);
         } catch (Exception e) {
             e.getStackTrace();
             model.addAttribute("csList", Collections.emptyList());
@@ -274,7 +281,7 @@ public class PageController {
             @RequestParam(value = "chgSpeedCdSearch", required = false) String chgSpeedCode,
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "10") int size,
-            Model model) {
+            Model model, Principal principal) {
         log.info("=== Model List Page ===");
         model.addAttribute("cpModelDto", new CpModelDto.CpModelRegDto());
 
@@ -313,6 +320,8 @@ public class PageController {
             model.addAttribute("chgSpeedCd", chgSpeedCd);
             List<CommCdBaseDto> connType = codeService.commonCodeStringToNum("CONNTYPE"); // 커넥터타입
             model.addAttribute("connType", connType);
+            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(), "G0100");
+            model.addAttribute("menuAuthority", menuAuthority);
         } catch (Exception e) {
             e.getStackTrace();
             model.addAttribute("modelList", Collections.emptyList());
@@ -333,7 +342,7 @@ public class PageController {
      * 시스템 > 공통코드관리
      */
     @GetMapping("/system/code/list")
-    public String showcodelist(Model model) {
+    public String showcodelist(Model model, Principal principal) {
         log.info("=== Code Management List Page ===");
 
         // group code 등록폼 전달
@@ -354,6 +363,8 @@ public class PageController {
 
             log.info("== commCode list found : ", ccdlist.size());
 
+            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(), "G0200");
+            model.addAttribute("menuAuthority", menuAuthority);
         } catch (Exception e) {
 
             log.error("Error occurred while fetching code list: {}", e.getMessage(), e);
@@ -375,7 +386,7 @@ public class PageController {
             @RequestParam(value = "nameSearch", required = false) String name,
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "10") int size,
-            Model model) {
+            Model model, Principal principal) {
 
         log.info("=== User List Page ===");
         log.info("companyId: {}, companyType: {}, name: {}", companyId, companyType, name);
@@ -432,6 +443,8 @@ public class PageController {
             List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT"); // 그리드 row 수
             model.addAttribute("showListCnt", showListCnt);
 
+            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(), "G0300");
+            model.addAttribute("menuAuthority", menuAuthority);
         } catch (Exception e) {
             log.error("Error occurred while fetching user list: {}", e.getMessage(), e);
             model.addAttribute("companyList", Collections.emptyList());
@@ -457,7 +470,7 @@ public class PageController {
             @RequestParam(value = "endDateSearch", required = false) String endDate,
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "10") int size,
-            Model model) {
+            Model model, Principal principal) {
         log.info("=== Notice List Page ===");
         log.info("companyId: {}, startDates: {}, endDate: {}", companyId, startDate, endDate);
 
@@ -502,6 +515,8 @@ public class PageController {
             List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT"); // 그리드 row 수
             model.addAttribute("showListCnt", showListCnt);
 
+            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(), "G0400");
+            model.addAttribute("menuAuthority", menuAuthority);
         } catch (Exception e) {
             e.getStackTrace();
             model.addAttribute("companyList", Collections.emptyList());
@@ -524,7 +539,7 @@ public class PageController {
             @RequestParam(value = "companyNameSearch", required = false) String companyName,
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "10") int size,
-            Model model) {
+            Model model, Principal principal) {
         log.info("=== Menu List Page ===");
 
         model.addAttribute("menuRegDto", new MenuDto.MenuRegDto());
@@ -572,6 +587,8 @@ public class PageController {
             List<MenuDto.MenuAuthorityListDto> companyMenuModalList = this.menuService.findMenuListWithParentName();
             model.addAttribute("companyMenuModalList", companyMenuModalList);
 
+            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(), "G0500");
+            model.addAttribute("menuAuthority", menuAuthority);
         } catch (Exception e) {
             e.getStackTrace();
             model.addAttribute("menuList", Collections.emptyList());
@@ -592,26 +609,27 @@ public class PageController {
      * 시스템 > 메뉴접근권한관리
      */
     @GetMapping("/system/authority/list")
-    public String showautoritylist(Model model) {
+    public String showautoritylist(Model model, Principal principal) {
         log.info("=== Authority List Page ===");
-
-        // model.addAttribute("companyAuthorityList", new
-        // MenuAuthorityDto.CompanyAuthorityListDto());
 
         try {
             // 사업자 권한 list
-            List<MenuAuthorityDto.CompanyAuthorityListDto> companyAuthorityList = menuAuthorityService
-                    .findCompanyAuthorityList();
+            // List<MenuAuthorityDto.CompanyAuthorityListDto> companyAuthorityList = menuAuthorityService
+            //        .findCompanyAuthorityList();
             // log.info("사업자 권한 확인 >> {}", companyAuthorityList.toString());
-            model.addAttribute("companyAuthorityList", companyAuthorityList);
+            // model.addAttribute("companyAuthorityList", companyAuthorityList);
 
-
-            // 사업자 list(select option)
-            List<CompanyListDto> companyList = this.companyService.findCompanyListAll();
+            List<CompanyListDto> companyList = this.companyService.findCompanyListAll(); // 사업자 list
             model.addAttribute("companyList", companyList);
 
             List<CommCdBaseDto> authorityList = codeService.commonCodeMenuAuthority("MENUACCLV"); // 메뉴권한
             model.addAttribute("authorityList", authorityList);
+
+            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(), "G0600");
+            // System.out.println("권한: " + menuAuthority.getAuthority());
+            // System.out.println("등록권한: " + menuAuthority.getModYn());
+            // System.out.println("principal getName : " + principal.getName());
+            model.addAttribute("menuAuthority", menuAuthority);
 
         } catch (Exception e) {
             e.getStackTrace();
@@ -629,7 +647,7 @@ public class PageController {
             @RequestParam(value = "contentSearch", required = false) String searchContent,
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "10") int size,
-            Model model) {
+            Model model, Principal principal) {
         log.info("=== Errcode List Page ===");
         log.info("manfCode: {}, searchOp: {}, searchContent: {}", manfCode, searchOp, searchContent);
         model.addAttribute("errCdDto", new ChgErrorCodeDto.ChgErrorCodeRegDto());
@@ -656,6 +674,8 @@ public class PageController {
             model.addAttribute("showListCnt", showListCnt);
             List<CommCdBaseDto> manfCd = codeService.commonCodeStringToNum("CGMANFCD"); // 충전기제조사
             model.addAttribute("manfCd", manfCd);
+            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(), "G0700");
+            model.addAttribute("menuAuthority", menuAuthority);
         } catch (Exception e) {
             e.getStackTrace();
             model.addAttribute("errcdList", Collections.emptyList());
@@ -675,7 +695,7 @@ public class PageController {
     public String showtarifflist(@RequestParam(value = "companyIdSearch", required = false) Long companyId,
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "10") int size,
-            Model model) {
+            Model model, Principal principal) {
 
         log.info("=== Tariff List Page ===");
         log.info("== companyId: {}, page: {}, size: {}", companyId, page, size);
@@ -725,7 +745,8 @@ public class PageController {
             // 요금제 적용상태 코드 리스트
             List<CommCdBaseDto> tariffStatCodeList = codeService.commonCodeStringToNum("TARIFFSTATCD");
             model.addAttribute("tariffStatCodeList", tariffStatCodeList);
-
+            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(), "G0800");
+            model.addAttribute("menuAuthority", menuAuthority);
         } catch (Exception e) {
             log.error("Error occurred while fetching tariff list: {}", e.getMessage(), e);
             tariffpolicyList = Page.empty();
@@ -742,8 +763,15 @@ public class PageController {
      * 시스템 > 약관관리
      */
     @GetMapping("/system/condition")
-    public String showcondition(Model model) {
+    public String showcondition(Model model, Principal principal) {
         log.info("=== Condition List Page ===");
+
+        try {
+            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(), "G0900");
+            model.addAttribute("menuAuthority", menuAuthority);
+        } catch (Exception e) {
+
+        }
         return "pages/system/condition_management";
     }
 
@@ -775,7 +803,7 @@ public class PageController {
             @RequestParam(value = "nameSearch", required = false) String name,
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "10") int size,
-            Model model) {
+            Model model, Principal principal) {
         log.info("=== VOC List Page ===");
         model.addAttribute("vocRegDto", new VocDto.VocRegDto());
 
@@ -803,6 +831,8 @@ public class PageController {
             model.addAttribute("vocStatList", vocStatList);
             List<CommCdBaseDto> vocPathList = codeService.commonCodeStringToNum("VOCPATH"); // 문의경로
             model.addAttribute("vocPathList", vocPathList);
+            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(), "J0100");
+            model.addAttribute("menuAuthority", menuAuthority);
         } catch (Exception e) {
             e.getStackTrace();
             model.addAttribute("memberList", Collections.emptyList());
@@ -827,7 +857,7 @@ public class PageController {
             @RequestParam(value = "sectionSearch", required = false) String section,
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "10") int size,
-            Model model) {
+            Model model, Principal principal) {
         log.info("=== FAQ List Page ===");
 
         model.addAttribute("faqDto", new FaqDto.FaqRegDto());
@@ -858,6 +888,8 @@ public class PageController {
 
             List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT"); // 그리드 row 수
             model.addAttribute("showListCnt", showListCnt);
+            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(), "J0200");
+            model.addAttribute("menuAuthority", menuAuthority);
         } catch (Exception e) {
             e.getStackTrace();
             model.addAttribute("selectedSection", Collections.emptyList());
@@ -922,7 +954,7 @@ public class PageController {
             @RequestParam(value = "companyLvSearch", required = false) String companyLv,
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "10") int size,
-            Model model) {
+            Model model, Principal principal) {
 
         log.info("=== Biz managment List Page ===");
         log.info("== companyId: {}, companyType:{}, companyLv: {}, page: {}, size: {}", companyId, companyType,
@@ -995,6 +1027,8 @@ public class PageController {
             List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT"); // 그리드 row 수
             model.addAttribute("showListCnt", showListCnt);
 
+            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(), "N0100");
+            model.addAttribute("menuAuthority", menuAuthority);
         } catch (Exception e) {
 
             log.error("Error occurred while fetching company list: {}", e.getMessage(), e);
@@ -1013,7 +1047,7 @@ public class PageController {
             @RequestParam(value = "contentSearch", required = false) String searchContent,
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "10") int size,
-            Model model) {
+            Model model, Principal principal) {
         log.info("=== Corp managment List Page ===");
         model.addAttribute("bizRegDto", new BizInfoRegDto());
 
@@ -1040,6 +1074,8 @@ public class PageController {
             model.addAttribute("showListCnt", showListCnt);
             List<CommCdBaseDto> creditCardList = codeService.commonCodeStringToNum("CREDITCARDCD"); // 카드사코드
             model.addAttribute("creditCardList", creditCardList);
+            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(), "N0200");
+            model.addAttribute("menuAuthority", menuAuthority);
         } catch (Exception e) {
             e.getStackTrace();
             model.addAttribute("bizList", Collections.emptyList());
