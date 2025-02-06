@@ -22,6 +22,6 @@ public interface MenuAuthorityRepositoryCustom {
     // 메뉴 단건의 권한
     MenuAuthority findMenuAuthorityOne(Long companyId, String authority, String menuCode);
 
-    //
+    // 사용자 메뉴별 권한 조회
     MenuAuthorityBaseDto findUserMenuAuthority(Long companyId, String authority, String menuCode);
 }

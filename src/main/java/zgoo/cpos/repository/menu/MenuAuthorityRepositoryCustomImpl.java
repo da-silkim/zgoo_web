@@ -82,8 +82,8 @@ public class MenuAuthorityRepositoryCustomImpl implements MenuAuthorityRepositor
 
         authorityList.forEach(dto -> {
             dto.setModYn("Y");
-            dto.setReadYn("Y");
-            dto.setExcelYn("Y");
+            dto.setReadYn("N");
+            dto.setExcelYn("N");
         });
 
         return authorityList;

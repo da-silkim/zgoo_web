@@ -140,6 +140,22 @@ public class MenuAuthorityService {
             }
 
             MenuAuthorityBaseDto dto = this.menuAuthorityRepository.findUserMenuAuthority(companyId, authority, menuCode);
+
+            // 권한설정이 안 되어있을 경우
+            if (dto == null) {
+                Company company = this.companyRepository.findById(companyId)
+                    .orElseThrow(() -> new IllegalArgumentException("=== company not found ==="));
+
+                dto = new MenuAuthorityBaseDto();
+                dto.setCompanyId(companyId);
+                dto.setCompanyName(company.getCompanyName());
+                dto.setAuthority(authority);
+                dto.setMenuCode(menuCode);
+                dto.setReadYn("Y");
+                dto.setModYn("N");
+                dto.setExcelYn("N");
+            }
+
             return dto;
         } catch (Exception e) {
             log.error("[searchUserAuthority] error: {}", e.getMessage());
