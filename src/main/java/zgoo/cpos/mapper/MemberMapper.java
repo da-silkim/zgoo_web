@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import zgoo.cpos.domain.biz.BizInfo;
 import zgoo.cpos.domain.company.Company;
 import zgoo.cpos.domain.member.MemberCondition;
+import zgoo.cpos.domain.member.ConditionCode;
 import zgoo.cpos.domain.member.Member;
 import zgoo.cpos.domain.member.MemberCar;
 import zgoo.cpos.domain.member.MemberCreditCard;
@@ -98,12 +99,12 @@ public class MemberMapper {
     /* 
      * condition(dto >> entity)
      */
-    public static MemberCondition toEntityCondition(MemberConditionDto dto, Member member) {
+    public static MemberCondition toEntityCondition(MemberConditionDto dto, Member member, ConditionCode conditionCode) {
         MemberCondition condition = MemberCondition.builder()
                 .member(member)
-                .conditionCode(dto.getConditionCode())
+                .condition(conditionCode)
                 .agreeYn(dto.getAgreeYn())
-                .section(dto.getSection())
+                .agreeDt(LocalDateTime.now())
                 .build();
         return condition;
     }

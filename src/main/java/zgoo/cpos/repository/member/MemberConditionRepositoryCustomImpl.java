@@ -8,8 +8,8 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import zgoo.cpos.domain.code.QCommonCode;
 import zgoo.cpos.domain.member.MemberCondition;
+import zgoo.cpos.domain.member.QConditionCode;
 import zgoo.cpos.domain.member.QMemberCondition;
 import zgoo.cpos.dto.member.MemberDto.MemberConditionDto;
 
@@ -17,36 +17,37 @@ import zgoo.cpos.dto.member.MemberDto.MemberConditionDto;
 @RequiredArgsConstructor
 public class MemberConditionRepositoryCustomImpl implements MemberConditionRepositoryCustom {
     private final JPAQueryFactory queryFactory;
-    QMemberCondition condition = QMemberCondition.memberCondition;
-    QCommonCode conditionCodeName = new QCommonCode("conditionCode");
+    QMemberCondition memberCondition = QMemberCondition.memberCondition;
+    QConditionCode conCode = QConditionCode.conditionCode1;
 
     @Override
     public List<MemberConditionDto> findAllByMemberIdDto(Long memberId) {
         return queryFactory.select(Projections.fields(MemberConditionDto.class,
-            condition.conditionCode.as("conditionCode"),
-            condition.agreeYn.as("agreeYn"),
-            condition.section.as("section"),
-            Expressions.stringTemplate("IF({0} = 'Y', '동의', '미동의')", condition.agreeYn).as("agreeYnCheck"),
-            conditionCodeName.name.as("conditionCodeName")))
-            .from(condition)
-            .leftJoin(conditionCodeName).on(condition.conditionCode.eq(conditionCodeName.commonCode))
-            .where(condition.member.id.eq(memberId))
+            memberCondition.condition.conditionCode.as("conditionCode"),
+            memberCondition.agreeYn.as("agreeYn"),
+            memberCondition.agreeDt.as("agreeDt"),
+            Expressions.stringTemplate("IF({0} = 'Y', '동의', '미동의')", memberCondition.agreeYn).as("agreeYnCheck"),
+            conCode.conditionName.as("conditionCodeName"),
+            Expressions.stringTemplate("IF({0} = 'Y', '필수', '선택')", conCode.section).as("section")))
+            .from(memberCondition)
+            .leftJoin(conCode).on(conCode.conditionCode.eq(memberCondition.condition.conditionCode))
+            .where(memberCondition.member.id.eq(memberId))
             .fetch();
     }
 
     @Override
     public List<MemberCondition> findAllByMemberId(Long memberId) {
         return queryFactory
-            .selectFrom(condition)
-            .where(condition.member.id.eq(memberId))
+            .selectFrom(memberCondition)
+            .where(memberCondition.member.id.eq(memberId))
             .fetch();
     }
 
     @Override
     public void deleteAllByMemberId(Long memberId) {
         queryFactory
-            .delete(condition)
-            .where(condition.member.id.eq(memberId))
+            .delete(memberCondition)
+            .where(memberCondition.member.id.eq(memberId))
             .execute();
     }
 }

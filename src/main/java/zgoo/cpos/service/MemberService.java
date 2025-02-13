@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import zgoo.cpos.domain.biz.BizInfo;
 import zgoo.cpos.domain.company.Company;
+import zgoo.cpos.domain.member.ConditionCode;
 import zgoo.cpos.domain.member.Member;
 import zgoo.cpos.domain.member.MemberCar;
 import zgoo.cpos.domain.member.MemberCondition;
@@ -30,6 +31,7 @@ import zgoo.cpos.dto.member.MemberDto.MemberRegDto;
 import zgoo.cpos.mapper.MemberMapper;
 import zgoo.cpos.repository.biz.BizRepository;
 import zgoo.cpos.repository.company.CompanyRepository;
+import zgoo.cpos.repository.member.ConditionCodeRepository;
 import zgoo.cpos.repository.member.MemberCarRepository;
 import zgoo.cpos.repository.member.MemberConditionRepository;
 import zgoo.cpos.repository.member.MemberCreditCardRepository;
@@ -48,6 +50,7 @@ public class MemberService {
     public final MemberConditionRepository memberConditionRepository;
     public final CompanyRepository companyRepository;
     public final BizRepository bizRepository;
+    public final ConditionCodeRepository conditionCodeRepository;
 
     // 회원 조회
     public Page<MemberListDto> findMemberInfoWithPagination(Long companyId, String idTag, String name, int page, int size) {
@@ -101,14 +104,21 @@ public class MemberService {
             .orElseThrow(() -> new IllegalArgumentException("member not found with id: " + memberId));
 
         try {
+            log.info("[findMemberDetailOne] start... ");
             List<MemberCarDto> carInfo = this.memberCarRepository.findAllByMemberIdDto(memberId);
+            log.info("[findAllByMemberIdDto] carInfo success");
+            
             List<MemberConditionDto> conditionInfo = this.memberConditionRepository.findAllByMemberIdDto(memberId);
+            log.info("[findAllByMemberIdDto] conditionInfo success");
 
             if ("PB".equals(member.getBizType())) { // 개인
                 List<MemberCreditCardDto> cardInfo = this.memberCreditCardRepository.findAllByMemberIdDto(memberId);
+                log.info("[findAllByMemberIdDto] cardInfo success");
+
                 for (MemberCreditCardDto dto : cardInfo) {
                     dto.setCardNum(AESUtil.decrypt(dto.getCardNum()));
                 }
+
                 return this.memberRepository.findMemberDetailOne(memberId, cardInfo, carInfo, conditionInfo);
             } else if ("CB".equals(member.getBizType())) { // 법인
                 return this.memberRepository.findBizMemberDetailOne(memberId, carInfo, conditionInfo);
@@ -219,7 +229,9 @@ public class MemberService {
         try {
             if (dtos != null) {
                 for (MemberConditionDto dto : dtos) {
-                    MemberCondition condition = MemberMapper.toEntityCondition(dto, member);
+                    String conCode = dto.getConditionCode();
+                    ConditionCode conditionCode = this.conditionCodeRepository.findByConditionCode(conCode);
+                    MemberCondition condition = MemberMapper.toEntityCondition(dto, member, conditionCode);
                     this.memberConditionRepository.save(condition);
                 }
             }
@@ -354,7 +366,7 @@ public class MemberService {
             
             for (MemberConditionDto conditionDto : dto.getCondition()) {
                 MemberCondition matchedOne = conditionList.stream()
-                    .filter(c -> c.getConditionCode().equals(conditionDto.getConditionCode()))
+                    .filter(c -> c.getCondition().getConditionCode().equals(conditionDto.getConditionCode()))
                     .findFirst()
                     .orElse(null);
                 

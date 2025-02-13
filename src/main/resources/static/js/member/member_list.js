@@ -594,14 +594,14 @@ $(document).ready(function() {
         const conditionInfoList = [];
 
         conditionRows.forEach(row => {
-            const section = row.querySelector(".condition-section").innerText;
+            // const section = row.querySelector(".condition-section").innerText;
             const conditionCode = row.querySelector(".condition-code").id;
             const agreeYn = row.querySelector('input[type="radio"]:checked').value;
 
             conditionInfoList.push({
                 conditionCode: conditionCode,
                 agreeYn: agreeYn,
-                section: section
+                // section: section
             });
         });
 
