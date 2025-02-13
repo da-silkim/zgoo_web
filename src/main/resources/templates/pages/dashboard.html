@@ -87,7 +87,7 @@
         </div>
         <!-- row:2 end -->
         <!-- row:3 start -->
-        <div class="row main-row">
+        <div class="row main-row" style="height: 300px;">
             <div class="col-7 h-100">
                 <div class="card h-100">
                     <div class="card-body">
@@ -117,14 +117,28 @@
             </div>
             <div class="col-5 h-100">
                 <div class="card h-100">
-                    <div class="card-body h-100">
-                        <div class="card-title"><span class="card-title-bar"></span><span>공지 사항</span>
-                            <span class="article-detail">
-                                <a th:href="@{/system/notice/list}">더보기<i class="bi bi-plus-circle ms-1"></i></a>
-                            </span>
+                    <div class="card-body main-notice-container">
+                        <div>
+                            <div class="card-title"><span class="card-title-bar"></span><span>공지 사항</span></div>
                         </div>
-                        <div class="py-4 px-2 m-auto mh-100">
-                            <div id="noticeList"></div>
+                        <span class="article-detail">
+                            <a th:href="@{/system/notice/list}">더보기<i class="bi bi-plus-circle ms-1"></i></a>
+                        </span>
+                        <div>
+                            <table>
+                                <tbody>
+                                    <tr th:each="notice : ${noticeList}">
+                                        <td>
+                                            <a th:href="@{/system/notice/detail/{id}(id=${notice.idx}, page=0, size=10)}" class="no-underline">
+                                                <div>
+                                                    <span th:text="|[${notice.typeName}] ${notice.title}|"></span>
+                                                    <span th:text="${#temporals.format(notice.regDt, 'yyyy-MM-dd HH:mm:ss')}" style="float: right;"></span>
+                                                </div>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>

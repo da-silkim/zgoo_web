@@ -91,14 +91,21 @@ input.input-add-row-bb{ border: none; border-bottom: 1px solid grey; outline: no
 .main-content .card .card-body .card-title { font-size: 20px; font-weight: bold; display: flex; align-items: center; }
 .main-content .card .card-body .card-title .card-title-bar { width: 4px; height: 30px; background: linear-gradient(#021526, #394867, #9BA4B4); display: inline-block; margin-right: 8px; }
 .main-content .main-row .card-body { overflow: hidden; }
-.main-content .main-row .card-body .card-title .article-detail { font-size: 16px; font-weight: 500; margin-left: auto; }
-.main-content .main-row .card-body .card-title .article-detail > a { text-decoration: none; color: #394867;}
+.main-content .main-row .card-body .article-detail { font-size: 16px; font-weight: 500; margin-left: auto; }
+.main-content .main-row .card-body .article-detail > a { text-decoration: none; color: #394867; position: absolute; top: 16px; right: 16px; }
 .main-content .main-row .card-body .error-status thead > tr { border-top-style: solid; border-top-color: grey; }
 .main-content .main-row .card-body .error-status thead tr > th { background-color: #F5F7F8; }
 .main-content .main-row .card-body .sales-status { padding: 10px 20px; font-size: 20px; }
 .main-content .main-row .card-body .sales-status .col6-text { font-size: 16px; display: flex; align-items: center; padding-left: 30px; }
 .main-content .main-row .card-body .charge-status { padding: 10px 20px; font-size: 20px; }
 .main-content .main-row .card-body .charge-status .col6-text { font-size: 16px; display: flex; align-items: center; padding-left: 30px; }
+
+.main-notice-container { width: 100% !important; position: relative; }
+.main-notice-container > div:nth-child(1) { position: absolute; top: 16px; left: 16px; }
+.main-notice-container > div:nth-child(3) { width: 100% !important; padding-top: 46px; }
+.main-notice-container > div:nth-child(3) table { width: 100% !important; height: auto; min-width: 500px; }
+.main-notice-container > div:nth-child(3) table tr { border-bottom: grey 1px solid; }
+.main-notice-container > div:nth-child(3) table tr td { height: 40px; }
 
 .table-bg thead tr > th, .table-bg-v tbody tr > th { background-color: #F5F7F8; }
 .table-border-top { border-top-color: #3D3B40; border-top-style: solid; border-top-width: 2px; }

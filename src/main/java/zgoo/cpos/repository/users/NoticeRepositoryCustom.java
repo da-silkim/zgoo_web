@@ -1,7 +1,7 @@
 package zgoo.cpos.repository.users;
 
 import java.time.LocalDate;
-import java.util.Optional;
+import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -33,4 +33,7 @@ public interface NoticeRepositoryCustom {
     Long deleteNoticeOne(Long idx);
 
     Users findUserOne (String userId);
+
+    // 공지사항 최신 4건 조회(대시보드)
+    List<NoticeListDto> findLatestNoticeList();
 }

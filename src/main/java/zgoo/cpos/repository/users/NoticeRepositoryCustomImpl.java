@@ -241,4 +241,29 @@ public class NoticeRepositoryCustomImpl implements NoticeRepositoryCustom {
                     .and(notice.delYn.eq("N")))
                 .execute();
     }
+
+    @Override
+    public List<NoticeListDto> findLatestNoticeList() {
+        List<NoticeListDto> noticeList = queryFactory.select(Projections.fields(NoticeListDto.class,
+            notice.idx.as("idx"),
+            notice.title.as("title"),
+            notice.content.as("content"),
+            notice.type.as("type"),
+            notice.views.as("views"),
+            notice.regDt.as("regDt"),
+            users.userId.as("userId"),
+            users.name.as("userName"),
+            company.id.as("companyId"),
+            company.companyName.as("companyName"),
+            typeCommonCode.name.as("typeName")))
+            .from(notice)
+            .leftJoin(users).on(notice.user.userId.eq(users.userId))
+            .leftJoin(company).on(users.company.id.eq(company.id))
+            .leftJoin(typeCommonCode).on(notice.type.eq(typeCommonCode.commonCode))
+            .where(notice.delYn.eq("N"))
+            .orderBy(notice.regDt.desc(), notice.idx.desc())
+            .limit(5)
+            .fetch();
+        return noticeList;
+    }
 }

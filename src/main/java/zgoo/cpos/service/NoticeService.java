@@ -1,6 +1,8 @@
 package zgoo.cpos.service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
@@ -14,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import zgoo.cpos.domain.users.Notice;
 import zgoo.cpos.domain.users.Users;
 import zgoo.cpos.dto.users.NoticeDto;
+import zgoo.cpos.dto.users.NoticeDto.NoticeListDto;
 import zgoo.cpos.dto.users.UsersDto;
 import zgoo.cpos.mapper.NoticeMapper;
 import zgoo.cpos.repository.users.NoticeRepository;
@@ -158,5 +161,17 @@ public class NoticeService {
     public void deleteNotice(Long idx) {
         Long count = this.noticeRepository.deleteNoticeOne(idx);
         log.info("=== delete notice info: {}", count);
+    }
+
+    // 공지사항 최신 조회
+    public List<NoticeListDto> findLatestNoticeList() {
+        try {
+            List<NoticeListDto> noticeList = this.noticeRepository.findLatestNoticeList();
+            log.info("[findLatestNoticeList] success");
+            return noticeList;
+        } catch (Exception e) {
+            log.error("[findLatestNoticeList] error: {}", e.getMessage());
+            return new ArrayList<>();
+        }
     }
 }

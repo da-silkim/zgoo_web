@@ -46,6 +46,7 @@ import zgoo.cpos.dto.tariff.TariffDto.TariffPolicyDto;
 import zgoo.cpos.dto.tariff.TariffDto.TariffRegDto;
 import zgoo.cpos.dto.users.FaqDto;
 import zgoo.cpos.dto.users.NoticeDto;
+import zgoo.cpos.dto.users.NoticeDto.NoticeListDto;
 import zgoo.cpos.dto.users.UsersDto;
 import zgoo.cpos.service.BizService;
 import zgoo.cpos.service.ChgErrorCodeService;
@@ -91,6 +92,14 @@ public class PageController {
     public String showdashboard(Model model) {
         log.info("Dashboard Home");
         // 필요한 data를 model에 추가 !!!
+
+        try {
+            List<NoticeListDto> noticeList = this.noticeService.findLatestNoticeList();
+            model.addAttribute("noticeList", noticeList);
+        } catch (Exception e) {
+            e.getStackTrace();
+            model.addAttribute("noticeList", Collections.emptyList());
+        }
 
         return "pages/dashboard";
     }
