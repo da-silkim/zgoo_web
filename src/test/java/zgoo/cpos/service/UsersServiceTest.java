@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import zgoo.cpos.dto.users.UsersDto;
 import zgoo.cpos.dto.users.UsersDto.UsersListDto;
 import zgoo.cpos.dto.users.UsersDto.UsersRegDto;
+import zgoo.cpos.util.EncryptionUtils;
 
 @SpringBootTest
 @Transactional
@@ -33,17 +34,18 @@ public class UsersServiceTest {
     }
 
     @Test
+    @Rollback(false)
     @DisplayName("사용자 - 등록")
     public void createUsers() throws Exception {
 
         UsersRegDto dto = UsersRegDto.builder()
                 .companyId(1L)
-                .userId("test4")
-                .password("1234")
-                .name("test4")
-                .phone("01022224444")
-                .email("teset4@test.com")
-                .authority("AD")
+                .userId("test12")
+                .password("qqq1111!!")
+                .name("테스트12")
+                .phone("010-2222-4444")
+                .email("teset12@test.com")
+                .authority("SU")
                 .regDt(LocalDateTime.now())
                 .build();
 
@@ -91,7 +93,7 @@ public class UsersServiceTest {
         // System.out.println("=== before delete: " + before.toString());
 
         // after delete
-        this.usersService.deleteUsers("test4");
+        //this.usersService.deleteUsers("test4");
 
         List<UsersDto.UsersListDto> ulist = this.usersService.findUsersAll();
         for (UsersListDto usersListDto : ulist) {

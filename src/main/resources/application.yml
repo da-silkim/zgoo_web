@@ -35,3 +35,6 @@ logging.level:
   org.hibernate.SQL: debug
   org.hibernate.type.descriptor.sql.BasicBinder: trace
   org.hibernate.stat: debug
+
+file:
+  dir: C:/Users/N-426/Desktop/store/

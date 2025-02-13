@@ -30,9 +30,12 @@ import zgoo.cpos.dto.cp.CpModelDto;
 import zgoo.cpos.dto.cp.CpModelDto.CpModelListDto;
 import zgoo.cpos.dto.cs.CsInfoDto;
 import zgoo.cpos.dto.cs.CsInfoDto.CsInfoListDto;
+import zgoo.cpos.dto.member.ConditionDto;
 import zgoo.cpos.dto.member.MemberDto;
 import zgoo.cpos.dto.member.MemberDto.MemberListDto;
 import zgoo.cpos.dto.member.VocDto;
+import zgoo.cpos.dto.member.ConditionDto.ConditionCodeBaseDto;
+import zgoo.cpos.dto.member.ConditionDto.ConditionVersionHistBaseDto;
 import zgoo.cpos.dto.member.VocDto.VocListDto;
 import zgoo.cpos.dto.menu.CompanyMenuAuthorityDto;
 import zgoo.cpos.dto.menu.MenuAuthorityDto;
@@ -47,6 +50,7 @@ import zgoo.cpos.service.BizService;
 import zgoo.cpos.service.ChgErrorCodeService;
 import zgoo.cpos.service.CodeService;
 import zgoo.cpos.service.CompanyService;
+import zgoo.cpos.service.ConditionService;
 import zgoo.cpos.service.CpModelService;
 import zgoo.cpos.service.CsService;
 import zgoo.cpos.service.FaqService;
@@ -77,6 +81,7 @@ public class PageController {
     private final TariffService tariffService;
     private final MemberService memberService;
     private final VocService vocService;
+    private final ConditionService conditionService;
 
     /*
      * 대시보드
@@ -767,6 +772,8 @@ public class PageController {
         log.info("=== Condition List Page ===");
 
         try {
+            List<ConditionCodeBaseDto> conList = this.conditionService.findConditionCodeAll();
+            model.addAttribute("conList", conList);
             MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(), "G0900");
             model.addAttribute("menuAuthority", menuAuthority);
         } catch (Exception e) {
