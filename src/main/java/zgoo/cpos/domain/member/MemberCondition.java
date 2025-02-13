@@ -1,5 +1,7 @@
 package zgoo.cpos.domain.member;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -31,20 +33,22 @@ public class MemberCondition {
     @Column(name = "condition_id")
     private Long id;
 
-    @Column(name = "condition_code")
-    private String conditionCode;
-
     @Column(name = "agree_yn")
     private String agreeYn;
 
-    @Column(name = "section")
-    private String section;
+    @Column(name = "agree_dt")
+    private LocalDateTime agreeDt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "condition_code")
+    private ConditionCode condition;
+
     public void updateMemberConditionInfo(MemberConditionDto dto) {
         this.agreeYn = dto.getAgreeYn();
+        this.agreeDt = LocalDateTime.now();
     }
 }

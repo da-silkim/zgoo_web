@@ -109,6 +109,7 @@ public class MemberDto {
         private String agreeYnCheck;
         private String section;
         private String conditionCodeName;
+        private LocalDateTime agreeDt;
     }
 
     @Data
