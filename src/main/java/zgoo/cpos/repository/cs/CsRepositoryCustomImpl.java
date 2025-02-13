@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
@@ -200,13 +201,15 @@ public class CsRepositoryCustomImpl implements CsRepositoryCustom {
             csInfo.parkingFeeYn.as("parkingFeeYn"),
             land.institutionName.as("institutionName"),
             land.landType.as("landType"),
-            land.staffName.as("staffName"),
-            land.staffPhone.as("staffPhone"),
+            Expressions.stringTemplate("IF({0} IS NULL OR {0} = '', '정보없음', {0})", land.staffName).as("staffName"),
+            Expressions.stringTemplate("IF({0} IS NULL OR {0} = '', '정보없음', {0})", land.staffPhone).as("staffPhone"),
+            Expressions.stringTemplate("IF({0} IS NULL, '정보없음', {0})", land.contractDate).as("contractDateString"),
             land.contractDate.as("contractDate"),
             land.startDate.as("startDate"),
             land.endDate.as("endDate"),
             land.landUseRate.as("landUseRate"),
             land.billDate.as("billDate"),
+            Expressions.stringTemplate("IF({0} IS NULL, '정보없음', {0})", land.billDate).as("billDateString"),
             kepco.KepcoCustNo.as("kepcoCustNo"),
             kepco.openingDate.as("openingDate"),
             kepco.contPower.as("contPower"),
@@ -217,8 +220,9 @@ public class CsRepositoryCustomImpl implements CsRepositoryCustom {
             stationTypeCode.name.as("stationTypeName"),
             facilityTypeCode.name.as("facilityTypeName"),
             landTypeCode.name.as("landTypeName"),
-            rcvCapacityMethodCode.name.as("rcvCapacityMethodName"),
-            voltageTypeCode.name.as("voltageTypeName"),
+            Expressions.stringTemplate("IF({0} IS NULL OR {0} = '', '정보없음', {0})", rcvCapacityMethodCode.name).as("rcvCapacityMethodName"),
+            Expressions.stringTemplate("IF({0} IS NULL OR {0} = '', '정보없음', {0})", voltageTypeCode.name).as("voltageTypeName"),
+            Expressions.stringTemplate("IF({0} IS NULL, '정보없음', {0})", kepco.rcvCapacity).as("rcvCapacityString"),
             company.companyName.as("companyName")))
             .from(csInfo)
             .leftJoin(company).on(csInfo.company.eq(company))
@@ -276,13 +280,15 @@ public class CsRepositoryCustomImpl implements CsRepositoryCustom {
             csInfo.parkingFeeYn.as("parkingFeeYn"),
             land.institutionName.as("institutionName"),
             land.landType.as("landType"),
-            land.staffName.as("staffName"),
-            land.staffPhone.as("staffPhone"),
+            Expressions.stringTemplate("IF({0} IS NULL OR {0} = '', '정보없음', {0})", land.staffName).as("staffName"),
+            Expressions.stringTemplate("IF({0} IS NULL OR {0} = '', '정보없음', {0})", land.staffPhone).as("staffPhone"),
+            Expressions.stringTemplate("IF({0} IS NULL, '정보없음', {0})", land.contractDate).as("contractDateString"),
             land.contractDate.as("contractDate"),
             land.startDate.as("startDate"),
             land.endDate.as("endDate"),
             land.landUseRate.as("landUseRate"),
             land.billDate.as("billDate"),
+            Expressions.stringTemplate("IF({0} IS NULL, '정보없음', {0})", land.billDate).as("billDateString"),
             kepco.KepcoCustNo.as("kepcoCustNo"),
             kepco.openingDate.as("openingDate"),
             kepco.contPower.as("contPower"),
@@ -293,8 +299,9 @@ public class CsRepositoryCustomImpl implements CsRepositoryCustom {
             stationTypeCode.name.as("stationTypeName"),
             facilityTypeCode.name.as("facilityTypeName"),
             landTypeCode.name.as("landTypeName"),
-            rcvCapacityMethodCode.name.as("rcvCapacityMethodName"),
-            voltageTypeCode.name.as("voltageTypeName"),
+            Expressions.stringTemplate("IF({0} IS NULL OR {0} = '', '정보없음', {0})", rcvCapacityMethodCode.name).as("rcvCapacityMethodName"),
+            Expressions.stringTemplate("IF({0} IS NULL OR {0} = '', '정보없음', {0})", voltageTypeCode.name).as("voltageTypeName"),
+            Expressions.stringTemplate("IF({0} IS NULL, '정보없음', {0})", kepco.rcvCapacity).as("rcvCapacityString"),
             company.companyName.as("companyName")))
             .from(csInfo)
             .leftJoin(company).on(csInfo.company.eq(company))
@@ -346,13 +353,15 @@ public class CsRepositoryCustomImpl implements CsRepositoryCustom {
             csInfo.parkingFeeYn.as("parkingFeeYn"),
             land.institutionName.as("institutionName"),
             land.landType.as("landType"),
-            land.staffName.as("staffName"),
-            land.staffPhone.as("staffPhone"),
+            Expressions.stringTemplate("IF({0} IS NULL OR {0} = '', '정보없음', {0})", land.staffName).as("staffName"),
+            Expressions.stringTemplate("IF({0} IS NULL OR {0} = '', '정보없음', {0})", land.staffPhone).as("staffPhone"),
+            Expressions.stringTemplate("IF({0} IS NULL, '정보없음', {0})", land.contractDate).as("contractDateString"),
             land.contractDate.as("contractDate"),
             land.startDate.as("startDate"),
             land.endDate.as("endDate"),
             land.landUseRate.as("landUseRate"),
             land.billDate.as("billDate"),
+            Expressions.stringTemplate("IF({0} IS NULL, '정보없음', {0})", land.billDate).as("billDateString"),
             kepco.KepcoCustNo.as("kepcoCustNo"),
             kepco.openingDate.as("openingDate"),
             kepco.contPower.as("contPower"),
@@ -363,8 +372,9 @@ public class CsRepositoryCustomImpl implements CsRepositoryCustom {
             stationTypeCode.name.as("stationTypeName"),
             facilityTypeCode.name.as("facilityTypeName"),
             landTypeCode.name.as("landTypeName"),
-            rcvCapacityMethodCode.name.as("rcvCapacityMethodName"),
-            voltageTypeCode.name.as("voltageTypeName"),
+            Expressions.stringTemplate("IF({0} IS NULL OR {0} = '', '정보없음', {0})", rcvCapacityMethodCode.name).as("rcvCapacityMethodName"),
+            Expressions.stringTemplate("IF({0} IS NULL OR {0} = '', '정보없음', {0})", voltageTypeCode.name).as("voltageTypeName"),
+            Expressions.stringTemplate("IF({0} IS NULL, '정보없음', {0})", kepco.rcvCapacity).as("rcvCapacityString"),
             company.companyName.as("companyName")))
             .from(csInfo)
             .leftJoin(company).on(csInfo.company.eq(company))

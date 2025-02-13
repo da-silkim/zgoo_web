@@ -81,19 +81,15 @@
                                     <th class="w-20" scope="row">운영시간<b class="required-data">*</b></th>
                                     <td class="w-30">
                                         <span th:text="${csInfo.openStartTimeFormatted + ' ~ ' + csInfo.openEndTimeFormatted}"></span>
-
                                     </td>
                                     <th class="w-20" scope="row">주차요금 정보</th>
                                     <td>
-                                        <div class="display-radio">
-                                            <input type="radio" name="parkingFeeYn" id="parkingFeeYes" value="Y" 
-                                                th:checked="${csInfo.parkingFeeYn == 'Y'}" th:disabled="true">
-                                            <label for="parkingFeeYes">유료</label>
-
-                                            <input type="radio" name="parkingFeeYn" id="parkingFeeNo" value="N"
-                                                th:checked="${csInfo.parkingFeeYn == 'N'}" th:disabled="true">
-                                            <label for="parkingFeeNo">무료</label>
-                                        </div>
+                                        <input type="radio" name="parkingFeeYn" id="parkingFeeYes" value="Y" 
+                                            th:checked="${csInfo.parkingFeeYn == 'Y'}" th:disabled="true">
+                                        <label for="parkingFeeYes" class="me-4">유료</label>
+                                        <input type="radio" name="parkingFeeYn" id="parkingFeeNo" value="N"
+                                            th:checked="${csInfo.parkingFeeYn == 'N'}" th:disabled="true">
+                                        <label for="parkingFeeNo">무료</label>
                                     </td>
                                 </tr>
                             </tbody>
@@ -116,19 +112,17 @@
                                 <tr>
                                     <th class="w-20">담당자 명</th>
                                     <td class="w-30">
-                                        <span th:if="${csInfo.staffName != null and !csInfo.staffName.isEmpty()}" th:text="${csInfo.staffName}"></span>
-                                        <span th:unless="${csInfo.staffName != null and !csInfo.staffName.isEmpty()}" th:text="'없음'"></span>
+                                        <span th:text="${csInfo.staffName}"></span>
                                     </td>
                                     <th class="w-20">담당자 연락처</th>
                                     <td class="w-30">
-                                        <span th:if="${csInfo.staffPhone != null and !csInfo.staffPhone.isEmpty()}" th:text="${csInfo.staffPhone}"></span>
-                                        <span th:unless="${csInfo.staffPhone != null and !csInfo.staffPhone.isEmpty()}" th:text="'없음'"></span>
+                                        <span th:text="${csInfo.staffPhone}"></span>
                                     </td>
                                 </tr>
                                 <tr>
                                     <th class="w-20">계약일자</th>
                                     <td class="w-30">
-                                        <span th:text="${csInfo.contractDate}"></span>
+                                        <span th:text="${csInfo.contractDateString}"></span>
                                     </td>
                                     <th class="w-20">계약기간<b class="required-data">*</b></th>
                                     <td class="w-30">
@@ -136,13 +130,13 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="w-20">부지사용료율<b class="required-data">*</b></th>
+                                    <th class="w-20">부지사용료율(%)<b class="required-data">*</b></th>
                                     <td class="w-30">
-                                        <span th:text="${csInfo.landUseRate} + ' %'"></span>
+                                        <span th:text="${csInfo.landUseRate}"></span>
                                     </td>
-                                    <th class="w-20">계산서 발행일<b class="required-data">*</b></th>
+                                    <th class="w-20">계산서 발행일</th>
                                     <td class="w-30">
-                                        <span th:text="${csInfo.billDate}"></span>
+                                        <span th:text="${csInfo.billDateString}"></span>
                                     </td>
                                 </tr>
                             </tbody>
@@ -163,26 +157,23 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="w-20">계약전력<b class="required-data">*</b></th>
+                                    <th class="w-20">계약전력(kW)<b class="required-data">*</b></th>
                                     <td class="w-30">
                                         <span th:text="${csInfo.contPower}"></span>
                                     </td>
                                     <th class="w-20">수전방식</th>
                                     <td class="w-30">
-                                        <span th:if="${csInfo.rcvCapacityMethodName != null and !csInfo.rcvCapacityMethodName.isEmpty()}" th:text="${csInfo.rcvCapacityMethodName}"></span>
-                                        <span th:unless="${csInfo.rcvCapacityMethodName != null and !csInfo.rcvCapacityMethodName.isEmpty()}" th:text="'없음'"></span>
+                                        <span th:text="${csInfo.rcvCapacityMethodName}"></span>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="w-20">수전용량</th>
+                                    <th class="w-20">수전용량(kVA)</th>
                                     <td class="w-30">
-                                        <span th:if="${csInfo.rcvCapacity != null}" th:text="${csInfo.rcvCapacity}"></span>
-                                        <span th:unless="${csInfo.rcvCapacity != null}" th:text="'없음'"></span>
+                                        <span th:text="${csInfo.rcvCapacityString}"></span>
                                     </td>
-                                    <th class="w-20">전압종류</th>
+                                    <th class="w-20">가입요금제</th>
                                     <td class="w-30">
-                                        <span th:if="${csInfo.voltageTypeName != null and !csInfo.voltageTypeName.isEmpty()}" th:text="${csInfo.voltageTypeName}"></span>
-                                        <span th:unless="${csInfo.voltageTypeName != null and !csInfo.voltageTypeName.isEmpty()}" th:text="'없음'"></span>
+                                        <span th:text="${csInfo.voltageTypeName}"></span>
                                     </td>
                                 </tr>
                             </tbody>

@@ -92,5 +92,10 @@ public class CsInfoDto {
         private String voltageTypeName;  // 전압종류 코드명
         private String openStartTimeFormatted;
         private String openEndTimeFormatted;
+
+        // '정보없음' 출력을 위한 데이터 형변환
+        private String contractDateString;
+        private String rcvCapacityString;
+        private String billDateString;
     }
 }
