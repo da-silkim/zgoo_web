@@ -23,7 +23,7 @@ public class CsMapper {
                 .asNum(dto.getAsNum())
                 .opStatus(dto.getOpStatus())
                 .latitude(dto.getLatitude())
-                .longtude(dto.getLongtude())
+                .longitude(dto.getLongitude())
                 .zipcode(dto.getZipcode())
                 .address(dto.getAddress())
                 .addressDetail(dto.getAddressDetail())

@@ -298,14 +298,14 @@ function postSearch() {
             document.getElementById('addressDetail').focus();
 
             const latitude = document.getElementById('latitude');
-            const longtude = document.getElementById('longtude');
+            const longitude = document.getElementById('longitude');
 
-            if (latitude && longtude) {
+            if (latitude && longitude) {
                 const geocoder = new kakao.maps.services.Geocoder();
                 geocoder.addressSearch(addr, (result, status) => {
                     if (status === kakao.maps.services.Status.OK) {
                         latitude.value = result[0].y;
-                        longtude.value = result[0].x;
+                        longitude.value = result[0].x;
                     }
                 })
             }

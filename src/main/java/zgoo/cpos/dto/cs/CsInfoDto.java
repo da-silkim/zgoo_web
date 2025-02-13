@@ -51,7 +51,7 @@ public class CsInfoDto {
         private String facilityType;
         private String asNum;
         private Double latitude;
-        private Double longtude;
+        private Double longitude;
         private String zipcode;
         private String addressDetail;
         private String parkingFeeYn;

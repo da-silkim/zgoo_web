@@ -5483,7 +5483,7 @@
       "SAlZKJfFTY8IuiLtgGmkM": {
         "id": "SAlZKJfFTY8IuiLtgGmkM",
         "tableId": "s4c_6KE-Yfti6apXYM4yC",
-        "name": "longtude",
+        "name": "longitude",
         "comment": "",
         "dataType": "DOUBLE",
         "default": "",

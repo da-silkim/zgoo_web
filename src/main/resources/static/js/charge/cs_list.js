@@ -105,7 +105,7 @@ $(document).ready(function() {
                 $('#address').val(data.address || '');
                 $('#addressDetail').val(data.addressDetail || '');
                 $('#latitude').val(data.latitude || '');
-                $('#longtude').val(data.longtude || '');
+                $('#longitude').val(data.longitude || '');
                 $('#openStartTime').val(data.openStartTime || '');
                 $('#openEndTime').val(data.openEndTime || '');
 
@@ -186,7 +186,7 @@ $(document).ready(function() {
                 address: $('#address').val(),
                 addressDetail: $('#addressDetail').val(),
                 latitude: $('#latitude').val(),
-                longtude: $('#longtude').val(),
+                longitude: $('#longitude').val(),
                 openStartTime: $('#openStartTime').val(),
                 openEndTime: $('#openEndTime').val(),
                 parkingFeeYn: $('input[name="parkingFeeYn"]:checked').val(),

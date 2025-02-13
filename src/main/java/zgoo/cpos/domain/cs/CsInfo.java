@@ -49,8 +49,8 @@ public class CsInfo {
     @Column(name = "latitude")
     private Double latitude;
 
-    @Column(name = "longtude")
-    private Double longtude;
+    @Column(name = "longitude")
+    private Double longitude;
 
     @Column(name = "zipcode")
     private String zipcode;
@@ -89,7 +89,7 @@ public class CsInfo {
         this.asNum = dto.getAsNum();
         this.opStatus = dto.getOpStatus();
         this.latitude = dto.getLatitude();
-        this.longtude = dto.getLongtude();
+        this.longitude = dto.getLongitude();
         this.zipcode = dto.getZipcode();
         this.address = dto.getAddress();
         this.addressDetail = dto.getAddressDetail();
