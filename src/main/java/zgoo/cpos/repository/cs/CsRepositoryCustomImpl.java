@@ -398,4 +398,32 @@ public class CsRepositoryCustomImpl implements CsRepositoryCustom {
                 .where(csInfo.id.eq(stationId))
                 .execute();
     }
+
+    @Override
+    public List<CsInfoDetailDto> findCsInfo() {
+        List<CsInfoDetailDto> csList = queryFactory.select(Projections.fields(CsInfoDetailDto.class,
+            csInfo.id.as("stationId"),
+            csInfo.stationName.as("stationName"),
+            csInfo.stationType.as("stationType"),
+            csInfo.facilityType.as("facilityType"),
+            csInfo.opStatus.as("opStatus"),
+            csInfo.latitude.as("latitude"),
+            csInfo.longitude.as("longitude"),
+            csInfo.zipcode.as("zipcode"),
+            csInfo.address.as("address"),
+            csInfo.addressDetail.as("addressDetail"),
+            csInfo.openStartTime.as("openStartTime"),
+            csInfo.openEndTime.as("openEndTime"),
+            csInfo.parkingFeeYn.as("parkingFeeYn"),
+            opStatusCode.name.as("opStatusName"),
+            company.companyName.as("companyName")))
+            .from(csInfo)
+            .leftJoin(company).on(csInfo.company.eq(company))
+            .leftJoin(kepco).on(csInfo.csKepcoContractInfo.eq(kepco))
+            .leftJoin(land).on(csInfo.csLandInfo.eq(land))
+            .leftJoin(opStatusCode).on(csInfo.opStatus.eq(opStatusCode.commonCode))
+            .orderBy(csInfo.id.desc())
+            .fetch();
+        return csList;
+    }
 }

@@ -6,6 +6,8 @@ document.addEventListener("DOMContentLoaded", function() {
         { name: '동아일렉콤(PRC)', lat: 37.226655, lng: 127.299036 }
     ];
 
+    places = csList;
+
     // map
     var container = document.getElementById('map'); // 지도를 담을 영역의 DOM 레퍼런스
     var options = { // 지도를 생성할 때 필요한 기본 옵션
@@ -121,7 +123,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // 자동 완성 함수
     function autocomplete(val) {
-        let suggestions = places.filter(place => place.name.toLowerCase().includes(val.toLowerCase()));
+        let suggestions = places.filter(place => place.stationName.toLowerCase().includes(val.toLowerCase()));
         displaySuggestions(suggestions);
     }
 
@@ -132,7 +134,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
         suggestions.forEach(suggestion => {
             const item = document.createElement('div');
-            item.textContent = suggestion.name;
+            item.textContent = suggestion.stationName;
             item.addEventListener('click', function() {
                 selectPlace(suggestion); // 장소 선택 시 처리
             });
@@ -147,7 +149,7 @@ document.addEventListener("DOMContentLoaded", function() {
         }
 
         // 새로운 마커 생성
-        var markerPosition = new kakao.maps.LatLng(place.lat, place.lng);
+        var markerPosition = new kakao.maps.LatLng(place.latitude, place.longitude);
         marker = new kakao.maps.Marker({
             position: markerPosition,
             image: markerImg
@@ -159,7 +161,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
         // 자동완성 목록 숨김
         document.getElementById('autocompleteList').innerHTML = '';
-        document.getElementById('searchBox').value = place.name; // 입력란에 선택한 장소 표시
+        document.getElementById('searchBox').value = place.stationName; // 입력란에 선택한 장소 표시
     }
 
     // 입력 시 자동 완성 기능 동작

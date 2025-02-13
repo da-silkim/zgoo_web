@@ -1,5 +1,8 @@
 package zgoo.cpos.service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -213,5 +216,16 @@ public class CsService {
     public void deleteCsInfo(String stationId) {
         Long count = this.csRepository.deleteCsInfoOne(stationId);
         log.info("=== delete cs Info: {}", count);
+    }
+
+    // 충전소 조회
+    public List<CsInfoDetailDto> findCsInfo() {
+        try {
+            List<CsInfoDetailDto> csList = this.csRepository.findCsInfo();
+            return csList;
+        } catch (Exception e) {
+            log.error("[findCsInfo] error: {}", e.getMessage());
+            return new ArrayList<>();
+        }
     }
 }

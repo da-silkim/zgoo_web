@@ -1,5 +1,7 @@
 package zgoo.cpos.repository.cs;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -33,4 +35,7 @@ public interface CsRepositoryCustom {
 
     // 충전소 삭제
     Long deleteCsInfoOne(String stationId);
+
+    // 충전소 조회
+    List<CsInfoDetailDto> findCsInfo();
 }

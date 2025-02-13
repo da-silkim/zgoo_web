@@ -29,6 +29,7 @@ import zgoo.cpos.dto.company.CompanyDto.CpPlanDto;
 import zgoo.cpos.dto.cp.CpModelDto;
 import zgoo.cpos.dto.cp.CpModelDto.CpModelListDto;
 import zgoo.cpos.dto.cs.CsInfoDto;
+import zgoo.cpos.dto.cs.CsInfoDto.CsInfoDetailDto;
 import zgoo.cpos.dto.cs.CsInfoDto.CsInfoListDto;
 import zgoo.cpos.dto.member.ConditionDto;
 import zgoo.cpos.dto.member.MemberDto;
@@ -100,6 +101,15 @@ public class PageController {
     @GetMapping("/map")
     public String showmap(Model model) {
         log.info("=== Map Page ===");
+        
+        try {
+            List<CsInfoDetailDto> csList = this.csService.findCsInfo();
+            model.addAttribute("csList", csList);
+        } catch (Exception e) {
+            e.getStackTrace();
+            model.addAttribute("csList", Collections.emptyList());
+        }
+
         return "pages/map/map";
     }
 
