@@ -523,4 +523,21 @@ public class MemberService {
             return Page.empty(pageable);
         }
     }
+
+    // 회원카드관리 - 단건조회
+    public MemberAuthDto findMemberAuthOne(String idTag) {
+        try {
+            MemberAuthDto authInfo = this.memberAuthRepository.findMemberAuthOne(idTag);
+
+            if (authInfo == null) {
+                log.error("[findMemberAuthOne] not found member auth info");
+                return null;
+            }
+
+            return authInfo;
+        } catch (Exception e) {
+            log.error("[findMemberAuthOne] error : {}", e.getMessage());
+            return null;
+        }
+    }
 }

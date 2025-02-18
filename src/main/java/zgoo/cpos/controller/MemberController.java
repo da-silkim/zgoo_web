@@ -22,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import zgoo.cpos.dto.biz.BizInfoDto.BizInfoRegDto;
 import zgoo.cpos.dto.member.MemberDto;
+import zgoo.cpos.dto.member.MemberDto.MemberAuthDto;
 import zgoo.cpos.dto.member.MemberDto.MemberDetailDto;
 import zgoo.cpos.dto.member.MemberDto.MemberPasswordDto;
 import zgoo.cpos.dto.member.MemberDto.MemberRegDto;
@@ -194,6 +195,31 @@ public class MemberController {
             log.error("[deleteMember] error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                                     .body("회원 정보 삭제 중 오류 발생");
+        }
+    }
+
+    // 회원카드 조회
+    @GetMapping("/tag/get/{idTag}")
+    public ResponseEntity<?> findMemberAuthOne(@PathVariable("idTag") String idTag) {
+        log.info("=== find member auth info ===");
+
+        Map<String, Object> response = new HashMap<>();
+
+        try {
+            MemberAuthDto authOne = this.memberService.findMemberAuthOne(idTag);
+
+            if (authOne == null) {
+                response.put("message", "조회된 데이터가 없습니다.");
+                response.put("authInfo", Collections.emptyList());
+                return ResponseEntity.ok(response);
+            }
+
+            response.put("authInfo", authOne);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            log.error("[findMemberAuthOne] error: {}", e.getMessage());
+            response.put("message", "서버 오류가 발생했습니다. 다시 시도해 주세요.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
 }

@@ -11,5 +11,8 @@ public interface MemberAuthRepositoryCustom {
     Page<MemberAuthDto> findMemberAuthWithPagination(Pageable pageable);
 
     // 검색조회
-    Page<MemberAuthDto> searchMemberAuthWithPagination(String idTag, String name, Pageable pageable);
+    Page<MemberAuthDto> searchMemberAuthWithPagination(String idtag, String name, Pageable pageable);
+
+    // 단건조회
+    MemberAuthDto findMemberAuthOne(String idtag);
 }

@@ -56,11 +56,11 @@ public class MemberAuthRepositoryCustomImpl implements MemberAuthRepositoryCusto
     }
 
     @Override
-    public Page<MemberAuthDto> searchMemberAuthWithPagination(String idTag, String name, Pageable pageable) {
+    public Page<MemberAuthDto> searchMemberAuthWithPagination(String idtag, String name, Pageable pageable) {
         BooleanBuilder builder = new BooleanBuilder();
 
-        if (idTag != null && !idTag.isEmpty()) {
-            builder.and(memberAuth.idTag.contains(idTag));
+        if (idtag != null && !idtag.isEmpty()) {
+            builder.and(memberAuth.idTag.contains(idtag));
         }
 
         if (name != null && !name.isEmpty()) {
@@ -95,5 +95,27 @@ public class MemberAuthRepositoryCustomImpl implements MemberAuthRepositoryCusto
             .fetchOne();
 
         return new PageImpl<>(memberAuthList, pageable, totalCount);
+    }
+
+    @Override
+    public MemberAuthDto findMemberAuthOne(String idtag) {
+        MemberAuthDto authDto = queryFactory.select(Projections.fields(MemberAuthDto.class,
+        memberAuth.idTag.as("idTag"),
+            memberAuth.expireDate.as("expireDate"),
+            memberAuth.useYn.as("useYn"),
+            memberAuth.parentIdTag.as("parentIdTag"),
+            memberAuth.totalChargingPower.as("totalChargingPower"),
+            memberAuth.status.as("status"),
+            memberAuth.totalChargingPrice.as("totalChargingPrice"),
+            memberAuth.regDt.as("regDt"),
+            member.name.as("name"),
+            member.phoneNo.as("phoneNo"),
+            company.companyName.as("companyName")))
+            .from(memberAuth)
+            .leftJoin(memberAuth.member, member)
+            .leftJoin(member.company, company)
+            .where(memberAuth.idTag.eq(idtag))
+            .fetchOne();
+        return authDto;
     }
 }

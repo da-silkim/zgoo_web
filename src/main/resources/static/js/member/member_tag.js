@@ -1,4 +1,5 @@
 $(document).ready(function() {
+    let selectRow, idTag;
 
     $('#resetBtn').on('click', function() {
         window.location.replace('/member/tag/list');
@@ -27,5 +28,50 @@ $(document).ready(function() {
         window.location.href = "/member/tag/list?page=0&size=" + selectedSize +
                                "&idTagSearch=" + (selectedIdTag) +
                                "&nameSearch=" + (selectedName);
+    });
+
+    $('#pageList').on('click', 'tr', function() {
+        selectRow = $(this);
+        idTag = selectRow.find('td').eq(5).text();
+    });
+
+    $('#editBtn').on('click', function(event) {
+        event.preventDefault();
+        $('#memberAuthForm')[0].reset();
+
+        console.log("idTag: " + idTag);
+
+        $.ajax({
+            type: 'GET',
+            url: `/member/tag/get/${idTag}`,
+            contentType: "application/json",
+            dataType: 'json',
+            success: function(data) {
+                if (data.message) {
+                    alert(data.message);
+                }
+
+                $('#name').val(data.authInfo.name || '');
+                $('#status').val(data.authInfo.status || '');
+                $('#idTag').val(data.authInfo.idTag || '');
+                $('#expireDate').val(data.authInfo.expireDate || '');
+                $('#parentIdTag').val(data.authInfo.parentIdTag || '');
+
+                if (data.authInfo.useYn === 'Y') {
+                    $('#useYes').prop('checked', true);
+                } else {
+                    $('#useNo').prop('checked', true);
+                }
+
+                const totalChargingPower = parseFloat(data.authInfo.totalChargingPower) || 0;
+                const totalChargingPrice = parseInt(data.authInfo.totalChargingPrice) || 0;
+
+                $('#totalChargingPower').val(totalChargingPower);
+                $('#totalChargingPrice').val(totalChargingPrice);
+            },
+            error: function(error) {
+
+            }
+        });
     });
 });

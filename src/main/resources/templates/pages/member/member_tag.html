@@ -140,13 +140,12 @@
         data-bs-backdrop="static" data-bs-keyboard="false">
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width: 60vw; height: 90vh;">
             <div class="modal-content mh-100 overflow-y-auto scrollbar">
-                <form id="memberForm" th:object="${memRegDto}">
+                <form id="memberAuthForm">
                     <!-- modal body start -->
                     <div class="modal-body">
                         <!-- 모달 내용 -->
                         <div class="modal-title mb-2">
-                            <span class="modal-title-bar"></span><span>회원 정보</span>
-                            <span class="tooltip-container">
+                            <span class="modal-title-bar"></span><span>회원카드정보</span>
                         </div>
                         <!-- table:1 start -->
                         <table class="table table-bg-v table-fixed w-100 text-center align-middle">
@@ -187,12 +186,12 @@
                                 <tr>
                                     <th>누적충전량</th>
                                     <td>
-                                        <input type="text" name="totalChargingPower" id="totalChargingPower" class="form-control"
+                                        <input type="number" name="totalChargingPower" id="totalChargingPower" class="form-control"
                                                 autocomplete="off" disabled>
                                     </td>
                                     <th>누적충전금액</th>
                                     <td>
-                                        <input type="text" name="totalChargingPrice" id="totalChargingPrice" class="form-control"
+                                        <input type="number" name="totalChargingPrice" id="totalChargingPrice" class="form-control"
                                                 autocomplete="off" disabled>
                                     </td>
                                 </tr>
@@ -203,7 +202,7 @@
                     <!-- modal body end -->
                     <div class="modal-footer justify-content-center border-top-none">
                         <button type="button" class="btn btn-outline-grey me-2" data-bs-dismiss="modal">취소</button>
-                        <button type="submit" id="modalBtn" class="btn btn-data-add">등록</button>
+                        <button type="button" id="modalBtn" class="btn btn-data-add">수정</button>
                     </div>
                 </form>
             </div>
