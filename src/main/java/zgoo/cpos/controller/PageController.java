@@ -37,6 +37,7 @@ import zgoo.cpos.dto.member.MemberDto.MemberListDto;
 import zgoo.cpos.dto.member.VocDto;
 import zgoo.cpos.dto.member.ConditionDto.ConditionCodeBaseDto;
 import zgoo.cpos.dto.member.ConditionDto.ConditionVersionHistBaseDto;
+import zgoo.cpos.dto.member.MemberDto.MemberAuthDto;
 import zgoo.cpos.dto.member.VocDto.VocListDto;
 import zgoo.cpos.dto.menu.CompanyMenuAuthorityDto;
 import zgoo.cpos.dto.menu.MenuAuthorityDto;
@@ -148,7 +149,7 @@ public class PageController {
 
             int totalPages = memberList.getTotalPages() == 0 ? 1 : memberList.getTotalPages(); // 전체 페이지 수
 
-            model.addAttribute("memberList", memberList.getContent()); // 에러코드 list
+            model.addAttribute("memberList", memberList.getContent()); // 회원 list
             model.addAttribute("size", String.valueOf(size)); // 페이지당 보여지는 데이터 건 수
             model.addAttribute("currentPage", page); // 현재 페이지
             model.addAttribute("totalPages", totalPages); // 총 페이지 수
@@ -189,6 +190,49 @@ public class PageController {
     public String showauthlist(Model model) {
         log.info("=== Member Authorization List Page ===");
         return "pages/member/member_authentication";
+    }
+
+    /* 
+     * 회원관리 > 회원카드관리
+     */
+    @GetMapping("/member/tag/list")
+    public String showtaglist(
+            @RequestParam(value = "idTagSearch", required = false) String idTag,
+            @RequestParam(value = "nameSearch", required = false) String name,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size,
+            Model model, Principal principal) {
+        log.info("=== Member Tag List Page ===");
+
+        try {
+            // 회원카드리스트
+            Page<MemberAuthDto> memberAuthList = this.memberService.findMemberAuthInfoWithPagination(idTag, name, page, size);
+
+            // 검색 조건 저장
+            model.addAttribute("selectedIdTag", idTag);
+            model.addAttribute("selectedName", name);
+
+            int totalPages = memberAuthList.getTotalPages() == 0 ? 1 : memberAuthList.getTotalPages(); // 전체 페이지 수
+
+            model.addAttribute("memberAuthList", memberAuthList.getContent()); // 회원카드 list
+            model.addAttribute("size", String.valueOf(size)); // 페이지당 보여지는 데이터 건 수
+            model.addAttribute("currentPage", page); // 현재 페이지
+            model.addAttribute("totalPages", totalPages); // 총 페이지 수
+            model.addAttribute("totalCount", memberAuthList.getTotalElements()); // 총 데이터
+
+            List<CompanyListDto> companyList = this.companyService.findCompanyListAll(); // 사업자 list
+            model.addAttribute("companyList", companyList);
+            List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT"); // 그리드 row 수
+            model.addAttribute("showListCnt", showListCnt);
+            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(), "C0300");
+            model.addAttribute("menuAuthority", menuAuthority);
+        } catch (Exception e) {
+            e.getStackTrace();
+            model.addAttribute("companyList", Collections.emptyList());
+            model.addAttribute("showListCnt", Collections.emptyList());
+        }
+
+        return "pages/member/member_tag";
     }
 
     /*

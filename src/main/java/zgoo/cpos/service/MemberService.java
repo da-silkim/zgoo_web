@@ -18,9 +18,11 @@ import zgoo.cpos.domain.biz.BizInfo;
 import zgoo.cpos.domain.company.Company;
 import zgoo.cpos.domain.member.ConditionCode;
 import zgoo.cpos.domain.member.Member;
+import zgoo.cpos.domain.member.MemberAuth;
 import zgoo.cpos.domain.member.MemberCar;
 import zgoo.cpos.domain.member.MemberCondition;
 import zgoo.cpos.domain.member.MemberCreditCard;
+import zgoo.cpos.dto.member.MemberDto.MemberAuthDto;
 import zgoo.cpos.dto.member.MemberDto.MemberCarDto;
 import zgoo.cpos.dto.member.MemberDto.MemberConditionDto;
 import zgoo.cpos.dto.member.MemberDto.MemberCreditCardDto;
@@ -32,6 +34,7 @@ import zgoo.cpos.mapper.MemberMapper;
 import zgoo.cpos.repository.biz.BizRepository;
 import zgoo.cpos.repository.company.CompanyRepository;
 import zgoo.cpos.repository.member.ConditionCodeRepository;
+import zgoo.cpos.repository.member.MemberAuthRepository;
 import zgoo.cpos.repository.member.MemberCarRepository;
 import zgoo.cpos.repository.member.MemberConditionRepository;
 import zgoo.cpos.repository.member.MemberCreditCardRepository;
@@ -51,6 +54,7 @@ public class MemberService {
     public final CompanyRepository companyRepository;
     public final BizRepository bizRepository;
     public final ConditionCodeRepository conditionCodeRepository;
+    public final MemberAuthRepository memberAuthRepository;
 
     // 회원 조회
     public Page<MemberListDto> findMemberInfoWithPagination(Long companyId, String idTag, String name, int page, int size) {
@@ -179,6 +183,10 @@ public class MemberService {
             
             saveCar(saved, dto.getCar());
             saveCondition(saved, dto.getCondition());
+
+            // 회원카드관리 - 기본값 설정
+            MemberAuth auth = MemberMapper.toEntityAuth(saved);
+            this.memberAuthRepository.save(auth);
         } catch (Exception e) {
             log.error("[saveMember] error: {}", e.getMessage());
         }
@@ -492,5 +500,27 @@ public class MemberService {
         } while (memberRepository.existsByIdTag(randomNumber));
 
         return randomNumber;
+    }
+
+    // 회원카드관리 - 조회
+    public Page<MemberAuthDto> findMemberAuthInfoWithPagination(String idTag, String name, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        try {
+            Page<MemberAuthDto> memberAuthList;
+
+            if ((idTag == null || idTag.isEmpty()) && (name == null || name.isEmpty())) {
+                log.info("Executing the [findMemberAuthWithPagination]");
+                memberAuthList = this.memberAuthRepository.findMemberAuthWithPagination(pageable);
+            } else {
+                log.info("Executing the [searchMemberAuthWithPagination]");
+                memberAuthList = this.memberAuthRepository.searchMemberAuthWithPagination(idTag, name, pageable);
+            }
+
+            return memberAuthList;
+        } catch (Exception e) {
+            log.error("[findMemberAuthInfoWithPagination] error: {}", e.getMessage(), e);
+            return Page.empty(pageable);
+        }
     }
 }
