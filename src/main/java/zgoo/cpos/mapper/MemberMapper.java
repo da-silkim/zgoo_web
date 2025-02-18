@@ -1,5 +1,6 @@
 package zgoo.cpos.mapper;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import zgoo.cpos.domain.biz.BizInfo;
@@ -7,6 +8,7 @@ import zgoo.cpos.domain.company.Company;
 import zgoo.cpos.domain.member.MemberCondition;
 import zgoo.cpos.domain.member.ConditionCode;
 import zgoo.cpos.domain.member.Member;
+import zgoo.cpos.domain.member.MemberAuth;
 import zgoo.cpos.domain.member.MemberCar;
 import zgoo.cpos.domain.member.MemberCreditCard;
 import zgoo.cpos.dto.member.MemberDto.MemberConditionDto;
@@ -107,5 +109,23 @@ public class MemberMapper {
                 .agreeDt(LocalDateTime.now())
                 .build();
         return condition;
+    }
+
+    /* 
+     * auth(dto >> entity)
+     */
+    public static MemberAuth toEntityAuth(Member member) {
+        MemberAuth auth = MemberAuth.builder()
+                .member(member)
+                .idTag(member.getIdTag())
+                .expireDate(LocalDate.parse("2099-12-31"))
+                .useYn("Y")
+                .parentIdTag("1001")
+                .totalChargingPower(0.0)
+                .status("Accepted")
+                .totalChargingPrice(0L)
+                .regDt(LocalDateTime.now())
+                .build();
+        return auth;
     }
 }

@@ -1,5 +1,6 @@
 package zgoo.cpos.dto.member;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -136,5 +137,23 @@ public class MemberDto {
         private String existPassword;
         private String newPassword;
         private String newPasswordCheck;
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class MemberAuthDto {
+        private String idTag;
+        private LocalDate expireDate;
+        private String useYn;
+        private String parentIdTag;
+        private Double totalChargingPower;
+        private String status;
+        private Long totalChargingPrice;
+
+        private String companyName;
+        private String name;
+        private String phoneNo;
     }
 }
