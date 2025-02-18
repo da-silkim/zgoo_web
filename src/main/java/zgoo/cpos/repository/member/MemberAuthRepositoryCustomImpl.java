@@ -99,8 +99,8 @@ public class MemberAuthRepositoryCustomImpl implements MemberAuthRepositoryCusto
 
     @Override
     public MemberAuthDto findMemberAuthOne(String idtag) {
-        MemberAuthDto authDto = queryFactory.select(Projections.fields(MemberAuthDto.class,
-        memberAuth.idTag.as("idTag"),
+        MemberAuthDto memberAuthDto = queryFactory.select(Projections.fields(MemberAuthDto.class,
+            memberAuth.idTag.as("idTag"),
             memberAuth.expireDate.as("expireDate"),
             memberAuth.useYn.as("useYn"),
             memberAuth.parentIdTag.as("parentIdTag"),
@@ -116,6 +116,6 @@ public class MemberAuthRepositoryCustomImpl implements MemberAuthRepositoryCusto
             .leftJoin(member.company, company)
             .where(memberAuth.idTag.eq(idtag))
             .fetchOne();
-        return authDto;
+        return memberAuthDto;
     }
 }

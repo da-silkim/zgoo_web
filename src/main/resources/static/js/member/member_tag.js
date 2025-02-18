@@ -70,8 +70,36 @@ $(document).ready(function() {
                 $('#totalChargingPrice').val(totalChargingPrice);
             },
             error: function(error) {
-
+                alert(error);
             }
         });
+    });
+
+    $('#modalBtn').on('click', function(event){
+        event.preventDefault();
+
+        if (confirmSubmit("수정")) {
+            const DATA = {
+                idTag: $('#idTag').val(),
+                status: $('#status').val(),
+                expireDate: $('#expireDate').val(),
+                parentIdTag: $('#parentIdTag').val(),
+                useYn: $('input[name="useYn"]:checked').val(),
+            }
+
+            $.ajax({
+                url: `/member/tag/update`,
+                method: 'PATCH',
+                contentType: 'application/json',
+                data: JSON.stringify(DATA),
+                success: function(response) {
+                    alert(response);
+                    window.location.reload();
+                },
+                error: function(error) {
+                    alert(error);
+                }
+            });
+        }
     });
 });

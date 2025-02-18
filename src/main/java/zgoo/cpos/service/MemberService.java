@@ -540,4 +540,17 @@ public class MemberService {
             return null;
         }
     }
+
+    // 회원카드정보 수정
+    @Transactional
+    public MemberAuth updateMemberAuthInfo(MemberAuthDto dto) {
+        try {
+            MemberAuth memberAuth = this.memberAuthRepository.findByIdTag(dto.getIdTag());
+            memberAuth.updateMemberAuthInfo(dto);
+            return memberAuth;
+        } catch (Exception e) {
+            log.error("[updateMemberAuthInfo] error: {}", e.getMessage());
+            return null;
+        }
+    }
 }

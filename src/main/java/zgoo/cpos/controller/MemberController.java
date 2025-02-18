@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import zgoo.cpos.domain.member.MemberAuth;
 import zgoo.cpos.dto.biz.BizInfoDto.BizInfoRegDto;
 import zgoo.cpos.dto.member.MemberDto;
 import zgoo.cpos.dto.member.MemberDto.MemberAuthDto;
@@ -220,6 +221,28 @@ public class MemberController {
             log.error("[findMemberAuthOne] error: {}", e.getMessage());
             response.put("message", "서버 오류가 발생했습니다. 다시 시도해 주세요.");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
+    // 회원카드정보 수정
+    @PatchMapping("/tag/update")
+    public ResponseEntity<String> updateMemberAuth(@Valid @RequestBody MemberAuthDto dto) {
+        log.info("=== update member auth info ===");
+        
+        try {
+            MemberAuth auth = this.memberService.updateMemberAuthInfo(dto);
+
+            if (auth == null) {
+                log.info("=== member auth info update failure ===");
+                return ResponseEntity.ok("회원카드정보 수정에 실패하였습니다.");
+            }
+
+            log.info("=== member auth info update complete ===");
+            return ResponseEntity.ok("회원카드정보가 정상적으로 수정되었습니다.");
+        } catch (Exception e) {
+            log.error("[updateMemberAuth] error: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                    .body("회원카드정보 수정 중 오류 발생");
         }
     }
 }
