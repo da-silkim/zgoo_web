@@ -553,4 +553,16 @@ public class MemberService {
             return null;
         }
     }
+
+    // 회원카드정보 삭제
+    @Transactional
+    public void deleteMemberAuth(String idTag) {
+        try {
+            MemberAuth memberAuth = this.memberAuthRepository.findByIdTag(idTag);
+            this.memberAuthRepository.delete(memberAuth);
+            log.info("==== idTag: {} is deleted..", idTag);
+        } catch (Exception e) {
+            log.error("[deleteMemberAuth] error: {}", e.getMessage());
+        }
+    }
 }

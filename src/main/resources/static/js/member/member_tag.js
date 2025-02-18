@@ -75,6 +75,23 @@ $(document).ready(function() {
         });
     });
 
+    $('#deleteBtn').on('click', function() {
+        if (confirmSubmit("삭제")) {
+            $.ajax({
+                type: 'DELETE',
+                url: `/member/tag/delete/${idTag}`,
+                contentType: "application/json",
+                success: function(response) {
+                    alert(response);
+                    window.location.replace('/member/tag/list');
+                },
+                error: function(error) {
+                    alert(error);
+                }
+            });
+        }
+    });
+
     $('#modalBtn').on('click', function(event){
         event.preventDefault();
 

@@ -245,4 +245,25 @@ public class MemberController {
                                     .body("회원카드정보 수정 중 오류 발생");
         }
     }
+
+    // 회원카드정보 삭제
+    @DeleteMapping("/tag/delete/{idTag}")
+    public ResponseEntity<String> deleteMemberAuth(@PathVariable("idTag") String idTag) {
+        log.info("=== delete member auth info ===");
+
+        if (idTag == null) {
+            log.error("idTag is null");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                                    .body("회원카드번호 정보가 없습니다.");
+        }
+
+        try {
+            this.memberService.deleteMemberAuth(idTag);
+            return ResponseEntity.ok("회원카드정보가 정상적으로 삭제되었습니다.");
+        } catch (Exception e) {
+            log.error("[deleteMemberAuth] error: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                    .body("회원카드정보 삭제 중 오류 발생");
+        }
+    }
 }
