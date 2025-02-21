@@ -112,3 +112,14 @@ VALUES
 ('1', '30', 'N0000', 'Y'),
 ('1', '31', 'N0100', 'Y'),
 ('1', '32', 'N0200', 'Y');
+
+
+/* insert default condition code */
+DELETE FROM condition_code;
+INSERT INTO condition_code (condition_code, condition_name, section, reg_dt)
+VALUES
+('PI', '개인정보 활용 동의서', 'Y', now()),
+('MS', '멤버십 서비스 이용약관', 'Y', now()),
+('MK', '마케팅 수신 동의', 'N', now()),
+('ES', '이메일 수신 동의', 'N', now()),
+('SS', 'SMS 수신 동의', 'N', now());
