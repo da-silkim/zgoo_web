@@ -28,6 +28,7 @@ import zgoo.cpos.dto.member.MemberDto.MemberDetailDto;
 import zgoo.cpos.dto.member.MemberDto.MemberPasswordDto;
 import zgoo.cpos.dto.member.MemberDto.MemberRegDto;
 import zgoo.cpos.service.BizService;
+import zgoo.cpos.service.ConditionService;
 import zgoo.cpos.service.MemberService;
 
 @Controller
@@ -38,6 +39,7 @@ public class MemberController {
 
     private final MemberService memberService;
     private final BizService bizService;
+    private final ConditionService conditionService;
 
     // 회원 단건 조회
     @GetMapping("/get/{memberId}")
@@ -264,6 +266,27 @@ public class MemberController {
             log.error("[deleteMemberAuth] error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                                     .body("회원카드정보 삭제 중 오류 발생");
+        }
+    }
+
+    // 회원약관 내용조회
+    @GetMapping("/file/{conditionCode}")
+    public ResponseEntity<Map<String, Object>> readFile(@PathVariable String conditionCode) {
+        log.info("=== read condition file info ===");
+
+        Map<String, Object> response = new HashMap<>();
+
+        try {
+            String fileContent = this.memberService.readDocxFile(conditionCode);
+            response.put("fileContent", fileContent);
+
+            String conditionName = this.conditionService.findConditionName(conditionCode);
+            response.put("conditionName", conditionName);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            log.error("[readFile] error: {}", e.getMessage());
+            response.put("message", "회원약관 내용 조회 중 오류 발생");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
 }

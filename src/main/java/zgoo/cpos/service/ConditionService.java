@@ -179,4 +179,14 @@ public class ConditionService {
             log.error("[deleteConditionHist] error: {}", e.getMessage());
         }
     }
+
+    // 약관명 조회
+    public String findConditionName(String conditionCode) {
+        ConditionCode condition = this.conditionCodeRepository.findByConditionCode(conditionCode);
+        if (condition == null) {
+            log.error("[findConditionName] error");
+            throw new IllegalArgumentException(conditionCode + "코드에 해당하는 파일 정보를 찾을 수 없습니다.");
+        }
+        return condition.getConditionName();
+    }
 }

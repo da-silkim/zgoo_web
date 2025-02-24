@@ -78,6 +78,14 @@ $(function () {
     $('#bizSearchModal').on('hidden.bs.modal', function () {
         $('#dataAddModal .modal-content').removeClass('blur-background');
     });
+
+    $('#conditionModal').on('show.bs.modal', function () {
+        $('#dataAddModal .modal-content').addClass('blur-background');
+    });
+
+    $('#conditionModal').on('hidden.bs.modal', function () {
+        $('#dataAddModal .modal-content').removeClass('blur-background');
+    });
 });
 
 function confirmSubmit(msg) {

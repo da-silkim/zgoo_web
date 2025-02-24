@@ -37,6 +37,7 @@ dependencies {
 	implementation "org.springframework.security:spring-security-web"
 	implementation "org.springframework.security:spring-security-config"
     implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
+	implementation 'org.apache.poi:poi-ooxml:5.4.0'
 	
 	//QueryDsl
     // 필수

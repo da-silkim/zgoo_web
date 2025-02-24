@@ -1,11 +1,14 @@
 package zgoo.cpos.service;
 
+import java.io.FileInputStream;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 
+import org.apache.poi.xwpf.usermodel.XWPFDocument;
+import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -17,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import zgoo.cpos.domain.biz.BizInfo;
 import zgoo.cpos.domain.company.Company;
 import zgoo.cpos.domain.member.ConditionCode;
+import zgoo.cpos.domain.member.ConditionVersionHist;
 import zgoo.cpos.domain.member.Member;
 import zgoo.cpos.domain.member.MemberAuth;
 import zgoo.cpos.domain.member.MemberCar;
@@ -34,6 +38,7 @@ import zgoo.cpos.mapper.MemberMapper;
 import zgoo.cpos.repository.biz.BizRepository;
 import zgoo.cpos.repository.company.CompanyRepository;
 import zgoo.cpos.repository.member.ConditionCodeRepository;
+import zgoo.cpos.repository.member.ConditionVersionHistRepository;
 import zgoo.cpos.repository.member.MemberAuthRepository;
 import zgoo.cpos.repository.member.MemberCarRepository;
 import zgoo.cpos.repository.member.MemberConditionRepository;
@@ -55,6 +60,7 @@ public class MemberService {
     public final BizRepository bizRepository;
     public final ConditionCodeRepository conditionCodeRepository;
     public final MemberAuthRepository memberAuthRepository;
+    public final ConditionVersionHistRepository conditionVersionHistRepository;
 
     // 회원 조회
     public Page<MemberListDto> findMemberInfoWithPagination(Long companyId, String idTag, String name, int page, int size) {
@@ -564,5 +570,31 @@ public class MemberService {
         } catch (Exception e) {
             log.error("[deleteMemberAuth] error: {}", e.getMessage());
         }
+    }
+
+    public String readDocxFile(String conditionCode) {
+        StringBuilder fileContent = new StringBuilder();
+
+        ConditionVersionHist conHist = this.conditionVersionHistRepository.findApplyYesByConditionCode(conditionCode);
+        if (conHist == null) {
+            throw new IllegalArgumentException(conditionCode + "코드에 해당하는 파일 정보를 찾을 수 없습니다.");
+        }
+
+        String filePath = conHist.getFilePath();
+
+        try (FileInputStream fis = new FileInputStream(filePath);
+             XWPFDocument document = new XWPFDocument(fis)) {
+
+            List<XWPFParagraph> paragraphs = document.getParagraphs();
+            for (XWPFParagraph paragraph : paragraphs) {
+                fileContent.append(paragraph.getText().replace("\n", "<br>")).append("<br>");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("파일을 읽는 도중 오류가 발생했습니다.");
+        }
+
+        return fileContent.toString();
     }
 }

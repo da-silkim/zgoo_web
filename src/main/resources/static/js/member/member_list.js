@@ -632,4 +632,34 @@ $(document).ready(function() {
             passwordField.attr('type', 'password');
         }
     });
+
+    $('.condition-detail').on('click', function(event) {
+        event.preventDefault();
+
+        var classList = $(this).attr('class').split(/\s+/);
+        var itemType = classList[1];
+
+        console.log('classList: ' + classList);
+        console.log('itemType: ' + itemType);
+
+
+        $.ajax({
+            type: 'GET',
+            url: `/member/file/${itemType}`,
+            success: function(data) {
+                $('#conditonText').html(data.fileContent);
+                $('#conditionName').html(data.conditionName);
+                console.log('data: ' + data.fileContent);
+
+                var conditionModal = new bootstrap.Modal(document.getElementById('conditionModal'), {
+                    backdrop: 'static',
+                    keyboard: false
+                });
+                conditionModal.show();
+            },
+            error: function(error) {
+                alert(error);
+            }
+        });
+    });
 });

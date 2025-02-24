@@ -239,3 +239,6 @@ table.table tbody tr.row-selected { background-color: #3D3B40 !important; color:
 
 #currAuthority { font-size: 14px; color: grey; }
 #saveBtn { position: absolute; right: 0; top: -50px; }
+
+.condition-detail-container { float: right; text-decoration: underline; }
+.condition-detail-container > a { color: black; }
