@@ -114,7 +114,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 const row = document.createElement("tr");
 
                 row.innerHTML = `
-                <td></td>
                 <td>${tariff.hour}</td>
                 <td>${tariff.memSlowUnitCost.toFixed(1)}</td>
                 <td>${tariff.nomemSlowUnitCost.toFixed(1)}</td>
