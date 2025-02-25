@@ -41,6 +41,7 @@ public class CpMaintainDto {
         private String stationId;
         private String stationName;
         private String address;
+        private String chargerId;
     }
 
     @Data
