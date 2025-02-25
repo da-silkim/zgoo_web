@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import zgoo.cpos.dto.cp.CpMaintainDto.CpInfoDto;
 import zgoo.cpos.dto.cp.CpMaintainDto.CpMaintainListDto;
 import zgoo.cpos.repository.cp.CpMaintainRepository;
 
@@ -41,6 +42,26 @@ public class CpMaintainService {
         } catch (Exception e) {
             log.error("[findCpMaintainInfoWithPagination] error: {}", e.getMessage(), e);
             return Page.empty(pageable);
+        }
+    }
+
+    // 충전소, 충전기 조회
+    public CpInfoDto searchCsCpInfo(String chargerId) {
+        try {
+            CpInfoDto dto = this.cpMaintainRepository.searchCsCpInfoWithChargerId(chargerId);
+            if (dto == null) {
+                dto = new CpInfoDto();
+                dto.setCompanyId(null);
+                dto.setCompanyName("");
+                dto.setStationId("");
+                dto.setStationName("");
+                dto.setAddress("");
+                dto.setChargerId(null);
+            }
+            return dto;
+        } catch (Exception e) {
+            log.error("[searchCsCpInfo] error: {}", e.getMessage(), e);
+            return null;
         }
     }
 }

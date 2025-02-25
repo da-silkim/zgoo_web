@@ -169,7 +169,7 @@
     <div class="modal fade" id="dataAddModal" tabindex="-1" aria-labelledby="dataAddModalLabel" data-bs-backdrop="static" data-bs-keyboard="false">
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width: 60vw; height: 90vh;">
             <div class="modal-content mh-100 overflow-y-auto scrollbar">
-                <form>
+                <form id="maintainForm">
                     <!-- modal body start -->
                     <div class="modal-body">
                         <!-- 모달 내용 -->
@@ -180,32 +180,32 @@
                                 <tr class="table-border-top">
                                     <th class="w-20">사업자<b class="required-data">*</b></th>
                                     <td colspan="w-30">
-                                        <input type="text" name="" id="" class="form-control" placeholder="" autocomplete="off" required disabled>
+                                        <input type="text" name="companyName" id="companyName" class="form-control" disabled>
                                     </td>
                                     <th class="w-20">충전기ID<b class="required-data">*</b></th>
                                     <td class="w-30">
                                         <div class="mb-2 display-input-btn">
-                                            <input type="text" name="" id="" class="form-control" placeholder="충전기ID를 입력해주세요." required>
-                                            <button class="btn btn-outline-grey flex-btn ms-0" id="search-btn">조회</button>
+                                            <input type="text" name="chargerId" id="chargerId" class="form-control" placeholder="충전기ID를 입력해주세요." required>
+                                            <button type="button" class="btn btn-outline-grey flex-btn ms-0" id="chargerIdSearchBtn">조회</button>
                                         </div>
                                     </td>
                                 </tr>
                                 <tr>
                                     <th class="w-20">충전소ID<b class="required-data">*</b></th>
                                     <td class="w-30">
-                                        <input type="text" name="" id="" class="form-control" placeholder="" autocomplete="off" required disabled>
+                                        <input type="text" name="stationId" id="stationId" class="form-control" disabled>
                                     </td>
                                     <th class="w-20">충전소명<b class="required-data">*</b></th>
                                     <td class="w-30">
-                                        <input type="text" name="" id="" class="form-control" placeholder="" autocomplete="off" disabled>
+                                        <input type="text" name="stationName" id="stationName" class="form-control" disabled>
                                     </td>
                                 </tr>
                                 <tr>
                                     <th class="w-20">주소<b class="required-data">*</b></th>
                                     <td colspan="3">
-                                        <input type="text" name="" id="" class="form-control" placeholder="" autocomplete="off" required disabled>
+                                        <input type="text" name="address" id="address" class="form-control" disabled>
                                     </td>
-                                </tr>                 
+                                </tr>
                             </tbody>
                         </table>
                         <!-- table:1 end -->
@@ -223,7 +223,7 @@
                                     </td>
                                     <th class="w-20">원격접속ID</th>
                                     <td class="w-30">
-                                        <input type="text" name="" id="" class="form-control" placeholder="" autocomplete="off" disabled>
+                                        <input type="text" name="" id="" class="form-control" disabled>
                                     </td>
                                 </tr>
                                 <tr>
@@ -235,7 +235,8 @@
                                 <tr>
                                     <th class="w-20">현장사진<b class="required-data">*</b><div style="font-weight: 300; font-size: small;">(jpg, png 파일만 업로드 가능)</div></th>
                                     <td colspan="3">
-                                        <div class="upload-container">
+                                        <!-- <div class="upload-container"> -->
+                                        <div class="">
                                             <div class="upload-item">
                                                 <img id="imgShow1" class="upload-preview" src="" alt="Image Preview" style="display: none; width: 100px; height: 100px;"/>
                                                 <input type="file" accept="image/*" onchange="loadFile(this, 'imgShow1')">

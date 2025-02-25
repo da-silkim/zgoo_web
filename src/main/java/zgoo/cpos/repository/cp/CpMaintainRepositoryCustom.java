@@ -5,7 +5,7 @@ import java.time.LocalDate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import zgoo.cpos.dto.cp.CpMaintainDto;
+import zgoo.cpos.dto.cp.CpMaintainDto.CpInfoDto;
 import zgoo.cpos.dto.cp.CpMaintainDto.CpMaintainListDto;
 
 public interface CpMaintainRepositoryCustom {
@@ -16,4 +16,7 @@ public interface CpMaintainRepositoryCustom {
     // 장애 등록 현황 - 검색 조회
     Page<CpMaintainListDto> searchCpMaintainWithPagination(Long companyId, String searchOp, String searchContent,
         String processStatus, LocalDate startDate, LocalDate endDate, Pageable pageable);
+
+    // 충전소, 충전기 조회
+    CpInfoDto searchCsCpInfoWithChargerId(String chargerId);
 }

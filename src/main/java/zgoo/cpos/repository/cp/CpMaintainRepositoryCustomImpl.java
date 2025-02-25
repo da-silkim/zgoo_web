@@ -18,6 +18,7 @@ import zgoo.cpos.domain.code.QCommonCode;
 import zgoo.cpos.domain.company.QCompany;
 import zgoo.cpos.domain.cp.QCpMaintain;
 import zgoo.cpos.domain.cs.QCsInfo;
+import zgoo.cpos.dto.cp.CpMaintainDto.CpInfoDto;
 import zgoo.cpos.dto.cp.CpMaintainDto.CpMaintainListDto;
 
 @Slf4j
@@ -147,5 +148,19 @@ public class CpMaintainRepositoryCustomImpl implements CpMaintainRepositoryCusto
         return new PageImpl<>(cpList, pageable, totalCount);
     }
 
-    
+    @Override
+    public CpInfoDto searchCsCpInfoWithChargerId(String chargerId) {
+        CpInfoDto dto = queryFactory.select(Projections.fields(CpInfoDto.class,
+            cpInfo.id.as("chargerId"),
+            csInfo.id.as("stationId"),
+            csInfo.stationName.as("stationName"),
+            csInfo.address.as("address"),
+            company.companyName.as("companyName")))
+            .from(cpInfo)
+            .leftJoin(csInfo).on(cpInfo.stationId.eq(csInfo))
+            .leftJoin(company).on(csInfo.company.id.eq(company.id))
+            .where(cpInfo.id.eq(chargerId))
+            .fetchOne();
+        return dto;
+    }
 }
