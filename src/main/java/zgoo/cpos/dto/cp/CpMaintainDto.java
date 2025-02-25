@@ -51,6 +51,7 @@ public class CpMaintainDto {
     public static class CpMaintainListDto extends CpMaintainRegDto {
         private Long companyId;
         private String companyName;
+        private String stationName;
         private String errorTypeName;
         private String processStatusName;
     }

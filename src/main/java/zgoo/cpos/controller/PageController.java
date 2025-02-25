@@ -31,6 +31,7 @@ import zgoo.cpos.dto.cp.ChargerDto.ChargerListDto;
 import zgoo.cpos.dto.cp.ChargerDto.ChargerRegDto;
 import zgoo.cpos.dto.cp.ChargerDto.ConnectorStatusDto;
 import zgoo.cpos.dto.cp.CpModelDto;
+import zgoo.cpos.dto.cp.CpMaintainDto.CpMaintainListDto;
 import zgoo.cpos.dto.cp.CpModelDto.CpModelListDto;
 import zgoo.cpos.dto.cs.CsInfoDto;
 import zgoo.cpos.dto.cs.CsInfoDto.CsInfoDetailDto;
@@ -56,6 +57,7 @@ import zgoo.cpos.service.ChgErrorCodeService;
 import zgoo.cpos.service.CodeService;
 import zgoo.cpos.service.CompanyService;
 import zgoo.cpos.service.ConditionService;
+import zgoo.cpos.service.CpMaintainService;
 import zgoo.cpos.service.CpModelService;
 import zgoo.cpos.service.CsService;
 import zgoo.cpos.service.FaqService;
@@ -88,6 +90,7 @@ public class PageController {
     private final VocService vocService;
     private final ChargerService chargerService;
     private final ConditionService conditionService;
+    private final CpMaintainService cpMaintainService;
 
     /*
      * 대시보드
@@ -929,7 +932,7 @@ public class PageController {
                     "G0900");
             model.addAttribute("menuAuthority", menuAuthority);
         } catch (Exception e) {
-
+            e.getStackTrace();
         }
         return "pages/system/condition_management";
     }
@@ -938,8 +941,66 @@ public class PageController {
      * 유지보수 > 장애관리
      */
     @GetMapping("/maintenance/errlist")
-    public String showerrlist(Model model) {
+    public String showerrlist(
+            @RequestParam(value = "companyIdSearch", required = false) Long companyId,
+            @RequestParam(value = "opSearch", required = false) String searchOp,
+            @RequestParam(value = "contentSearch", required = false) String searchContent,
+            @RequestParam(value = "processStatusSearch", required = false) String processStatus,
+            @RequestParam(value = "startDateSearch", required = false) LocalDate startDate,
+            @RequestParam(value = "endDateSearch", required = false) LocalDate endDate,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size,
+            Model model, Principal principal) {
         log.info("=== Maintenance Error List Page ===");
+
+        try {
+            Page<CpMaintainListDto> cpList = this.cpMaintainService.findCpMaintainInfoWithPagination(companyId, searchOp, searchContent,
+                processStatus, startDate, endDate, page, size);
+
+            // 검색 조건 저장
+            model.addAttribute("selectedCompanyId", companyId);
+            model.addAttribute("selectedOpSearch", searchOp);
+            model.addAttribute("selectedContentSearch", searchContent);
+            model.addAttribute("selectedProcessStatus", processStatus);
+            model.addAttribute("selectedStartDate", startDate);
+            model.addAttribute("selectedEndDate", endDate);
+
+            int totalPages = cpList.getTotalPages() == 0 ? 1 : cpList.getTotalPages(); // 전체 페이지 수
+
+            model.addAttribute("cpList", cpList.getContent()); // 장애관리 list
+            model.addAttribute("size", String.valueOf(size)); // 페이지당 보여지는 데이터 건 수
+            model.addAttribute("currentPage", page); // 현재 페이지
+            model.addAttribute("totalPages", totalPages); // 총 페이지 수
+            model.addAttribute("totalCount", cpList.getTotalElements()); // 총 데이터
+
+            List<CompanyListDto> companyList = this.companyService.findCompanyListAll();
+            model.addAttribute("companyList", companyList);
+
+            List<CommCdBaseDto> frList = codeService.findCommonCdNamesByGrpcd("FRCODE");        // 장애접수유형코드
+            model.addAttribute("frList", frList);
+
+            List<CommCdBaseDto> fstatList = codeService.findCommonCdNamesByGrpcd("FSTATCODE");  // 장애처리상태코드
+            model.addAttribute("fstatList", fstatList);
+
+            List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT"); // 그리드 row 수
+            model.addAttribute("showListCnt", showListCnt);
+
+            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(), "H0100");
+            model.addAttribute("menuAuthority", menuAuthority);
+        } catch (Exception e) {
+            e.getStackTrace();
+            model.addAttribute("size", Collections.emptyList());
+            model.addAttribute("cpList", Collections.emptyList());
+            model.addAttribute("currentPage", Collections.emptyList());
+            model.addAttribute("totalPages", Collections.emptyList());
+            model.addAttribute("totalCount", Collections.emptyList());
+            model.addAttribute("companyList", Collections.emptyList());
+            model.addAttribute("frList", Collections.emptyList());
+            model.addAttribute("fstatList", Collections.emptyList());
+            model.addAttribute("showListCnt", Collections.emptyList());
+            model.addAttribute("menuAuthority", Collections.emptyList());
+        }
+
         return "pages/maintenance/error_management";
     }
 

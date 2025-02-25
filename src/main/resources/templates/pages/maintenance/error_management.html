@@ -11,41 +11,51 @@
                 <div class="card-body">
                     <div class="card-title"><span class="card-title-bar"></span><span>검색조건</span></div>
                     <!-- form start -->
-                    <form class="position-relative">
+                    <form id="searchForm" class="position-relative" th:action="@{/maintenance/errlist}" method="get">
                         <!-- row:1 start -->
                         <div class="row mb-3 row-cols-2 row-cols-lg-3 g-2">
                             <div class="col d-flex align-items-center">
-                                <label for="business" class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">사업자</label>
-                                <select id="business" class="mx-3 form-control">
-                                    <option value='%'>(선택)</option>
-                                    <option value="">test</option>
+                                <label for="companyIdSearch" class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">사업자</label>
+                                <select id="companyIdSearch" name="companyIdSearch" class="mx-3 form-control">
+                                    <option th:value="null">선택</option>
+                                    <option th:each="company : ${companyList}" th:value="${company.companyId}"
+                                                th:text="${company.companyName}"
+                                                th:selected="${company.companyId == selectedCompanyId}"></option>
                                 </select>
                             </div>
                             <div class="col d-flex align-items-center">
-                                <label for="saerchOp" class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">검색조건</label>
-                                <select id="saerchOp" class="ms-3 form-control w-40">
-                                    <option value='%'>(선택)</option>
-                                    <option value="">test1</option> 
+                                <label for="opSearch" class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">검색조건</label>
+                                <select id="opSearch" name="opSearch" class="ms-3 form-control w-40">
+                                    <option th:value="null" th:selected="${selectedOpSearch == null}">(선택)</option>
+                                    <option th:value="'stationName'" th:text="충전소명" th:selected="${selectedOpSearch == 'stationName'}"></option>
+                                    <option th:value="'chargerId'" th:text="충전기ID" th:selected="${selectedOpSearch == 'chargerId'}"></option>
                                 </select>
-                                <input type="text" name="" id="" class="mx-3 form-control" placeholder="" autocomplete="off">
+                                <input type="text" name="contentSearch" id="contentSearch" class="mx-2 form-control"
+                                    th:value="${selectedContentSearch}" autocomplete="off">
                             </div>
                             <div class="col d-flex align-items-center">
-                                <label for="" class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">처리상태</label>
-                                <select id="" class="mx-3 form-control">
-                                    <option value='%'>(선택)</option>
-                                    <option value="">test</option>
+                                <label for="processStatusSearch" class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">처리상태</label>
+                                <select id="processStatusSearch" name="processStatusSearch" class="mx-3 form-control">
+                                    <option th:value="null">선택</option>
+                                    <option th:each="data : ${fstatList}" th:value="${data.commonCode}"
+                                                th:text="${data.commonCodeName}"
+                                                th:selected="${data.commonCode == selectedProcessStatus}"></option>
                                 </select>
                             </div>
                             <div class="col d-flex align-items-center">
                                 <span class="flex-shrink-0 col-form-label font-weight-bold mr-3p text-right w-25">접수일시</span>
-                                <input type="date" min="1970-01-01" max="2199-12-31" name="fromDate" id="fromDate" class="mx-3 form-control">
+                                <input type="date" min="1970-01-01" max="2199-12-31" th:value="${selectedStartDate}" name="startDateSearch"
+                                        id="startDateSearch" class="mx-3 form-control">
                                 <span class="flex-shrink-0 col-form-label font-weight-bold">~</span>
-                                <input type="date" min="1970-01-01" max="2199-12-31" name="toDate" id="toDate" class="mx-3 form-control">
+                                <input type="date" min="1970-01-01" max="2199-12-31" th:value="${selectedEndDate}" name="endDateSearch"
+                                        id="endDateSearch" class="mx-3 form-control">
                             </div>
                         </div>
                         <div class="search-btn">
-                            <button type="button" class="btn btn-outline-grey me-2" data-bs-dismiss="modal"><i class="bi bi-search me-2"></i>검색</button>
-                            <button type="button" class="btn btn-outline-grey me-2" data-bs-dismiss="modal"><i class="bi bi-arrow-repeat me-2"></i>초기화</button>
+                            <button type="button" class="btn btn-outline-grey me-2" id="searchBtn">
+                                <i class="bi bi-search me-2"></i>검색</button>
+                            <button type="button" class="btn btn-outline-grey me-2" id="resetBtn">
+                                <i class="bi bi-arrow-repeat me-2"></i>초기화</button>
                         </div>
                         <!-- row:1 end -->
                     </form>
@@ -59,16 +69,22 @@
                 <!-- card body:3 start -->
                 <div class="card-body">
                     <div class="card-title"><span class="card-title-bar"></span><span>장애 등록 현황</span></div>
-                    <div class="mt-3 position-relative">
-                        <button class="btn btn-data-add" data-bs-toggle="modal" data-bs-target="#dataAddModal"><i class="bi bi-plus-square me-2"></i>등록</button>
-                        <button class="btn btn-data-edit" id="editBtn" disabled><i class="fa-regular fa-pen-to-square me-2"></i>수정</button>
-                        <button class="btn btn-data-delete" id="deleteBtn" disabled><i class="bi bi-trash me-2"></i>삭제</button>
-                        <span class="position-absolute" style="right: 0; bottom: 0;">
-                            <span id="page-info"></span>
-                            <select class="mx-3 page-select" id="" name="">
-                                <option value='%'>10개</option>
-                                <option value="">30개</option>
-                                <option value="">50개</option>
+                    <div class="mt-3 btn-page-area">
+                        <div th:if="${menuAuthority.authority == 'SU' or menuAuthority.modYn == 'Y'}">
+                            <button class="btn btn-data-add" id="addBtn" data-bs-toggle="modal" data-bs-target="#dataAddModal">
+                                <i class="bi bi-plus-square"></i>등록</button>
+                            <button class="btn btn-data-edit" id="editBtn" data-bs-toggle="modal" data-bs-target="#dataAddModal" disabled>
+                                <i class="fa-regular fa-pen-to-square"></i>수정</button>
+                            <button class="btn btn-data-delete" id="deleteBtn" disabled>
+                                <i class="bi bi-trash"></i>삭제</button>
+                        </div>
+                        <span>
+                            <span id="pageInfo">
+                                <span th:text="'Page ' + (${currentPage + 1}) + ' of ' + ${totalPages} + ' [총 ' + ${totalCount} + '건]'"></span>
+                            </span>
+                            <select class="mx-3 page-select" id="size" name="size">
+                                <option th:each="data : ${showListCnt}" th:value="${data.commonCode}"
+                                        th:text="${data.commonCodeName}" th:selected="${data.commonCode == size}"></option>
                             </select>
                         </span>
                     </div>
@@ -88,12 +104,58 @@
                                     <th scope="col">작성자ID</th>
                                 </tr>
                             </thead>
-                            <tbody id=""></tbody>
+                            <tbody id="pageList">
+                                <tr th:each="cp : ${cpList}">
+                                    <td th:id="${cp.cpmaintainId}"><input type="checkbox" /></td>
+                                    <td th:text="${cp.errorTypeName}"></td>
+                                    <td th:text="${cp.errorContent}" class="text-left"></td>
+                                    <td th:text="${cp.processStatusName}"></td>
+                                    <td th:text="${cp.companyName}"></td>
+                                    <td th:text="${cp.stationName}"></td>
+                                    <td th:text="${cp.chargerId}"></td>
+                                    <td th:text="${#temporals.format(cp.regDt, 'yyyy-MM-dd HH:mm:ss')}"></td>
+                                    <td th:text="${#temporals.format(cp.processDate, 'yyyy-MM-dd HH:mm:ss')}"></td>
+                                    <td th:text="${cp.regUserId}"></td>
+                                </tr>
+                                <tr th:if="${cpList.size() == 0}">
+                                    <td colspan="10">등록된 데이터가 없습니다.</td>
+                                </tr>
+                            </tbody>
                         </table>                                
                     </div>
-                    <div class="text-center">
-                        <ul class="pagination" id=""></ul>
+                    <!-- paging navigation start -->
+                    <div th:if="${cpList.size() > 0}">
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled' : ''">
+                                <a class="page-link" th:href="@{/maintenance/errlist(page=0, size=${size}, companyIdSearch=${selectedCompanyId},
+                                opSearch=${selectedOpSearch}, contentSearch=${selectedContentSearch}, processStatus=${selectedProcessStatus},
+                                startDate=${selectedStartDate}, endDate=${selectedEndDate})}"><i class="bi bi-chevron-double-left"></i></a>
+                            </li>
+                            <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled' : ''">
+                                <a class="page-link" th:href="@{/maintenance/errlist(page=${currentPage-1}, size=${size}, companyIdSearch=${selectedCompanyId},
+                                opSearch=${selectedOpSearch}, contentSearch=${selectedContentSearch}, processStatus=${selectedProcessStatus},
+                                startDate=${selectedStartDate}, endDate=${selectedEndDate})}"><i class="bi bi-chevron-left"></i></a>
+                            </li>
+                            <li class="page-item" th:each="i : ${#numbers.sequence(currentPage - 2, currentPage + 2)}"
+                                th:if="${i >= 0 && i < totalPages}">
+                                <a class="page-link" th:href="@{/maintenance/errlist(page=${i}, size=${size}, companyIdSearch=${selectedCompanyId},
+                                opSearch=${selectedOpSearch}, contentSearch=${selectedContentSearch}, processStatus=${selectedProcessStatus},
+                                startDate=${selectedStartDate}, endDate=${selectedEndDate})}"
+                                th:text="${i+1}" th:classappend="${i == currentPage} ? 'active' : ''"></a>
+                            </li>
+                            <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled' : ''">
+                                <a class="page-link" th:href="@{/maintenance/errlist(page=${currentPage+1}, size=${size}, companyIdSearch=${selectedCompanyId},
+                                opSearch=${selectedOpSearch}, contentSearch=${selectedContentSearch}, processStatus=${selectedProcessStatus},
+                                startDate=${selectedStartDate}, endDate=${selectedEndDate})}"><i class="bi bi-chevron-right"></i></a>
+                            </li>
+                            <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled' : ''">
+                                <a class="page-link" th:href="@{/maintenance/errlist(page=${totalPages - 1}, size=${size}, companyIdSearch=${selectedCompanyId},
+                                opSearch=${selectedOpSearch}, contentSearch=${selectedContentSearch}, processStatus=${selectedProcessStatus},
+                                startDate=${selectedStartDate}, endDate=${selectedEndDate})}"><i class="bi bi-chevron-double-right"></i></a>
+                            </li>
+                        </ul>
                     </div>
+                    <!-- paging navigation end -->
                 </div>
                 <!-- card body:3 end -->
             </div>
@@ -122,9 +184,9 @@
                                     </td>
                                     <th class="w-20">충전기ID<b class="required-data">*</b></th>
                                     <td class="w-30">
-                                        <div class="mb-2" style="display: flex; align-items: center; gap: 10px;">
-                                            <input type="text" name="" id="" class="form-control" placeholder="회원카드번호를 입력해주세요." required>
-                                            <button class="btn btn-outline-grey" id="search-btn" style="flex: 0 0 auto; margin-left: 10px;">중복체크</button>
+                                        <div class="mb-2 display-input-btn">
+                                            <input type="text" name="" id="" class="form-control" placeholder="충전기ID를 입력해주세요." required>
+                                            <button class="btn btn-outline-grey flex-btn ms-0" id="search-btn">조회</button>
                                         </div>
                                     </td>
                                 </tr>
@@ -154,9 +216,9 @@
                                 <tr class="table-border-top">
                                     <th class="w-20">장애유형<b class="required-data">*</b></th>
                                     <td colspan="w-30">
-                                        <select id="" class="form-control" required>
-                                            <option value='%'>(선택)</option>
-                                            <option value="">test</option>
+                                        <select id="errorType" class="form-control" required>
+                                            <option th:each="data : ${frList}" th:value="${data.commonCode}"
+                                                    th:text="${data.commonCodeName}"></option>
                                         </select>
                                     </td>
                                     <th class="w-20">원격접속ID</th>
@@ -167,7 +229,7 @@
                                 <tr>
                                     <th class="w-20">장애내용<b class="required-data">*</b></th>
                                     <td colspan="3">
-                                        <textarea class="form-control" name="opinion" cols="" rows="10"></textarea>
+                                        <textarea class="form-control resize-none" name="errorContent" id="errorContent" cols="" rows="10"></textarea>
                                     </td>
                                 </tr>
                                 <tr>
@@ -199,9 +261,9 @@
                                 <tr class="table-border-top">
                                     <th class="w-20">처리상태<b class="required-data">*</b></th>
                                     <td class="w-30">
-                                        <select id="" class="form-control" required>
-                                            <option value='%'>(선택)</option>
-                                            <option value="">test</option>
+                                        <select id="processStatus" class="form-control" required>
+                                            <option th:each="data : ${fstatList}" th:value="${data.commonCode}"
+                                                    th:text="${data.commonCodeName}"></option>
                                         </select>
                                     </td>
                                     <td colspan="2"></td>
@@ -209,7 +271,7 @@
                                 <tr>
                                     <th class="w-20">처리내용<b class="required-data">*</b></th>
                                     <td colspan="3">
-                                        <textarea class="form-control" name="opinion" cols="" rows="5" style="resize: none;"></textarea>
+                                        <textarea class="form-control resize-none" name="opinion" cols="" rows="5"></textarea>
                                     </td>
                                 </tr>                 
                             </tbody>
@@ -228,5 +290,6 @@
         <!-- modal dialog end -->
     </div>
     <!-- Add Modal end -->
+    <script type="text/javascript" th:src="@{/js/maintenance/error_management.js}"></script>
 </div>
 </html>
