@@ -52,7 +52,7 @@ public class CpMaintain {
     private String pictureLoc3;
 
     @Column(name = "process_date")
-    private LocalDateTime processDat;
+    private LocalDateTime processDate;
 
     @Column(name = "process_status")
     private String processStatus;
