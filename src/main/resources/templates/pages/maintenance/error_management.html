@@ -233,21 +233,26 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="w-20">현장사진<b class="required-data">*</b><div style="font-weight: 300; font-size: small;">(jpg, png 파일만 업로드 가능)</div></th>
-                                    <td colspan="3">
-                                        <!-- <div class="upload-container"> -->
-                                        <div class="">
-                                            <div class="upload-item">
-                                                <img id="imgShow1" class="upload-preview" src="" alt="Image Preview" style="display: none; width: 100px; height: 100px;"/>
-                                                <input type="file" accept="image/*" onchange="loadFile(this, 'imgShow1')">
+                                    <th class="w-20">현장사진<b class="required-data">*</b><div class="small-info">(jpg, png 파일만 업로드 가능)</div></th>
+                                    <td colspan="3" class="overflow-x-hidden">
+                                        <div class="upload-container">
+                                            <div class="upload-items">
+                                                <label for="input-pictureLoc1" id="label-pictureLoc1">업로드</label>
+                                                <input type="file" id="input-pictureLoc1" accept="image/*" onchange="loadFile(this, 'pictureLoc1')">
+                                                <img id="pictureLoc1" class="upload-preview" src="" alt="Image Preview"/>
+                                                <button type="button" id="remove-pictureLoc1" onclick="removeImage('pictureLoc1')">X</button>
                                             </div>
-                                            <div class="upload-item">
-                                                <img id="imgShow2" class="upload-preview" src="" alt="Image Preview" style="display: none; width: 100px; height: 100px;"/>
-                                                <input type="file" accept="image/*" onchange="loadFile(this, 'imgShow2')">
+                                            <div class="upload-items">
+                                                <label for="input-pictureLoc2" id="label-pictureLoc2">업로드</label>
+                                                <input type="file" id="input-pictureLoc2" accept="image/*" onchange="loadFile(this, 'pictureLoc2')">
+                                                <img id="pictureLoc2" class="upload-preview" src="" alt="Image Preview"/>
+                                                <button type="button" id="remove-pictureLoc2" onclick="removeImage('pictureLoc2')">X</button>
                                             </div>
-                                            <div class="upload-item">
-                                                <img id="imgShow3" class="upload-preview" src="" alt="Image Preview" style="display: none; width: 100px; height: 100px;"/>
-                                                <input type="file" accept="image/*" onchange="loadFile(this, 'imgShow3')">
+                                            <div class="upload-items">
+                                                <label for="input-pictureLoc3" id="label-pictureLoc3">업로드</label>
+                                                <input type="file" id="input-pictureLoc3" accept="image/*" onchange="loadFile(this, 'pictureLoc3')">
+                                                <img id="pictureLoc3" class="upload-preview" src="" alt="Image Preview"/>
+                                                <button type="button" id="remove-pictureLoc3" onclick="removeImage('pictureLoc3')">X</button>
                                             </div>
                                         </div>
                                     </td>
@@ -270,9 +275,9 @@
                                     <td colspan="2"></td>
                                 </tr>
                                 <tr>
-                                    <th class="w-20">처리내용<b class="required-data">*</b></th>
+                                    <th class="w-20">처리내용</th>
                                     <td colspan="3">
-                                        <textarea class="form-control resize-none" name="opinion" cols="" rows="5"></textarea>
+                                        <textarea class="form-control resize-none" id="processContent" cols="" rows="5" disabled></textarea>
                                     </td>
                                 </tr>                 
                             </tbody>
@@ -280,9 +285,9 @@
                         <!-- table:3 end -->
                     </div>
                     <!-- modal body end -->
-                    <div class="modal-footer justify-content-center" style="border-top: none;">
+                    <div class="modal-footer justify-content-center border-top-none">
                         <button type="button" class="btn btn-outline-grey me-2" data-bs-dismiss="modal">취소</button>
-                        <button type="submit" class="btn btn-data-add">등록</button>
+                        <button type="submit" id="modalBtn" class="btn btn-data-add">등록</button>
                     </div>
                 </form>              
             </div>
