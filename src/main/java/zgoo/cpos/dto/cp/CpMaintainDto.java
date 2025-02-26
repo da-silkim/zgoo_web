@@ -2,6 +2,8 @@ package zgoo.cpos.dto.cp;
 
 import java.time.LocalDateTime;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -25,6 +27,9 @@ public class CpMaintainDto {
         private String pictureLoc1;
         private String pictureLoc2;
         private String pictureLoc3;
+        private MultipartFile fileLoc1;
+        private MultipartFile fileLoc2;
+        private MultipartFile fileLoc3;
         private LocalDateTime processDate;
         private String processStatus;
         private String processContent;

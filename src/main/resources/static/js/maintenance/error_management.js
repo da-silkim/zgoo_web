@@ -84,4 +84,143 @@ $(document).ready(function() {
         $('#maintainForm')[0].reset();
         $('#processStatus').val('FSTATREADY');
     });
+
+    $('#modalBtn').on('click', function(event) {
+        event.preventDefault();
+
+        if(!chargerIdValid) {
+            alert('충전소ID 정보를 확인해 주세요.');
+            return;
+        }
+
+        const processStatus = document.getElementById('processStatus').value;
+        const processContent = document.getElementById('processContent').value;
+        if ((!processContent || processContent.trim() === '') && processStatus === 'FSTATFINISH') {
+            alert('처리내용을 작성해 주세요.');
+            return;
+        }
+
+        if (confirmSubmit(btnMsg)) {
+            const formData = new FormData();
+            var chargerId =  $('#chargerId').val();
+            var errorType = $('#errorType').val();
+            var errorContent = $('#errorContent').val();
+            var pStatus = $('#processStatus').val();
+            var pContent = $('#processContent').val();
+            var fileLoc1 = $('#input-pictureLoc1')[0].files[0];
+            var fileLoc2 = $('#input-pictureLoc2')[0].files[0];
+            var fileLoc3 = $('#input-pictureLoc3')[0].files[0];
+
+            formData.append('chargerId', chargerId);
+            formData.append('errorType', errorType);
+            formData.append('errorContent', errorContent);
+            formData.append('processStatus', pStatus);
+            formData.append('processContent', pContent);
+
+            if (fileLoc1) {
+                formData.append('fileLoc1', fileLoc1);
+            }
+            if (fileLoc2) {
+                formData.append('fileLoc2', fileLoc2);
+            }
+            if (fileLoc3) {
+                formData.append('fileLoc3', fileLoc3);
+            }
+
+            const DATA = {
+                chargerId: $('#chargerId').val(),
+                errorType: $('#errorType').val(),
+                errorContent: $('#errorContent').val(),
+                processStatus: $('#processStatus').val(),
+                processContent: $('#processContent').val()
+            }
+
+            const URL = modalCon ? `/errlist/update/${cpmaintainId}` : `/errlist/new`;
+            const TYPE = modalCon ? 'PATCH' : 'POST';
+
+            // 수정
+            if (modalCon) {
+                $.ajax({
+                    url: `/errlist/update/${cpmaintainId}`,
+                    method: 'PATCH',
+                    contentType: 'application/json',
+                    data: JSON.stringify(DATA),
+                    success: function(response) {
+                        alert(response);
+                    },
+                    error: function(error) {
+                        alert(error);
+                    }
+                });
+            } else {
+                $.ajax({
+                    url: `/errlist/new`,
+                    type: 'POST',
+                    data: formData,
+                    enctype: 'multipart/form-data',
+                    contentType: false,
+                    processData: false,
+                    cache: false,
+                    success: function(response) {
+                        alert(response);
+                        $('#dataAddModal').modal('hide');
+                    },
+                    error: function(error) {
+                        alert(error);
+                    }
+                });
+            }
+
+        }
+    });
+
+    $('#processStatus').on('change', function() {
+        const processStatus = document.getElementById('processStatus').value;
+        const processContent = document.getElementById('processContent');
+
+        if (processStatus === 'FSTATREADY') {
+            processContent.setAttribute('disabled', 'disabled');
+            processContent.value = '';
+        } else {
+            processContent.removeAttribute('disabled');
+        }
+    });
 });
+
+function loadFile(input, imageId) {
+    const file = input.files[0];
+    const img = document.getElementById(imageId);
+
+    if (file) {
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+            img.src = e.target.result;
+            img.style.display = 'block';
+
+            const removeBtn = document.getElementById('remove-' + imageId);
+            removeBtn.style.display = 'block';
+
+            const label = document.getElementById('label-' + imageId);
+            label.style.display = 'none';
+        };
+
+        reader.readAsDataURL(file);
+    }
+}
+
+function removeImage(imageId) {
+    const img = document.getElementById(imageId);
+    img.src = "";
+    img.style.display = 'none';
+    img.previousElementSibling.value = "";
+
+    const inputFile = document.getElementById('input-' + imageId);
+    inputFile.value = "";
+
+    const removeBtn = document.getElementById('remove-' + imageId);
+    removeBtn.style.display = 'none';
+
+    const label = document.getElementById('label-' + imageId);
+    label.style.display = 'block';
+}
