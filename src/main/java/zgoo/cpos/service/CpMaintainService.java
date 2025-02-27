@@ -4,6 +4,8 @@ import java.io.File;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -119,9 +121,24 @@ public class CpMaintainService {
             }
 
             // image file upload
-            dto.setPictureLoc1(saveImageFile(dto.getFileLoc1(), "picture1"));
-            dto.setPictureLoc2(saveImageFile(dto.getFileLoc2(), "picture2"));
-            dto.setPictureLoc3(saveImageFile(dto.getFileLoc3(), "picture3"));
+            List<String> picturePaths = new ArrayList<>();
+            String pictureLoc1 = saveImageFile(dto.getFileLoc1(), "picture1");
+            String pictureLoc2 = saveImageFile(dto.getFileLoc2(), "picture2");
+            String pictureLoc3 = saveImageFile(dto.getFileLoc3(), "picture3");
+
+            if (pictureLoc1 != null) {
+                picturePaths.add(pictureLoc1);
+            }
+            if (pictureLoc2 != null) {
+                picturePaths.add(pictureLoc2);
+            }
+            if (pictureLoc3 != null) {
+                picturePaths.add(pictureLoc3);
+            }
+
+            dto.setPictureLoc1(!picturePaths.isEmpty() ? picturePaths.get(0) : null);
+            dto.setPictureLoc2(picturePaths.size() > 1 ? picturePaths.get(1) : null);
+            dto.setPictureLoc3(picturePaths.size() > 2 ? picturePaths.get(2) : null);
 
             CpMaintain cpMaintain = CpMaintainMapper.toEntity(dto, regUserId);
             this.cpMaintainRepository.save(cpMaintain);
