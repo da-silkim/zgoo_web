@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import lombok.RequiredArgsConstructor;
@@ -77,6 +78,17 @@ public class CpMaintainService {
         }
     }
 
+    // 충전기 장애정보 단건 조회
+    public CpMaintainRegDto findMaintainOne(Long cpmaintainId) {
+        try {
+            CpMaintainRegDto dto = this.cpMaintainRepository.findMaintainOne(cpmaintainId);
+            return dto;
+        } catch (Exception e) {
+            log.error("[findMaintainOne] error: {}", e.getMessage());
+            return null;
+        }
+    }
+
     // 충전기 장애정보 등록
     public void saveMaintain(CpMaintainRegDto dto, String regUserId) {
         try {
@@ -110,5 +122,19 @@ public class CpMaintainService {
                 }
             }
         return null;
+    }
+
+    // 충전기 장애정보 삭제
+    @Transactional
+    public void deleteMaintain(Long cpmaintainId) {
+        CpMaintain cpMaintain = this.cpMaintainRepository.findById(cpmaintainId)
+            .orElseThrow(() -> new IllegalArgumentException("cpmaintain not found with id: " + cpmaintainId));
+
+        try {
+            this.cpMaintainRepository.deleteById(cpmaintainId);
+            log.info("=== cpmaintainId: {} is deleted..", cpmaintainId);
+        } catch (Exception e) {
+            log.error("[deleteMaintain] error: {}", e.getMessage());
+        }
     }
 }

@@ -83,6 +83,67 @@ $(document).ready(function() {
 
         $('#maintainForm')[0].reset();
         $('#processStatus').val('FSTATREADY');
+        $('#chargerId').prop('disabled', false);
+        $('#chargerIdSearchBtn').prop('disabled', false);
+        $('#errorType').prop('disabled', false);
+        $('#errorContent').prop('disabled', false);
+    });
+
+    $('#editBtn').on('click', function(event) {
+        event.preventDefault();
+        modalCon = true;
+        btnMsg = "수정";
+        $('#modalBtn').text(btnMsg);
+
+        $('#maintainForm')[0].reset();
+        $('#chargerId').prop('disabled', true);
+        $('#chargerIdSearchBtn').prop('disabled', true);
+        $('#errorType').prop('disabled', true);
+        $('#errorContent').prop('disabled', true);
+
+        $.ajax({
+            type: 'GET',
+            url: `/errlist/get/${cpmaintainId}`,
+            contentType: "application/json",
+            dataType: 'json',
+            success: function(data) {
+                $('#companyName').val(data.cpInfo.companyName || '');
+                $('#stationId').val(data.cpInfo.stationId || '');
+                $('#stationName').val(data.cpInfo.stationName || '');
+                $('#address').val(data.cpInfo.address || '');
+
+                $('#chargerId').val(data.cpMaintain.chargerId || '');
+                $('#errorType').val(data.cpMaintain.errorType || '');
+                $('#errorContent').val(data.cpMaintain.errorContent || '');
+                $('#processStatus').val(data.cpMaintain.processStatus || '');
+                $('#processContent').val(data.cpMaintain.processContent || '');
+
+                if (data.cpMaintain.processStatus === 'FSTATFINISH') {
+                    $('#processStatus').prop('disabled', true);
+                }
+
+                $('#pictureLoc1').attr('src', data.cpMaintain.pictureLoc1 || '');
+                $('#pictureLoc2').attr('src', data.cpMaintain.pictureLoc2 || '');
+                $('#pictureLoc3').attr('src', data.cpMaintain.pictureLoc3 || '');
+            }
+        });
+    });
+
+    $('#deleteBtn').on('click', function() {
+        if(confirmSubmit("삭제")) {
+            $.ajax({
+                type: 'DELETE',
+                url: `/errlist/delete/${cpmaintainId}`,
+                contentType: "application/json",
+                success: function(response) {
+                    alert(response);
+                    window.location.reload();
+                },
+                error: function(error) {
+                    alert(error);
+                }
+            });
+        }
     });
 
     $('#modalBtn').on('click', function(event) {

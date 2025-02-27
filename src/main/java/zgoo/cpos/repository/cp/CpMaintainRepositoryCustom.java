@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 
 import zgoo.cpos.dto.cp.CpMaintainDto.CpInfoDto;
 import zgoo.cpos.dto.cp.CpMaintainDto.CpMaintainListDto;
+import zgoo.cpos.dto.cp.CpMaintainDto.CpMaintainRegDto;
 
 public interface CpMaintainRepositoryCustom {
 
@@ -19,4 +20,7 @@ public interface CpMaintainRepositoryCustom {
 
     // 충전소, 충전기 조회
     CpInfoDto searchCsCpInfoWithChargerId(String chargerId);
+
+    // 장애 정보 - 단건 조회
+    CpMaintainRegDto findMaintainOne(Long cpmaintainId);
 }
