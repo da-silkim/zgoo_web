@@ -2,6 +2,9 @@ $(document).ready(function() {
     let modalCon = false, selectRow, btnMsg = "등록", chargerIdValid = false;
     var cpmaintainId, chargerId;
 
+    var uploadImage = document.getElementById('uploadImage');
+    var showImage = document.getElementById('showImage');
+
     $('#resetBtn').on('click', function() {
         window.location.replace('/maintenance/errlist');
     });
@@ -87,6 +90,13 @@ $(document).ready(function() {
         $('#chargerIdSearchBtn').prop('disabled', false);
         $('#errorType').prop('disabled', false);
         $('#errorContent').prop('disabled', false);
+        $('#processStatus').prop('disabled', false);
+        $('#processContent').prop('disabled', true);
+        removeImage('pictureLoc1');
+        removeImage('pictureLoc2');
+        removeImage('pictureLoc3');
+        uploadImage.hidden = false;
+        showImage.hidden = true;
     });
 
     $('#editBtn').on('click', function(event) {
@@ -100,6 +110,12 @@ $(document).ready(function() {
         $('#chargerIdSearchBtn').prop('disabled', true);
         $('#errorType').prop('disabled', true);
         $('#errorContent').prop('disabled', true);
+        $('#processContent').prop('disabled', true);
+        uploadImage.hidden = true;
+        showImage.hidden = false;
+        showPicture(1);
+        showPicture(2);
+        showPicture(3);
 
         $.ajax({
             type: 'GET',
@@ -120,11 +136,34 @@ $(document).ready(function() {
 
                 if (data.cpMaintain.processStatus === 'FSTATFINISH') {
                     $('#processStatus').prop('disabled', true);
+                } else {
+                    $('#processStatus').prop('disabled', false);
                 }
 
-                $('#pictureLoc1').attr('src', data.cpMaintain.pictureLoc1 || '');
-                $('#pictureLoc2').attr('src', data.cpMaintain.pictureLoc2 || '');
-                $('#pictureLoc3').attr('src', data.cpMaintain.pictureLoc3 || '');
+                const pic1 = data.cpMaintain.pictureLoc1;
+                const pic2 = data.cpMaintain.pictureLoc2;
+                const pic3 = data.cpMaintain.pictureLoc3;
+
+                if (!pic1 || pic1 === '') {
+                    document.getElementById('showPictureLoc1').style.display = 'none';
+                    document.getElementById('showPicture1').style.border = 'none';
+                } else {
+                    $('#showPictureLoc1').attr('src', data.cpMaintain.pictureLoc1 || '');
+                }
+                
+                if (!pic2 || pic2 === '') {
+                    document.getElementById('showPictureLoc2').style.display = 'none';
+                    document.getElementById('showPicture2').style.border = 'none';
+                } else {
+                    $('#showPictureLoc2').attr('src', data.cpMaintain.pictureLoc2 || '');
+                }
+                
+                if (!pic3 || pic3 === '') {
+                    document.getElementById('showPictureLoc3').style.display = 'none';
+                    document.getElementById('showPicture3').style.border = 'none';
+                } else {
+                    $('#showPictureLoc3').attr('src', data.cpMaintain.pictureLoc3 || '');
+                }
             }
         });
     });
@@ -284,4 +323,9 @@ function removeImage(imageId) {
 
     const label = document.getElementById('label-' + imageId);
     label.style.display = 'block';
+}
+
+function showPicture(imageId) {
+    document.getElementById('showPictureLoc' + imageId).style.display = 'block';
+    document.getElementById('showPicture' + imageId).style.border = '1px #2e2e2e solid';
 }

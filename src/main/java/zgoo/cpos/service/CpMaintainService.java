@@ -1,6 +1,7 @@
 package zgoo.cpos.service;
 
 import java.io.File;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -82,6 +83,27 @@ public class CpMaintainService {
     public CpMaintainRegDto findMaintainOne(Long cpmaintainId) {
         try {
             CpMaintainRegDto dto = this.cpMaintainRepository.findMaintainOne(cpmaintainId);
+
+            // 이미지 경로를 웹 경로로 수정 (null 체크 추가)
+            if (dto.getPictureLoc1() != null) {
+                System.out.println("pic1 (before): " + dto.getPictureLoc1());
+                dto.setPictureLoc1("/images/" + Paths.get(dto.getPictureLoc1()).getFileName());
+                System.out.println("pic1 (after): " + dto.getPictureLoc1());
+            }
+
+            if (dto.getPictureLoc2() != null) {
+                System.out.println("pic2 (before): " + dto.getPictureLoc2());
+                dto.setPictureLoc2("/images/" + Paths.get(dto.getPictureLoc2()).getFileName());
+                System.out.println("pic2 (after): " + dto.getPictureLoc2());
+            }
+
+            if (dto.getPictureLoc3() != null) {
+                System.out.println("pic3 (before): " + dto.getPictureLoc3());
+                dto.setPictureLoc3("/images/" + Paths.get(dto.getPictureLoc3()).getFileName());
+                System.out.println("pic3 (after): " + dto.getPictureLoc3());
+            }
+
+
             return dto;
         } catch (Exception e) {
             log.error("[findMaintainOne] error: {}", e.getMessage());

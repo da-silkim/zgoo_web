@@ -235,7 +235,7 @@
                                 <tr>
                                     <th class="w-20">현장사진<b class="required-data">*</b><div class="small-info">(jpg, png 파일만 업로드 가능)</div></th>
                                     <td colspan="3" class="overflow-x-hidden">
-                                        <div class="upload-container">
+                                        <div class="upload-container" id="uploadImage">
                                             <div class="upload-items">
                                                 <label for="input-pictureLoc1" id="label-pictureLoc1">업로드</label>
                                                 <input type="file" id="input-pictureLoc1" accept="image/*" onchange="loadFile(this, 'pictureLoc1')">
@@ -253,6 +253,17 @@
                                                 <input type="file" id="input-pictureLoc3" accept="image/*" onchange="loadFile(this, 'pictureLoc3')">
                                                 <img id="pictureLoc3" class="upload-preview" src="" alt="Image Preview"/>
                                                 <button type="button" id="remove-pictureLoc3" onclick="removeImage('pictureLoc3')">X</button>
+                                            </div>
+                                        </div>
+                                        <div class="upload-container" id="showImage" hidden>
+                                            <div class="upload-items show-picture1" id="showPicture1">
+                                                <img id="showPictureLoc1" class="show-image" src="" alt="없음"/>
+                                            </div>
+                                            <div class="upload-items show-picture2" id="showPicture2">
+                                                <img id="showPictureLoc2" class="show-image" src="" alt="없음"/>
+                                            </div>
+                                            <div class="upload-items show-picture3" id="showPicture3">
+                                                <img id="showPictureLoc3" class="show-image" src="" alt="없음"/>
                                             </div>
                                         </div>
                                     </td>
