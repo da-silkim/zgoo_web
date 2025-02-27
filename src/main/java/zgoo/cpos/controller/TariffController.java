@@ -55,30 +55,22 @@ public class TariffController {
         }
     }
 
-    // // 요금정보 등록
-    // @PostMapping("/tariffinfo/new")
-    // public ResponseEntity<Map<String, String>> createTariffInfo(@RequestBody
-    // TariffRegDto requestDto) {
-    // log.info("==== create Request Charger Tariff Info(dto):{}",
-    // requestDto.toString());
+    // 요금제 list 조회
+    @GetMapping("/get/planInfo/{companyId}")
+    public ResponseEntity<List<CpPlanDto>> findplanListWithCompanyId(@PathVariable("companyId") Long companyId) {
+        log.info("==== find PlanInfo List with CompanyId:{}", companyId);
+        try {
+            List<CpPlanDto> planList = tariffService.searchPlanListWithCompanyId(companyId);
 
-    // Map<String, String> response = new HashMap<>();
-
-    // try {
-
-    // // Tariff policy 저장
-    // tariffService.saveTariffInfo(requestDto);
-
-    // } catch (Exception e) {
-    // log.error("TariffController >> createPlan Error:{}", e, e.getMessage());
-    // response.put("message", "서버 오류");
-    // return
-    // ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
-    // }
-
-    // response.put("message", "성공적으로 등록되었습니다.");
-    // return ResponseEntity.ok(response);
-    // }
+            if (planList.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
+            return ResponseEntity.ok(planList);
+        } catch (Exception e) {
+            log.error("[TariffController - findplanListWithCompanyId] error: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 
     // 요금제 등록
     @PostMapping("/new")

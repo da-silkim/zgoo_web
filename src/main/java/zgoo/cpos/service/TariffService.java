@@ -177,6 +177,13 @@ public class TariffService {
         return dtolist;
     }
 
+    public List<CpPlanDto> searchPlanListWithCompanyId(Long companyId) {
+        List<CpPlanDto> resultList = planRepository.findPlanListByCompanyId(companyId)
+                .orElseThrow(() -> new IllegalArgumentException("Plan Info Not found with companyid: " + companyId));
+
+        return resultList;
+    }
+
     public List<CpPlanPolicy> searchPlanPolicyByCompanyId(Long companyId) {
         log.info("==  Start search PlanPolicy by CompanyId : {}", companyId);
 

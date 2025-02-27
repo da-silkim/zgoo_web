@@ -2,17 +2,14 @@ package zgoo.cpos.domain.charger;
 
 import java.time.LocalDateTime;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import zgoo.cpos.type.ChargePointErrorCode;
+import zgoo.cpos.type.ChargePointStatus;
 
 @Entity
 @Table(name = "CONNECTOR_STATUS")
@@ -21,19 +18,23 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder(toBuilder = true)
 public class ConnectorStatus {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "idx")
-    private Long id;
+    @EmbeddedId // 복합키 지정
+    private ConnectorStatusId id; // 임베디드된 복합키
 
     @Column(nullable = false)
-    private String chargerId;
+    @Enumerated(EnumType.STRING)
+    private ChargePointStatus status;
 
-    @Column(nullable = false)
-    private Integer connectorId;
+    @Column
+    @Enumerated(EnumType.STRING)
+    private ChargePointErrorCode errCode;
 
-    @Column(nullable = false)
-    private String status;
+    @Column
+    private String vendorId;
 
+    @Column
+    private String vendorErrCode;
+
+    @Column
     private LocalDateTime timestamp;
 }

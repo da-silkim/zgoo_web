@@ -139,7 +139,8 @@ document.addEventListener("DOMContentLoaded", function () {
     document.querySelectorAll('#pageList tr').forEach(row => {
         row.addEventListener('click', function () {
             companySelectedRow = row;
-        })
+            console.log('selected row data:', companySelectedRow);
+        });
     });
 
     // 삭제버튼 클릭 이벤트 처리

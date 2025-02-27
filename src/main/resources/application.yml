@@ -36,5 +36,16 @@ logging.level:
   org.hibernate.type.descriptor.sql.BasicBinder: trace
   org.hibernate.stat: debug
 
+
+# WEB - WAS Ajp 방화벽 (내장 톰캣 설정 시) - (짐작)
+fwaccess:
+  properties:
+    tomcat_ajp_protocol: AJP/1.3
+    tomcat_ajp_port: 9009
+    tomcat_ajp_redirect_port: 9443
+    tomcat_ajp_address: 192.168.30.120
+    tomcat_ajp_allowed_request_attributes_pattern: .*
+    tomcat_ajp_enable: true
+
 file:
   dir: C:/Users/N-426/Desktop/store/

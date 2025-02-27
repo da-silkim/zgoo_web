@@ -5,12 +5,13 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import lombok.RequiredArgsConstructor;
@@ -26,23 +27,23 @@ import zgoo.cpos.dto.company.CompanyDto.BaseCompnayDto;
 import zgoo.cpos.dto.company.CompanyDto.CompanyListDto;
 import zgoo.cpos.dto.company.CompanyDto.CompanyRegDto;
 import zgoo.cpos.dto.company.CompanyDto.CpPlanDto;
+import zgoo.cpos.dto.cp.ChargerDto.ChargerListDto;
+import zgoo.cpos.dto.cp.ChargerDto.ChargerRegDto;
+import zgoo.cpos.dto.cp.ChargerDto.ConnectorStatusDto;
 import zgoo.cpos.dto.cp.CpModelDto;
 import zgoo.cpos.dto.cp.CpModelDto.CpModelListDto;
 import zgoo.cpos.dto.cs.CsInfoDto;
 import zgoo.cpos.dto.cs.CsInfoDto.CsInfoDetailDto;
 import zgoo.cpos.dto.cs.CsInfoDto.CsInfoListDto;
-import zgoo.cpos.dto.member.ConditionDto;
+import zgoo.cpos.dto.member.ConditionDto.ConditionCodeBaseDto;
 import zgoo.cpos.dto.member.MemberDto;
+import zgoo.cpos.dto.member.MemberDto.MemberAuthDto;
 import zgoo.cpos.dto.member.MemberDto.MemberListDto;
 import zgoo.cpos.dto.member.VocDto;
-import zgoo.cpos.dto.member.ConditionDto.ConditionCodeBaseDto;
-import zgoo.cpos.dto.member.ConditionDto.ConditionVersionHistBaseDto;
-import zgoo.cpos.dto.member.MemberDto.MemberAuthDto;
 import zgoo.cpos.dto.member.VocDto.VocListDto;
 import zgoo.cpos.dto.menu.CompanyMenuAuthorityDto;
-import zgoo.cpos.dto.menu.MenuAuthorityDto;
-import zgoo.cpos.dto.menu.MenuDto;
 import zgoo.cpos.dto.menu.MenuAuthorityDto.MenuAuthorityBaseDto;
+import zgoo.cpos.dto.menu.MenuDto;
 import zgoo.cpos.dto.tariff.TariffDto.TariffPolicyDto;
 import zgoo.cpos.dto.tariff.TariffDto.TariffRegDto;
 import zgoo.cpos.dto.users.FaqDto;
@@ -50,6 +51,7 @@ import zgoo.cpos.dto.users.NoticeDto;
 import zgoo.cpos.dto.users.NoticeDto.NoticeListDto;
 import zgoo.cpos.dto.users.UsersDto;
 import zgoo.cpos.service.BizService;
+import zgoo.cpos.service.ChargerService;
 import zgoo.cpos.service.ChgErrorCodeService;
 import zgoo.cpos.service.CodeService;
 import zgoo.cpos.service.CompanyService;
@@ -84,6 +86,7 @@ public class PageController {
     private final TariffService tariffService;
     private final MemberService memberService;
     private final VocService vocService;
+    private final ChargerService chargerService;
     private final ConditionService conditionService;
 
     /*
@@ -111,7 +114,7 @@ public class PageController {
     @GetMapping("/map")
     public String showmap(Model model) {
         log.info("=== Map Page ===");
-        
+
         try {
             List<CsInfoDetailDto> csList = this.csService.findCsInfo();
             model.addAttribute("csList", csList);
@@ -165,7 +168,8 @@ public class PageController {
             model.addAttribute("bizTypeList", bizTypeList);
             List<CommCdBaseDto> creditCardList = codeService.commonCodeStringToNum("CREDITCARDCD"); // 카드사코드
             model.addAttribute("creditCardList", creditCardList);
-            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(), "C0100");
+            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(),
+                    "C0100");
             model.addAttribute("menuAuthority", menuAuthority);
         } catch (Exception e) {
             e.getStackTrace();
@@ -192,7 +196,7 @@ public class PageController {
         return "pages/member/member_authentication";
     }
 
-    /* 
+    /*
      * 회원관리 > 회원카드관리
      */
     @GetMapping("/member/tag/list")
@@ -206,7 +210,8 @@ public class PageController {
 
         try {
             // 회원카드리스트
-            Page<MemberAuthDto> memberAuthList = this.memberService.findMemberAuthInfoWithPagination(idTag, name, page, size);
+            Page<MemberAuthDto> memberAuthList = this.memberService.findMemberAuthInfoWithPagination(idTag, name, page,
+                    size);
 
             // 검색 조건 저장
             model.addAttribute("selectedIdTag", idTag);
@@ -224,7 +229,8 @@ public class PageController {
             model.addAttribute("companyList", companyList);
             List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT"); // 그리드 row 수
             model.addAttribute("showListCnt", showListCnt);
-            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(), "C0300");
+            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(),
+                    "C0300");
             model.addAttribute("menuAuthority", menuAuthority);
         } catch (Exception e) {
             e.getStackTrace();
@@ -289,7 +295,8 @@ public class PageController {
             model.addAttribute("faucetType", faucetType);
             List<CommCdBaseDto> powerType = codeService.commonCodeStringToNum("POWERTYPE"); // 전압종류
             model.addAttribute("powerType", powerType);
-            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(), "D0100");
+            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(),
+                    "D0100");
             model.addAttribute("menuAuthority", menuAuthority);
         } catch (Exception e) {
             e.getStackTrace();
@@ -313,19 +320,91 @@ public class PageController {
      * 충전기관리 > 충전기리스트
      */
     @GetMapping("/charger/list")
-    public String showchargerlist(@RequestParam(value = "companyIdSearch", required = false) Long companyId,
+    public String showchargerlist(@RequestParam(value = "companyIdSearch", required = false) Long reqCompanyId,
+            @RequestParam(value = "manfCodeSearch", required = false) String reqManfCd,
+            @RequestParam(value = "opSearch", required = false) String reqOpSearch,
+            @RequestParam(value = "contentSearch", required = false) String reqSearchContent,
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "10") int size,
             Model model) {
 
         log.info("=== Charger List Page ===");
-        log.info("== companyId: {}, page: {}, size: {}", companyId, page, size);
+        log.info("== companyId: {}, page: {}, size: {}", reqCompanyId, page, size);
 
-        // TODO: 충전기 등록폼 전달
+        // 충전기 등록폼 전달
+        model.addAttribute("chargerRegDto", new ChargerRegDto());
 
-        log.info("== companyId: {}, page: {}, size: {}", companyId, page, size);
+        Page<ChargerListDto> chargerList;
 
-        // TODO: 충전기 등록폼 전달
+        try {
+            log.info("=== Charger DB search result >>>");
+
+            // charger list 조회
+            // 검색조건 check
+            if (reqCompanyId == null && reqManfCd == null && reqOpSearch == null) {
+                log.info("Search all charger list >>");
+                chargerList = chargerService.searchCpListPageAll(page, size);
+
+            } else {
+                log.info("Search charger list by options:companyid:{},manfcode:{},op:{},content:{} >>",
+                        reqCompanyId, reqManfCd, reqOpSearch, reqSearchContent);
+                chargerList = chargerService.searchCpListPage(reqCompanyId, reqManfCd, reqOpSearch, reqSearchContent,
+                        page, size);
+            }
+
+            // page 처리
+            int totalPages = chargerList.getTotalPages() == 0 ? 1 : chargerList.getTotalPages();
+            model.addAttribute("chargerList", chargerList.getContent());
+            model.addAttribute("size", String.valueOf(size));
+            model.addAttribute("currentPage", page);
+            model.addAttribute("totalPages", totalPages);
+            model.addAttribute("totalCount", chargerList.getTotalElements());
+            log.info("===ChargerList_PageInfo >> totalPages:{}, totalCount:{}", totalPages,
+                    chargerList.getTotalElements());
+
+            // 충전기 커넥터 상태 리스트 조회
+            List<ConnectorStatusDto> connStatList = chargerService.searchConStatListAll();
+            Map<String, String> connStatusMap = connStatList.stream()
+                    .collect(Collectors.groupingBy(ConnectorStatusDto::getChargerId,
+                            Collectors.mapping(ConnectorStatusDto::getStatus, Collectors.joining(","))));
+            model.addAttribute("connStatusMap", connStatusMap);
+            log.info("=== connector_status map: {}", connStatusMap); // Map 전체 로깅
+
+            // 검색 select options 조회
+            // 1.사업자 리스트
+            List<BaseCompnayDto> companyList = companyService.searchAllCompanyForSelectOpt();
+            model.addAttribute("companyList", companyList);
+            // 2.grid row count
+            List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT");
+            model.addAttribute("showListCnt", showListCnt);
+            // 3.제조사 리스트
+            List<CommCdBaseDto> manfCd = codeService.commonCodeStringToNum("CGMANFCD");
+            model.addAttribute("manfCdList", manfCd);
+            // 4.공용구분
+            List<CommCdBaseDto> commonTypeList = codeService.commonCodeStringToNum("CGCOMMONCD");
+            model.addAttribute("commonTypeList", commonTypeList);
+            // 5.충전기 미사용 사유
+            List<CommCdBaseDto> reasonList = codeService.commonCodeStringToNum("NOTUSINGRSN");
+            model.addAttribute("reasonList", reasonList);
+            // 6.모뎀통신사
+            List<CommCdBaseDto> modemCorpList = codeService.commonCodeStringToNum("MODEMCORP");
+            model.addAttribute("modemCorpList", modemCorpList);
+            // 7.모뎀계약상태
+            List<CommCdBaseDto> modemContractOptionList = codeService.commonCodeStringToNum("MODEMCTCD");
+            model.addAttribute("modemContractOptionList", modemContractOptionList);
+
+        } catch (Exception e) {
+            log.error("Error occurered while fetching charger list: {}", e.getMessage(), e);
+
+            chargerList = Page.empty();
+            model.addAttribute("companyList", Collections.emptyList());
+            model.addAttribute("showListCnt", Collections.emptyList());
+            model.addAttribute("manfCdList", Collections.emptyList());
+            model.addAttribute("commonTypeList", Collections.emptyList());
+            model.addAttribute("reasonList", Collections.emptyList());
+            model.addAttribute("modemCorpList", Collections.emptyList());
+            model.addAttribute("modemContractOptionList", Collections.emptyList());
+        }
 
         return "pages/charge/cp_list";
     }
@@ -388,7 +467,8 @@ public class PageController {
             model.addAttribute("chgSpeedCd", chgSpeedCd);
             List<CommCdBaseDto> connType = codeService.commonCodeStringToNum("CONNTYPE"); // 커넥터타입
             model.addAttribute("connType", connType);
-            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(), "G0100");
+            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(),
+                    "G0100");
             model.addAttribute("menuAuthority", menuAuthority);
         } catch (Exception e) {
             e.getStackTrace();
@@ -431,7 +511,8 @@ public class PageController {
 
             log.info("== commCode list found : ", ccdlist.size());
 
-            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(), "G0200");
+            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(),
+                    "G0200");
             model.addAttribute("menuAuthority", menuAuthority);
         } catch (Exception e) {
 
@@ -511,7 +592,8 @@ public class PageController {
             List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT"); // 그리드 row 수
             model.addAttribute("showListCnt", showListCnt);
 
-            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(), "G0300");
+            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(),
+                    "G0300");
             model.addAttribute("menuAuthority", menuAuthority);
         } catch (Exception e) {
             log.error("Error occurred while fetching user list: {}", e.getMessage(), e);
@@ -583,7 +665,8 @@ public class PageController {
             List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT"); // 그리드 row 수
             model.addAttribute("showListCnt", showListCnt);
 
-            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(), "G0400");
+            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(),
+                    "G0400");
             model.addAttribute("menuAuthority", menuAuthority);
         } catch (Exception e) {
             e.getStackTrace();
@@ -655,7 +738,8 @@ public class PageController {
             List<MenuDto.MenuAuthorityListDto> companyMenuModalList = this.menuService.findMenuListWithParentName();
             model.addAttribute("companyMenuModalList", companyMenuModalList);
 
-            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(), "G0500");
+            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(),
+                    "G0500");
             model.addAttribute("menuAuthority", menuAuthority);
         } catch (Exception e) {
             e.getStackTrace();
@@ -682,8 +766,9 @@ public class PageController {
 
         try {
             // 사업자 권한 list
-            // List<MenuAuthorityDto.CompanyAuthorityListDto> companyAuthorityList = menuAuthorityService
-            //        .findCompanyAuthorityList();
+            // List<MenuAuthorityDto.CompanyAuthorityListDto> companyAuthorityList =
+            // menuAuthorityService
+            // .findCompanyAuthorityList();
             // log.info("사업자 권한 확인 >> {}", companyAuthorityList.toString());
             // model.addAttribute("companyAuthorityList", companyAuthorityList);
 
@@ -693,7 +778,8 @@ public class PageController {
             List<CommCdBaseDto> authorityList = codeService.commonCodeMenuAuthority("MENUACCLV"); // 메뉴권한
             model.addAttribute("authorityList", authorityList);
 
-            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(), "G0600");
+            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(),
+                    "G0600");
             // System.out.println("권한: " + menuAuthority.getAuthority());
             // System.out.println("등록권한: " + menuAuthority.getModYn());
             // System.out.println("principal getName : " + principal.getName());
@@ -742,7 +828,8 @@ public class PageController {
             model.addAttribute("showListCnt", showListCnt);
             List<CommCdBaseDto> manfCd = codeService.commonCodeStringToNum("CGMANFCD"); // 충전기제조사
             model.addAttribute("manfCd", manfCd);
-            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(), "G0700");
+            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(),
+                    "G0700");
             model.addAttribute("menuAuthority", menuAuthority);
         } catch (Exception e) {
             e.getStackTrace();
@@ -813,7 +900,8 @@ public class PageController {
             // 요금제 적용상태 코드 리스트
             List<CommCdBaseDto> tariffStatCodeList = codeService.commonCodeStringToNum("TARIFFSTATCD");
             model.addAttribute("tariffStatCodeList", tariffStatCodeList);
-            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(), "G0800");
+            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(),
+                    "G0800");
             model.addAttribute("menuAuthority", menuAuthority);
         } catch (Exception e) {
             log.error("Error occurred while fetching tariff list: {}", e.getMessage(), e);
@@ -827,7 +915,7 @@ public class PageController {
         return "pages/system/tariff_management";
     }
 
-    /* 
+    /*
      * 시스템 > 약관관리
      */
     @GetMapping("/system/condition")
@@ -837,7 +925,8 @@ public class PageController {
         try {
             List<ConditionCodeBaseDto> conList = this.conditionService.findConditionCodeAll();
             model.addAttribute("conList", conList);
-            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(), "G0900");
+            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(),
+                    "G0900");
             model.addAttribute("menuAuthority", menuAuthority);
         } catch (Exception e) {
 
@@ -901,7 +990,8 @@ public class PageController {
             model.addAttribute("vocStatList", vocStatList);
             List<CommCdBaseDto> vocPathList = codeService.commonCodeStringToNum("VOCPATH"); // 문의경로
             model.addAttribute("vocPathList", vocPathList);
-            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(), "J0100");
+            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(),
+                    "J0100");
             model.addAttribute("menuAuthority", menuAuthority);
         } catch (Exception e) {
             e.getStackTrace();
@@ -958,7 +1048,8 @@ public class PageController {
 
             List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT"); // 그리드 row 수
             model.addAttribute("showListCnt", showListCnt);
-            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(), "J0200");
+            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(),
+                    "J0200");
             model.addAttribute("menuAuthority", menuAuthority);
         } catch (Exception e) {
             e.getStackTrace();
@@ -1097,7 +1188,8 @@ public class PageController {
             List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT"); // 그리드 row 수
             model.addAttribute("showListCnt", showListCnt);
 
-            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(), "N0100");
+            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(),
+                    "N0100");
             model.addAttribute("menuAuthority", menuAuthority);
         } catch (Exception e) {
 
@@ -1144,7 +1236,8 @@ public class PageController {
             model.addAttribute("showListCnt", showListCnt);
             List<CommCdBaseDto> creditCardList = codeService.commonCodeStringToNum("CREDITCARDCD"); // 카드사코드
             model.addAttribute("creditCardList", creditCardList);
-            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(), "N0200");
+            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(),
+                    "N0200");
             model.addAttribute("menuAuthority", menuAuthority);
         } catch (Exception e) {
             e.getStackTrace();

@@ -92,6 +92,7 @@
                             <thead>
                                 <tr class="table-border-top">
                                     <th scope="col"></th>
+                                    <th scope="col" style="display:none;">ID</th>
                                     <th scope="col">사업자명</th>
                                     <th scope="col">사업자구분</th>
                                     <th scope="col">사업자유형</th>
@@ -104,6 +105,7 @@
                             <tbody id="pageList">
                                 <tr th:each="company : ${companyList}">
                                     <td><input type="checkbox" /></td>
+                                    <td th:text="${company.companyId}" style="display:none;"></td>
                                     <td th:text="${company.companyName}"></td>
                                     <td th:text="${company.companyLvName}"></td>
                                     <td th:text="${company.companyTypeName}"></td>
@@ -237,7 +239,7 @@
                                     <th class="w-20">로고URL<b class="required-data">*</b></th>
                                     <td class="w-30">
                                         <input type="text" name="logoUrl" id="logoUrl" class="form-control"
-                                                th:field="*{logoUrl}" required>
+                                            th:field="*{logoUrl}" required>
                                     </td>
                                 </tr>
                                 <tr>
@@ -497,4 +499,5 @@
     <script type="text/javascript" th:src="@{/js/biz/biz_management.js}"></script>
 
 </div>
+
 </html>
