@@ -21,9 +21,15 @@ public interface CpModelRepositoryCustom {
     // 충전기 모델 단건 조회
     CpModelRegDto findCpModelOne(Long modelId);
 
+    // 충전기 모델 단건 조회(모달용)
+    CpModelListDto findCpModelModalOne(String modelCode);
+
     // 충전기 모델 상세 조회
     CpModelDetailDto findCpModelDetailOne(Long modelId);
 
     // 충전기 커넥터 조회
     List<CpConnectorDto> findCpConnectorByModelId(Long modelId);
+
+    // 충전기 모델 조회 by 사업자
+    List<CpModelListDto> findCpModelListByCompanyId(Long companyId);
 }

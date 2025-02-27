@@ -1,6 +1,7 @@
 package zgoo.cpos.domain.charger;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -16,8 +17,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import zgoo.cpos.domain.company.CpPlanPolicy;
 import zgoo.cpos.domain.cs.CsInfo;
-import zgoo.cpos.domain.tariff.TariffPolicy;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -38,9 +39,9 @@ public class CpInfo {
     @JoinColumn(name = "cpmodem_id")
     private CpModem cpmodemInfo;
 
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name = "tariff_id")
-    private TariffPolicy tariffInfo;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "policy_id")
+    private CpPlanPolicy planInfo;
 
     private String chargerName;
     private String serialNo;
@@ -48,6 +49,7 @@ public class CpInfo {
     private String commonType;
     private String anydeskId;
     private LocalDate installDate;
+    private LocalDateTime regDt;
     private String protocol;
     private String location;
     private String modelCode;

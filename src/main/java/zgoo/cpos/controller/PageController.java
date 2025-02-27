@@ -4,6 +4,8 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
@@ -24,6 +26,9 @@ import zgoo.cpos.dto.company.CompanyDto.BaseCompnayDto;
 import zgoo.cpos.dto.company.CompanyDto.CompanyListDto;
 import zgoo.cpos.dto.company.CompanyDto.CompanyRegDto;
 import zgoo.cpos.dto.company.CompanyDto.CpPlanDto;
+import zgoo.cpos.dto.cp.ChargerDto.ChargerListDto;
+import zgoo.cpos.dto.cp.ChargerDto.ChargerRegDto;
+import zgoo.cpos.dto.cp.ChargerDto.ConnectorStatusDto;
 import zgoo.cpos.dto.cp.CpModelDto;
 import zgoo.cpos.dto.cp.CpModelDto.CpModelListDto;
 import zgoo.cpos.dto.cs.CsInfoDto;
@@ -41,6 +46,7 @@ import zgoo.cpos.dto.users.FaqDto;
 import zgoo.cpos.dto.users.NoticeDto;
 import zgoo.cpos.dto.users.UsersDto;
 import zgoo.cpos.service.BizService;
+import zgoo.cpos.service.ChargerService;
 import zgoo.cpos.service.ChgErrorCodeService;
 import zgoo.cpos.service.CodeService;
 import zgoo.cpos.service.CompanyService;
@@ -74,6 +80,7 @@ public class PageController {
     private final TariffService tariffService;
     private final MemberService memberService;
     private final VocService vocService;
+    private final ChargerService chargerService;
 
     /*
      * 대시보드
@@ -238,19 +245,91 @@ public class PageController {
      * 충전기관리 > 충전기리스트
      */
     @GetMapping("/charger/list")
-    public String showchargerlist(@RequestParam(value = "companyIdSearch", required = false) Long companyId,
+    public String showchargerlist(@RequestParam(value = "companyIdSearch", required = false) Long reqCompanyId,
+            @RequestParam(value = "manfCodeSearch", required = false) String reqManfCd,
+            @RequestParam(value = "opSearch", required = false) String reqOpSearch,
+            @RequestParam(value = "contentSearch", required = false) String reqSearchContent,
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "10") int size,
             Model model) {
 
         log.info("=== Charger List Page ===");
-        log.info("== companyId: {}, page: {}, size: {}", companyId, page, size);
+        log.info("== companyId: {}, page: {}, size: {}", reqCompanyId, page, size);
 
-        // TODO: 충전기 등록폼 전달
+        // 충전기 등록폼 전달
+        model.addAttribute("chargerRegDto", new ChargerRegDto());
 
-        log.info("== companyId: {}, page: {}, size: {}", companyId, page, size);
+        Page<ChargerListDto> chargerList;
 
-        // TODO: 충전기 등록폼 전달
+        try {
+            log.info("=== Charger DB search result >>>");
+
+            // charger list 조회
+            // 검색조건 check
+            if (reqCompanyId == null && reqManfCd == null && reqOpSearch == null) {
+                log.info("Search all charger list >>");
+                chargerList = chargerService.searchCpListPageAll(page, size);
+
+            } else {
+                log.info("Search charger list by options:companyid:{},manfcode:{},op:{},content:{} >>",
+                        reqCompanyId, reqManfCd, reqOpSearch, reqSearchContent);
+                chargerList = chargerService.searchCpListPage(reqCompanyId, reqManfCd, reqOpSearch, reqSearchContent,
+                        page, size);
+            }
+
+            // page 처리
+            int totalPages = chargerList.getTotalPages() == 0 ? 1 : chargerList.getTotalPages();
+            model.addAttribute("chargerList", chargerList.getContent());
+            model.addAttribute("size", String.valueOf(size));
+            model.addAttribute("currentPage", page);
+            model.addAttribute("totalPages", totalPages);
+            model.addAttribute("totalCount", chargerList.getTotalElements());
+            log.info("===ChargerList_PageInfo >> totalPages:{}, totalCount:{}", totalPages,
+                    chargerList.getTotalElements());
+
+            // 충전기 커넥터 상태 리스트 조회
+            List<ConnectorStatusDto> connStatList = chargerService.searchConStatListAll();
+            Map<String, String> connStatusMap = connStatList.stream()
+                    .collect(Collectors.groupingBy(ConnectorStatusDto::getChargerId,
+                            Collectors.mapping(ConnectorStatusDto::getStatus, Collectors.joining(","))));
+            model.addAttribute("connStatusMap", connStatusMap);
+            log.info("=== connector_status map: {}", connStatusMap); // Map 전체 로깅
+
+            // 검색 select options 조회
+            // 1.사업자 리스트
+            List<BaseCompnayDto> companyList = companyService.searchAllCompanyForSelectOpt();
+            model.addAttribute("companyList", companyList);
+            // 2.grid row count
+            List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT");
+            model.addAttribute("showListCnt", showListCnt);
+            // 3.제조사 리스트
+            List<CommCdBaseDto> manfCd = codeService.commonCodeStringToNum("CGMANFCD");
+            model.addAttribute("manfCdList", manfCd);
+            // 4.공용구분
+            List<CommCdBaseDto> commonTypeList = codeService.commonCodeStringToNum("CGCOMMONCD");
+            model.addAttribute("commonTypeList", commonTypeList);
+            // 5.충전기 미사용 사유
+            List<CommCdBaseDto> reasonList = codeService.commonCodeStringToNum("NOTUSINGRSN");
+            model.addAttribute("reasonList", reasonList);
+            // 6.모뎀통신사
+            List<CommCdBaseDto> modemCorpList = codeService.commonCodeStringToNum("MODEMCORP");
+            model.addAttribute("modemCorpList", modemCorpList);
+            // 7.모뎀계약상태
+            List<CommCdBaseDto> modemContractOptionList = codeService.commonCodeStringToNum("MODEMCTCD");
+            model.addAttribute("modemContractOptionList", modemContractOptionList);
+
+        } catch (Exception e) {
+            log.error("Error occurered while fetching charger list: {}", e.getMessage(), e);
+
+            chargerList = Page.empty();
+            model.addAttribute("companyList", Collections.emptyList());
+            model.addAttribute("showListCnt", Collections.emptyList());
+            model.addAttribute("manfCdList", Collections.emptyList());
+            model.addAttribute("commonTypeList", Collections.emptyList());
+            model.addAttribute("reasonList", Collections.emptyList());
+            model.addAttribute("modemCorpList", Collections.emptyList());
+            model.addAttribute("modemContractOptionList", Collections.emptyList());
+        }
 
         return "pages/charge/cp_list";
     }

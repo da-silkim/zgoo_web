@@ -127,6 +127,8 @@ public class Company {
         this.staffPhone = dto.getStaffPhone();
         this.consignmentPayment = dto.getConsignmentPayment();
         this.updatedAt = LocalDateTime.now();
+        this.logoUrl = dto.getLogoUrl();
+        this.companyCode = dto.getCompanyCode();
     }
 
 }

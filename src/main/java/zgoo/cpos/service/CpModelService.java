@@ -1,5 +1,6 @@
 package zgoo.cpos.service;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -59,14 +60,17 @@ public class CpModelService {
 
     // 충전기 모델 검색 조회
     @Transactional
-    public Page<CpModelListDto> searchCpModelWithPagination(Long companyId, String manuf, String chgSpeed, int page, int size) {
+    public Page<CpModelListDto> searchCpModelWithPagination(Long companyId, String manuf, String chgSpeed, int page,
+            int size) {
         Pageable pageable = PageRequest.of(page, size);
 
         try {
-            Page<CpModelListDto> modelList = this.cpModelRepository.searchCpModelWithPagination(companyId, manuf, chgSpeed, pageable);
+            Page<CpModelListDto> modelList = this.cpModelRepository.searchCpModelWithPagination(companyId, manuf,
+                    chgSpeed, pageable);
             return modelList;
         } catch (DataAccessException dae) {
-            log.error("Database error occurred while fetching model list with search pagination: {}", dae.getMessage(), dae);
+            log.error("Database error occurred while fetching model list with search pagination: {}", dae.getMessage(),
+                    dae);
             return Page.empty(pageable);
         } catch (Exception e) {
             log.error("Error occurred while fetching model list with search pagination: {}", e.getMessage(), e);
@@ -82,6 +86,28 @@ public class CpModelService {
         } catch (Exception e) {
             log.error("[findCpModelOne] error : {}", e.getMessage());
             return null;
+        }
+    }
+
+    // 충전기 모델 단건 조회(모달용)
+    public CpModelListDto findCpModelModalOne(String modelCode) {
+        try {
+            CpModelListDto cpModel = this.cpModelRepository.findCpModelModalOne(modelCode);
+            return cpModel;
+        } catch (Exception e) {
+            log.error("[findCpModelModalOne] error : {}", e.getMessage());
+            return null;
+        }
+    }
+
+    // 충전기 모델 list 조회 by companyId
+    public List<CpModelListDto> findCpModelListByCompany(Long companyId) {
+        try {
+            List<CpModelListDto> cpModelList = this.cpModelRepository.findCpModelListByCompanyId(companyId);
+            return cpModelList;
+        } catch (Exception e) {
+            log.error("[findCpModelListByCompany] error : {}", e.getMessage());
+            return Collections.emptyList();
         }
     }
 
@@ -125,10 +151,11 @@ public class CpModelService {
     // 충전기 모델 수정
     @Transactional
     public CpModel updateCpModelInfo(CpModelRegDto dto, Long modelId) {
-        CpModel  model = this.cpModelRepository.findById(modelId)
-            .orElseThrow(() -> new IllegalArgumentException("cp model not found with id: " + modelId));
+        CpModel model = this.cpModelRepository.findById(modelId)
+                .orElseThrow(() -> new IllegalArgumentException("cp model not found with id: " + modelId));
         try {
-            if (model != null) model.updateCpModelInfo(dto);
+            if (model != null)
+                model.updateCpModelInfo(dto);
         } catch (Exception e) {
             log.error("[updateCpModel] error: {}", e.getMessage());
         }
@@ -168,9 +195,9 @@ public class CpModelService {
 
                 for (CpConnectorDto connectorDto : dto.getConnector()) {
                     CpConnector matchedOne = connectorList.stream()
-                        .filter(c -> c.getConnectorId().equals(connectorDto.getConnectorId()))
-                        .findFirst()
-                        .orElse(null);
+                            .filter(c -> c.getConnectorId().equals(connectorDto.getConnectorId()))
+                            .findFirst()
+                            .orElse(null);
 
                     if (matchedOne != null) {
                         matchedOne.updateCpConnectorInfo(connectorDto);
@@ -178,10 +205,10 @@ public class CpModelService {
                     } else {
                         // 매칭되는 커넥터 정보가 없으면 새로 추가
                         CpConnector newConnector = CpConnector.builder()
-                            .connectorId(connectorDto.getConnectorId())
-                            .connectorType(connectorDto.getConnectorType())
-                            .cpModel(model)
-                            .build();
+                                .connectorId(connectorDto.getConnectorId())
+                                .connectorType(connectorDto.getConnectorType())
+                                .cpModel(model)
+                                .build();
                         this.cpConnectorRepository.save(newConnector);
                     }
                 }
@@ -205,7 +232,7 @@ public class CpModelService {
     @Transactional
     public void deleteCpModel(Long modelId) {
         CpModel model = this.cpModelRepository.findById(modelId)
-            .orElseThrow(() -> new IllegalArgumentException("cp model not found with id: " + modelId));
+                .orElseThrow(() -> new IllegalArgumentException("cp model not found with id: " + modelId));
 
         try {
             this.cpConnectorRepository.deleteAllByModelId(modelId);

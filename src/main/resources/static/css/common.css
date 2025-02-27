@@ -207,3 +207,32 @@ table.table tbody tr.row-selected { background-color: #3D3B40 !important; color:
 .password-content .modal-body > div:nth-child(2) { margin-top: 1rem !important; margin-bottom: 1rem !important; }
 .password-content .modal-body > div:nth-child(3) { padding: 2rem 4rem; border-top: 2px solid grey; border-bottom: 1px solid grey; }
 .blur-background { filter: blur(1px); transition: filter 0.3s; }
+
+
+/* connector status */
+.connector-status i {
+        width: 30px;
+        height: 30px;
+        line-height: 30px;
+        aspect-ratio: 1 / 1;  /* 1:1 비율로 원형 유지 */
+        text-align: center;
+        border-radius: 50%;  /* 동그란 배경 */
+        font-size: 18px;
+        font-weight: bold;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: #ffffff !important;  /* 아이콘 색상을 흰색으로 */
+        font-family: "Font Awesome 5 Free", "FontAwesome"; /* Font Awesome 아이콘 사용 */
+    }
+
+.connector-status .available { background-color: #78be39 !important; }
+.connector-status .preparing { background-color: #78be39 !important; }
+.connector-status .charging { background-color: #39afe2 !important; }
+.connector-status .finising { background-color: #f1b30d !important; }
+.connector-status .reserved { background-color: #c247e7 !important; }
+.connector-status .faulted { background-color: #dd1e1e !important; }
+.connector-status .suspendedev { background-color: #dd1e1e !important; }
+.connector-status .suspendedevse { background-color: #dd1e1e !important; }
+.connector-status .unavailable { background-color: #dd1e1e !important; }
+.connector-status .disconnected { background-color: #505050 !important; }

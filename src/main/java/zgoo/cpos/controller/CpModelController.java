@@ -1,5 +1,7 @@
 package zgoo.cpos.controller;
 
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -19,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import zgoo.cpos.domain.cp.CpModel;
 import zgoo.cpos.dto.cp.CpModelDto.CpModelDetailDto;
+import zgoo.cpos.dto.cp.CpModelDto.CpModelListDto;
 import zgoo.cpos.dto.cp.CpModelDto.CpModelRegDto;
 import zgoo.cpos.service.CpModelService;
 
@@ -29,6 +32,42 @@ import zgoo.cpos.service.CpModelService;
 public class CpModelController {
 
     private final CpModelService cpModelService;
+
+    // 충전기 모델 단거조회 by 사업자ID
+    @GetMapping("/get/modal/list/{companyId}")
+    public ResponseEntity<List<CpModelListDto>> findcpmodelList(@PathVariable("companyId") Long companyId) {
+        log.info("=== find cp model List info by companyId ===");
+
+        try {
+            List<CpModelListDto> modelList = this.cpModelService.findCpModelListByCompany(companyId);
+
+            if (modelList.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
+            return ResponseEntity.ok(modelList);
+        } catch (Exception e) {
+            log.error("[CpModelController - findcpmodelList] error: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    // 충전기 모델 단건 조회(모달)
+    @GetMapping("/get/modal/one/{modelCode}")
+    public ResponseEntity<CpModelListDto> findCpModelModalOne(@PathVariable("modelCode") String modelCode) {
+        log.info("=== find cp model info(Modal) ===");
+
+        try {
+            CpModelListDto findOne = this.cpModelService.findCpModelModalOne(modelCode);
+
+            if (findOne == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
+            return ResponseEntity.ok(findOne);
+        } catch (Exception e) {
+            log.error("[findCpModelOne_Modal] error: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 
     // 충전기 모델 단건 조회
     @GetMapping("/get/{modelId}")
@@ -44,7 +83,7 @@ public class CpModelController {
             return ResponseEntity.ok(cpModeFindOne);
         } catch (Exception e) {
             log.error("[findCpModelOne] error: {}", e.getMessage());
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
@@ -87,14 +126,14 @@ public class CpModelController {
             } else {
                 // dto.setUserId("daadmin"); // 비로그인, 테스트 사용자ID
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                                    .body("충전기 모델 정보를 등록할 사용자ID가 없습니다.");
+                        .body("충전기 모델 정보를 등록할 사용자ID가 없습니다.");
             }
             this.cpModelService.saveCpModelInfo(dto);
             return ResponseEntity.ok("충전기 모델 정보가 정상적으로 등록되었습니다.");
         } catch (Exception e) {
             log.error("[createCpModel] error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                    .body("충전기 모델 등록 중 오류 발생");
+                    .body("충전기 모델 등록 중 오류 발생");
         }
     }
 
@@ -113,7 +152,7 @@ public class CpModelController {
         } catch (Exception e) {
             log.error("[updateCpModel] error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                    .body("충전기 모델 수정 중 오류 발생");
+                    .body("충전기 모델 수정 중 오류 발생");
         }
     }
 
@@ -125,7 +164,7 @@ public class CpModelController {
         if (modelId == null) {
             log.error("modelId id is null");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                                    .body("충전소기 모델ID가 없습니다.");
+                    .body("충전소기 모델ID가 없습니다.");
         }
 
         try {
@@ -134,7 +173,7 @@ public class CpModelController {
         } catch (Exception e) {
             log.error("[deleteCpModel] error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                    .body("충전기 모델 삭제 중 오류 발생");
+                    .body("충전기 모델 삭제 중 오류 발생");
         }
     }
 }
