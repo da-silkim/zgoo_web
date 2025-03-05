@@ -83,6 +83,7 @@ $(document).ready(function() {
         modalCon = false;
         btnMsg = "등록";
         $('#modalBtn').text(btnMsg);
+        $('#modalBtn').show();
 
         $('#maintainForm')[0].reset();
         $('#processStatus').val('FSTATREADY');
@@ -104,6 +105,7 @@ $(document).ready(function() {
         modalCon = true;
         btnMsg = "수정";
         $('#modalBtn').text(btnMsg);
+        $('#modalBtn').show();
 
         $('#maintainForm')[0].reset();
         $('#chargerId').prop('disabled', true);
@@ -136,6 +138,7 @@ $(document).ready(function() {
 
                 if (data.cpMaintain.processStatus === 'FSTATFINISH') {
                     $('#processStatus').prop('disabled', true);
+                    $('#modalBtn').hide();
                 } else {
                     $('#processStatus').prop('disabled', false);
                 }
@@ -188,9 +191,11 @@ $(document).ready(function() {
     $('#modalBtn').on('click', function(event) {
         event.preventDefault();
 
-        if(!chargerIdValid) {
-            alert('충전소ID 정보를 확인해 주세요.');
-            return;
+        if (!modalCon) {
+            if(!chargerIdValid) {
+                alert('충전소ID 정보를 확인해 주세요.');
+                return;
+            }
         }
 
         const processStatus = document.getElementById('processStatus').value;
@@ -227,6 +232,19 @@ $(document).ready(function() {
                 formData.append('fileLoc3', fileLoc3);
             }
 
+            // var fileLoc1 = $('#showPictureLoc1')[0].files[0];
+            // var fileLoc2 = $('#showPictureLoc2')[0].files[0];
+            // var fileLoc3 = $('#showPictureLoc3')[0].files[0];
+            // if (fileLoc1) {
+            //     formData.append('fileLoc1', fileLoc1);
+            // }
+            // if (fileLoc2) {
+            //     formData.append('fileLoc2', fileLoc2);
+            // }
+            // if (fileLoc3) {
+            //     formData.append('fileLoc3', fileLoc3);
+            // }
+
             const DATA = {
                 chargerId: $('#chargerId').val(),
                 errorType: $('#errorType').val(),
@@ -252,6 +270,22 @@ $(document).ready(function() {
                         alert(error);
                     }
                 });
+                // $.ajax({
+                //     url: `/errlist/update/${cpmaintainId}`,
+                //     method: 'PATCH',
+                //     data: formData,
+                //     enctype: 'multipart/form-data',
+                //     contentType: false,
+                //     processData: false,
+                //     cache: false,
+                //     success: function(response) {
+                //         alert(response);
+                //         $('#dataAddModal').modal('hide');
+                //     },
+                //     error: function(error) {
+                //         alert(error);
+                //     }
+                // });
             } else {
                 $.ajax({
                     url: `/errlist/new`,

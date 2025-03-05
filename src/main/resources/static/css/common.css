@@ -1007,3 +1007,10 @@ table.table tbody tr.row-selected {
 .connector-status .disconnected {
   background-color: #505050 !important;
 }
+
+.content-overflow {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  max-width: 150px; 
+}

@@ -108,7 +108,7 @@
                                 <tr th:each="cp : ${cpList}">
                                     <td th:id="${cp.cpmaintainId}"><input type="checkbox" /></td>
                                     <td th:text="${cp.errorTypeName}"></td>
-                                    <td th:text="${cp.errorContent}" class="text-left"></td>
+                                    <td th:text="${cp.errorContent}" class="text-left content-overflow"></td>
                                     <td th:text="${cp.processStatusName}"></td>
                                     <td th:text="${cp.companyName}"></td>
                                     <td th:text="${cp.stationName}"></td>
