@@ -151,7 +151,9 @@ public class CpMaintainService {
     private String saveImageFile(MultipartFile file, String logName) {
         if (file != null && !file.isEmpty()) {
                 try {
+                    System.out.println("fileLoc: " + file);
                     String originalFileName = file.getOriginalFilename();
+                    System.out.println("originalFileName: " + originalFileName);
                     String saveFileName = FileNameUtils.fileNameConver(originalFileName);
                     String fullPath = filepath + saveFileName;
                     file.transferTo(new File(fullPath));
@@ -162,6 +164,64 @@ public class CpMaintainService {
             }
         return null;
     }
+
+    // 충전기 장애정보 수정
+    @Transactional
+    public void updateMaintain(Long cpmaintainId, CpMaintainRegDto dto) {
+        CpMaintain cpMaintain = this.cpMaintainRepository.findById(cpmaintainId)
+            .orElseThrow(() -> new IllegalArgumentException("cpmaintain not found with id: " + cpmaintainId));
+
+            try {
+                if ("FSTATFINISH".equals(dto.getProcessStatus())) {
+                    cpMaintain.updateProcessInfo(dto);
+                }
+            } catch (Exception e) {
+                log.error("[updateMaintain] error: {}", e.getMessage());
+            }
+    }
+
+    // @Transactional
+    // public void updateMaintain2(Long cpmaintainId, CpMaintainRegDto dto) {
+    //     CpMaintain cpMaintain = this.cpMaintainRepository.findById(cpmaintainId)
+    //         .orElseThrow(() -> new IllegalArgumentException("cpmaintain not found with id: " + cpmaintainId));
+
+    //         try {
+    //             if (dto.getFileLoc1() != null && !dto.getFileLoc1().isEmpty()) {
+    //                 String originalFileName = dto.getFileLoc1().getOriginalFilename();
+    //                 System.out.println("originalFileName1: " + originalFileName);
+    //                 String saveFileName = FileNameUtils.fileNameConver(originalFileName);
+    //                 System.out.println("saveFileName1: " + saveFileName);
+    //                 String fullPath = filepath + saveFileName;
+    //                 System.out.println("fullPath1: " + fullPath);
+    //             }
+
+    //             if (dto.getFileLoc2() != null && !dto.getFileLoc2().isEmpty()) {
+    //                 String originalFileName = dto.getFileLoc2().getOriginalFilename();
+    //                 System.out.println("originalFileName2: " + originalFileName);
+    //                 String saveFileName = FileNameUtils.fileNameConver(originalFileName);
+    //                 System.out.println("saveFileName2: " + saveFileName);
+    //                 String fullPath = filepath + saveFileName;
+    //                 System.out.println("fullPath2: " + fullPath);
+    //             }
+
+    //             if (dto.getFileLoc3() != null && !dto.getFileLoc3().isEmpty()) {
+    //                 String originalFileName = dto.getFileLoc3().getOriginalFilename();
+    //                 System.out.println("originalFileName3: " + originalFileName);
+    //                 String saveFileName = FileNameUtils.fileNameConver(originalFileName);
+    //                 System.out.println("saveFileName3: " + saveFileName);
+    //                 String fullPath = filepath + saveFileName;
+    //                 System.out.println("fullPath3: " + fullPath);
+    //             }
+
+    //             if ("FSTATFINISH".equals(dto.getProcessStatus())) {
+    //                 cpMaintain.updateProcessInfo(dto);
+    //             }
+
+    //             cpMaintain.updateCpMaintainInfo(dto);
+    //         } catch (Exception e) {
+    //             log.error("[updateMaintain] error: {}", e.getMessage());
+    //         }
+    // }
 
     // 충전기 장애정보 삭제
     @Transactional

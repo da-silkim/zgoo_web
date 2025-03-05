@@ -15,6 +15,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import zgoo.cpos.dto.cp.CpMaintainDto.CpMaintainRegDto;
 
 @Table(name = "CP_MAINTAIN")
 @Entity
@@ -64,7 +65,14 @@ public class CpMaintain {
     @Column(name = "reg_user_id")
     private String regUserId;
 
-    public void updateCpMaintainInfo() {
-        
+    public void updateCpMaintainInfo(CpMaintainRegDto dto) {
+        this.errorType = dto.getErrorType();
+        this.errorContent = dto.getErrorContent();
+    }
+
+    public void updateProcessInfo(CpMaintainRegDto dto) {
+        this.processDate = LocalDateTime.now();
+        this.processStatus = dto.getProcessStatus();
+        this.processContent = dto.getProcessContent();
     }
 }
