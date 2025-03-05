@@ -170,10 +170,31 @@ public class CpMaintainService {
             .orElseThrow(() -> new IllegalArgumentException("cpmaintain not found with id: " + cpmaintainId));
 
         try {
+            // image delete
+            deleteImage(cpMaintain.getPictureLoc1());
+            deleteImage(cpMaintain.getPictureLoc2());
+            deleteImage(cpMaintain.getPictureLoc3());
             this.cpMaintainRepository.deleteById(cpmaintainId);
             log.info("=== cpmaintainId: {} is deleted..", cpmaintainId);
         } catch (Exception e) {
             log.error("[deleteMaintain] error: {}", e.getMessage());
         }
+    }
+
+    private void deleteImage(String imagePath) {
+        if (imagePath != null && !imagePath.isEmpty()) {
+            File imageFile = new File(imagePath);
+
+            if (imageFile.exists()) {
+                boolean deleted = imageFile.delete();
+                if (deleted) {
+                    log.info("=== Image at path: {} is deleted successfully.", imagePath);
+                } else {
+                    log.warn("=== Failed to delete image at path: {}", imagePath);
+                }
+            } else {
+                log.warn("=== Image file not found at path: {}", imagePath);
+            }
+        } 
     }
 }
