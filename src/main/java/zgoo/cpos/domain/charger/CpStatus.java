@@ -4,8 +4,8 @@ import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
@@ -13,6 +13,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import zgoo.cpos.type.ConnectionStatus;
 
 @Entity
 @Table(name = "CP_STATUS")
@@ -22,17 +23,19 @@ import lombok.NoArgsConstructor;
 @Builder(toBuilder = true)
 public class CpStatus {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "idx")
-    private Long id;
-
-    @Column(nullable = false, unique = true)
+    @Column(name = "charger_id")
     private String chargerId;
 
-    @Column(nullable = false)
-    private String connectionYn;
+    @Column(name = "connection_yn", columnDefinition = "CHAR(1)")
+    @Enumerated(EnumType.STRING)
+    private ConnectionStatus connectionYn;
 
+    @Column(name = "last_boot_time")
     private LocalDateTime lastBootTime;
+
+    @Column(name = "last_heartbeat_rcv_time")
     private LocalDateTime lastHeartbeatRcvTime;
+
+    @Column(name = "last_fwupdate_time")
     private LocalDateTime lastFwupdateTime;
 }

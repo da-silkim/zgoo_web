@@ -21,7 +21,10 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import zgoo.cpos.dto.biz.BizInfoDto.BizInfoRegDto;
+import zgoo.cpos.dto.payment.BillkeyIssueRequestDto;
+import zgoo.cpos.dto.payment.BillkeyIssueResponseDto;
 import zgoo.cpos.service.BizService;
+import zgoo.cpos.service.PaymentService;
 
 @Controller
 @RequiredArgsConstructor
@@ -30,6 +33,7 @@ import zgoo.cpos.service.BizService;
 public class BizController {
 
     private final BizService bizService;
+    private final PaymentService paymentService;
 
     // 법인 단건 조회
     @GetMapping("/get/{bizId}")
@@ -92,7 +96,7 @@ public class BizController {
     // 법인 정보 등록
     @PostMapping("/new")
     public ResponseEntity<String> createBiz(@Valid @RequestBody BizInfoRegDto dto) {
-        log.info("=== create biz info ===");
+        log.info("=== create biz request info : {}", dto);
 
         try {
             this.bizService.saveBiz(dto);
@@ -100,7 +104,7 @@ public class BizController {
         } catch (Exception e) {
             log.error("[createBiz] error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                    .body("법인 정보 등록 중 오류 발생");
+                    .body("법인 정보 등록 중 오류 발생");
         }
     }
 
@@ -116,7 +120,7 @@ public class BizController {
         } catch (Exception e) {
             log.error("[updateBiz] error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                    .body("법인 정보 수정 중 오류 발생");
+                    .body("법인 정보 수정 중 오류 발생");
         }
     }
 
@@ -128,7 +132,7 @@ public class BizController {
         if (bizId == null) {
             log.error("bizId id is null");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                                    .body("법인ID가 없습니다.");
+                    .body("법인ID가 없습니다.");
         }
 
         try {
@@ -137,7 +141,25 @@ public class BizController {
         } catch (Exception e) {
             log.error("[deleteBiz] error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                    .body("법인 정보 삭제 중 오류 발생");
+                    .body("법인 정보 삭제 중 오류 발생");
+        }
+    }
+
+    // 법인카드 빌키 발급 요청
+    @PostMapping("/billkey")
+    public ResponseEntity<BillkeyIssueResponseDto> issueBillkey(@RequestBody BillkeyIssueRequestDto requestDto) {
+        log.info("Billkey Issue Request dto:{}", requestDto);
+
+        try {
+            // 빌키 발급 요청 로직
+            BillkeyIssueResponseDto responseDto = this.paymentService.issueBillkey(requestDto);
+            log.info("Billkey Issue Response Result:{}", responseDto.getResultCode());
+
+            return ResponseEntity.ok(responseDto);
+        } catch (Exception e) {
+            log.error("[issueBillkey] error: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new BillkeyIssueResponseDto());
         }
     }
 }

@@ -16,13 +16,15 @@
                             <div class="col d-flex align-items-center">
                                 <label for="opSearch"
                                     class="flex-shrink-0 col-form-label font-weight-bold text-right w-20">검색조건</label>
-                                    <select id="opSearch" name="opSearch" class="ms-3 form-control w-45">
-                                        <option th:value="null" th:selected="${selectedOpSearch == null}">선택</option>
-                                        <option th:value="'bizName'" th:text="법인명" th:selected="${selectedOpSearch == 'bizName'}"></option>
-                                        <option th:value="'bizNo'" th:text="사업자번호" th:selected="${selectedOpSearch == 'bizNo'}"></option>
-                                    </select>
-                                    <input type="text" name="contentSearch" id="contentSearch" class="mx-2 form-control"
-                                        th:value="${selectedContentSearch}" autocomplete="off">
+                                <select id="opSearch" name="opSearch" class="ms-3 form-control w-45">
+                                    <option th:value="null" th:selected="${selectedOpSearch == null}">선택</option>
+                                    <option th:value="'bizName'" th:text="법인명"
+                                        th:selected="${selectedOpSearch == 'bizName'}"></option>
+                                    <option th:value="'bizNo'" th:text="사업자번호"
+                                        th:selected="${selectedOpSearch == 'bizNo'}"></option>
+                                </select>
+                                <input type="text" name="contentSearch" id="contentSearch" class="mx-2 form-control"
+                                    th:value="${selectedContentSearch}" autocomplete="off">
                             </div>
                         </div>
                         <div class="search-btn">
@@ -46,20 +48,23 @@
                     </div>
                     <div class="mt-3 btn-page-area">
                         <div th:if="${menuAuthority.authority == 'SU' or menuAuthority.modYn == 'Y'}">
-                            <button class="btn btn-data-add" id="addBtn" data-bs-toggle="modal" data-bs-target="#dataAddModal">
+                            <button class="btn btn-data-add" id="addBtn" data-bs-toggle="modal"
+                                data-bs-target="#dataAddModal">
                                 <i class="bi bi-plus-square me-2"></i>등록</button>
-                            <button class="btn btn-data-edit" id="editBtn" data-bs-toggle="modal" data-bs-target="#dataAddModal" disabled>
+                            <button class="btn btn-data-edit" id="editBtn" data-bs-toggle="modal"
+                                data-bs-target="#dataAddModal" disabled>
                                 <i class="fa-regular fa-pen-to-square me-2"></i>수정</button>
                             <button class="btn btn-data-delete" id="deleteBtn" disabled>
                                 <i class="bi bi-trash me-2"></i>삭제</button>
                         </div>
                         <span>
                             <span id="pageInfo">
-                                <span th:text="'Page ' + (${currentPage + 1}) + ' of ' + ${totalPages} + ' [총 ' + ${totalCount} + '건]'"></span>
+                                <span
+                                    th:text="'Page ' + (${currentPage + 1}) + ' of ' + ${totalPages} + ' [총 ' + ${totalCount} + '건]'"></span>
                             </span>
                             <select class="mx-3 page-select" id="size" name="size">
                                 <option th:each="data : ${showListCnt}" th:value="${data.commonCode}"
-                                        th:text="${data.commonCodeName}" th:selected="${data.commonCode == size}"></option>
+                                    th:text="${data.commonCodeName}" th:selected="${data.commonCode == size}"></option>
                             </select>
                     </div>
                     <div class="w-100 table-responsive position-relative">
@@ -67,7 +72,7 @@
                             <thead>
                                 <tr class="table-border-top">
                                     <th scope="col"></th>
-                                    <th scope="col">NO.</th>
+                                    <th scope="col" class="d-none">NO.</th>
                                     <th scope="col">법인명</th>
                                     <th scope="col">사업자번호</th>
                                     <th scope="col">카드사</th>
@@ -78,12 +83,12 @@
                             <tbody id="pageList">
                                 <tr th:each="biz : ${bizList}">
                                     <td th:id="${biz.bizId}"><input type="checkbox" /></td>
-                                    <td th:text="${biz.bizId}"></td>
+                                    <td th:text="${biz.bizId}" class="d-none"></td>
                                     <td th:text="${biz.bizName}"></td>
                                     <td th:text="${biz.bizNo}"></td>
-                                    <td th:text="${biz.fnCodeName}"></td>
+                                    <td th:text="${biz.cardName}"></td>
                                     <td th:text="${biz.cardNum}"></td>
-                                    <td th:text="${biz.tid}"></td>
+                                    <td th:text="${biz.bid}"></td>
                                 </tr>
                                 <tr th:if="${bizList.size() == 0}">
                                     <td colspan="8">조회된 데이터가 없습니다.</td>
@@ -96,25 +101,29 @@
                         <ul class="pagination justify-content-center">
                             <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled' : ''">
                                 <a class="page-link" th:href="@{/corp/list(page=0, size=${size},
-                                opSearch=${selectedOpSearch}, contentSearch=${selectedContentSearch})}"><i class="bi bi-chevron-double-left"></i></a>
+                                opSearch=${selectedOpSearch}, contentSearch=${selectedContentSearch})}"><i
+                                        class="bi bi-chevron-double-left"></i></a>
                             </li>
                             <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled' : ''">
                                 <a class="page-link" th:href="@{/corp/list(page=${currentPage-1}, size=${size},
-                                opSearch=${selectedOpSearch}, contentSearch=${selectedContentSearch})}"><i class="bi bi-chevron-left"></i></a>
+                                opSearch=${selectedOpSearch}, contentSearch=${selectedContentSearch})}"><i
+                                        class="bi bi-chevron-left"></i></a>
                             </li>
                             <li class="page-item" th:each="i : ${#numbers.sequence(currentPage - 2, currentPage + 2)}"
                                 th:if="${i >= 0 && i < totalPages}">
                                 <a class="page-link" th:href="@{/corp/list(page=${i}, size=${size},
                                 opSearch=${selectedOpSearch}, contentSearch=${selectedContentSearch})}"
-                                th:text="${i+1}" th:classappend="${i == currentPage} ? 'active' : ''"></a>
+                                    th:text="${i+1}" th:classappend="${i == currentPage} ? 'active' : ''"></a>
                             </li>
                             <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled' : ''">
                                 <a class="page-link" th:href="@{/corp/list(page=${currentPage+1}, size=${size},
-                                opSearch=${selectedOpSearch}, contentSearch=${selectedContentSearch})}"><i class="bi bi-chevron-right"></i></a>
+                                opSearch=${selectedOpSearch}, contentSearch=${selectedContentSearch})}"><i
+                                        class="bi bi-chevron-right"></i></a>
                             </li>
                             <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled' : ''">
                                 <a class="page-link" th:href="@{/corp/list(page=${totalPages - 1}, size=${size},
-                                opSearch=${selectedOpSearch}, contentSearch=${selectedContentSearch})}"><i class="bi bi-chevron-double-right"></i></a>
+                                opSearch=${selectedOpSearch}, contentSearch=${selectedContentSearch})}"><i
+                                        class="bi bi-chevron-double-right"></i></a>
                             </li>
                         </ul>
                     </div>
@@ -149,59 +158,77 @@
                                     </td>
                                     <th class="w-20">사업자등록번호<b class="required-data">*</b></th>
                                     <td class="w-30">
-                                        <input type="text" name="bizNo" id="bizNo" class="form-control" oninput="addHyphenBizNo(this)"
+                                        <input type="text" name="bizNo" id="bizNo" class="form-control"
                                             autocomplete="off" required>
+                                        <!-- <input type="text" name="bizNo" id="bizNo" class="form-control"
+                                            oninput="addHyphenBizNo(this)" autocomplete="off" required> -->
                                     </td>
                                 </tr>
                             </tbody>
                         </table>
                         <!-- table:1 end -->
+                        <br>
                         <!-- table:2 start -->
-                        <div class="modal-title mb-2 position-relative">
-                            <span class="modal-title-bar"></span>
-                            <span>결제 정보</span>
+                        <div class="modal-title mb-2"><span class="modal-title-bar"></span><span>결제카드 정보</span>
                             <span class="ms-5 position-absolute" style="right: 0;">
-                                <button type="button" class="btn btn-outline-grey me-2">빌키발급</button>
-                                <button type="button" class="btn btn-outline-grey" onclick="deleteCardInfo()">삭제</button>
+                                <button type="button" class="btn btn-outline-grey me-3" id="billkeyBtn">빌키발급</button>
+                                <!-- <button type="button" class="btn btn-outline-grey" onclick="deleteCardInfo()">삭제</button> -->
                             </span>
                         </div>
                         <table class="table table-bg-v table-fixed w-100 text-center align-middle">
-                            <thead>
-                                <tr class="table-border-top">
-                                    <!-- <th scope="col" class="w-5"></th> -->
-                                    <th scope="col" class="w-20">카드사</th>
-                                    <th scope="col" class="w-40 text-center">카드번호</th>
-                                    <th scope="col" class="w-40 text-center">TID</th>
-                                </tr>
-                            </thead>
                             <tbody>
-                                <tr>
-                                    <!-- <td><input type="checkbox" class="single-checkbox"></td> -->
-                                    <td>
-                                        <select id="fnCode" name="fnCode" class="form-control" required>
-                                            <option th:value="null" th:text="선택"></option>
-                                            <option th:each="data : ${creditCardList}" th:value="${data.commonCode}"
-                                                    th:text="${data.commonCodeName}" ></option>
-                                        </select>
-                                    </td>
-                                    <td>
-                                        <!-- <input type="text" id="cardNum" name="cardNum" class="input-add-row"
-                                            oninput="addHyphenCardNum(this)" style="color: transparent; caret-color: black;" autocomplete="off" required> -->
-                                        <div class="card-num-container">
-                                            <input type="number" id="cardNum1" name="cardNum1" class="input-add-row-bb" oninput="maxLengthNum(this, 4)"
-                                                autocomplete="off" required>
-                                            <span>-</span>
-                                            <input type="number" id="cardNum2" name="cardNum2" class="input-add-row-bb" oninput="maxLengthNum(this, 4)"
-                                                autocomplete="off" required>
-                                            <span>-</span>
-                                            <input type="password" id="cardNum3" name="cardNum3" class="input-add-row-bb" oninput="maxLengthNum(this, 4)"
-                                                autocomplete="off" required>
-                                            <span>-</span>
-                                            <input type="password" id="cardNum4" name="cardNum4" class="input-add-row-bb" oninput="maxLengthNum(this, 4)"
-                                                autocomplete="off" required>
+                                <tr class="table-border-top">
+                                    <th class="w-20">결제카드 번호<b class="required-data">*</b></th>
+                                    <td class="w-30">
+                                        <div class="d-flex align-items-center">
+                                            <input type="number" id="cardNum1" name="cardNum1"
+                                                class="form-control card-input" oninput="maxLengthNum(this, 4)"
+                                                autocomplete="off" value="9410" required>
+                                            <span class="mx-1">-</span>
+                                            <input type="number" id="cardNum2" name="cardNum2"
+                                                class="form-control card-input" oninput="maxLengthNum(this, 4)"
+                                                autocomplete="off" value="6186" required>
+                                            <span class="mx-1">-</span>
+                                            <input type="password" id="cardNum3" name="cardNum3"
+                                                class="form-control card-input" oninput="maxLengthNum(this, 4)"
+                                                autocomplete="off" value="7780" required>
+                                            <span class="mx-1">-</span>
+                                            <input type="password" id="cardNum4" name="cardNum4"
+                                                class="form-control card-input" oninput="maxLengthNum(this, 4)"
+                                                autocomplete="off" value="8903" required>
                                         </div>
                                     </td>
-                                    <td><input type="text" id="tid" name="tid" class="input-add-row" autocomplete="off"></td>
+                                    <th class="w-20">유효기간<b class="required-data">*</b></th>
+                                    <td class="w-30">
+                                        <div class="d-flex align-items-center">
+                                            <input type="number" id="cardExpMonth" name="cardExpMonth"
+                                                class="form-control expiry-input" placeholder="MM"
+                                                oninput="maxLengthNum(this, 2)" autocomplete="off" value="06" required>
+                                            <span class="mx-1">/</span>
+                                            <input type="number" id="cardExpYear" name="cardExpYear"
+                                                class="form-control expiry-input" placeholder="YY"
+                                                oninput="maxLengthNum(this, 2)" autocomplete="off" value="29" required>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="w-20">비밀번호<b class="required-data">*</b></th>
+                                    <td class="w-30">
+                                        <div class="d-flex align-items-center">
+                                            <input type="password" id="cardPwd" name="cardPwd" class="form-control"
+                                                placeholder="비밀번호 앞 2자리" oninput="maxLengthNum(this, 2)"
+                                                autocomplete="off" value="29" required>
+                                            <span class="mx-1">**</span>
+                                        </div>
+                                    </td>
+                                    <th class="w-20">BID<b class="required-data">*</b></th>
+                                    <td class="w-30">
+                                        <input type="text" name="bid" id="bid" class="form-control" autocomplete="off"
+                                            disabled required>
+                                        <input type="hidden" name="cardCode" id="cardCode">
+                                        <input type="hidden" name="cardName" id="cardName">
+                                        <input type="hidden" name="authDate" id="authDate">
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
@@ -221,4 +248,5 @@
     <!-- Add Modal end -->
     <script type="text/javascript" th:src="@{/js/biz/corporation_management.js}"></script>
 </div>
+
 </html>

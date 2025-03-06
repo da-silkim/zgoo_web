@@ -63,7 +63,8 @@ public class MemberService {
     public final ConditionVersionHistRepository conditionVersionHistRepository;
 
     // 회원 조회
-    public Page<MemberListDto> findMemberInfoWithPagination(Long companyId, String idTag, String name, int page, int size) {
+    public Page<MemberListDto> findMemberInfoWithPagination(Long companyId, String idTag, String name, int page,
+            int size) {
         Pageable pageable = PageRequest.of(page, size);
 
         try {
@@ -87,18 +88,18 @@ public class MemberService {
     // 회원 단건 조회
     public MemberRegDto findMemberOne(Long memberId) {
         Member member = this.memberRepository.findById(memberId)
-            .orElseThrow(() -> new IllegalArgumentException("member not found with id: " + memberId));
+                .orElseThrow(() -> new IllegalArgumentException("member not found with id: " + memberId));
 
         try {
             List<MemberCarDto> carInfo = this.memberCarRepository.findAllByMemberIdDto(memberId);
             List<MemberConditionDto> conditionInfo = this.memberConditionRepository.findAllByMemberIdDto(memberId);
-            
+
             if ("PB".equals(member.getBizType())) { // 개인
                 List<MemberCreditCardDto> cardInfo = this.memberCreditCardRepository.findAllByMemberIdDto(memberId);
                 return this.memberRepository.findMemberOne(memberId, cardInfo, carInfo, conditionInfo);
             } else if ("CB".equals(member.getBizType())) { // 법인
                 return this.memberRepository.findBizMemberOne(memberId, carInfo, conditionInfo);
-            } 
+            }
 
             log.error("[findMemberOne] 사업자구분 조회 오류");
             return null;
@@ -111,13 +112,13 @@ public class MemberService {
     // 회원 단건 조회(detail)
     public MemberDetailDto findMemberDetailOne(Long memberId) {
         Member member = this.memberRepository.findById(memberId)
-            .orElseThrow(() -> new IllegalArgumentException("member not found with id: " + memberId));
+                .orElseThrow(() -> new IllegalArgumentException("member not found with id: " + memberId));
 
         try {
             log.info("[findMemberDetailOne] start... ");
             List<MemberCarDto> carInfo = this.memberCarRepository.findAllByMemberIdDto(memberId);
             log.info("[findAllByMemberIdDto] carInfo success");
-            
+
             List<MemberConditionDto> conditionInfo = this.memberConditionRepository.findAllByMemberIdDto(memberId);
             log.info("[findAllByMemberIdDto] conditionInfo success");
 
@@ -152,7 +153,8 @@ public class MemberService {
     public void saveMember(MemberRegDto dto) {
         try {
             Company company = this.companyRepository.findById(dto.getCompanyId())
-                            .orElseThrow(() -> new IllegalArgumentException("company not found with id: " + dto.getCompanyId()));
+                    .orElseThrow(
+                            () -> new IllegalArgumentException("company not found with id: " + dto.getCompanyId()));
 
             Member member;
 
@@ -166,16 +168,19 @@ public class MemberService {
                 member = MemberMapper.toEntityMember(dto, company);
             } else {
                 BizInfo biz = this.bizRepository.findById(dto.getBizId())
-                    .orElseThrow(() -> new IllegalArgumentException("bizInfo not found with id: " + dto.getBizId()));
+                        .orElseThrow(
+                                () -> new IllegalArgumentException("bizInfo not found with id: " + dto.getBizId()));
                 member = MemberMapper.toEntityMemberBiz(dto, company, biz);
 
                 // 법인회원 결제카드 상태
-                if ((biz.getCardNum() != null || !biz.getCardNum().isEmpty()) && (biz.getTid() !=null || !biz.getTid().isEmpty())) {
-                    member.updateCreditStatInfo("MCNORMAL");    // 정상
-                } else if ((biz.getCardNum() != null || !biz.getCardNum().isEmpty()) && (biz.getTid() ==null || biz.getTid().isEmpty())) {
+                if ((biz.getCardNum() != null || !biz.getCardNum().isEmpty())
+                        && (biz.getBid() != null || !biz.getBid().isEmpty())) {
+                    member.updateCreditStatInfo("MCNORMAL"); // 정상
+                } else if ((biz.getCardNum() != null || !biz.getCardNum().isEmpty())
+                        && (biz.getBid() == null || biz.getBid().isEmpty())) {
                     member.updateCreditStatInfo("MCNOBILLKEY"); // 빌키없음
                 } else {
-                    member.updateCreditStatInfo("MCNOTREG");    // 미등록
+                    member.updateCreditStatInfo("MCNOTREG"); // 미등록
                 }
             }
 
@@ -186,7 +191,7 @@ public class MemberService {
                 log.info("[saveCondition] 실행 전");
                 saveCreditCard(saved, dto.getCard());
             }
-            
+
             saveCar(saved, dto.getCar());
             saveCondition(saved, dto.getCondition());
 
@@ -258,24 +263,27 @@ public class MemberService {
     @Transactional
     public Member updateMemberInfo(Long memberId, MemberRegDto dto) {
         Member member = this.memberRepository.findById(memberId)
-            .orElseThrow(() -> new IllegalArgumentException("member not found with id: " + memberId));
+                .orElseThrow(() -> new IllegalArgumentException("member not found with id: " + memberId));
         try {
             member.updateMemberInfo(dto);
 
             // 결제카드 정보 수정
-            if ("PB".equals(dto.getBizType())) {    // 개인
+            if ("PB".equals(dto.getBizType())) { // 개인
                 updateCreditCardInfo(dto, member);
-            } else {                                // 법인
+            } else { // 법인
                 BizInfo biz = this.bizRepository.findById(dto.getBizId())
-                    .orElseThrow(() -> new IllegalArgumentException("bizInfo not found with id: " + dto.getBizId()));
+                        .orElseThrow(
+                                () -> new IllegalArgumentException("bizInfo not found with id: " + dto.getBizId()));
 
                 // 법인회원 결제카드 상태
-                if ((biz.getCardNum() != null || !biz.getCardNum().isEmpty()) && (biz.getTid() !=null || !biz.getTid().isEmpty())) {
-                    member.updateCreditStatInfo("MCNORMAL");    // 정상
-                } else if ((biz.getCardNum() != null || !biz.getCardNum().isEmpty()) && (biz.getTid() ==null || biz.getTid().isEmpty())) {
+                if ((biz.getCardNum() != null || !biz.getCardNum().isEmpty())
+                        && (biz.getBid() != null || !biz.getBid().isEmpty())) {
+                    member.updateCreditStatInfo("MCNORMAL"); // 정상
+                } else if ((biz.getCardNum() != null || !biz.getCardNum().isEmpty())
+                        && (biz.getBid() == null || biz.getBid().isEmpty())) {
                     member.updateCreditStatInfo("MCNOBILLKEY"); // 빌키없음
                 } else {
-                    member.updateCreditStatInfo("MCNOTREG");    // 미등록
+                    member.updateCreditStatInfo("MCNOTREG"); // 미등록
                 }
             }
 
@@ -298,9 +306,9 @@ public class MemberService {
 
                 for (MemberCreditCardDto cardDto : dto.getCard()) {
                     MemberCreditCard matchedOne = cardList.stream()
-                        .filter(c -> c.getCardNum().equals(cardDto.getCardNum()))
-                        .findFirst()
-                        .orElse(null);
+                            .filter(c -> c.getCardNum().equals(cardDto.getCardNum()))
+                            .findFirst()
+                            .orElse(null);
 
                     if ("Y".equals(cardDto.getRepresentativeCard())) {
                         updateRepresentativeCard(member, cardDto);
@@ -344,9 +352,9 @@ public class MemberService {
 
                 for (MemberCarDto carDto : dto.getCar()) {
                     MemberCar matchedOne = carList.stream()
-                        .filter(c -> c.getCarNum().equals(carDto.getCarNum()))
-                        .findFirst()
-                        .orElse(null);
+                            .filter(c -> c.getCarNum().equals(carDto.getCarNum()))
+                            .findFirst()
+                            .orElse(null);
 
                     if (matchedOne != null) {
                         matchedOne.updateMemberCarInfo(carDto);
@@ -377,13 +385,13 @@ public class MemberService {
     public void updateMemberConditionInfo(MemberRegDto dto, Member member) {
         try {
             List<MemberCondition> conditionList = this.memberConditionRepository.findAllByMemberId(member.getId());
-            
+
             for (MemberConditionDto conditionDto : dto.getCondition()) {
                 MemberCondition matchedOne = conditionList.stream()
-                    .filter(c -> c.getCondition().getConditionCode().equals(conditionDto.getConditionCode()))
-                    .findFirst()
-                    .orElse(null);
-                
+                        .filter(c -> c.getCondition().getConditionCode().equals(conditionDto.getConditionCode()))
+                        .findFirst()
+                        .orElse(null);
+
                 if (matchedOne != null) {
                     matchedOne.updateMemberConditionInfo(conditionDto);
                 } else {
@@ -405,13 +413,13 @@ public class MemberService {
             dto.setExistPassword(EncryptionUtils.encryptSHA256(dto.getExistPassword()));
 
             // 1. 현재 비밀번호 일치여부
-            if(!member.getPassword().equals(dto.getExistPassword())) {
+            if (!member.getPassword().equals(dto.getExistPassword())) {
                 log.info("[updateMemberPasswordInfo] doesn't match the current password");
                 return 0;
             }
             // 2. 새 비밀번호 == 새 비밀번호 확인 값이 같은지 체크
             if (!dto.getNewPassword().equals(dto.getNewPasswordCheck())) {
-                log.info("[updateMemberPasswordInfo] two password values do not match");                
+                log.info("[updateMemberPasswordInfo] two password values do not match");
                 return 2;
             }
             // password SHA-256
@@ -430,7 +438,7 @@ public class MemberService {
     public void deleteMember(Long memberId) {
         Member member = this.memberRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("member not found with id: " + memberId));
-        
+
         try {
             this.memberCreditCardRepository.deleteAllByMemberId(memberId);
             this.memberCarRepository.deleteAllByMemberId(memberId);
@@ -451,7 +459,7 @@ public class MemberService {
             dto.setTid(AESUtil.encrypt(dto.getTid()));
         }
     }
-    
+
     // 대표결제카드에 따른 결제카드정상여부 업데이트
     private void updateRepresentativeCard(Member member, MemberCreditCardDto dto) {
         log.info("[updateRepresentativeCard] 카드 업데이트 실행");
@@ -459,7 +467,8 @@ public class MemberService {
         if (dto.getTid() == null || dto.getTid().isEmpty()) { // 카드번호 not null && TID null
             log.info("[updateRepresentativeCard] 결제카드 업데이트 MCNOBILLKEY");
             member.updateCreditStatInfo("MCNOBILLKEY");
-        } else if ((dto.getCardNum() != null || !dto.getCardNum().isEmpty()) && (dto.getTid() != null || !dto.getTid().isEmpty())) { // 카드번호 && TID not null
+        } else if ((dto.getCardNum() != null || !dto.getCardNum().isEmpty())
+                && (dto.getTid() != null || !dto.getTid().isEmpty())) { // 카드번호 && TID not null
             log.info("[updateRepresentativeCard] 결제카드 업데이트 MCNORMAL");
             member.updateCreditStatInfo("MCNORMAL");
         } else {
@@ -500,7 +509,7 @@ public class MemberService {
     // 중복되지 않게 숫자 생성
     public String generateIdTag() {
         String randomNumber;
-        
+
         do {
             randomNumber = generateRandomNumber();
         } while (memberRepository.existsByIdTag(randomNumber));
@@ -583,7 +592,7 @@ public class MemberService {
         String filePath = conHist.getFilePath();
 
         try (FileInputStream fis = new FileInputStream(filePath);
-             XWPFDocument document = new XWPFDocument(fis)) {
+                XWPFDocument document = new XWPFDocument(fis)) {
 
             List<XWPFParagraph> paragraphs = document.getParagraphs();
             for (XWPFParagraph paragraph : paragraphs) {

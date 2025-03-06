@@ -1008,9 +1008,27 @@ table.table tbody tr.row-selected {
   background-color: #505050 !important;
 }
 
+.card-input {
+  width: 60px !important;
+  text-align: center;
+}
+
+.expiry-input {
+  width: 60px !important;
+  text-align: center;
+}
+
+/* 반응형 조정 */
+@media (max-width: 768px) {
+  .card-input,
+  .expiry-input {
+    width: 50px !important;
+  }
+}
+
 .content-overflow {
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
-  max-width: 150px; 
+  max-width: 150px;
 }

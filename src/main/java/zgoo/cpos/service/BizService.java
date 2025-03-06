@@ -100,11 +100,8 @@ public class BizService {
     // 법인 정보 저장
     public void saveBiz(BizInfoRegDto dto) {
         try {
-            
-            if (dto.getCardNum() == null || dto.getCardNum().isEmpty()) {
-                // 카드번호가 null이면 카드사 null 처리
-                dto.setFnCode(null);
-            } else {
+
+            if (dto.getCardNum() != null || !dto.getCardNum().isEmpty()) {
                 // AES256 카드번호, TID 암호화
                 encryptCardNumAndTidRegDto(dto);
             }
@@ -120,17 +117,17 @@ public class BizService {
     @Transactional
     public void updateBizInfo(Long bizId, BizInfoRegDto dto) {
         BizInfo biz = this.bizRepository.findById(bizId)
-            .orElseThrow(() -> new IllegalArgumentException("biz info not found with id: " + bizId));
+                .orElseThrow(() -> new IllegalArgumentException("biz info not found with id: " + bizId));
 
         try {
             if (dto.getCardNum() == null || dto.getCardNum().isEmpty()) {
                 // 카드번호가 null이면 카드사 null 처리
-                dto.setFnCode(null);
+                // dto.setFnCode(null);
             } else {
                 // AES256 카드번호, TID 암호화
                 encryptCardNumAndTidRegDto(dto);
             }
-            
+
             biz.updateBizInfo(dto);
         } catch (Exception e) {
             log.error("[updateBizInfo] error: {}", e.getMessage());
@@ -141,7 +138,7 @@ public class BizService {
     @Transactional
     public void deleteBiz(Long bizId) {
         BizInfo biz = this.bizRepository.findById(bizId)
-            .orElseThrow(() -> new IllegalArgumentException("biz info not found with id: " + bizId));
+                .orElseThrow(() -> new IllegalArgumentException("biz info not found with id: " + bizId));
 
         try {
             this.bizRepository.deleteById(bizId);
@@ -154,13 +151,13 @@ public class BizService {
     // 카드번호, TID 복호화 + 카드번호 마스킹
     private void decryptCardNumAndTid(BizInfoListDto bizDto) throws Exception {
         bizDto.setCardNum(bizRepository.maskCardNum(AESUtil.decrypt(bizDto.getCardNum())));
-        bizDto.setTid(AESUtil.decrypt(bizDto.getTid()));
+        bizDto.setBid(AESUtil.decrypt(bizDto.getBid()));
     }
 
     // 카드번호, TID 복호화
     private void decryptCardNumAndTidRegDto(BizInfoRegDto bizDto) throws Exception {
         bizDto.setCardNum(AESUtil.decrypt(bizDto.getCardNum()));
-        bizDto.setTid(AESUtil.decrypt(bizDto.getTid()));
+        bizDto.setBid(AESUtil.decrypt(bizDto.getBid()));
     }
 
     // 카드번호, TID 암호화(값이 있을 경우에만 암호화 처리)
@@ -168,8 +165,8 @@ public class BizService {
         if (bizDto.getCardNum() != null && !bizDto.getCardNum().isEmpty()) {
             bizDto.setCardNum(AESUtil.encrypt(bizDto.getCardNum()));
         }
-        if (bizDto.getTid() != null && !bizDto.getTid().isEmpty()) {
-            bizDto.setTid(AESUtil.encrypt(bizDto.getTid()));
+        if (bizDto.getBid() != null && !bizDto.getBid().isEmpty()) {
+            bizDto.setBid(AESUtil.encrypt(bizDto.getBid()));
         }
     }
 }

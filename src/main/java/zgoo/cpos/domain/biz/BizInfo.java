@@ -34,14 +34,20 @@ public class BizInfo {
     @Column(name = "biz_name")
     private String bizName;
 
-    @Column(name = "tid")
-    private String tid;
+    @Column(name = "bid")
+    private String bid;
 
     @Column(name = "card_num")
     private String cardNum;
 
-    @Column(name = "fn_code")
-    private String fnCode;
+    @Column(name = "card_name")
+    private String cardName;
+
+    @Column(name = "card_code")
+    private String cardCode;
+
+    @Column(name = "auth_date")
+    private String authDate;
 
     @Column(name = "reg_dt")
     private LocalDateTime regDt;
@@ -49,8 +55,10 @@ public class BizInfo {
     public void updateBizInfo(BizInfoRegDto dto) {
         this.bizNo = dto.getBizNo();
         this.bizName = dto.getBizName();
-        this.tid = dto.getTid();
+        this.bid = dto.getBid();
         this.cardNum = dto.getCardNum();
-        this.fnCode = dto.getFnCode();
+        this.cardCode = dto.getCardCode();
+        this.cardName = dto.getCardName();
+        this.authDate = dto.getAuthDate();
     }
 }

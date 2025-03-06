@@ -1291,12 +1291,13 @@ public class PageController {
             model.addAttribute("totalPages", totalPages); // 총 페이지 수
             model.addAttribute("totalCount", bizList.getTotalElements()); // 총 데이터
 
-            List<CompanyListDto> companyList = this.companyService.findCompanyListAll();
-            model.addAttribute("companyList", companyList);
+            // List<CompanyListDto> companyList = this.companyService.findCompanyListAll();
+            // model.addAttribute("companyList", companyList);
             List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT"); // 그리드 row 수
             model.addAttribute("showListCnt", showListCnt);
-            List<CommCdBaseDto> creditCardList = codeService.commonCodeStringToNum("CREDITCARDCD"); // 카드사코드
-            model.addAttribute("creditCardList", creditCardList);
+            // List<CommCdBaseDto> creditCardList =
+            // codeService.commonCodeStringToNum("CREDITCARDCD"); // 카드사코드
+            // model.addAttribute("creditCardList", creditCardList);
             MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(),
                     "N0200");
             model.addAttribute("menuAuthority", menuAuthority);
@@ -1306,9 +1307,9 @@ public class PageController {
             model.addAttribute("currentPage", Collections.emptyList());
             model.addAttribute("totalPages", Collections.emptyList());
             model.addAttribute("totalCount", Collections.emptyList());
-            model.addAttribute("companyList", Collections.emptyList());
+            // model.addAttribute("companyList", Collections.emptyList());
             model.addAttribute("showListCnt", Collections.emptyList());
-            model.addAttribute("creditCardList", Collections.emptyList());
+            // model.addAttribute("creditCardList", Collections.emptyList());
         }
         return "pages/biz/corporation_management";
     }
