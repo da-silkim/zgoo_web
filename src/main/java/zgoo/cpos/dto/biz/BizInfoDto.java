@@ -24,6 +24,12 @@ public class BizInfoDto {
         private String cardNum;
         private String cardCode;
         private String cardName;
+        private String cardExpireMonth;
+        private String cardExpireYear;
+        private boolean termsEtf;
+        private boolean termsRb;
+        private boolean termsPrivacy;
+        private boolean termsPrivacy3rd;
         private String authDate;
         private LocalDateTime regDt;
 
@@ -32,8 +38,6 @@ public class BizInfoDto {
         private String cardNum3;
         private String cardNum4;
 
-        private String cardYn;
-        private String bidYn;
     }
 
     @Data

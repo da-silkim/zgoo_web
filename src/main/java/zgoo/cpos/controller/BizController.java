@@ -111,7 +111,7 @@ public class BizController {
     // 법인 정보 수정
     @PatchMapping("/update/{bizId}")
     public ResponseEntity<String> updateBiz(@PathVariable("bizId") Long bizId, @RequestBody BizInfoRegDto dto) {
-        log.info("=== update biz info ===");
+        log.info("=== update biz info :{}", dto);
 
         try {
             this.bizService.updateBizInfo(bizId, dto);
@@ -162,4 +162,5 @@ public class BizController {
                     .body(new BillkeyIssueResponseDto());
         }
     }
+
 }

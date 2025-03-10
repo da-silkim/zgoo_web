@@ -109,6 +109,12 @@ public class BizRepositoryCustomImpl implements BizRepositoryCustom {
                 biz.cardCode.as("cardCode"),
                 biz.cardName.as("cardName"),
                 biz.authDate.as("authDate"),
+                biz.cardExpireMonth.as("cardExpireMonth"),
+                biz.cardExpireYear.as("cardExpireYear"),
+                biz.termsEtf.as("termsEtf"),
+                biz.termsRb.as("termsRb"),
+                biz.termsPrivacy.as("termsPrivacy"),
+                biz.termsPrivacy3rd.as("termsPrivacy3rd"),
                 biz.regDt.as("regDt")))
                 .from(biz)
                 .where(biz.id.eq(bizId))
@@ -134,16 +140,16 @@ public class BizRepositoryCustomImpl implements BizRepositoryCustom {
                 .orderBy(biz.regDt.desc())
                 .fetchOne();
 
-        if (bizDto.getBid() != null && !bizDto.getBid().isEmpty()) {
-            bizDto.setBidYn("Y");
-        } else {
-            bizDto.setBidYn("N");
-        }
-        if (bizDto.getCardNum() != null && !bizDto.getCardNum().isEmpty()) {
-            bizDto.setCardYn("Y");
-        } else {
-            bizDto.setCardYn("N");
-        }
+        // if (bizDto.getBid() != null && !bizDto.getBid().isEmpty()) {
+        // bizDto.setBidYn("Y");
+        // } else {
+        // bizDto.setBidYn("N");
+        // }
+        // if (bizDto.getCardNum() != null && !bizDto.getCardNum().isEmpty()) {
+        // bizDto.setCardYn("Y");
+        // } else {
+        // bizDto.setCardYn("N");
+        // }
 
         return bizDto;
     }

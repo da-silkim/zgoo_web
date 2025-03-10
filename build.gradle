@@ -2,10 +2,16 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.3.4'
 	id 'io.spring.dependency-management' version '1.1.6'
+	id 'war'
 }
 
 group = 'zgoo'
 version = '0.0.1-SNAPSHOT'
+
+// 내장 톰캣을 WAR 파일에 포함하지 않도록 설정 (선택 사항)
+configurations {
+    providedRuntime
+}
 
 java {
 	toolchain {
@@ -38,6 +44,7 @@ dependencies {
 	implementation "org.springframework.security:spring-security-config"
     implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
 	implementation 'org.apache.poi:poi-ooxml:5.4.0'
+	implementation 'org.mariadb.jdbc:mariadb-java-client:3.1.4'
 	
 	//QueryDsl
     // 필수
@@ -53,6 +60,8 @@ dependencies {
 	annotationProcessor 'jakarta.persistence:jakarta.persistence-api'
 	annotationProcessor 'jakarta.annotation:jakarta.annotation-api'
 
+	// 내장 톰캣을 providedRuntime으로 변경 (외부 톰캣 사용 시)
+    providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
 
 	compileOnly 'org.projectlombok:lombok'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'

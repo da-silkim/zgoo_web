@@ -1032,3 +1032,49 @@ table.table tbody tr.row-selected {
   overflow: hidden;
   max-width: 150px;
 }
+
+.terms-container {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.terms-item {
+  background-color: #f8f9fa;
+}
+
+.terms-content {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.terms-all {
+  background-color: #e9ecef;
+}
+
+/* 약관 내용 스타일 */
+.terms-content-body {
+  font-size: 12px !important;
+  line-height: 1.5 !important;
+  max-height: 400px;
+  overflow-y: auto;
+  padding: 10px;
+}
+
+.terms-content-body p {
+  font-size: 12px !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.terms-content-body span {
+  font-size: 12px !important;
+}
+
+/* 모달 크기 조정 */
+#termsDetailModal .modal-dialog {
+  max-width: 800px;
+}
+
+#termsDetailModal .modal-body {
+  max-height: 500px;
+  overflow-y: auto;
+}

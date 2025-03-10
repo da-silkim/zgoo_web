@@ -25,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import zgoo.cpos.dto.payment.BillkeyIssueRequestDto;
 import zgoo.cpos.dto.payment.BillkeyIssueResponseDto;
+import zgoo.cpos.util.AESUtil;
 
 @Service
 @Slf4j
@@ -32,7 +33,7 @@ import zgoo.cpos.dto.payment.BillkeyIssueResponseDto;
 public class PaymentService {
 
     private final RestTemplate restTemplate;
-    private final ObjectMapper objectMapper;;
+    private final ObjectMapper objectMapper;
 
     @Value("${nicepay.merchant.id}")
     private String merchantID;
@@ -101,6 +102,7 @@ public class PaymentService {
 
             // 응답 파싱
             BillkeyIssueResponseDto response = parseResponse(responseBody);
+            encryptBid(response);
 
             // 빌키 발급 성공 시 법인 정보 업데이트
             if (response != null && "F100".equals(response.getResultCode())) {
@@ -201,6 +203,20 @@ public class PaymentService {
         } catch (Exception e) {
             log.error("응답 파싱 오류", e);
             return new BillkeyIssueResponseDto(); // 빈 객체 반환
+        }
+    }
+
+    // bid 복호화
+    private void decryptBid(BillkeyIssueResponseDto dto) throws Exception {
+        if (dto.getBid() != null && !dto.getBid().isEmpty()) {
+            dto.setBid(AESUtil.decrypt(dto.getBid()));
+        }
+    }
+
+    // 카드번호, TID 암호화(값이 있을 경우에만 암호화 처리)
+    private void encryptBid(BillkeyIssueResponseDto bizDto) throws Exception {
+        if (bizDto.getBid() != null && !bizDto.getBid().isEmpty()) {
+            bizDto.setBid(AESUtil.encrypt(bizDto.getBid()));
         }
     }
 

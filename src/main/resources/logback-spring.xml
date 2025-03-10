@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <property name="LOG_DIR" value="/app/cpos/logs" />
+    <property name="LOG_PATH_NAME" value="${LOG_DIR}/dailylog.log" />
+
+    <appender name="ROLLING" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH_NAME}</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!-- rollover daily -->
+            <fileNamePattern>${LOG_PATH_NAME}.%d{yyyyMMdd}.%i</fileNamePattern>
+            <!-- each file should be at most 100MB, keep 60 days worth of history, but at most 10GB -->
+            <maxFileSize>100MB</maxFileSize>
+            <maxHistory>60</maxHistory>
+            <totalSizeCap>10GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%-4relative %date [%thread] %-5level %C %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>%date [%thread] %-5level %C %logger{36} - %msg%n</Pattern>
+        </layout>
+    </appender>
+
+    <logger name="org.springframework" level="info" additivity="false"> <!-- warn -->
+        <appender-ref ref="ROLLING" />
+    </logger>
+
+    <logger name="jdbc.audit" level="OFF" additivity="false">
+        <appender-ref ref="STDOUT" />
+        <appender-ref ref="ROLLING" />
+    </logger>
+
+    <logger name="jdbc.sqltiming" level="info" additivity="false">
+        <appender-ref ref="STDOUT" />
+        <appender-ref ref="ROLLING" />
+    </logger>
+
+    <logger name="jdbc.resultsettable" level="error" additivity="false">
+        <appender-ref ref="ROLLING" />
+    </logger>
+
+    <logger name="com.bluenetworks.cpos" level="info" additivity="false">
+        <appender-ref ref="STDOUT" />
+        <appender-ref ref="ROLLING" />
+    </logger>
+
+    <root name="jdbc.sqlonly" level="info" additivity="false">
+        <appender-ref ref="STDOUT" />
+        <appender-ref ref="ROLLING" />
+    </root>
+</configuration>

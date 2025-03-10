@@ -46,6 +46,24 @@ public class BizInfo {
     @Column(name = "card_code")
     private String cardCode;
 
+    @Column(name = "card_expire_month")
+    private String cardExpireMonth;
+
+    @Column(name = "card_expire_year")
+    private String cardExpireYear;
+
+    @Column(name = "terms_etf")
+    private boolean termsEtf;
+
+    @Column(name = "terms_rb")
+    private boolean termsRb;
+
+    @Column(name = "terms_privacy")
+    private boolean termsPrivacy;
+
+    @Column(name = "terms_privacy3rd")
+    private boolean termsPrivacy3rd;
+
     @Column(name = "auth_date")
     private String authDate;
 
@@ -59,6 +77,12 @@ public class BizInfo {
         this.cardNum = dto.getCardNum();
         this.cardCode = dto.getCardCode();
         this.cardName = dto.getCardName();
+        this.cardExpireMonth = dto.getCardExpireMonth();
+        this.cardExpireYear = dto.getCardExpireYear();
+        this.termsEtf = dto.isTermsEtf();
+        this.termsRb = dto.isTermsRb();
+        this.termsPrivacy = dto.isTermsPrivacy();
+        this.termsPrivacy3rd = dto.isTermsPrivacy3rd();
         this.authDate = dto.getAuthDate();
     }
 }

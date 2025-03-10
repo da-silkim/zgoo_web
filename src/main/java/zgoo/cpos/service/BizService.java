@@ -151,13 +151,13 @@ public class BizService {
     // 카드번호, TID 복호화 + 카드번호 마스킹
     private void decryptCardNumAndTid(BizInfoListDto bizDto) throws Exception {
         bizDto.setCardNum(bizRepository.maskCardNum(AESUtil.decrypt(bizDto.getCardNum())));
-        bizDto.setBid(AESUtil.decrypt(bizDto.getBid()));
+        // bizDto.setBid(AESUtil.decrypt(bizDto.getBid()));
     }
 
     // 카드번호, TID 복호화
     private void decryptCardNumAndTidRegDto(BizInfoRegDto bizDto) throws Exception {
         bizDto.setCardNum(AESUtil.decrypt(bizDto.getCardNum()));
-        bizDto.setBid(AESUtil.decrypt(bizDto.getBid()));
+        // bizDto.setBid(AESUtil.decrypt(bizDto.getBid()));
     }
 
     // 카드번호, TID 암호화(값이 있을 경우에만 암호화 처리)
@@ -165,8 +165,9 @@ public class BizService {
         if (bizDto.getCardNum() != null && !bizDto.getCardNum().isEmpty()) {
             bizDto.setCardNum(AESUtil.encrypt(bizDto.getCardNum()));
         }
-        if (bizDto.getBid() != null && !bizDto.getBid().isEmpty()) {
-            bizDto.setBid(AESUtil.encrypt(bizDto.getBid()));
-        }
+        // if (bizDto.getBid() != null && !bizDto.getBid().isEmpty()) {
+        // bizDto.setBid(AESUtil.encrypt(bizDto.getBid()));
+        // }
     }
+
 }

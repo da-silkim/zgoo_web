@@ -18,6 +18,12 @@ public class BizMapper {
                 .cardNum(dto.getCardNum())
                 .cardCode(dto.getCardCode())
                 .cardName(dto.getCardName())
+                .cardExpireMonth(dto.getCardExpireMonth())
+                .cardExpireYear(dto.getCardExpireYear())
+                .termsEtf(dto.isTermsEtf())
+                .termsRb(dto.isTermsRb())
+                .termsPrivacy(dto.isTermsPrivacy())
+                .termsPrivacy3rd(dto.isTermsPrivacy3rd())
                 .authDate(dto.getAuthDate())
                 .regDt(LocalDateTime.now())
                 .build();

@@ -137,9 +137,28 @@
     </div>
     <!-- card:1 end -->
 
+    <!-- 약관 상세보기 모달 -->
+    <div class="modal fade" id="termsDetailModal" tabindex="-1" aria-labelledby="termsDetailModalLabel" insert>
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="termsDetailModalLabel">약관 상세보기</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- 약관 내용이 여기에 동적으로 로드됩니다 -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary">확인</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 약관 상세보기 모달 end -->
+
     <!-- Add Modal start -->
     <div class="modal fade" id="dataAddModal" tabindex="-1" aria-labelledby="dataAddModalLabel"
-        data-bs-backdrop="static" data-bs-keyboard="false">
+        data-bs-backdrop="static" data-bs-keyboard="false" insert>
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width: 60vw; height: 90vh;">
             <div class="modal-content mh-100 overflow-y-auto scrollbar">
                 <form th:object="${bizRegDto}">
@@ -171,31 +190,31 @@
                         <!-- table:2 start -->
                         <div class="modal-title mb-2"><span class="modal-title-bar"></span><span>결제카드 정보</span>
                             <span class="ms-5 position-absolute" style="right: 0;">
-                                <button type="button" class="btn btn-outline-grey me-3" id="billkeyBtn">빌키발급</button>
+                                <button type="button" class="btn btn-outline-grey me-3" id="billkeyBtn">카드등록</button>
                                 <!-- <button type="button" class="btn btn-outline-grey" onclick="deleteCardInfo()">삭제</button> -->
                             </span>
                         </div>
                         <table class="table table-bg-v table-fixed w-100 text-center align-middle">
                             <tbody>
                                 <tr class="table-border-top">
-                                    <th class="w-20">결제카드 번호<b class="required-data">*</b></th>
+                                    <th class="w-20">카드번호<b class="required-data">*</b></th>
                                     <td class="w-30">
                                         <div class="d-flex align-items-center">
                                             <input type="number" id="cardNum1" name="cardNum1"
                                                 class="form-control card-input" oninput="maxLengthNum(this, 4)"
-                                                autocomplete="off" value="9410" required>
+                                                autocomplete="off" value="" required>
                                             <span class="mx-1">-</span>
                                             <input type="number" id="cardNum2" name="cardNum2"
                                                 class="form-control card-input" oninput="maxLengthNum(this, 4)"
-                                                autocomplete="off" value="6186" required>
+                                                autocomplete="off" value="" required>
                                             <span class="mx-1">-</span>
                                             <input type="password" id="cardNum3" name="cardNum3"
                                                 class="form-control card-input" oninput="maxLengthNum(this, 4)"
-                                                autocomplete="off" value="7780" required>
+                                                autocomplete="off" value="" required>
                                             <span class="mx-1">-</span>
                                             <input type="password" id="cardNum4" name="cardNum4"
                                                 class="form-control card-input" oninput="maxLengthNum(this, 4)"
-                                                autocomplete="off" value="8903" required>
+                                                autocomplete="off" value="" required>
                                         </div>
                                     </td>
                                     <th class="w-20">유효기간<b class="required-data">*</b></th>
@@ -203,11 +222,12 @@
                                         <div class="d-flex align-items-center">
                                             <input type="number" id="cardExpMonth" name="cardExpMonth"
                                                 class="form-control expiry-input" placeholder="MM"
-                                                oninput="maxLengthNum(this, 2)" autocomplete="off" value="06" required>
+                                                oninput="maxLengthNum(this, 2)" autocomplete="off" value="" required>
                                             <span class="mx-1">/</span>
                                             <input type="number" id="cardExpYear" name="cardExpYear"
                                                 class="form-control expiry-input" placeholder="YY"
-                                                oninput="maxLengthNum(this, 2)" autocomplete="off" value="29" required>
+                                                oninput="maxLengthNum(this, 2)" autocomplete="off" value="" required>
+                                            <span class="mx-2">(MM/YY)</span>
                                         </div>
                                     </td>
                                 </tr>
@@ -215,10 +235,10 @@
                                     <th class="w-20">비밀번호<b class="required-data">*</b></th>
                                     <td class="w-30">
                                         <div class="d-flex align-items-center">
-                                            <input type="password" id="cardPwd" name="cardPwd" class="form-control"
-                                                placeholder="비밀번호 앞 2자리" oninput="maxLengthNum(this, 2)"
-                                                autocomplete="off" value="29" required>
-                                            <span class="mx-1">**</span>
+                                            <input type="password" id="cardPwd" name="cardPwd"
+                                                class="form-control card-input" placeholder=""
+                                                oninput="maxLengthNum(this, 2)" autocomplete="off" value="" required>
+                                            <span class="mx-1">** (비밀번호 앞 2자리)</span>
                                         </div>
                                     </td>
                                     <th class="w-20">BID<b class="required-data">*</b></th>
@@ -233,7 +253,81 @@
                             </tbody>
                         </table>
                         <!-- table:2 end -->
+                        <br>
+
+                        <!-- 이용약관 섹션 시작 -->
+                        <div class="modal-title mb-2"><span class="modal-title-bar"></span><span>이용약관 동의</span></div>
+                        <div class="terms-section mt-4">
+                            <div class="terms-header d-flex align-items-center mb-2">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="termsAll">
+                                    <label class="form-check-label fw-bold" for="termsAll">
+                                        전체 동의
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="terms-list">
+                                <!-- 전자금융거래 이용약관 -->
+                                <div class="terms-item d-flex align-items-center justify-content-between mb-2">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="termsEFT"
+                                            data-required="true">
+                                        <label class="form-check-label" for="termsEFT">
+                                            NICE페이먼츠 전자금융거래 이용약관 동의 <span class="text-danger">(필수)</span>
+                                        </label>
+                                    </div>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary terms-detail-btn"
+                                        data-terms-id="etf" data-terms-title="NICE페이먼츠 전자금융거래 이용약관 동의">
+                                        상세보기
+                                    </button>
+                                </div>
+                                <!-- 정기과금(자동승인)이용약관 -->
+                                <div class="terms-item d-flex align-items-center justify-content-between mb-2">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="termsRegularBilling"
+                                            data-required="true">
+                                        <label class="form-check-label" for="termsRegularBilling">
+                                            정기과금(자동승인)이용약관 동의 <span class="text-danger">(필수)</span>
+                                        </label>
+                                    </div>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary terms-detail-btn"
+                                        data-terms-id="regularBilling" data-terms-title="정기과금(자동승인)이용약관 동의">
+                                        상세보기
+                                    </button>
+                                </div>
+                                <!-- 개인정보 수집 및 이용에 대한 동의 -->
+                                <div class="terms-item d-flex align-items-center justify-content-between mb-2">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="termsPrivacy"
+                                            data-required="false">
+                                        <label class="form-check-label" for="termsPrivacy">
+                                            개인정보 수집 및 이용에 대한 동의 <span class="text-info">(선택)</span>
+                                        </label>
+                                    </div>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary terms-detail-btn"
+                                        data-terms-id="privacy" data-terms-title="개인정보 수집 및 이용에 대한 동의">
+                                        상세보기
+                                    </button>
+                                </div>
+                                <!-- 개인정보 제3자 제공에 대한 동의 -->
+                                <div class="terms-item d-flex align-items-center justify-content-between mb-2">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="termsPrivacy3rd"
+                                            data-required="false">
+                                        <label class="form-check-label" for="termsPrivacy3rd">
+                                            개인정보 제3자 제공에 대한 동의 <span class="text-info">(선택)</span>
+                                        </label>
+                                    </div>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary terms-detail-btn"
+                                        data-terms-id="privacy3rd" data-terms-title="개인정보 제3자 제공에 대한 동의">
+                                        상세보기
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- 이용약관 섹션 끝 -->
                     </div>
+
                     <!-- modal body end -->
                     <div class="modal-footer justify-content-center border-top-none">
                         <button type="button" class="btn btn-outline-grey me-2" data-bs-dismiss="modal">취소</button>
@@ -246,6 +340,7 @@
         <!-- modal dialog end -->
     </div>
     <!-- Add Modal end -->
+
     <script type="text/javascript" th:src="@{/js/biz/corporation_management.js}"></script>
 </div>
 
