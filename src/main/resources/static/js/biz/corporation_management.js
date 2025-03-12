@@ -587,4 +587,49 @@ $(document).ready(function () {
 
         return cardNum1 + cardNum2 + cardNum3 + cardNum4;
     }
+
+    $('#testPaymentBtn').on('click', function () {
+        console.log('결제 테스트');
+
+        const testPaymentData = {
+            amount: 1004,
+            orderId: '1234'
+        };
+
+        //로딩표시
+        const $btn = $(this);
+        const originalText = $btn.text();
+        $btn.prop('disabled', true).text('결제 처리중...');
+
+        //내부컨트롤러로 요청
+        $.ajax({
+            url: '/corp/payment/test',  // 내부 컨트롤러 엔드포인트
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(testPaymentData),
+            success: function (response) {
+                console.log('결제 테스트 성공:', response);
+                alert('결제 테스트가 성공했습니다.\n' + JSON.stringify(response, null, 2));
+            },
+            error: function (xhr, status, error) {
+                console.error('결제 테스트 실패:', xhr.status, error);
+                let errorMessage = '결제 테스트가 실패했습니다.';
+
+                try {
+                    const errorResponse = JSON.parse(xhr.responseText);
+                    if (errorResponse && errorResponse.message) {
+                        errorMessage += '\n오류: ' + errorResponse.message;
+                    }
+                } catch (e) {
+                    errorMessage += '\n상태: ' + xhr.status + '\n오류: ' + error;
+                }
+
+                alert(errorMessage);
+            },
+            complete: function () {
+                // 버튼 상태 복원
+                $btn.prop('disabled', false).text(originalText);
+            }
+        });
+    });
 });
