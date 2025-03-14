@@ -45,6 +45,8 @@ dependencies {
     implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
 	implementation 'org.apache.poi:poi-ooxml:5.4.0'
 	implementation 'org.mariadb.jdbc:mariadb-java-client:3.1.4'
+	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+
 	
 	//QueryDsl
     // 필수
