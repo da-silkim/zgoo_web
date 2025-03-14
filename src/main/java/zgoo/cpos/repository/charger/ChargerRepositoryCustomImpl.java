@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,8 @@ import zgoo.cpos.domain.company.QCpPlanPolicy;
 import zgoo.cpos.domain.cp.QCpModel;
 import zgoo.cpos.domain.cs.QCsInfo;
 import zgoo.cpos.dto.cp.ChargerDto.ChargerListDto;
+import zgoo.cpos.dto.cp.ChargerDto.ChargerRegDto;
+import zgoo.cpos.dto.cp.ChargerDto.ChargerSearchDto;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -35,6 +38,7 @@ public class ChargerRepositoryCustomImpl implements ChargerRepositoryCustom {
     QCpPlanPolicy cpplan = QCpPlanPolicy.cpPlanPolicy;
     QCommonCode commonTypeName = new QCommonCode("commonTypeCode");
     QCommonCode manufCdName = new QCommonCode("manufCd");
+    QCommonCode cpTypeName = new QCommonCode("cpType");
 
     @Override
     public Page<ChargerListDto> findAllChargerListPaging(Pageable pageable) {
@@ -147,4 +151,22 @@ public class ChargerRepositoryCustomImpl implements ChargerRepositoryCustom {
         return Optional.ofNullable(result);
     }
 
+    @Override
+    public List<ChargerSearchDto> findChargerListByStationId(String stationId) {
+        List<ChargerSearchDto> chargerList = queryFactory.select(Projections.fields(ChargerSearchDto.class,
+            cpInfo.id.as("chargerId"),
+            Expressions.stringTemplate("IF({0} IS NULL OR {0} = '', '-', {0})", cpInfo.chargerName).as("chargerName"),
+            Expressions.stringTemplate("IF({0} IS NULL OR {0} = '', '-', {0})", cpInfo.fwVersion).as("fwVersion"),
+            Expressions.stringTemplate("IF({0} IS NULL OR {0} = '', '-', {0})", cpInfo.location).as("location"),
+            Expressions.stringTemplate("IF({0} IS NULL OR {0} = '', '-', {0})", model.modelName).as("modelName"),
+            Expressions.stringTemplate("IF({0} IS NULL OR {0} = '', '-', {0})", manufCdName.name).as("manufCdName"),
+            Expressions.stringTemplate("IF({0} IS NULL OR {0} = '', '-', {0})", cpTypeName.name).as("cpTypeName")))
+            .from(cpInfo)
+            .leftJoin(model).on(cpInfo.modelCode.eq(model.modelCode))
+            .leftJoin(manufCdName).on(model.manufCd.eq(manufCdName.commonCode))
+            .leftJoin(cpTypeName).on(model.cpType.eq(cpTypeName.commonCode))
+            .where(cpInfo.stationId.id.eq(stationId))
+            .fetch();
+        return chargerList;
+    }
 }

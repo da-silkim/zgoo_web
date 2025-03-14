@@ -1,12 +1,16 @@
 package zgoo.cpos.repository.charger;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import zgoo.cpos.domain.charger.CpInfo;
+import zgoo.cpos.dto.cp.ChargerDto;
 import zgoo.cpos.dto.cp.ChargerDto.ChargerListDto;
+import zgoo.cpos.dto.cp.ChargerDto.ChargerRegDto;
+import zgoo.cpos.dto.cp.ChargerDto.ChargerSearchDto;
 
 public interface ChargerRepositoryCustom {
     Page<ChargerListDto> findAllChargerListPaging(Pageable page);
@@ -16,4 +20,5 @@ public interface ChargerRepositoryCustom {
 
     Optional<CpInfo> findCpByStationId(String stationId);
 
+    List<ChargerSearchDto> findChargerListByStationId(String stationId);
 }

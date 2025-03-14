@@ -19,6 +19,7 @@ import zgoo.cpos.domain.company.CpPlanPolicy;
 import zgoo.cpos.domain.cs.CsInfo;
 import zgoo.cpos.dto.cp.ChargerDto.ChargerListDto;
 import zgoo.cpos.dto.cp.ChargerDto.ChargerRegDto;
+import zgoo.cpos.dto.cp.ChargerDto.ChargerSearchDto;
 import zgoo.cpos.dto.cp.ChargerDto.ConnectorStatusDto;
 import zgoo.cpos.mapper.CpMapper;
 import zgoo.cpos.mapper.CpModemMapper;
@@ -159,6 +160,18 @@ public class ChargerService {
             return connectorStatusRepository.findAllConnectorStatusList();
         } catch (Exception e) {
             log.error("Error while fetching connector_status list:{}", e.getMessage(), e);
+            return Collections.emptyList();
+        }
+    }
+
+    /* 
+     * stationId로 충전기 전체 조회
+     */
+    public List<ChargerSearchDto> searchChargerList(String stationId) {
+        try {
+            return chargerRepository.findChargerListByStationId(stationId);
+        } catch (Exception e) {
+            log.error("[ChargerService >> searchChargerList] error:", e.getMessage(), e);
             return Collections.emptyList();
         }
     }

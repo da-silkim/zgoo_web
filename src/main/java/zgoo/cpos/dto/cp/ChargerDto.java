@@ -93,4 +93,17 @@ public class ChargerDto {
         private String status;
     }
 
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class ChargerSearchDto {
+        private String chargerId;
+        private String chargerName;
+        private String fwVersion;
+        private String location;
+        private String modelName;
+        private String manufCdName;
+        private String cpTypeName;
+    }
 }
