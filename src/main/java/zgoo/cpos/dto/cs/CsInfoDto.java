@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -97,5 +98,18 @@ public class CsInfoDto {
         private String contractDateString;
         private String rcvCapacityString;
         private String billDateString;
+        private String parkingFeeString;
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class StationSearchDto {
+        private String stationId;
+        private String stationName;
+        private String address;
+        private Double latitude;
+        private Double longitude;
     }
 }

@@ -5,9 +5,11 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import zgoo.cpos.dto.cs.CsInfoDto.CsInfoBaseDto;
 import zgoo.cpos.dto.cs.CsInfoDto.CsInfoDetailDto;
 import zgoo.cpos.dto.cs.CsInfoDto.CsInfoListDto;
 import zgoo.cpos.dto.cs.CsInfoDto.CsInfoRegDto;
+import zgoo.cpos.dto.cs.CsInfoDto.StationSearchDto;
 
 public interface CsRepositoryCustom {
 
@@ -38,4 +40,10 @@ public interface CsRepositoryCustom {
 
     // 충전소 조회
     List<CsInfoDetailDto> findCsInfo();
+
+    // 충전소 검색 조회
+    List<StationSearchDto> findCsInfoContainKeyword(String keyword);
+
+    // 사용자 위치 기반, 주변 충전소 조회
+    List<CsInfoDetailDto> findStationsWithinRadius(double latitude, double longitude, double radiusInKm);
 }
