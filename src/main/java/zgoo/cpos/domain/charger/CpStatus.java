@@ -22,6 +22,7 @@ import zgoo.cpos.type.ConnectionStatus;
 @AllArgsConstructor
 @Builder(toBuilder = true)
 public class CpStatus {
+
     @Id
     @Column(name = "charger_id")
     private String chargerId;

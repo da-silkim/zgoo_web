@@ -1078,3 +1078,114 @@ table.table tbody tr.row-selected {
   max-height: 500px;
   overflow-y: auto;
 }
+#searchList {
+  top: 46px; 
+  width: 300px;
+  height: calc(80vh - 40px);
+  max-height: 80vh;
+  position: absolute;
+}
+#searchStationList {
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.1);
+  overflow-y: auto;
+}
+.nearby-station {
+  width: 100%;
+  border-bottom: 2px grey solid;
+  background-color: #fff;
+  padding: 10px 6px;
+  font-size: large;
+  font-weight: bold;
+}
+.search-station {
+  width: 100%;
+  border-bottom: 1px grey solid;
+  background-color: #fff;
+  box-shadow: 0px 10px 10px -6px rgba(0, 0, 0, 0.3);
+  padding: 10px 6px;
+}
+.search-station:hover {
+  background-color: #f0f0f0;
+}
+.search-station > div:nth-child(1) {
+  font-weight: 700;
+  font-size: 19px;
+  margin-bottom: 6px;
+}
+#stationInfoDetail {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: #fff; 
+  top: 0;
+  left: 306px;
+  display: none;
+}
+#stationInfoDetail > div:nth-child(1) {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+#stationNameContainer {
+  padding: 6px;
+  width: 100%;
+  font-size: 20px;
+  font-weight: bolder;
+  box-shadow: 0px 10px 10px -10px rgba(0, 0, 0, 0.3);
+  background-color: #eaeaf1;
+}
+#stationNameContainer > span:nth-child(1) {
+  vertical-align: middle;
+  margin: 6px;
+}
+#stationNameContainer > span:nth-child(2) {
+  float: right;
+  cursor: pointer;
+}
+#stationContentContainer {
+  width: 100%;
+  height: calc(100% - 45px);
+  overflow-x: hidden;
+}
+#stationContainer, #chargerContainer {
+  padding: 5px;
+}
+#stationContainer > div:nth-child(1), #chargerContainer > div:nth-child(1) {
+  border-bottom: 1px grey solid;
+  font-size: 18px;
+  font-weight: 600;
+  padding: 8px 0;
+}
+.station-info {
+  font-size: 13px;
+  box-shadow: 0px 10px 10px -10px rgba(0, 0, 0, 0.3);
+  padding: 5px;
+}
+.station-info > div, .charger-info > div {
+  margin: 6px 0;
+}
+.station-info .col-4, .charger-info .col-4 {
+  font-weight: 600;
+}
+.charger-info {
+  font-size: 13px;
+  border-bottom: 1px grey solid;
+  padding: 5px;
+}
+.charger-info .charging-time {
+  margin: 6px 0;
+  display: flex;
+  align-items: center;
+}
+.infowindow {
+  width: 220px;
+  padding: 6px;
+}
+.infowindow > div:nth-child(1) {
+  font-size: 18px; font-weight: 700;
+}
+.infowindow > div:nth-child(2) {
+  font-size: 12px;
+}

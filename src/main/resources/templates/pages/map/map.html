@@ -22,13 +22,13 @@
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
         crossorigin="anonymous"></script>
     <script type="text/javascript"
-        src="//dapi.kakao.com/v2/maps/sdk.js?appkey=2627a1d15418d5bd6f92dfadded8a675&libraries=services"></script>
+        src="//dapi.kakao.com/v2/maps/sdk.js?appkey=2627a1d15418d5bd6f92dfadded8a675&libraries=services,clusterer"></script>
     <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
     <script type="text/javascript" th:src="@{/js/common.js}"></script>
     <script type="text/javascript" th:src="@{/js/map.js}"></script>
     <script th:inline="javascript">
-        var csList = /*[[${csList != null ? csList : '{}'}]]*/ {};
-        console.log(csList);
+        // var stationList = /*[[${stationList != null ? stationList : '{}'}]]*/ {};
+        // console.log(stationList);
     </script>
 </head>
 
@@ -55,10 +55,46 @@
                                 <button id="searchBtn"><i class="bi bi-search"></i></button>
                             </div>
                             <div id="autocompleteList" class="autocomplete-items"></div>
+                            <div id="searchList">
+                                <div id="searchStationList"></div>
+                                <div id="stationInfoDetail">
+                                    <div>
+                                        <div id="stationNameContainer">
+                                            <span id="stationNameTitle"></span>
+                                            <span id="infoCloseBtn">X</span>
+                                        </div>
+                                        <div id="stationContentContainer" class="overflow-y-auto scrollbar">
+                                            <div id="stationContainer">
+                                                <div>충전소 정보</div>
+                                                <div class="row row-cols-2 station-info">
+                                                    <div class="col-4">충전소명</div>
+                                                    <div class="col-8" id="stationName"></div>
+                                                    <div class="col-4">사업자명</div>
+                                                    <div class="col-8" id="companyName"></div>
+                                                    <div class="col-4">충전소ID</div>
+                                                    <div class="col-8" id="stationId"></div>
+                                                    <div class="col-4">주소</div>
+                                                    <div class="col-8" id="address"></div>
+                                                    <div class="col-4">운영여부</div>
+                                                    <div class="col-8" id="opStatusName"></div>
+                                                    <div class="col-4">주차정보</div>
+                                                    <div class="col-8" id="parkingFeeYn"></div>
+                                                    <div class="col-4">고객센터</div>
+                                                    <div class="col-8" id="asNum"></div>
+                                                </div>
+                                            </div>
+                                            <div id="chargerContainer">
+                                                <div>충전기 정보</div>
+                                                <div id="chargerList"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <!-- search area: end -->
                         <!-- login user current location -->
-                        <button id="currentLocationBtn" class="current-location">
+                        <button type="button" id="currentLocationBtn" class="current-location">
                             <img src="/img/now_pos.png">
                         </button>
                     </div>
