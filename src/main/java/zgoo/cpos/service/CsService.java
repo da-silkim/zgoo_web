@@ -19,6 +19,7 @@ import zgoo.cpos.domain.cs.CsLandInfo;
 import zgoo.cpos.dto.cs.CsInfoDto.CsInfoDetailDto;
 import zgoo.cpos.dto.cs.CsInfoDto.CsInfoListDto;
 import zgoo.cpos.dto.cs.CsInfoDto.CsInfoRegDto;
+import zgoo.cpos.dto.cs.CsInfoDto.StationSearchDto;
 import zgoo.cpos.mapper.CsMapper;
 import zgoo.cpos.repository.company.CompanyRepository;
 import zgoo.cpos.repository.cs.CsKepcoContractInfoRepository;
@@ -225,6 +226,29 @@ public class CsService {
             return csList;
         } catch (Exception e) {
             log.error("[findCsInfo] error: {}", e.getMessage());
+            return new ArrayList<>();
+        }
+    }
+
+    // 키워드로 충전소 조회
+    public List<StationSearchDto> saerchStationList(String keyword) {
+        try {
+            List<StationSearchDto> csList = this.csRepository.findCsInfoContainKeyword(keyword);
+            return csList;
+        } catch (Exception e) {
+            log.error("[saerchStationList] error: {}", e.getMessage());
+            return new ArrayList<>();
+        }
+    }
+
+    // 사용자 위치 기반, 주변 충전소 조회
+    public List<CsInfoDetailDto> findNearbyStations(double latitude, double longitude) {
+        try {
+            List<CsInfoDetailDto> csList = this.csRepository.findStationsWithinRadius(latitude, longitude, 10.0); // 10km 이내
+            System.out.println("주변 충전소 >> " + csList.toString());
+            return csList;
+        } catch (Exception e) {
+            log.error("[findNearbyStations] error: {}", e.getMessage());
             return new ArrayList<>();
         }
     }
