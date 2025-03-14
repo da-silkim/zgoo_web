@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import zgoo.cpos.cpcontrol.dto.CancelTestRequestDto;
+import zgoo.cpos.cpcontrol.dto.CancelTestRsponseDto;
 import zgoo.cpos.cpcontrol.dto.PaymentTestRequestDto;
 import zgoo.cpos.cpcontrol.dto.PaymentTestResponseDto;
 import zgoo.cpos.cpcontrol.service.CpControlService;
@@ -42,4 +44,13 @@ public class CpControlController {
         }
     }
 
+    @PostMapping("/payment/test/cancel")
+    public ResponseEntity<?> testCancelPayment(@RequestBody CancelTestRequestDto request) {
+        try {
+            CancelTestRsponseDto response = cpControlService.processTestCancelPayment(request);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
+        }
+    }
 }

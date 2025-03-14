@@ -609,6 +609,7 @@ $(document).ready(function () {
             data: JSON.stringify(testPaymentData),
             success: function (response) {
                 console.log('결제 테스트 성공:', response);
+                $('#otid').val(response.TID);
                 alert('결제 테스트가 성공했습니다.\n' + JSON.stringify(response, null, 2));
             },
             error: function (xhr, status, error) {
@@ -631,5 +632,52 @@ $(document).ready(function () {
                 $btn.prop('disabled', false).text(originalText);
             }
         });
+    });
+
+    $('#testCancelBtn').on('click', function () {
+        console.log('결제 취소');
+
+        const testCancelData = {
+            amount: 1004,
+            orderId: '1234',
+            tid: $('#otid').val()
+        };
+
+        //로딩표시
+        const $btn = $(this);
+        const originalText = $btn.text();
+        $btn.prop('disabled', true).text('취소 처리중...');
+
+        //내부 컨트롤러 요청
+        $.ajax({
+            url: '/corp/payment/test/cancel',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(testCancelData),
+            success: function (response) {
+                console.log('결제 취소 성공:', response);
+                alert('결제 취소가 성공했습니다.\n' + JSON.stringify(response, null, 2));
+            },
+            error: function (xhr, status, error) {
+                console.error('결제 취소 실패:', xhr.status, error);
+                let errorMessage = '결제 취소가 실패했습니다.';
+
+                try {
+                    const errorResponse = JSON.parse(xhr.responseText);
+                    if (errorResponse && errorResponse.message) {
+                        errorMessage += '\n오류: ' + errorResponse.message;
+                    }
+                } catch (e) {
+                    errorMessage += '\n상태: ' + xhr.status + '\n오류: ' + error;
+                }
+
+                alert(errorMessage);
+            },
+            complete: function () {
+                //버튼 상태 복원
+                $btn.prop('disabled', false).text(originalText);
+            }
+        });
+
     });
 });
