@@ -614,14 +614,8 @@ public class PageController {
             List<CompanyListDto> companyList = this.companyService.findCompanyListAll();
             model.addAttribute("companyList", companyList);
 
-            Page<NoticeDto.NoticeListDto> noticeList;
-
-            if (companyId == null && startDate == null && endDate == null) {
-                noticeList = this.noticeService.findNoticeAll(page, size);
-            } else {
-                noticeList = this.noticeService.searchNoticeListwithPagination(companyId, startDateSearch,
-                        endDateSearch, page, size);
-            }
+            Page<NoticeDto.NoticeListDto> noticeList  = this.noticeService.findNoticeWithPagintaion(companyId, startDateSearch,
+                endDateSearch, page, size);
 
             int totalPages = noticeList.getTotalPages() == 0 ? 1 : noticeList.getTotalPages();
 

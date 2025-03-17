@@ -36,6 +36,7 @@ public class NoticeDto {
         private Long companyId;
         private String companyName;
         private String typeName;
+        private boolean isNew;
     }
 
     @Data

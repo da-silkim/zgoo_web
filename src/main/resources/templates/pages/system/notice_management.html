@@ -97,7 +97,12 @@
                                         </a>
                                     </td>
                                     <td th:text="${notice.typeName}"></td>
-                                    <td th:text="${notice.title}" class="text-left"></td>
+                                    <td>
+                                        <div class="float-left">
+                                            <span th:text="${notice.title}"></span>
+                                            <span th:if="${notice.isNew}" class="new-article">NEW</span>
+                                        </div>
+                                    </td>
                                     <td th:text="${notice.userId}"></td>
                                     <td th:text="${notice.userName}"></td>
                                     <td th:text="${#temporals.format(notice.regDt, 'yyyy-MM-dd HH:mm:ss')}"></td>

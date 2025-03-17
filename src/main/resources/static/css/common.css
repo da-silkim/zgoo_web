@@ -1189,3 +1189,10 @@ table.table tbody tr.row-selected {
 .infowindow > div:nth-child(2) {
   font-size: 12px;
 }
+.new-article {
+  background-color: #3E5879;
+  color: white;
+  border-radius: 6px;
+  padding: 2px 6px;
+  font-size: 13px;
+}

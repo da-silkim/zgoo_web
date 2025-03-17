@@ -132,7 +132,8 @@
                                             <a th:href="@{/system/notice/detail/{id}(id=${notice.idx}, page=0, size=10)}" class="no-underline">
                                                 <div>
                                                     <span th:text="|[${notice.typeName}] ${notice.title}|"></span>
-                                                    <span th:text="${#temporals.format(notice.regDt, 'yyyy-MM-dd HH:mm:ss')}" style="float: right;"></span>
+                                                    <span th:if="${notice.isNew}" class="new-article">NEW</span>
+                                                    <span th:text="${#temporals.format(notice.regDt, 'yyyy-MM-dd HH:mm:ss')}" class="float-right"></span>
                                                 </div>
                                             </a>
                                         </td>

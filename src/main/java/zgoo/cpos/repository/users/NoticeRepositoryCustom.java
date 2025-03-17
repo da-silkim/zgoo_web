@@ -34,6 +34,6 @@ public interface NoticeRepositoryCustom {
 
     Users findUserOne (String userId);
 
-    // 공지사항 최신 4건 조회(대시보드)
+    // 공지사항 최신 5건 조회(대시보드)
     List<NoticeListDto> findLatestNoticeList();
 }

@@ -1,6 +1,8 @@
 package zgoo.cpos.service;
 
+import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,7 +19,6 @@ import zgoo.cpos.domain.users.Notice;
 import zgoo.cpos.domain.users.Users;
 import zgoo.cpos.dto.users.NoticeDto;
 import zgoo.cpos.dto.users.NoticeDto.NoticeListDto;
-import zgoo.cpos.dto.users.UsersDto;
 import zgoo.cpos.mapper.NoticeMapper;
 import zgoo.cpos.repository.users.NoticeRepository;
 import zgoo.cpos.repository.users.UsersRepository;
@@ -58,6 +59,36 @@ public class NoticeService {
             return Page.empty(pageable);
         } catch (Exception e) {
             log.error("[searchNoticeListwithPagination] error : {}", e.getMessage(), e);
+            return Page.empty(pageable);
+        }
+    }
+
+    // 공지사항 조회
+    public Page<NoticeListDto> findNoticeWithPagintaion(Long companyId, LocalDate startDate, LocalDate endDate, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        try {
+            Page<NoticeListDto> noticeList;
+
+            if (companyId == null && startDate == null && endDate == null) {
+                log.info("Executing the [findNoticeWithPagination]");
+                noticeList = this.noticeRepository.findNoticeWithPagination(pageable);
+            } else {
+                log.info("Executing the [searchNoticeListwithPagination]");
+                noticeList = this.noticeRepository.searchNoticeListwithPagination(companyId, startDate, endDate, pageable);
+            }
+
+            LocalDateTime now = LocalDateTime.now();
+
+            noticeList.forEach(notice -> {
+                LocalDateTime registrationDate = notice.getRegDt();
+                long daysBetween = Duration.between(registrationDate, now).toDays();
+                notice.setNew(daysBetween < 3);
+            });
+
+            return noticeList;
+        } catch (Exception e) {
+            log.error("[findNoticeWithPagintaion] error: {}", e.getMessage(), e);
             return Page.empty(pageable);
         }
     }
@@ -167,6 +198,14 @@ public class NoticeService {
     public List<NoticeListDto> findLatestNoticeList() {
         try {
             List<NoticeListDto> noticeList = this.noticeRepository.findLatestNoticeList();
+
+            LocalDateTime now = LocalDateTime.now();
+            noticeList.forEach(notice -> {
+                LocalDateTime registrationDate = notice.getRegDt();
+                long daysBetween = Duration.between(registrationDate, now).toDays();
+                notice.setNew(daysBetween < 3);
+            });
+            
             log.info("[findLatestNoticeList] success");
             return noticeList;
         } catch (Exception e) {
