@@ -2,6 +2,7 @@ package zgoo.cpos.repository.code;
 
 import java.util.List;
 
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -155,6 +156,27 @@ public class CommonCodeRepositoryCustomImpl implements CommonCodeRepositoryCusto
                                 .from(commonCode)
                                 .where(commonCode.group.grpCode.eq(grpcode)
                                         .and(commonCode.commonCode.ne("SU")))
+                                .fetch();
+        }
+
+        @Override
+        public List<CommCdBaseDto> commonCodeUsersAuthority(String authority) {
+                BooleanBuilder builder = new BooleanBuilder();
+                builder.and(commonCode.group.grpCode.eq("MENUACCLV"));
+
+                // !SU
+                if (!"SU".equals(authority)) {
+                        builder.and(commonCode.commonCode.ne("SU"));
+                }
+
+
+                return queryFactory
+                                .select(Projections.fields(CommCdBaseDto.class,
+                                                commonCode.group.grpCode.as("grpCode"),
+                                                commonCode.commonCode.as("commonCode"),
+                                                commonCode.name.as("commonCodeName")))
+                                .from(commonCode)
+                                .where(builder)
                                 .fetch();
         }
 }

@@ -14,9 +14,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import zgoo.cpos.domain.company.Company;
 import zgoo.cpos.domain.users.Users;
+import zgoo.cpos.dto.code.CodeDto.CommCdBaseDto;
 import zgoo.cpos.dto.users.UsersDto;
+import zgoo.cpos.dto.users.UsersDto.UsersListDto;
 import zgoo.cpos.dto.users.UsersDto.UsersPasswordDto;
 import zgoo.cpos.mapper.UsersMapper;
+import zgoo.cpos.repository.code.CommonCodeRepository;
 import zgoo.cpos.repository.company.CompanyRepository;
 import zgoo.cpos.repository.users.UsersRepository;
 import zgoo.cpos.util.EncryptionUtils;
@@ -25,8 +28,10 @@ import zgoo.cpos.util.EncryptionUtils;
 @RequiredArgsConstructor
 @Slf4j
 public class UsersService {
+
     private final CompanyRepository companyRepository;
     private final UsersRepository usersRepository;
+    private final CommonCodeRepository commonCodeRepository;
 
     // 사용자 - 전체 조회
     @Transactional
@@ -151,6 +156,28 @@ public class UsersService {
         }
     }
 
+    // 사용자 조회
+    public Page<UsersListDto> findUsersWithPagination(Long companyId, String companyType, String name, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        try {
+            Page<UsersListDto> usersList;
+
+            if (companyId == null && (companyType == null || companyType.isEmpty()) && (name == null || name.isEmpty())) {
+                log.info("Executing the [findUsersWithPaginationToDto]");
+                usersList = this.usersRepository.findUsersWithPaginationToDto(pageable);
+            } else {
+                log.info("Executing the [searchUsersWithPaginationToDto]");
+                usersList = this.usersRepository.searchUsersWithPaginationToDto(companyId, companyType, name, pageable);
+            }
+
+            return usersList;
+        } catch (Exception e) {
+            log.error("[findUsersWithPagination] error: {}", e.getMessage());
+            return Page.empty(pageable);
+        }
+    }
+
     public Long findCompanyId(String userId) {
         try {
             Long companyId = this.usersRepository.findCompanyId(userId);
@@ -162,7 +189,7 @@ public class UsersService {
                 return 0L;
             }
         } catch (Exception e) {
-            log.error("[findCompanyId] error : ", e.getMessage());
+            log.error("[findCompanyId] error: {}", e.getMessage());
             return 0L;
         }
     }
@@ -197,6 +224,18 @@ public class UsersService {
         } catch (Exception e) {
             log.error("[updateUsersPasswordInfo] error: {}", e.getMessage());
             return null;
+        }
+    }
+
+    // 사용자 권한에 따른 메뉴권한리스트
+    public List<CommCdBaseDto> searchMenuAccessList(String userId) {
+        try {
+            Users user = this.usersRepository.findUserOne(userId);
+            String auth = user.getAuthority();
+            return this.commonCodeRepository.commonCodeUsersAuthority(auth);
+        } catch (Exception e) {
+            log.error("[searchMenuAccessList] error: {}", e.getMessage());
+            return new ArrayList<>();
         }
     }
 }

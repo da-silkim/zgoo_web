@@ -538,19 +538,6 @@ public class PageController {
         log.info("companyId: {}, companyType: {}, name: {}", companyId, companyType, name);
         model.addAttribute("usersDto", new UsersDto.UsersRegDto());
 
-        /*
-         * required = false일 때 요청 파라미터 값이 없으면 null를 저장해야 하는데
-         * companyType, name 값이 공백으로 처리되는 문제발생(companyId는 정상적으로 처리)
-         * null 값이 아닌 공백이 들어왔을 경우 null 처리
-         */
-        if (companyType != null && companyType.isEmpty()) {
-            companyType = null;
-        }
-
-        if (name != null && name.trim().isEmpty()) {
-            name = null;
-        }
-
         try {
             log.info("=== user DB search result >>>");
 
@@ -559,13 +546,7 @@ public class PageController {
             model.addAttribute("companyList", companyList);
 
             // 사용자 list
-            Page<UsersDto.UsersListDto> userList;
-
-            if (companyId == null && companyType == null && name == null) { // 검색 조건이 없으면 전체 조회
-                userList = usersService.findUsersAll(page, size);
-            } else { // 검색 조건이 1개 이상 존재할 경우
-                userList = usersService.searchUsersListWithPagination(companyId, companyType, name, page, size);
-            }
+            Page<UsersDto.UsersListDto> userList = this.usersService.findUsersWithPagination(companyId, companyType, name, page, size);
 
             // 검색 조건 저장
             model.addAttribute("selectedCompanyId", companyId);
@@ -580,7 +561,7 @@ public class PageController {
             model.addAttribute("totalPages", totalPages); // 총 페이지 수
             model.addAttribute("totalCount", userList.getTotalElements()); // 총 데이터
 
-            List<CommCdBaseDto> authList = codeService.findCommonCdNamesByGrpcd("MENUACCLV"); // 메뉴권한
+            List<CommCdBaseDto> authList = this.usersService.searchMenuAccessList(principal.getName()); // 메뉴권한
             model.addAttribute("authList", authList);
 
             List<CommCdBaseDto> coKind = codeService.findCommonCdNamesByGrpcd("COKIND"); // 사업자 유형

@@ -49,4 +49,7 @@ public interface CommonCodeRepositoryCustom {
 
     // 공통코드 조회(메뉴권한)
     List<CommCdBaseDto> commonCodeMenuAuthority(String grpcode);
+
+    // 사용자 권한에 따른 메뉴권한 공통코드 조회
+    List<CommCdBaseDto> commonCodeUsersAuthority(String authority);
 }
