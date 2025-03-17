@@ -3,13 +3,11 @@ package zgoo.cpos.service;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import zgoo.cpos.domain.company.Company;
@@ -21,6 +19,7 @@ import zgoo.cpos.dto.cs.CsInfoDto.CsInfoListDto;
 import zgoo.cpos.dto.cs.CsInfoDto.CsInfoRegDto;
 import zgoo.cpos.dto.cs.CsInfoDto.StationSearchDto;
 import zgoo.cpos.mapper.CsMapper;
+import zgoo.cpos.repository.charger.ChargerRepository;
 import zgoo.cpos.repository.company.CompanyRepository;
 import zgoo.cpos.repository.cs.CsKepcoContractInfoRepository;
 import zgoo.cpos.repository.cs.CsLandInfoRepository;
@@ -35,37 +34,31 @@ public class CsService {
     private final CompanyRepository companyRepository;
     private final CsKepcoContractInfoRepository csKepcoContractInfoRepository;
     private final CsLandInfoRepository csLandInfoRepository;
+    private final ChargerRepository chargerRepository;
 
-    // 충전소 전체 조회
-    @Transactional
-    public Page<CsInfoListDto> findCsInfoAll(int page, int size) {
+    // 충전소 조회
+    public Page<CsInfoListDto> findCsInfoWithPagination(Long companyId, String searchOp, String searchContent, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
 
         try {
-            Page<CsInfoListDto> csList = this.csRepository.findCsInfoWithPagination(pageable);
-            return csList;
-        } catch (DataAccessException dae) {
-            log.error("Database error occurred while fetching csList with pagination: {}", dae.getMessage(), dae);
-            return Page.empty(pageable);
-        } catch (Exception e) {
-            log.error("Error occurred while fetching csList with pagination: {}", e.getMessage(), e);
-            return Page.empty(pageable);
-        }
-    }
+            Page<CsInfoListDto> csList;
 
-    // 충전소 검색 조회
-    @Transactional
-    public Page<CsInfoListDto> searchCsInfoListWithPagination(Long companyId, String searchOp, String searchContent, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
+            if (companyId == null && (searchOp == null || searchOp.isEmpty()) && (searchContent == null || searchContent.isEmpty())) {
+                log.info("Executing the [findCsInfoWithPagination]");
+                csList = this.csRepository.findCsInfoWithPagination(pageable);
+            } else {
+                log.info("Executing the [findCsInfoWithPagination]");
+                csList = this.csRepository.searchCsInfoWithPagination(companyId, searchOp, searchContent, pageable);
+            }
 
-        try {
-            Page<CsInfoListDto> csList = this.csRepository.searchCsInfoWithPagination(companyId, searchOp, searchContent, pageable);
+            for (CsInfoListDto station : csList) {
+                long cpCount = this.chargerRepository.countByStationId(station.getStationId());
+                station.setCpCount(cpCount);
+            }
+
             return csList;
-        } catch (DataAccessException dae) {
-            log.error("Database error occurred while fetching csList with pagination: {}", dae.getMessage(), dae);
-            return Page.empty(pageable);
         } catch (Exception e) {
-            log.error("Error occurred while fetching csList with pagination: {}", e.getMessage(), e);
+            log.error("[findCsInfoWithPagination] error: {}", e.getMessage(), e);
             return Page.empty(pageable);
         }
     }

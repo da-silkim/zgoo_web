@@ -169,4 +169,13 @@ public class ChargerRepositoryCustomImpl implements ChargerRepositoryCustom {
             .fetch();
         return chargerList;
     }
+
+    @Override
+    public long countByStationId(String stationId) {
+        return queryFactory
+            .select(cpInfo.count())
+            .from(cpInfo)
+            .where(cpInfo.stationId.id.eq(stationId))
+            .fetchOne();
+    }
 }

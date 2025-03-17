@@ -164,11 +164,11 @@ public class PageController {
             model.addAttribute("companyList", companyList);
             List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT"); // 그리드 row 수
             model.addAttribute("showListCnt", showListCnt);
-            List<CommCdBaseDto> memStatList = codeService.commonCodeStringToNum("MEMSTATCD"); // 회원상태코드
+            List<CommCdBaseDto> memStatList = codeService.findCommonCdNamesByGrpcd("MEMSTATCD"); // 회원상태코드
             model.addAttribute("memStatList", memStatList);
-            List<CommCdBaseDto> bizTypeList = codeService.commonCodeStringToNum("BIZTYPECD"); // 사업자구분코드
+            List<CommCdBaseDto> bizTypeList = codeService.findCommonCdNamesByGrpcd("BIZTYPECD"); // 사업자구분코드
             model.addAttribute("bizTypeList", bizTypeList);
-            List<CommCdBaseDto> creditCardList = codeService.commonCodeStringToNum("CREDITCARDCD"); // 카드사코드
+            List<CommCdBaseDto> creditCardList = codeService.findCommonCdNamesByGrpcd("CREDITCARDCD"); // 카드사코드
             model.addAttribute("creditCardList", creditCardList);
             MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(),
                     "C0100");
@@ -260,12 +260,7 @@ public class PageController {
 
         try {
             // 충전소 list
-            Page<CsInfoListDto> csList;
-            if (companyId == null && searchOp == null && searchContent == null) {
-                csList = this.csService.findCsInfoAll(page, size);
-            } else {
-                csList = this.csService.searchCsInfoListWithPagination(companyId, searchOp, searchContent, page, size);
-            }
+            Page<CsInfoListDto> csList = this.csService.findCsInfoWithPagination(companyId, searchOp, searchContent, page, size);
 
             // 검색 조건 저장
             model.addAttribute("selectedCompanyId", companyId);
@@ -285,17 +280,17 @@ public class PageController {
             model.addAttribute("companyList", companyList);
             List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT"); // 그리드 row 수
             model.addAttribute("showListCnt", showListCnt);
-            List<CommCdBaseDto> csFacility = codeService.commonCodeStringToNum("CSFACILITY"); // 충전소시설유형
+            List<CommCdBaseDto> csFacility = codeService.findCommonCdNamesByGrpcd("CSFACILITY"); // 충전소시설유형
             model.addAttribute("csFacility", csFacility);
-            List<CommCdBaseDto> csFSub = codeService.commonCodeStringToNum("CSFSUB"); // 충전소시설구분
+            List<CommCdBaseDto> csFSub = codeService.findCommonCdNamesByGrpcd("CSFSUB"); // 충전소시설구분
             model.addAttribute("csFSub", csFSub);
-            List<CommCdBaseDto> opStepCd = codeService.commonCodeStringToNum("OPSTEPCD"); // 운영단계분류
+            List<CommCdBaseDto> opStepCd = codeService.findCommonCdNamesByGrpcd("OPSTEPCD"); // 운영단계분류
             model.addAttribute("opStepCd", opStepCd);
-            List<CommCdBaseDto> landType = codeService.commonCodeStringToNum("LANDTYPE"); // 부지구분
+            List<CommCdBaseDto> landType = codeService.findCommonCdNamesByGrpcd("LANDTYPE"); // 부지구분
             model.addAttribute("landType", landType);
-            List<CommCdBaseDto> faucetType = codeService.commonCodeStringToNum("FAUCETTYPE"); // 수전방식
+            List<CommCdBaseDto> faucetType = codeService.findCommonCdNamesByGrpcd("FAUCETTYPE"); // 수전방식
             model.addAttribute("faucetType", faucetType);
-            List<CommCdBaseDto> powerType = codeService.commonCodeStringToNum("POWERTYPE"); // 전압종류
+            List<CommCdBaseDto> powerType = codeService.findCommonCdNamesByGrpcd("POWERTYPE"); // 전압종류
             model.addAttribute("powerType", powerType);
             MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(),
                     "D0100");
@@ -461,13 +456,13 @@ public class PageController {
             model.addAttribute("companyList", companyList);
             List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT"); // 그리드 row 수
             model.addAttribute("showListCnt", showListCnt);
-            List<CommCdBaseDto> manfCd = codeService.commonCodeStringToNum("CGMANFCD"); // 충전기제조사
+            List<CommCdBaseDto> manfCd = codeService.findCommonCdNamesByGrpcd("CGMANFCD"); // 충전기제조사
             model.addAttribute("manfCd", manfCd);
-            List<CommCdBaseDto> chgTypeCd = codeService.commonCodeStringToNum("CHGINTTYPECD"); // 충전기설치유형
+            List<CommCdBaseDto> chgTypeCd = codeService.findCommonCdNamesByGrpcd("CHGINTTYPECD"); // 충전기설치유형
             model.addAttribute("chgTypeCd", chgTypeCd);
-            List<CommCdBaseDto> chgSpeedCd = codeService.commonCodeStringToNum("CHGSPEEDCD"); // 충전기속도구분(충전기유형)
+            List<CommCdBaseDto> chgSpeedCd = codeService.findCommonCdNamesByGrpcd("CHGSPEEDCD"); // 충전기속도구분(충전기유형)
             model.addAttribute("chgSpeedCd", chgSpeedCd);
-            List<CommCdBaseDto> connType = codeService.commonCodeStringToNum("CONNTYPE"); // 커넥터타입
+            List<CommCdBaseDto> connType = codeService.findCommonCdNamesByGrpcd("CONNTYPE"); // 커넥터타입
             model.addAttribute("connType", connType);
             MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(),
                     "G0100");
@@ -661,7 +656,7 @@ public class PageController {
             model.addAttribute("totalPages", totalPages);
             model.addAttribute("totalCount", noticeList.getTotalElements());
 
-            List<CommCdBaseDto> noticeTypeList = codeService.commonCodeStringToNum("NOTICETYPECD"); // 공지유형
+            List<CommCdBaseDto> noticeTypeList = codeService.findCommonCdNamesByGrpcd("NOTICETYPECD"); // 공지유형
             model.addAttribute("noticeTypeList", noticeTypeList);
 
             List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT"); // 그리드 row 수
@@ -828,7 +823,7 @@ public class PageController {
 
             List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT"); // 그리드 row 수
             model.addAttribute("showListCnt", showListCnt);
-            List<CommCdBaseDto> manfCd = codeService.commonCodeStringToNum("CGMANFCD"); // 충전기제조사
+            List<CommCdBaseDto> manfCd = codeService.findCommonCdNamesByGrpcd("CGMANFCD"); // 충전기제조사
             model.addAttribute("manfCd", manfCd);
             MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(),
                     "G0700");
@@ -1044,11 +1039,11 @@ public class PageController {
 
             List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT"); // 그리드 row 수
             model.addAttribute("showListCnt", showListCnt);
-            List<CommCdBaseDto> vocTypeList = codeService.commonCodeStringToNum("VOCTYPE"); // 문의유형
+            List<CommCdBaseDto> vocTypeList = codeService.findCommonCdNamesByGrpcd("VOCTYPE"); // 문의유형
             model.addAttribute("vocTypeList", vocTypeList);
-            List<CommCdBaseDto> vocStatList = codeService.commonCodeStringToNum("VOCSTAT"); // 조치상태
+            List<CommCdBaseDto> vocStatList = codeService.findCommonCdNamesByGrpcd("VOCSTAT"); // 조치상태
             model.addAttribute("vocStatList", vocStatList);
-            List<CommCdBaseDto> vocPathList = codeService.commonCodeStringToNum("VOCPATH"); // 문의경로
+            List<CommCdBaseDto> vocPathList = codeService.findCommonCdNamesByGrpcd("VOCPATH"); // 문의경로
             model.addAttribute("vocPathList", vocPathList);
             MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(),
                     "J0100");
@@ -1103,7 +1098,7 @@ public class PageController {
             model.addAttribute("totalPages", totalPages);
             model.addAttribute("totalCount", faqList.getTotalElements());
 
-            List<CommCdBaseDto> faqKindList = codeService.commonCodeStringToNum("FAQKIND"); // FAQ 구분코드
+            List<CommCdBaseDto> faqKindList = codeService.findCommonCdNamesByGrpcd("FAQKIND"); // FAQ 구분코드
             model.addAttribute("faqKindList", faqKindList);
 
             List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT"); // 그리드 row 수
