@@ -36,7 +36,7 @@ public class CsInfoDto {
     @ToString(callSuper = true)
     public static class CsInfoListDto extends CsInfoBaseDto {
         private String companyName;
-        private Integer cpCount;        // 충전기수
+        private Long cpCount;        // 충전기수
         private String opStatusName;    // 운영상태명
     }
 
@@ -65,8 +65,8 @@ public class CsInfoDto {
         private LocalDate contractDate;
         private LocalDate startDate;
         private LocalDate endDate;
-        private Integer landUseRate;
-        private LocalDate billDate;
+        private String landUseType;
+        private Integer landUseFee;
 
         // 충전소 한전계약 정보
         private String kepcoCustNo;
@@ -97,7 +97,6 @@ public class CsInfoDto {
         // '정보없음' 출력을 위한 데이터 형변환
         private String contractDateString;
         private String rcvCapacityString;
-        private String billDateString;
         private String parkingFeeString;
     }
 

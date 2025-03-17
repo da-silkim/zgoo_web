@@ -73,6 +73,7 @@ $(document).ready(function() {
         $('#companyId').prop('disabled', false);
         $('#stationName').prop('disabled', false);
         $('#duplicateBtn').prop('disabled', false);
+        updateUnit();
     });
 
     $('#editBtn').on('click', function(event) {
@@ -127,6 +128,13 @@ $(document).ready(function() {
                     $('#parkingFeeNo').prop('checked', true);
                 }
 
+                if (data.landUseType === 'FIX') {
+                    $('#FIX').prop('checked', true);
+                } else {
+                    $('#RATE').prop('checked', true);
+                }
+                updateUnit();
+
                 $('#institutionName').val(data.institutionName || '');
                 $('#landType').val(data.landType || '');
                 $('#staffName').val(data.staffName || '');
@@ -134,8 +142,7 @@ $(document).ready(function() {
                 $('#contractDate').val(data.contractDate || '');
                 $('#startDate').val(data.startDate || '');
                 $('#endDate').val(data.endDate || '');
-                $('#landUseRate').val(data.landUseRate || '');
-                $('#billDate').val(data.billDate || '');
+                $('#landUseFee').val(data.landUseFee || '');
                 $('#kepcoCustNo').val(data.kepcoCustNo || '');
                 $('#openingDate').val(data.openingDate || '');
                 $('#contPower').val(data.contPower || '');
@@ -197,8 +204,8 @@ $(document).ready(function() {
                 contractDate: $('#contractDate').val(),
                 startDate: $('#startDate').val(),
                 endDate: $('#endDate').val(),
-                landUseRate: $('#landUseRate').val(),
-                billDate: $('#billDate').val(),
+                landUseType: $('input[name="landUseType"]:checked').val(),
+                landUseFee: $('#landUseFee').val(),
                 kepcoCustNo: $('#kepcoCustNo').val(),
                 openingDate: $('#openingDate').val(),
                 contPower: $('#contPower').val(),
@@ -266,4 +273,21 @@ $(document).ready(function() {
             }
         });
     });
+
+    // 토지사용구분 제어
+    function updateUnit() {
+        const selectedValue = document.querySelector('input[name="landUseType"]:checked').value;
+        const unitElement = document.getElementById('unit');
+        const landUseFeeInput = document.getElementById('landUseFee');
+        landUseFeeInput.value = '';
+
+        if (selectedValue === 'FIX') {
+            unitElement.innerText = '원';
+        } else if (selectedValue === 'RATE') {
+            unitElement.innerText = '%';
+        }
+    }
+
+    document.getElementById('FIX').addEventListener('click', updateUnit);
+    document.getElementById('RATE').addEventListener('click', updateUnit);
 });

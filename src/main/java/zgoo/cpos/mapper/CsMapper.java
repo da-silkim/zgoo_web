@@ -46,8 +46,8 @@ public class CsMapper {
                 .contractDate(dto.getContractDate())
                 .startDate(dto.getStartDate())
                 .endDate(dto.getEndDate())
-                .landUseRate(dto.getLandUseRate())
-                .billDate(dto.getBillDate())
+                .landUseType(dto.getLandUseType())
+                .landUseFee(dto.getLandUseFee())
                 .build();
         return land;
     }

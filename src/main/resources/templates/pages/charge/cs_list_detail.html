@@ -130,13 +130,22 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="w-20">부지사용료율(%)<b class="required-data">*</b></th>
+                                    <th class="w-20">토지사용구분<b class="required-data">*</b></th>
                                     <td class="w-30">
-                                        <span th:text="${csInfo.landUseRate}"></span>
+                                        <input type="radio" name="landUseType" id="FIX" value="FIX" 
+                                            th:checked="${csInfo.landUseType == 'FIX'}" th:disabled="true">
+                                        <label for="FIX" class="me-4">고정형</label>
+                                        <input type="radio" name="landUseType" id="RATE" value="RATE"
+                                            th:checked="${csInfo.landUseType == 'RATE'}" th:disabled="true">
+                                        <label for="RATE">사용료율</label>
                                     </td>
-                                    <th class="w-20">계산서 발행일</th>
+                                    <th class="w-20">토지사용료</th>
                                     <td class="w-30">
-                                        <span th:text="${csInfo.billDateString}"></span>
+                                        <span th:if="${csInfo.landUseType == 'FIX'}" >
+                                            <span th:text="${csInfo.landUseFee}" class="price-format"></span>
+                                            <span>원</span>
+                                        </span>
+                                        <span th:if="${csInfo.landUseType == 'RATE'}" th:text="${csInfo.landUseFee + '%'}"></span>
                                     </td>
                                 </tr>
                             </tbody>

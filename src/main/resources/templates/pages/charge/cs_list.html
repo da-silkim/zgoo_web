@@ -104,7 +104,7 @@
                                     <td th:text="${cs.stationName}"></td>
                                     <td th:text="${cs.stationId}"></td>
                                     <td th:text="${cs.address}"></td>
-                                    <td>2</td>
+                                    <td th:text="${cs.cpCount}"></td>
                                     <td th:text="${cs.opStatusName}"></td>
                                     <td th:text="${cs.openStartTime}"></td>
                                     <td th:text="${cs.openEndTime}"></td>
@@ -317,14 +317,22 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="w-20">부지사용료율(%)<b class="required-data">*</b></th>
+                                    <th class="w-20">토지사용구분<b class="required-data">*</b></th>
                                     <td>
-                                        <input type="number" name="landUseRate" id="landUseRate" class="form-control attr-control" maxlength="3" autocomplete="off">
+                                        <div class="display-radio">
+                                            <input type="radio" name="landUseType" id="FIX" class="attr-control" value="FIX" checked>
+                                            <label for="FIX">고정형</label>
+                                            <input type="radio" name="landUseType" id="RATE" class="attr-control" value="RATE">
+                                            <label for="RATE">사용료율</label>
+                                        </div>
                                     </td>
-                                    <th class="w-20">계산서 발행일</th>
+                                    <th class="w-20">토지사용료<b class="required-data">*</b></th>
                                     <td class="w-30">
-                                        <input type="date" min="1970-01-01" max="2199-12-31" name="billDate"
-                                            id="billDate" class="form-control attr-control" required>
+                                        <div class="display-input-btn">
+                                            <input type="number" name="landUseFee" id="landUseFee"class="form-control attr-control"
+                                                autocomplete="off" required>
+                                            <span id="unit">원</span>
+                                        </div>
                                     </td>
                                 </tr>
                             </tbody>

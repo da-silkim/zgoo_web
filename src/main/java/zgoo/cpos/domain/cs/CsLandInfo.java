@@ -49,11 +49,12 @@ public class CsLandInfo {
     @Column(name = "end_date")
     private LocalDate endDate;
 
-    @Column(name = "land_use_rate")
-    private Integer landUseRate;
+    @Column(name = "land_use_type")
+    private String landUseType;
 
-    @Column(name = "bill_date")
-    private LocalDate billDate;
+    @Column(name = "land_use_fee")
+    private Integer landUseFee;
+
 
     public void updateCsLandInfo(CsInfoRegDto dto) {
         this.institutionName = dto.getInstitutionName();
@@ -63,7 +64,7 @@ public class CsLandInfo {
         this.contractDate = dto.getContractDate();
         this.startDate = dto.getStartDate();
         this.endDate = dto.getEndDate();
-        this.landUseRate = dto.getLandUseRate();
-        this.billDate = dto.getBillDate();
+        this.landUseType = dto.getLandUseType();
+        this.landUseFee = dto.getLandUseFee();
     }
 }

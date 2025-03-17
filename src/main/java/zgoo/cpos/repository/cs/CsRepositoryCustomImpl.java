@@ -21,7 +21,6 @@ import zgoo.cpos.domain.cs.CsInfo;
 import zgoo.cpos.domain.cs.QCsInfo;
 import zgoo.cpos.domain.cs.QCsKepcoContractInfo;
 import zgoo.cpos.domain.cs.QCsLandInfo;
-import zgoo.cpos.dto.cs.CsInfoDto.CsInfoBaseDto;
 import zgoo.cpos.dto.cs.CsInfoDto.CsInfoDetailDto;
 import zgoo.cpos.dto.cs.CsInfoDto.CsInfoListDto;
 import zgoo.cpos.dto.cs.CsInfoDto.CsInfoRegDto;
@@ -163,8 +162,8 @@ public class CsRepositoryCustomImpl implements CsRepositoryCustom {
             land.contractDate.as("contractDate"),
             land.startDate.as("startDate"),
             land.endDate.as("endDate"),
-            land.landUseRate.as("landUseRate"),
-            land.billDate.as("billDate"),
+            land.landUseType.as("landUseType"),
+            land.landUseFee.as("landUseFee"),
             kepco.KepcoCustNo.as("kepcoCustNo"),
             kepco.openingDate.as("openingDate"),
             kepco.contPower.as("contPower"),
@@ -211,9 +210,8 @@ public class CsRepositoryCustomImpl implements CsRepositoryCustom {
             land.contractDate.as("contractDate"),
             land.startDate.as("startDate"),
             land.endDate.as("endDate"),
-            land.landUseRate.as("landUseRate"),
-            land.billDate.as("billDate"),
-            Expressions.stringTemplate("IF({0} IS NULL, '정보없음', {0})", land.billDate).as("billDateString"),
+            land.landUseType.as("landUseType"),
+            land.landUseFee.as("landUseFee"),
             kepco.KepcoCustNo.as("kepcoCustNo"),
             kepco.openingDate.as("openingDate"),
             kepco.contPower.as("contPower"),
@@ -290,9 +288,8 @@ public class CsRepositoryCustomImpl implements CsRepositoryCustom {
             land.contractDate.as("contractDate"),
             land.startDate.as("startDate"),
             land.endDate.as("endDate"),
-            land.landUseRate.as("landUseRate"),
-            land.billDate.as("billDate"),
-            Expressions.stringTemplate("IF({0} IS NULL, '정보없음', {0})", land.billDate).as("billDateString"),
+            land.landUseType.as("landUseType"),
+            land.landUseFee.as("landUseFee"),
             kepco.KepcoCustNo.as("kepcoCustNo"),
             kepco.openingDate.as("openingDate"),
             kepco.contPower.as("contPower"),
@@ -363,9 +360,8 @@ public class CsRepositoryCustomImpl implements CsRepositoryCustom {
             land.contractDate.as("contractDate"),
             land.startDate.as("startDate"),
             land.endDate.as("endDate"),
-            land.landUseRate.as("landUseRate"),
-            land.billDate.as("billDate"),
-            Expressions.stringTemplate("IF({0} IS NULL, '정보없음', {0})", land.billDate).as("billDateString"),
+            land.landUseType.as("landUseType"),
+            land.landUseFee.as("landUseFee"),
             kepco.KepcoCustNo.as("kepcoCustNo"),
             kepco.openingDate.as("openingDate"),
             kepco.contPower.as("contPower"),
