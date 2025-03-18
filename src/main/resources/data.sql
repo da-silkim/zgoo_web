@@ -73,6 +73,16 @@ VALUES ('/voc', '1:1 문의', '1', 'J0000', 'J0100', 'Y', null, now(), null);
 INSERT INTO menu (menu_url, menu_name, menu_lv, parent_code, menu_code,use_yn, icon_class, reg_dt, mod_dt)
 VALUES ('/faq', 'FAQ 문의', '1', 'J0000', 'J0200', 'Y', null, now(), null);
 INSERT INTO menu (menu_url, menu_name, menu_lv, parent_code, menu_code,use_yn, icon_class, reg_dt, mod_dt)
+VALUES ('HISTORY', '이력', '0', null, 'K0000', 'Y', 'fa-solid fa-clipboard-list font-ico', now(), null);
+INSERT INTO menu (menu_url, menu_name, menu_lv, parent_code, menu_code,use_yn, icon_class, reg_dt, mod_dt)
+VALUES ('/history/charging', '충전이력', '1', 'K0000', 'K0100', 'Y', null, now(), null);
+INSERT INTO menu (menu_url, menu_name, menu_lv, parent_code, menu_code,use_yn, icon_class, reg_dt, mod_dt)
+VALUES ('/history/payment', '결제이력', '1', 'K0000', 'K0200', 'Y', null, now(), null);
+INSERT INTO menu (menu_url, menu_name, menu_lv, parent_code, menu_code,use_yn, icon_class, reg_dt, mod_dt)
+VALUES ('/history/comm', '통신이력', '1', 'K0000', 'K0300', 'Y', null, now(), null);
+INSERT INTO menu (menu_url, menu_name, menu_lv, parent_code, menu_code,use_yn, icon_class, reg_dt, mod_dt)
+VALUES ('/history/error', '에러이력', '1', 'K0000', 'K0400', 'Y', null, now(), null);
+INSERT INTO menu (menu_url, menu_name, menu_lv, parent_code, menu_code,use_yn, icon_class, reg_dt, mod_dt)
 VALUES ('BIZ', '업체관리', '0', null, 'N0000', 'Y', 'fa-solid fa-building', now(), null);
 INSERT INTO menu (menu_url, menu_name, menu_lv, parent_code, menu_code,use_yn, icon_class, reg_dt, mod_dt)
 VALUES ('/biz/list', '사업자 관리', '1', 'N0000', 'N0100', 'Y', null, now(), null);
@@ -113,9 +123,14 @@ VALUES
 ('1', '27', 'J0000', 'Y'),
 ('1', '28', 'J0100', 'Y'),
 ('1', '29', 'J0200', 'Y'),
-('1', '30', 'N0000', 'Y'),
-('1', '31', 'N0100', 'Y'),
-('1', '32', 'N0200', 'Y');
+('1', '30', 'K0000', 'Y'),
+('1', '31', 'K0100', 'Y'),
+('1', '32', 'K0200', 'Y'),
+('1', '33', 'K0300', 'Y'),
+('1', '34', 'K0400', 'Y'),
+('1', '35', 'N0000', 'Y'),
+('1', '36', 'N0100', 'Y'),
+('1', '37', 'N0200', 'Y');
 
 
 /* insert default condition code */

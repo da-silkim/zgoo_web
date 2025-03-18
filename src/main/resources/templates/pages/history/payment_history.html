@@ -1,0 +1,159 @@
+<html layout:decorate="~{fragments/layout}">
+<div layout:fragment="content" class="main-content">
+    <!-- card:1 start -->
+    <div class="card responsive-content">
+        <!-- card body:1 start -->
+        <div class="card-body">
+            <div class="content-title"><i class="fa-solid fa-clipboard-list font-ico me-2"></i>이력 > 결제이력</div>
+            <!-- card:2 start -->
+            <div class="card card-shadow">
+                <!-- card body:2 start -->
+                <div class="card-body">
+                    <div class="card-title"><span class="card-title-bar"></span><span>검색조건</span></div>
+                    <!-- form start -->
+                    <form id="searchForm" class="position-relative" th:action="@{/history/payment}" method="get">
+                        <!-- row:1 start -->
+                        <div class="row mb-3 row-cols-2 row-cols-lg-3 g-2">
+                            <div class="col d-flex align-items-center">
+                                <label for="opSearch" class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">검색조건</label>
+                                <select id="opSearch" name="opSearch" class="ms-3 form-control w-40">
+                                    <option th:value="null" th:selected="${selectedOpSearch == null}">선택</option>
+                                    <option th:value="'stationName'" th:text="충전소명" th:selected="${selectedOpSearch == 'stationName'}"></option>
+                                    <option th:value="'stationId'" th:text="충전소ID" th:selected="${selectedOpSearch == 'stationId'}"></option>
+                                    <option th:value="'chargerId'" th:text="충전기ID" th:selected="${selectedOpSearch == 'chargerId'}"></option>
+                                    <option th:value="'company'" th:text="사업자" th:selected="${selectedOpSearch == 'company'}"></option>
+                                </select>
+                                <input type="text" name="contentSearch" id="contentSearch" class="mx-2 form-control"
+                                    th:value="${selectedContentSearch}" autocomplete="off">
+                            </div>
+                            <div class="col d-flex align-items-center">
+                                <label for="processResult" class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">처리결과</label>
+                                <select id="processResult" name="processResult" class="mx-3 form-control">
+                                    <option th:value="null" th:selected="${selectedProcessResult == null}">선택</option>
+                                    <option th:value="'success'" th:text="성공" th:selected="${selectedProcessResult == 'M'}"></option>
+                                    <option th:value="'fail'" th:text="실패" th:selected="${selectedProcessResult == 'N'}"></option>
+                                </select>
+                            </div>
+                            <div class="col d-flex align-items-center">
+                                <span class="flex-shrink-0 col-form-label font-weight-bold mr-3p text-right w-25">승인일시</span>
+                                <input type="date" min="1970-01-01" max="2199-12-31" th:value="${selectedApprovalStart}" name="approvalStart"
+                                        id="approvalStart" class="mx-3 form-control">
+                                <span class="flex-shrink-0 col-form-label font-weight-bold">~</span>
+                                <input type="date" min="1970-01-01" max="2199-12-31" th:value="${selectedApprovalEnd}" name="approvalEnd"
+                                        id="approvalEnd" class="mx-3 form-control">
+                            </div>
+                            <div class="col d-flex align-items-center">
+                                <span class="flex-shrink-0 col-form-label font-weight-bold mr-3p text-right w-25">취소일시</span>
+                                <input type="date" min="1970-01-01" max="2199-12-31" th:value="${selectedCancelStart}" name="cancelStart"
+                                        id="cancelStart" class="mx-3 form-control">
+                                <span class="flex-shrink-0 col-form-label font-weight-bold">~</span>
+                                <input type="date" min="1970-01-01" max="2199-12-31" th:value="${selectedCancelEnd}" name="cancelEnd"
+                                        id="cancelEnd" class="mx-3 form-control">
+                            </div>
+                        </div>
+                        <div class="search-btn">
+                            <button type="button" class="btn btn-outline-grey me-2" id="searchBtn">
+                                <i class="bi bi-search me-2"></i>검색</button>
+                            <button type="button" class="btn btn-outline-grey me-2" id="resetBtn">
+                                <i class="bi bi-arrow-repeat me-2"></i>초기화</button>
+                        </div>
+                        <!-- row:1 end -->
+                    </form>
+                    <!-- form end -->
+                </div>
+                <!-- card body:2 end -->
+            </div>
+            <!-- card:2 end -->
+            <!-- card:3 start -->
+            <div class="card card-shadow mt-4">
+                <!-- card body:3 start -->
+                <div class="card-body">
+                    <div class="card-title"><span class="card-title-bar"></span><span>결제이력</span></div>
+                    <div class="mt-3 btn-page-area">
+                        <span>
+                            <span id="pageInfo">
+                                <!-- <span th:text="'Page ' + (${currentPage + 1}) + ' of ' + ${totalPages} + ' [총 ' + ${totalCount} + '건]'"></span> -->
+                            </span>
+                            <select class="mx-3 page-select" id="size" name="size">
+                                <option th:each="data : ${showListCnt}" th:value="${data.commonCode}"
+                                        th:text="${data.commonCodeName}" th:selected="${data.commonCode == size}"></option>
+                            </select>
+                        </span>
+                    </div>
+                    <div class="w-100 table-responsive position-relative">
+                        <table class="table text-center mt-3 table-bg table-hover" style="overflow-x: auto; min-width: 3000px;">
+                            <thead>
+                                <tr class="table-border-top">
+                                    <th scope="col">사업자</th>
+                                    <th scope="col">충전소명</th>
+                                    <th scope="col">충전소ID</th>
+                                    <th scope="col">충전기ID</th>
+                                    <th scope="col">커넥터ID</th>
+                                    <th scope="col">회원</th>
+                                    <th scope="col">회원구분</th>
+                                    <th scope="col">적용단가</th>
+                                    <th scope="col">충전량(kWh)</th>
+                                    <th scope="col">충전금액</th>
+                                    <th scope="col">결제카드번호</th>
+                                    <th scope="col">승인번호</th>
+                                    <th scope="col">최초결제승인일시</th>
+                                    <th scope="col">취소일시</th>
+                                    <th scope="col">최초결제금액</th>
+                                    <th scope="col">부분취소금액</th>
+                                    <th scope="col">실충전금액</th>
+                                    <th scope="col">처리결과</th>
+                                    <th scope="col">실패사유</th>
+                                </tr>
+                            </thead>
+                            <tbody id="pageList">
+                            </tbody>
+                        </table>                                
+                    </div>
+                    <!-- paging navigation start -->
+                    <!-- <div th:if="${cpList.size() > 0}">
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled' : ''">
+                                <a class="page-link" th:href="@{/history/payment(page=0, size=${size},
+                                opSearch=${selectedOpSearch}, contentSearch=${selectedContentSearch}, processResult=${selectedUserType},
+                                approvalStart=${selectedApprovalStart}, approvalEnd=${selectedApprovalEnd}, cancelStart=${selectedCancelStart},
+                                cancelEnd=${selectedCancelEnd})}"><i class="bi bi-chevron-double-left"></i></a>
+                            </li>
+                            <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled' : ''">
+                                <a class="page-link" th:href="@{/history/payment(page=${currentPage-1}, size=${size},
+                                opSearch=${selectedOpSearch}, contentSearch=${selectedContentSearch}, processResult=${selectedUserType},
+                                approvalStart=${selectedApprovalStart}, approvalEnd=${selectedApprovalEnd}, cancelStart=${selectedCancelStart},
+                                cancelEnd=${selectedCancelEnd})}"><i class="bi bi-chevron-left"></i></a>
+                            </li>
+                            <li class="page-item" th:each="i : ${#numbers.sequence(currentPage - 2, currentPage + 2)}"
+                                th:if="${i >= 0 && i < totalPages}">
+                                <a class="page-link" th:href="@{/history/payment(page=${i}, size=${size},
+                                opSearch=${selectedOpSearch}, contentSearch=${selectedContentSearch}, processResult=${selectedUserType},
+                                approvalStart=${selectedApprovalStart}, approvalEnd=${selectedApprovalEnd}, cancelStart=${selectedCancelStart},
+                                cancelEnd=${selectedCancelEnd})}" th:text="${i+1}" th:classappend="${i == currentPage} ? 'active' : ''"></a>
+                            </li>
+                            <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled' : ''">
+                                <a class="page-link" th:href="@{/history/payment(page=${currentPage+1}, size=${size},
+                                opSearch=${selectedOpSearch}, contentSearch=${selectedContentSearch}, processResult=${selectedUserType},
+                                approvalStart=${selectedApprovalStart}, approvalEnd=${selectedApprovalEnd}, cancelStart=${selectedCancelStart},
+                                cancelEnd=${selectedCancelEnd})}"><i class="bi bi-chevron-right"></i></a>
+                            </li>
+                            <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled' : ''">
+                                <a class="page-link" th:href="@{/history/payment(page=${totalPages - 1}, size=${size},
+                                opSearch=${selectedOpSearch}, contentSearch=${selectedContentSearch}, processResult=${selectedUserType},
+                                approvalStart=${selectedApprovalStart}, approvalEnd=${selectedApprovalEnd}, cancelStart=${selectedCancelStart},
+                                cancelEnd=${selectedCancelEnd})}"><i class="bi bi-chevron-double-right"></i></a>
+                            </li>
+                        </ul>
+                    </div> -->
+                    <!-- paging navigation end -->
+                </div>
+                <!-- card body:3 end -->
+            </div>
+            <!-- card:3 end -->
+        </div>
+        <!-- card body:1 end -->
+    </div>
+    <!-- card:1 end -->
+    <!-- <script type="text/javascript" th:src="@{/js/maintenance/error_management.js}"></script> -->
+</div>
+</html>

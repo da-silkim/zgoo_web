@@ -1098,18 +1098,161 @@ public class PageController {
     /*
      * 이력 > 충전이력
      */
+    @GetMapping("/history/charging")
+    public String showcharginghistory(
+            @RequestParam(value = "companyIdSearch", required = false) Long companyId,
+            @RequestParam(value = "opSearch", required = false) String searchOp,
+            @RequestParam(value = "contentSearch", required = false) String searchContent,
+            @RequestParam(value = "userType", required = false) String userType,
+            @RequestParam(value = "startDate", required = false) LocalDate startDate,
+            @RequestParam(value = "endDate", required = false) LocalDate endDate,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size,
+            Model model, Principal principal) {
+        log.info("=== Charging History Page ===");
+
+        try {
+
+            // 검색 조건 저장
+            model.addAttribute("selectedCompanyId", companyId);
+            model.addAttribute("selectedOpSearch", searchOp);
+            model.addAttribute("selectedContentSearch", searchContent);
+            model.addAttribute("selectedUserType", userType);
+            model.addAttribute("selectedStartDate", startDate);
+            model.addAttribute("selectedEndDate", endDate);
+
+            List<CompanyListDto> companyList = this.companyService.findCompanyListAll();
+            model.addAttribute("companyList", companyList);
+
+            List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT"); // 그리드 row 수
+            model.addAttribute("showListCnt", showListCnt);
+
+            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(), "K0100");
+            model.addAttribute("menuAuthority", menuAuthority);
+        } catch (Exception e) {
+            e.getStackTrace();
+            model.addAttribute("companyList", Collections.emptyList());
+            model.addAttribute("showListCnt", Collections.emptyList());
+            model.addAttribute("menuAuthority", Collections.emptyList());
+        }
+
+        return "pages/history/charging_history";
+    }
 
     /*
      * 이력 > 결제이력
      */
+    @GetMapping("/history/payment")
+    public String showpaymenthistory(
+            @RequestParam(value = "opSearch", required = false) String searchOp,
+            @RequestParam(value = "contentSearch", required = false) String searchContent,
+            @RequestParam(value = "processResult", required = false) String processResult,
+            @RequestParam(value = "approvalStart", required = false) LocalDate approvalStart,
+            @RequestParam(value = "approvalEnd", required = false) LocalDate approvalEnd,
+            @RequestParam(value = "cancelStart", required = false) LocalDate cancelStart,
+            @RequestParam(value = "cancelEnd", required = false) LocalDate cancelEnd,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size,
+            Model model, Principal principal) {
+        log.info("=== Payment History Page ===");
+
+        try {
+
+            model.addAttribute("selectedOpSearch", searchOp);
+            model.addAttribute("selectedContentSearch", searchContent);
+            model.addAttribute("selectedProcessResult", processResult);
+            model.addAttribute("selectedApprovalStart", approvalStart);
+            model.addAttribute("selectedApprovalEnd", approvalEnd);
+            model.addAttribute("selectedCancelStart", cancelStart);
+            model.addAttribute("selectedCancelEnd", cancelEnd);
+
+            List<CompanyListDto> companyList = this.companyService.findCompanyListAll();
+            model.addAttribute("companyList", companyList);
+
+            List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT"); // 그리드 row 수
+            model.addAttribute("showListCnt", showListCnt);
+
+            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(), "K0200");
+            model.addAttribute("menuAuthority", menuAuthority);
+        } catch (Exception e) {
+            e.getStackTrace();
+            model.addAttribute("companyList", Collections.emptyList());
+            model.addAttribute("showListCnt", Collections.emptyList());
+            model.addAttribute("menuAuthority", Collections.emptyList());
+        }
+
+        return "pages/history/payment_history";
+    }
 
     /*
      * 이력 > 통신이력
      */
+    @GetMapping("/history/comm")
+    public String showcommhistory(
+            @RequestParam(value = "opSearch", required = false) String searchOp,
+            @RequestParam(value = "contentSearch", required = false) String searchContent,
+            @RequestParam(value = "startDate", required = false) LocalDate startDate,
+            @RequestParam(value = "endDate", required = false) LocalDate endDate,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size,
+            Model model, Principal principal) {
+        log.info("=== Communication History Page ===");
+
+        try {
+
+            model.addAttribute("selectedOpSearch", searchOp);
+            model.addAttribute("selectedContentSearch", searchContent);
+            model.addAttribute("selectedStartDate", startDate);
+            model.addAttribute("selectedEndDate", endDate);
+
+            List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT"); // 그리드 row 수
+            model.addAttribute("showListCnt", showListCnt);
+
+            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(), "K0300");
+            model.addAttribute("menuAuthority", menuAuthority);
+        } catch (Exception e) {
+            e.getStackTrace();
+            model.addAttribute("showListCnt", Collections.emptyList());
+            model.addAttribute("menuAuthority", Collections.emptyList());
+        }
+
+        return "pages/history/comm_history";
+    }
 
     /*
      * 이력 > 에러이력
      */
+    @GetMapping("/history/error")
+    public String showerrorhistory(
+            @RequestParam(value = "opSearch", required = false) String searchOp,
+            @RequestParam(value = "contentSearch", required = false) String searchContent,
+            @RequestParam(value = "startDate", required = false) LocalDate startDate,
+            @RequestParam(value = "endDate", required = false) LocalDate endDate,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size,
+            Model model, Principal principal) {
+        log.info("=== Error History Page ===");
+
+        try {
+
+            model.addAttribute("selectedOpSearch", searchOp);
+            model.addAttribute("selectedContentSearch", searchContent);
+            model.addAttribute("selectedStartDate", startDate);
+            model.addAttribute("selectedEndDate", endDate);
+            
+            List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT"); // 그리드 row 수
+            model.addAttribute("showListCnt", showListCnt);
+
+            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(), "K0400");
+            model.addAttribute("menuAuthority", menuAuthority);
+        } catch (Exception e) {
+            e.getStackTrace();
+            model.addAttribute("showListCnt", Collections.emptyList());
+            model.addAttribute("menuAuthority", Collections.emptyList());
+        }
+
+        return "pages/history/error_history";
+    }
 
     /*
      * 정산 > 매출정산
