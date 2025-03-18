@@ -83,6 +83,12 @@ VALUES ('/history/comm', '통신이력', '1', 'K0000', 'K0300', 'Y', null, now()
 INSERT INTO menu (menu_url, menu_name, menu_lv, parent_code, menu_code,use_yn, icon_class, reg_dt, mod_dt)
 VALUES ('/history/error', '에러이력', '1', 'K0000', 'K0400', 'Y', null, now(), null);
 INSERT INTO menu (menu_url, menu_name, menu_lv, parent_code, menu_code,use_yn, icon_class, reg_dt, mod_dt)
+VALUES ('CALCULATION', '정산', '0', null, 'L0000', 'Y', 'fa-solid fa-receipt', now(), null);
+INSERT INTO menu (menu_url, menu_name, menu_lv, parent_code, menu_code,use_yn, icon_class, reg_dt, mod_dt)
+VALUES ('/calc/chgpayment', '충전결제정보', '1', 'L0000', 'L0100', 'Y', null, now(), null);
+INSERT INTO menu (menu_url, menu_name, menu_lv, parent_code, menu_code,use_yn, icon_class, reg_dt, mod_dt)
+VALUES ('/calc/purchase', '매입관리', '1', 'L0000', 'L0200', 'Y', null, now(), null);
+INSERT INTO menu (menu_url, menu_name, menu_lv, parent_code, menu_code,use_yn, icon_class, reg_dt, mod_dt)
 VALUES ('BIZ', '업체관리', '0', null, 'N0000', 'Y', 'fa-solid fa-building', now(), null);
 INSERT INTO menu (menu_url, menu_name, menu_lv, parent_code, menu_code,use_yn, icon_class, reg_dt, mod_dt)
 VALUES ('/biz/list', '사업자 관리', '1', 'N0000', 'N0100', 'Y', null, now(), null);
@@ -128,9 +134,12 @@ VALUES
 ('1', '32', 'K0200', 'Y'),
 ('1', '33', 'K0300', 'Y'),
 ('1', '34', 'K0400', 'Y'),
-('1', '35', 'N0000', 'Y'),
-('1', '36', 'N0100', 'Y'),
-('1', '37', 'N0200', 'Y');
+('1', '35', 'L0000', 'Y'),
+('1', '36', 'L0100', 'Y'),
+('1', '37', 'L0200', 'Y'),
+('1', '38', 'N0000', 'Y'),
+('1', '39', 'N0100', 'Y'),
+('1', '40', 'N0200', 'Y');
 
 
 /* insert default condition code */
@@ -218,7 +227,9 @@ VALUES
 ('VOCSTAT', '조치상태', 'zgoodev', NOW(), NULL, NULL),
 ('VOCTYPE', '문의유형', 'zgoodev', NOW(), NULL, NULL),
 ('FRCODE', '장애접수유형코드', 'zgoodev', NOW(), NULL, NULL),
-('FSTATCODE', '장애처리상태코드', 'zgoodev', NOW(), NULL, NULL);
+('FSTATCODE', '장애처리상태코드', 'zgoodev', NOW(), NULL, NULL),
+('ACCOUNTCD', '계정과목', 'zgoodev', NOW(), NULL, NULL),
+('PURCHASEMTH', '매입거래지불수단', 'zgoodev', NOW(), NULL, NULL);
 
 
 INSERT INTO common_code (grp_code, common_code, name, reserved, ref_code1, ref_code2, ref_code3, reg_user_id, reg_dt, mod_user_id, mod_dt)
@@ -313,7 +324,17 @@ VALUES
 ('VOCTYPE', 'UINQ', '사용문의', NULL, NULL, NULL, NULL, 'daadmin', NOW(), NULL, NULL),
 ('VOCTYPE', 'FINQ', '고장문의', NULL, NULL, NULL, NULL, 'daadmin', NOW(), NULL, NULL),
 ('VOCTYPE', 'BINQ', '요금/결제문의', NULL, NULL, NULL, NULL, 'daadmin', NOW(), NULL, NULL),
-('VOCTYPE', 'EINQ', '기타', NULL, NULL, NULL, NULL, 'daadmin', NOW(), NULL, NULL);
+('VOCTYPE', 'EINQ', '기타', NULL, NULL, NULL, NULL, 'daadmin', NOW(), NULL, NULL),
+('ACCOUNTCD', 'ELCFEE', '전기료', NULL, NULL, NULL, NULL, 'daadmin', NOW(), NULL, NULL),
+('ACCOUNTCD', 'COMFEE', '통신비', NULL, NULL, NULL, NULL, 'daadmin', NOW(), NULL, NULL),
+('ACCOUNTCD', 'LANDFEE', '토지사용료', NULL, NULL, NULL, NULL, 'daadmin', NOW(), NULL, NULL),
+('ACCOUNTCD', 'SMFEE', '안전점검관리비', NULL, NULL, NULL, NULL, 'daadmin', NOW(), NULL, NULL),
+('PURCHASEMTH', 'PM01', '신용(체크)카드', NULL, NULL, NULL, NULL, 'daadmin', NOW(), NULL, NULL),
+('PURCHASEMTH', 'PM02', '현금영수증(계좌이체)', NULL, NULL, NULL, NULL, 'daadmin', NOW(), NULL, NULL),
+('PURCHASEMTH', 'PM03', '현금영수증(현금)', NULL, NULL, NULL, NULL, 'daadmin', NOW(), NULL, NULL),
+('PURCHASEMTH', 'PM04', '현금', NULL, NULL, NULL, NULL, 'daadmin', NOW(), NULL, NULL),
+('PURCHASEMTH', 'PM05', '계좌이체', NULL, NULL, NULL, NULL, 'daadmin', NOW(), NULL, NULL),
+('PURCHASEMTH', 'PM06', '세금계산서(청구)', NULL, NULL, NULL, NULL, 'daadmin', NOW(), NULL, NULL);
 
 -- 외래 키 제약 조건 다시 활성화
 SET FOREIGN_KEY_CHECKS = 1;

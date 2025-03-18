@@ -1,0 +1,249 @@
+<html layout:decorate="~{fragments/layout}">
+<div layout:fragment="content" class="main-content">
+    <!-- card:1 start -->
+    <div class="card responsive-content">
+        <!-- card body:1 start -->
+        <div class="card-body">
+            <div class="content-title"><i class="fa-solid fa-receipt me-2"></i>정산 > 매입관리</div>
+            <!-- card:2 start -->
+            <div class="card card-shadow">
+                <!-- card body:2 start -->
+                <div class="card-body">
+                    <div class="card-title"><span class="card-title-bar"></span><span>검색조건</span></div>
+                    <!-- form start -->
+                    <form id="searchForm" class="position-relative" th:action="@{/calc/purchase}" method="get">
+                        <!-- row:1 start -->
+                        <div class="row mb-3 row-cols-2 row-cols-lg-3 g-2">
+                            <div class="col d-flex align-items-center">
+                                <label for="opSearch" class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">검색조건</label>
+                                <select id="opSearch" name="opSearch" class="ms-3 form-control w-40">
+                                    <option th:value="null" th:selected="${selectedOpSearch == null}">선택</option>
+                                    <option th:value="'company'" th:text="사업자" th:selected="${selectedOpSearch == 'company'}"></option>
+                                    <option th:value="'stationName'" th:text="충전소명" th:selected="${selectedOpSearch == 'stationName'}"></option>
+                                    <option th:value="'chargerId'" th:text="충전기ID" th:selected="${selectedOpSearch == 'chargerId'}"></option>
+                                </select>
+                                <input type="text" name="contentSearch" id="contentSearch" class="mx-2 form-control"
+                                    th:value="${selectedContentSearch}" autocomplete="off">
+                            </div>
+                            <div class="col d-flex align-items-center">
+                                <span class="flex-shrink-0 col-form-label font-weight-bold mr-3p text-right w-25">결제기간</span>
+                                <input type="date" min="1970-01-01" max="2199-12-31" th:value="${selectedStartDate}" name="startDateSearch"
+                                        id="startDateSearch" class="mx-3 form-control">
+                                <span class="flex-shrink-0 col-form-label font-weight-bold">~</span>
+                                <input type="date" min="1970-01-01" max="2199-12-31" th:value="${selectedEndDate}" name="endDateSearch"
+                                        id="endDateSearch" class="mx-3 form-control">
+                            </div>
+                        </div>
+                        <div class="search-btn">
+                            <button type="button" class="btn btn-outline-grey me-2" id="searchBtn">
+                                <i class="bi bi-search me-2"></i>검색</button>
+                            <button type="button" class="btn btn-outline-grey me-2" id="resetBtn">
+                                <i class="bi bi-arrow-repeat me-2"></i>초기화</button>
+                        </div>
+                        <!-- row:1 end -->
+                    </form>
+                    <!-- form end -->
+                </div>
+                <!-- card body:2 end -->
+            </div>
+            <!-- card:2 end -->
+            <!-- card:3 start -->
+            <div class="card card-shadow mt-4">
+                <!-- card body:3 start -->
+                <div class="card-body">
+                    <div class="card-title"><span class="card-title-bar"></span><span>매입관리</span></div>
+                    <div class="mt-3 btn-page-area">
+                        <div th:if="${menuAuthority.authority == 'SU' or menuAuthority.modYn == 'Y'}">
+                            <button class="btn btn-data-add" id="addBtn" data-bs-toggle="modal" data-bs-target="#dataAddModal">
+                                <i class="bi bi-plus-square"></i>등록</button>
+                            <button class="btn btn-data-edit" id="editBtn" data-bs-toggle="modal" data-bs-target="#dataAddModal" disabled>
+                                <i class="fa-regular fa-pen-to-square"></i>수정</button>
+                            <button class="btn btn-data-delete" id="deleteBtn" disabled>
+                                <i class="bi bi-trash"></i>삭제</button>
+                        </div>
+                        <button class="btn btn-excel" id="excelBtn" onclick="excelDownload()"
+                            th:if="${menuAuthority.authority == 'SU' or menuAuthority.excelYn == 'Y'}">
+                            <i class="bi bi-file-earmark-spreadsheet"></i>엑셀다운로드</button>
+                        <span>
+                            <span id="pageInfo">
+                                <!-- <span th:text="'Page ' + (${currentPage + 1}) + ' of ' + ${totalPages} + ' [총 ' + ${totalCount} + '건]'"></span> -->
+                            </span>
+                            <select class="mx-3 page-select" id="size" name="size">
+                                <option th:each="data : ${showListCnt}" th:value="${data.commonCode}"
+                                        th:text="${data.commonCodeName}" th:selected="${data.commonCode == size}"></option>
+                            </select>
+                        </span>
+                    </div>
+                    <div class="w-100 table-responsive position-relative">
+                        <table class="table text-center mt-3 table-bg table-hover">
+                            <thead>
+                                <tr class="table-border-top">
+                                    <th scope="col"></th>
+                                    <th scope="col"></th>
+                                    <th scope="col">거래처</th>
+                                    <th scope="col">계정과목</th>
+                                    <th scope="col">품목</th>
+                                    <th scope="col">매입일자</th>
+                                    <th scope="col">공급가액</th>
+                                    <th scope="col">부가세</th>
+                                    <th scope="col">합계</th>
+                                    <th scope="col">지불방법</th>
+                                </tr>
+                            </thead>
+                            <tbody id="pageList">
+                            </tbody>
+                        </table>                                
+                    </div>
+                    <!-- paging navigation start -->
+                    <!-- <div th:if="${cpList.size() > 0}">
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled' : ''">
+                                <a class="page-link" th:href="@{/calc/purchase(page=0, size=${size}, opSearch=${selectedOpSearch},
+                                contentSearch=${selectedContentSearch}, startDate=${selectedStartDate}, endDate=${selectedEndDate})}">
+                                <i class="bi bi-chevron-double-left"></i></a>
+                            </li>
+                            <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled' : ''">
+                                <a class="page-link" th:href="@{/calc/purchase(page=${currentPage-1}, size=${size}, opSearch=${selectedOpSearch},
+                                contentSearch=${selectedContentSearch}, startDate=${selectedStartDate}, endDate=${selectedEndDate})}">
+                                <i class="bi bi-chevron-left"></i></a>
+                            </li>
+                            <li class="page-item" th:each="i : ${#numbers.sequence(currentPage - 2, currentPage + 2)}"
+                                th:if="${i >= 0 && i < totalPages}">
+                                <a class="page-link" th:href="@{/calc/purchase(page=${i}, size=${size}, opSearch=${selectedOpSearch},
+                                contentSearch=${selectedContentSearch}, startDate=${selectedStartDate}, endDate=${selectedEndDate})}"
+                                th:text="${i+1}" th:classappend="${i == currentPage} ? 'active' : ''"></a>
+                            </li>
+                            <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled' : ''">
+                                <a class="page-link" th:href="@{/calc/purchase(page=${currentPage+1}, size=${size}, opSearch=${selectedOpSearch},
+                                contentSearch=${selectedContentSearch}, startDate=${selectedStartDate}, endDate=${selectedEndDate})}">
+                                <i class="bi bi-chevron-right"></i></a>
+                            </li>
+                            <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled' : ''">
+                                <a class="page-link" th:href="@{/calc/purchase(page=${totalPages - 1}, size=${size}, opSearch=${selectedOpSearch},
+                                contentSearch=${selectedContentSearch}, startDate=${selectedStartDate}, endDate=${selectedEndDate})}">
+                                <i class="bi bi-chevron-double-right"></i></a>
+                            </li>
+                        </ul>
+                    </div> -->
+                    <!-- paging navigation end -->
+                </div>
+                <!-- card body:3 end -->
+            </div>
+            <!-- card:3 end -->
+        </div>
+        <!-- card body:1 end -->
+    </div>
+    <!-- card:1 end -->
+    <!-- Add Modal start -->
+    <div class="modal fade" id="dataAddModal" tabindex="-1" aria-labelledby="dataAddModalLabel"
+        data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width: 60vw; height: 90vh;">
+            <div class="modal-content mh-100 overflow-y-auto scrollbar">
+                <form id="purchaseForm">
+                <!-- modal body start -->
+                <div class="modal-body">
+                    <!-- 모달 내용 -->
+                    <div class="modal-title mb-2"><span class="modal-title-bar"></span><span>매입정보</span></div>
+                    <!-- table:1 start -->
+                    <table class="table table-bg-v table-fixed w-100 text-center align-middle">
+                        <tbody>
+                            <tr class="table-border-top">
+                                <th class="w-20">계정과목<b class="required-data">*</b></th>
+                                <td class="w-30">
+                                    <select id="accountCode" class="form-control" required>
+                                        <option th:each="data : ${accList}" th:value="${data.commonCode}"
+                                                th:text="${data.commonCodeName}"></option>
+                                    </select>
+                                </td>
+                                <th class="w-20">품목명</th>
+                                <td class="w-30">
+                                    <input type="text" name="item" id="item" class="form-control" autocomplete="off">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="w-20">사업자등록번호<b class="required-data">*</b></th>
+                                <td class="w-30">
+                                    <input type="text" name="bizNum" id="bizNum" class="form-control" autocomplete="off" required>
+                                </td>
+                                <th class="w-20">거래처명<b class="required-data">*</b></th>
+                                <td class="w-30">
+                                    <input type="text" name="bizName" id="bizName" class="form-control" autocomplete="off" required>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="w-20">충전소ID<b class="required-data">*</b></th>
+                                <td class="w-30">
+                                    <div class="display-input-btn">
+                                        <input type="text" name="stationId" id="stationId" class="form-control"
+                                                autocomplete="off" required>
+                                        <button type="button" class="btn btn-outline-grey flex-btn"
+                                                id="stationIdBtn">조회</button>
+                                    </div>
+                                </td>
+                                <th class="w-20">매입거래일자<b class="required-data">*</b></th>
+                                <td class="w-30">
+                                    <input type="date" min="1930-01-01" max="2199-12-31" name="purchaseDate" id="purchaseDate"
+                                    class="form-control" required>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="w-20">대금거래방법<b class="required-data">*</b></th>
+                                <td class="w-30">
+                                    <select id="paymentMethod" class="form-control" required>
+                                        <option th:each="data : ${purchaseList}" th:value="${data.commonCode}"
+                                                th:text="${data.commonCodeName}"></option>
+                                    </select>
+                                </td>
+                                <th class="w-20">승인번호</th>
+                                <td class="w-30">
+                                    <input type="text" name="approvalNo" id="approvalNo" class="form-control" autocomplete="off" required>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="w-20">단가<b class="required-data">*</b></th>
+                                <td class="w-30">
+                                    <input type="number" name="unitPrice" id="unitPrice" class="form-control"
+                                            autocomplete="off" required>
+                                </td>
+                                <th class="w-20">수량<b class="required-data">*</b></th>
+                                <td class="w-30">
+                                    <input type="number" name="amount" id="amount" class="form-control" autocomplete="off" required>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="w-20">공급가액<b class="required-data">*</b></th>
+                                <td class="w-30">
+                                    <input type="number" name="supplyPrice" id="supplyPrice" class="form-control"
+                                            autocomplete="off" required>
+                                </td>
+                                <th class="w-20">부가세<b class="required-data">*</b></th>
+                                <td class="w-30">
+                                    <input type="number" name="vat" id="vat" class="form-control" autocomplete="off" required>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="w-20">합계액<b class="required-data">*</b></th>
+                                <td class="w-30">
+                                    <input type="number" name="totalAmount" id="totalAmount" class="form-control" autocomplete="off" disabled required>
+                                </td>
+                                <td colspan="2"></td>
+                            </tr>    
+                        </tbody>
+                    </table>
+                    <!-- table:1 end -->
+                    </div>
+                    <!-- modal body end -->
+                    <div class="modal-footer justify-content-center border-top-none">
+                        <button type="button" id="cancelBtn" class="btn btn-outline-grey me-2" data-bs-dismiss="modal">취소</button>
+                        <button type="submit" id="modalBtn" class="btn btn-data-add">등록</button>
+                    </div>
+                </form>              
+            </div>
+            <!-- modal content end -->
+        </div>
+        <!-- modal dialog end -->
+    </div>
+    <!-- Add Modal end -->
+    <!-- <script type="text/javascript" th:src="@{/js/maintenance/error_management.js}"></script> -->
+</div>
+</html>

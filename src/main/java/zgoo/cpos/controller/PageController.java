@@ -1239,7 +1239,7 @@ public class PageController {
             model.addAttribute("selectedContentSearch", searchContent);
             model.addAttribute("selectedStartDate", startDate);
             model.addAttribute("selectedEndDate", endDate);
-            
+
             List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT"); // 그리드 row 수
             model.addAttribute("showListCnt", showListCnt);
 
@@ -1255,12 +1255,72 @@ public class PageController {
     }
 
     /*
-     * 정산 > 매출정산
+     * 정산 > 충전결제정보
      */
+    @GetMapping("/calc/chgpayment")
+    public String showchgpayment(
+            @RequestParam(value = "opSearch", required = false) String searchOp,
+            @RequestParam(value = "contentSearch", required = false) String searchContent,
+            @RequestParam(value = "startDate", required = false) LocalDate startDate,
+            @RequestParam(value = "endDate", required = false) LocalDate endDate,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size,
+            Model model, Principal principal) {
+        log.info("=== Charging Payment Information Page ===");
+
+        try {
+
+            List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT"); // 그리드 row 수
+            model.addAttribute("showListCnt", showListCnt);
+
+            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(), "L0100");
+            model.addAttribute("menuAuthority", menuAuthority);
+        } catch (Exception e) {
+            e.getStackTrace();
+            model.addAttribute("showListCnt", Collections.emptyList());
+            model.addAttribute("menuAuthority", Collections.emptyList());
+        }
+
+        return "pages/calc/chgpayment";
+    }
 
     /*
      * 정산 > 매입관리
      */
+    @GetMapping("/calc/purchase")
+    public String showpurchase(
+            @RequestParam(value = "opSearch", required = false) String searchOp,
+            @RequestParam(value = "contentSearch", required = false) String searchContent,
+            @RequestParam(value = "startDate", required = false) LocalDate startDate,
+            @RequestParam(value = "endDate", required = false) LocalDate endDate,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size,
+            Model model, Principal principal) {
+        log.info("=== Purchase Management Page ===");
+
+        try {
+
+            List<CommCdBaseDto> accList = codeService.findCommonCdNamesByGrpcd("ACCOUNTCD"); // 계정과목
+            model.addAttribute("accList", accList);
+
+            List<CommCdBaseDto> purchaseList = codeService.findCommonCdNamesByGrpcd("PURCHASEMTH"); // 매입거래지불수단
+            model.addAttribute("purchaseList", purchaseList);
+            
+            List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT"); // 그리드 row 수
+            model.addAttribute("showListCnt", showListCnt);
+
+            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(), "L0200");
+            model.addAttribute("menuAuthority", menuAuthority);
+        } catch (Exception e) {
+            e.getStackTrace();
+            model.addAttribute("accList", Collections.emptyList());
+            model.addAttribute("purchaseList", Collections.emptyList());
+            model.addAttribute("showListCnt", Collections.emptyList());
+            model.addAttribute("menuAuthority", Collections.emptyList());
+        }
+
+        return "pages/calc/purchase";
+    }
 
     /*
      * 통계 > 매출통계
