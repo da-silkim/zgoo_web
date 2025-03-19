@@ -1,0 +1,130 @@
+<html layout:decorate="~{fragments/layout}">
+<div layout:fragment="content" class="main-content">
+    <!-- card:1 start -->
+    <div class="card responsive-content">
+        <!-- card body:1 start -->
+        <div class="card-body">
+            <div class="content-title"><i class="fa-solid fa-chart-simple me-2"></i>통계 > 이용률 통계</div>
+            <!-- card:2 start -->
+            <div class="card card-shadow">
+                <!-- card body:2 start -->
+                <div class="card-body">
+                    <div class="card-title"><span class="card-title-bar"></span><span>검색조건</span></div>
+                    <!-- form start -->
+                    <form id="searchForm" class="statistics-form" th:action="@{/statistics/totalkw}" method="get">
+                        <div class="row">
+                            <div class="col-12 search-table">
+                                <label for="companyIdSearch"
+                                    class="col-form-label">사업자<b>*</b></label>
+                                <select id="companyIdSearch" class="mx-3 form-control" name="companyIdSearch" required>
+                                    <option th:value="*{null}" th:text="'(없음)'"></option>
+                                    <option th:each="company : ${companyList}" th:value="${company.companyId}"
+                                        th:text="${company.companyName}"
+                                        th:selected="${company.companyId == selectedCompanyId}"></option>
+                                </select>
+                            </div>
+                            <div class="col-12 search-table">
+                                <label for="errorSearch"
+                                    class="col-form-label">장애유형<b>*</b></label>
+                                <select id="errorSearch" class="mx-3 form-control" name="errorSearch" required>
+                                    <option th:value="*{null}" th:text="'(없음)'"></option>
+                                    <!-- <option th:each="err : ${errList}" th:value="${err.commonCode}"
+                                        th:text="${err.commonName}"
+                                        th:selected="${err.commonCode == selectedError}"></option> -->
+                                </select>
+                            </div>
+                            <div class="col-12 search-table">
+                                <label for="stationSearch"
+                                    class="col-form-label">충전소<b>*</b></label>
+                                <select id="stationSearch" class="mx-3 form-control" name="stationSearch" required>
+                                    <option th:value="*{null}" th:text="'(없음)'"></option>
+                                    <!-- <option th:each="cs : ${csList}" th:value="${cs.stationId}"
+                                        th:text="${cs.stationName}"
+                                        th:selected="${cs.stationId == selectedStationId}"></option> -->
+                                </select>
+                            </div>
+                            <div class="col-12 search-table">
+                                <label for="chargerSearch"
+                                    class="col-form-label">충전기<b>*</b></label>
+                                <select id="chargerSearch" class="mx-3 form-control" name="chargerSearch" required>
+                                    <option th:value="*{null}" th:text="'(없음)'"></option>
+                                    <!-- <option th:each="cp : ${cpList}" th:value="${cp.chargerId}"
+                                        th:text="${cp.chargerName}"
+                                        th:selected="${cp.stationId == selectedChargerId}"></option> -->
+                                </select>
+                                <select id="chargerType" class="form-control" name="chargerType" required>
+                                    <option th:value="'HIGH'" th:text="'급속'"></option>
+                                    <option th:value="'LOW'" th:text="'완속'"></option>
+                                </select>
+                            </div>
+                            <div class="col-12 search-table">
+                                <label for="dateSearch"
+                                    class="col-form-label">조회기간<b>*</b></label>
+                                <select id="dateSearch" class="mx-3 form-control" name="stationSearch" required>
+                                    <option th:value="'year'" th:text="년단위" th:selected="${selectedDateSearch == 'year'}"></option>
+                                    <option th:value="'month'" th:text="월단위" th:selected="${selectedDateSearch == 'month'}"></option>
+                                </select>
+                                <input type="date" class="form-control" id="startDate">
+                                <span class="mx-2">~</span>
+                                <input type="date" class="form-control" id="endDate">
+                            </div>
+                        </div>
+                        <div>
+                            <button type="button" class="btn btn-outline-grey me-2" id="serachBtn">
+                                <i class="bi bi-search me-2"></i>검색</button>
+                            <button type="button" class="btn btn-outline-grey me-2" id="resetBtn">
+                                <i class="bi bi-arrow-repeat me-2"></i>초기화</button>
+                        </div>
+
+                    </form>
+                    <!-- form end -->
+                </div>
+                <!-- card body:2 end -->
+            </div>
+            <!-- card:2 end -->
+            <!-- card:3 start -->
+            <div class="card card-shadow mt-4">
+                <!-- card body:3 start -->
+                <div class="card-body">
+                    <!-- 조회연도 메출통계 -->
+                    <div class="card-title"><span class="card-title-bar"></span><span>조회연도 이용률 통계</span></div>
+                    <div class="w-100 table-responsive position-relative">
+                        <table class="table text-center mt-2 table-bg">
+                            <thead>
+                                <tr class="table-border-top">
+                                    <th scope="col" class="w-20"></th>
+                                    <th scope="col">장애유형</th>
+                                    <th scope="col">발생건수</th>
+                                </tr>
+                            </thead>
+                            <tbody id="pageList">
+                                <tr>
+                                    <th style="background-color: #f5f7f8;"></th>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="statistics-chart">
+                        <canvas id="lineChart"></canvas>
+                    </div>
+                    <!-- 전연도 데이터 비교 -->
+                    <div class="card-title mt-4"><span class="card-title-bar"></span><span>전연도 데이터 비교</span></div>
+                    <div class="statistics-chart">
+                        <canvas id="barChart"></canvas>
+                    </div>
+                </div>
+                <!-- card body:3 end -->
+            </div>
+            <!-- card:3 end -->
+        </div>
+        <!-- card body:1 end -->
+    </div>
+    <!-- card:1 end -->
+    <script type="text/javascript" th:src="@{/js/statistics/statistics_chart.js}"></script>
+    <script type="text/javascript">
+        const STAT = 'ERROR';
+    </script>
+</div>
+</html>

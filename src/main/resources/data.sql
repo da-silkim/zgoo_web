@@ -89,6 +89,16 @@ VALUES ('/calc/chgpayment', '충전결제정보', '1', 'L0000', 'L0100', 'Y', nu
 INSERT INTO menu (menu_url, menu_name, menu_lv, parent_code, menu_code,use_yn, icon_class, reg_dt, mod_dt)
 VALUES ('/calc/purchase', '매입관리', '1', 'L0000', 'L0200', 'Y', null, now(), null);
 INSERT INTO menu (menu_url, menu_name, menu_lv, parent_code, menu_code,use_yn, icon_class, reg_dt, mod_dt)
+VALUES ('STATISTICS', '통계', '0', null, 'M0000', 'Y', 'fa-solid fa-chart-simple', now(), null);
+INSERT INTO menu (menu_url, menu_name, menu_lv, parent_code, menu_code,use_yn, icon_class, reg_dt, mod_dt)
+VALUES ('/statistics/purchaseandsales', '매입/매출통계', '1', 'M0000', 'M0100', 'Y', null, now(), null);
+INSERT INTO menu (menu_url, menu_name, menu_lv, parent_code, menu_code,use_yn, icon_class, reg_dt, mod_dt)
+VALUES ('/statistics/usage', '이용률 통계', '1', 'M0000', 'M0200', 'Y', null, now(), null);
+INSERT INTO menu (menu_url, menu_name, menu_lv, parent_code, menu_code,use_yn, icon_class, reg_dt, mod_dt)
+VALUES ('/statistics/totalkw', '충전량 통계', '1', 'M0000', 'M0300', 'Y', null, now(), null);
+INSERT INTO menu (menu_url, menu_name, menu_lv, parent_code, menu_code,use_yn, icon_class, reg_dt, mod_dt)
+VALUES ('/statistics/error', '장애율 통계', '1', 'M0000', 'M0400', 'Y', null, now(), null);
+INSERT INTO menu (menu_url, menu_name, menu_lv, parent_code, menu_code,use_yn, icon_class, reg_dt, mod_dt)
 VALUES ('BIZ', '업체관리', '0', null, 'N0000', 'Y', 'fa-solid fa-building', now(), null);
 INSERT INTO menu (menu_url, menu_name, menu_lv, parent_code, menu_code,use_yn, icon_class, reg_dt, mod_dt)
 VALUES ('/biz/list', '사업자 관리', '1', 'N0000', 'N0100', 'Y', null, now(), null);
@@ -143,12 +153,17 @@ VALUES
 ('1', '35', 'L0000', 'Y'),
 ('1', '36', 'L0100', 'Y'),
 ('1', '37', 'L0200', 'Y'),
-('1', '38', 'N0000', 'Y'),
-('1', '39', 'N0100', 'Y'),
-('1', '40', 'N0200', 'Y'),
-('1', '41', 'O0000', 'Y'),
-('1', '42', 'O0100', 'Y'),
-('1', '43', 'O0200', 'Y');
+('1', '38', 'M0000', 'Y'),
+('1', '39', 'M0100', 'Y'),
+('1', '40', 'M0200', 'Y'),
+('1', '41', 'M0300', 'Y'),
+('1', '42', 'M0400', 'Y'),
+('1', '43', 'N0000', 'Y'),
+('1', '44', 'N0100', 'Y'),
+('1', '45', 'N0200', 'Y'),
+('1', '46', 'O0000', 'Y'),
+('1', '47', 'O0100', 'Y'),
+('1', '48', 'O0200', 'Y');
 
 
 /* insert default condition code */

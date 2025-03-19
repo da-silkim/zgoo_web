@@ -1323,20 +1323,71 @@ public class PageController {
     }
 
     /*
-     * 통계 > 매출통계
+     * 통계 > 매입/매출통계
      */
+    @GetMapping("/statistics/purchaseandsales")
+    public String showpurchaseandsales(Model model, Principal principal) {
+        log.info("=== Purchase and Sales Statistics Page ===");
+
+        try {
+            List<CompanyListDto> companyList = this.companyService.findCompanyListAll();
+            model.addAttribute("companyList", companyList);
+        } catch (Exception e) {
+            e.getStackTrace();
+            model.addAttribute("companyList", Collections.emptyList());
+        }
+
+        return "pages/statistics/purchaseandsales_statistics";
+    }
+
 
     /*
      * 통계 > 이용률통계
      */
+    @GetMapping("/statistics/usage")
+    public String showusage(Model model, Principal principal) {
+        log.info("=== Usage Statistics Page ===");
+
+        try {
+
+        } catch (Exception e) {
+            e.getStackTrace();
+        }
+
+        return "pages/statistics/usage_statistics";
+    }
 
     /*
      * 통계 > 충전량통계
      */
+    @GetMapping("/statistics/totalkw")
+    public String showtotalkw(Model model, Principal principal) {
+        log.info("=== Charge Statistics Page ===");
+
+        try {
+
+        } catch (Exception e) {
+            e.getStackTrace();
+        }
+
+        return "pages/statistics/usage_statistics";
+    }
 
     /*
      * 통계 > 장애율통계
      */
+    @GetMapping("/statistics/error")
+    public String showerror(Model model, Principal principal) {
+        log.info("=== Error Statistics Page ===");
+
+        try {
+
+        } catch (Exception e) {
+            e.getStackTrace();
+        }
+
+        return "pages/statistics/error_statistics";
+    }
 
     /*
      * 업체관리 > 사업자관리
