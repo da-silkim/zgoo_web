@@ -94,6 +94,12 @@ INSERT INTO menu (menu_url, menu_name, menu_lv, parent_code, menu_code,use_yn, i
 VALUES ('/biz/list', '사업자 관리', '1', 'N0000', 'N0100', 'Y', null, now(), null);
 INSERT INTO menu (menu_url, menu_name, menu_lv, parent_code, menu_code,use_yn, icon_class, reg_dt, mod_dt)
 VALUES ('/corp/list', '법인 관리', '1', 'N0000', 'N0200', 'Y', null, now(), null);
+INSERT INTO menu (menu_url, menu_name, menu_lv, parent_code, menu_code,use_yn, icon_class, reg_dt, mod_dt)
+VALUES ('FIRMWARE', '펌웨어', '0', null, 'O0000', 'Y', 'fa-solid fa-microchip font-ico', now(), null);
+INSERT INTO menu (menu_url, menu_name, menu_lv, parent_code, menu_code,use_yn, icon_class, reg_dt, mod_dt)
+VALUES ('/fw/version', '펌웨어 버전관리', '1', 'O0000', 'O0100', 'Y', null, now(), null);
+INSERT INTO menu (menu_url, menu_name, menu_lv, parent_code, menu_code,use_yn, icon_class, reg_dt, mod_dt)
+VALUES ('/fw/update', '펌웨어 업데이트', '1', 'O0000', 'O0200', 'Y', null, now(), null);
 
 
 /* insert default menu authority */
@@ -139,7 +145,10 @@ VALUES
 ('1', '37', 'L0200', 'Y'),
 ('1', '38', 'N0000', 'Y'),
 ('1', '39', 'N0100', 'Y'),
-('1', '40', 'N0200', 'Y');
+('1', '40', 'N0200', 'Y'),
+('1', '41', 'O0000', 'Y'),
+('1', '42', 'O0100', 'Y'),
+('1', '43', 'O0200', 'Y');
 
 
 /* insert default condition code */

@@ -1200,3 +1200,34 @@ table.table tbody tr.row-selected {
   padding: 2px 6px;
   font-size: 13px;
 }
+.firmware-update {
+  margin-top: 1.5rem !important;
+  position: relative;
+}
+.firmware-update > div:nth-child(1) {
+  border-top: 1px solid black;
+}
+.firmware-update > div:nth-child(2) {
+  position: absolute;
+  right: 0;
+  top: -50px;
+}
+.search-table {
+  padding: 0 !important;
+  align-items: center !important;
+  display: flex !important;
+  border-bottom: 1px solid lightgrey;
+  margin-top: 0 !important;
+}
+.search-table > label {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  flex-shrink: 0 !important;
+  width: 25% !important;
+  height: 54px;
+  background-color: #F5F5F5;
+}
+.search-table > input[type="text"] {
+  margin: 0 1rem !important;
+}

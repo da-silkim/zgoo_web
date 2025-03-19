@@ -1305,7 +1305,7 @@ public class PageController {
 
             List<CommCdBaseDto> purchaseList = codeService.findCommonCdNamesByGrpcd("PURCHASEMTH"); // 매입거래지불수단
             model.addAttribute("purchaseList", purchaseList);
-            
+
             List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT"); // 그리드 row 수
             model.addAttribute("showListCnt", showListCnt);
 
@@ -1489,10 +1489,63 @@ public class PageController {
     /*
      * 펌웨어 > 펌웨어 버전관리
      */
+    @GetMapping("/fw/version")
+    public String showfwversion(
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size,
+            Model model, Principal principal) {
+        log.info("=== Firmware Version Page ===");
+
+        try {
+            List<CompanyListDto> companyList = this.companyService.findCompanyListAll();
+            model.addAttribute("companyList", companyList);
+
+            List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT"); // 그리드 row 수
+            model.addAttribute("showListCnt", showListCnt);
+
+            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(), "O0100");
+            model.addAttribute("menuAuthority", menuAuthority);
+        } catch (Exception e) {
+            e.getStackTrace();
+            model.addAttribute("companyList", Collections.emptyList());
+            model.addAttribute("showListCnt", Collections.emptyList());
+            model.addAttribute("menuAuthority", Collections.emptyList());
+        }
+
+        return "pages/firmware/fw_version";
+    }
 
     /*
      * 펌웨어 > 펌웨어 업데이트
      */
+    @GetMapping("/fw/update")
+    public String showfwupdate(
+            @RequestParam(value = "companyIdSearch", required = false) Long companyId,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size,
+            Model model, Principal principal) {
+        log.info("=== Firmware Update Page ===");
+
+        try {
+            model.addAttribute("selectedCompanyId", companyId);
+
+            List<CompanyListDto> companyList = this.companyService.findCompanyListAll();
+            model.addAttribute("companyList", companyList);
+
+            List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT"); // 그리드 row 수
+            model.addAttribute("showListCnt", showListCnt);
+
+            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(), "O0200");
+            model.addAttribute("menuAuthority", menuAuthority);
+        } catch (Exception e) {
+            e.getStackTrace();
+            model.addAttribute("companyList", Collections.emptyList());
+            model.addAttribute("showListCnt", Collections.emptyList());
+            model.addAttribute("menuAuthority", Collections.emptyList());
+        }
+
+        return "pages/firmware/fw_update";
+    }
 
     /*
      * 예약
