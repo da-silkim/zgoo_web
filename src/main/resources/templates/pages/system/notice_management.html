@@ -98,10 +98,8 @@
                                     </td>
                                     <td th:text="${notice.typeName}"></td>
                                     <td>
-                                        <div class="float-left">
-                                            <span th:text="${notice.title}"></span>
-                                            <span th:if="${notice.isNew}" class="new-article">NEW</span>
-                                        </div>
+                                        <div th:text="${notice.title}" class="float-left"></div>
+                                        <span th:if="${notice.isNew}" class="new-article float-left ms-2">NEW</span>
                                     </td>
                                     <td th:text="${notice.userId}"></td>
                                     <td th:text="${notice.userName}"></td>

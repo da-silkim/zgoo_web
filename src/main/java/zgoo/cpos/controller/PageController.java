@@ -1053,13 +1053,7 @@ public class PageController {
         model.addAttribute("faqDto", new FaqDto.FaqRegDto());
 
         try {
-            Page<FaqDto.FaqListDto> faqList;
-
-            if (section == null) {
-                faqList = this.faqService.findFaqAll(page, size);
-            } else {
-                faqList = this.faqService.searchFaqListWithPagination(section, page, size);
-            }
+            Page<FaqDto.FaqListDto> faqList = this.faqService.findFaqWithPagination(section, page, size);
 
             int totalPages = faqList.getTotalPages() == 0 ? 1 : faqList.getTotalPages();
 

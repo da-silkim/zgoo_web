@@ -85,7 +85,10 @@
                                     </td>
                                     <td th:text="${faq.id}"></td>
                                     <td th:text="${faq.sectionName}"></td>
-                                    <td th:text="${faq.title}" style="text-align: left;"></td>
+                                    <td>
+                                        <div th:text="${faq.title}" class="content-overflow-t2 float-left"></div>
+                                        <span th:if="${faq.isNew}" class="new-article float-left ms-2">NEW</span>
+                                    </td>
                                     <td th:text="${faq.userName}"></td>
                                     <td th:text="${#temporals.format(faq.regDt, 'yyyy-MM-dd HH:mm:ss')}"></td>
                                 </tr>

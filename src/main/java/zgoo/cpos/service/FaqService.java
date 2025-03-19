@@ -1,5 +1,8 @@
 package zgoo.cpos.service;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -12,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import zgoo.cpos.domain.users.Faq;
 import zgoo.cpos.domain.users.Users;
 import zgoo.cpos.dto.users.FaqDto;
+import zgoo.cpos.dto.users.FaqDto.FaqListDto;
 import zgoo.cpos.mapper.FaqMapper;
 import zgoo.cpos.mapper.NoticeMapper;
 import zgoo.cpos.repository.users.FaqRepository;
@@ -52,6 +56,36 @@ public class FaqService {
             return Page.empty(pageable);
         } catch (Exception e) {
             log.error("[searchFaqListWithPagination] error : {}", e.getMessage());
+            return Page.empty(pageable);
+        }
+    }
+
+    // FAQ 조회
+    public Page<FaqListDto> findFaqWithPagination(String section, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        try {
+            Page<FaqListDto> faqList;
+
+            if (section == null || section.isEmpty()) {
+                log.info("Executing the [findFaqWithPagination]");
+                faqList = this.faqRepository.findFaqWithPagination(pageable);
+            } else {
+                log.info("Executing the [findFaqWithPagination]");
+                faqList = this.faqRepository.searchFaqListWithPagination(section, pageable);
+            }
+
+            LocalDateTime now = LocalDateTime.now();
+
+            faqList.forEach(faq -> {
+                LocalDateTime registractionDate = faq.getRegDt();
+                long daysBetween = Duration.between(registractionDate, now).toDays();
+                faq.setNew(daysBetween < 3);
+            });
+
+            return faqList;
+        } catch (Exception e) {
+            log.error("[findFaqWithPagination] error : {}", e.getMessage());
             return Page.empty(pageable);
         }
     }

@@ -33,6 +33,7 @@ public class FaqDto {
     public static class FaqListDto extends BaseFaqDto {
         public String userName;
         public String sectionName;
+        public boolean isNew;
     }
 
     @Data

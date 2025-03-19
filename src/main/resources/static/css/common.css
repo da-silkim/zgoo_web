@@ -1038,6 +1038,13 @@ table.table tbody tr.row-selected {
   max-width: 150px;
 }
 
+.content-overflow-t2 {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  max-width: 420px;
+}
+
 .terms-container {
   max-height: 300px;
   overflow-y: auto;
