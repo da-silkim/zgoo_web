@@ -588,6 +588,7 @@ $(document).ready(function () {
         return cardNum1 + cardNum2 + cardNum3 + cardNum4;
     }
 
+    //=================== 결제 테스트 Code =====================
     $('#testPaymentBtn').on('click', function () {
         console.log('결제 테스트');
 
@@ -679,5 +680,21 @@ $(document).ready(function () {
             }
         });
 
+    });
+
+    $('#tradeData').on('click', function () {
+        console.log('거래대사조회');
+
+        $.ajax({
+            url: '/corp/payment/trade/data',
+            method: 'GET',
+            success: function (response) {
+                console.log('거래대사조회 성공:', response);
+            },
+            error: function (xhr, status, error) {
+                console.error('거래대사조회 실패:', xhr.status, error);
+                alert('거래대사 조회에 실패했습니다.\n상태: ' + xhr.status + '\n오류: ' + error);
+            }
+        });
     });
 });
