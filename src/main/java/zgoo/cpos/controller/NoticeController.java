@@ -1,15 +1,17 @@
 package zgoo.cpos.controller;
 
+import java.security.Principal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,23 +34,16 @@ public class NoticeController {
 
     // 공지사항 - 등록
     @PostMapping("/new")
-    public ResponseEntity<String> createNotice(@RequestBody NoticeDto.NoticeRegDto dto,
-            @ModelAttribute("loginUserId") String loginUserId) {
+    public ResponseEntity<String> createNotice(@RequestBody NoticeDto.NoticeRegDto dto, Principal principal) {
         log.info("=== create notice info ===");
 
-        System.out.println("notice userId1: " + loginUserId);
-        if (loginUserId != null) {
-            dto.setUserId(loginUserId);
-        }
-        
         try {
-            System.out.println("notice userId2: " + dto.getUserId());
-            this.noticeService.saveNotice(dto);
+            this.noticeService.saveNotice(dto, principal.getName());
             return ResponseEntity.ok("공지사항이 정상적으로 등록되었습니다.");
         } catch (Exception e) {
             log.error("[createNotice] error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                    .body("공지사항 등록 중 오류 발생");
+                                    .body("공지사항 등록 중 오류가 발생했습니다.");
         }
     }
 
@@ -124,43 +119,61 @@ public class NoticeController {
 
     // 공지사항 - 수정
     @PatchMapping("/update/{id}")
-    public ResponseEntity<String> updateNotice(@PathVariable("id") Long idx, @RequestBody NoticeDto.NoticeRegDto dto) {
+    public ResponseEntity<String> updateNotice(@PathVariable("id") Long idx, @RequestBody NoticeDto.NoticeRegDto dto,
+            Principal principal) {
         log.info("=== update notice info ===");
 
         try {
-            if (idx != null) {
-                dto.setIdx(idx);
-            } else {
-                log.error("Notice idx is null");
+            if (idx == null) {
+                log.error("[updateNotice] noticeId is null");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                                    .body("공지사항 ID가 없습니다.");
+                                    .body("공지사항 ID값이 누락됐습니다.");
             }
-            this.noticeService.updateNotice(dto);
+            dto.setIdx(idx);
+
+            this.noticeService.updateNotice(dto, principal.getName());
             return ResponseEntity.ok("공지사항이 정상적으로 수정되었습니다.");
         } catch (Exception e) {
             log.error("[updateNotice] error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                    .body("공지사항 수정 중 오류 발생");
+                                    .body("공지사항 수정 중 오류가 발생했습니다.");
         }
     }
 
     // 공지사항 - 삭제
     @PatchMapping("/delete/{id}")
-    public ResponseEntity<String> deleteNotice(@PathVariable("id") Long idx) {
+    public ResponseEntity<String> deleteNotice(@PathVariable("id") Long idx, Principal principal) {
         log.info("=== delete notice info ===");
 
         try {
             if (idx == null) {
-                log.error("Notice idx is null");
+                log.error("[deleteNotice] noticeId is null");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                                    .body("공지사항 ID가 없습니다.");
+                                    .body("공지사항 ID값이 누락됐습니다.");
             }
-            this.noticeService.deleteNotice(idx);
+            this.noticeService.deleteNotice(idx, principal.getName());
             return ResponseEntity.ok("공지사항이 정상적으로 삭제되었습니다."); 
         } catch (Exception e) {
             log.error("[deleteNotice] error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                    .body("공지사항 삭제 중 오류 발생");
+                                    .body("공지사항 삭제 중 오류가 발생했습니다.");
+        }
+    }
+
+    @GetMapping("/btncontrol/{id}")
+    public ResponseEntity<Map<String, Object>> buttonControl(@PathVariable("id") Long id, Principal principal) {
+        log.info("=== update & delete button authority info ===");
+
+        Map<String, Object> response = new HashMap<>();
+
+        try {
+            boolean btnControl = this.noticeService.buttonControl(id, principal.getName());
+            response.put("btnControl", btnControl);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            log.error("[NoticeController >> buttonControl] error: {}", e.getMessage());
+            response.put("message", "버튼 권한 확인 중 오류가 발생했습니다.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
 }

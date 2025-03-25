@@ -17,11 +17,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import zgoo.cpos.domain.users.Notice;
 import zgoo.cpos.domain.users.Users;
+import zgoo.cpos.dto.menu.MenuAuthorityDto.MenuAuthorityBaseDto;
 import zgoo.cpos.dto.users.NoticeDto;
 import zgoo.cpos.dto.users.NoticeDto.NoticeListDto;
 import zgoo.cpos.mapper.NoticeMapper;
+import zgoo.cpos.repository.menu.MenuAuthorityRepository;
 import zgoo.cpos.repository.users.NoticeRepository;
 import zgoo.cpos.repository.users.UsersRepository;
+import zgoo.cpos.util.MenuConstants;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +32,7 @@ import zgoo.cpos.repository.users.UsersRepository;
 public class NoticeService {
     private final NoticeRepository noticeRepository;
     private final UsersRepository usersRepository;
+    private final MenuAuthorityRepository menuAuthorityRepository;
 
     // 공지사항 - 전체 조회 페이징
     public Page<NoticeDto.NoticeListDto> findNoticeAll(int page, int size) {
@@ -154,15 +158,26 @@ public class NoticeService {
 
     // 공지사항 - 등록
     @Transactional
-    public void saveNotice(NoticeDto.NoticeRegDto dto) {
+    public void saveNotice(NoticeDto.NoticeRegDto dto, String loginUserId) {
         try {
-            System.out.println("공지사항 사용자ID: " + dto.getUserId());
-            // Users users = this.noticeRepository.findUserOne(dto.getUserId());
-            Users users = this.usersRepository.finsUserOneNotJoinedComapny(dto.getUserId());
-            System.out.println("사용자 확인1: " + users.getUserId());
-            Notice notice = NoticeMapper.toEntity(dto, users);
-            System.out.println("사용자 확인2: " + notice.getUser().getUserId());
-            this.noticeRepository.save(notice);
+            if (loginUserId == null || loginUserId.isEmpty()) {
+                throw new IllegalArgumentException("User ID is missing. Cannot save notice without login user ID."); 
+            }
+            dto.setUserId(loginUserId);
+
+            boolean isMod = checkSaveAuthority(loginUserId);
+
+            if (isMod) {
+                Users users = this.usersRepository.finsUserOneNotJoinedComapny(dto.getUserId());
+                Notice notice = NoticeMapper.toEntity(dto, users);
+                this.noticeRepository.save(notice);
+            } else {
+                log.warn("[saveNotice] Access without permission.");
+            }
+
+        } catch (IllegalArgumentException e) {
+            log.error("[saveNotice] Illegal argument error: {}", e.getMessage());
+            throw e;
         } catch (Exception e) {
             log.error("[saveNotice] error: {}", e.getMessage());
         }
@@ -170,17 +185,31 @@ public class NoticeService {
 
     // 공지사항 - 수정
     @Transactional
-    public NoticeDto.NoticeRegDto updateNotice(NoticeDto.NoticeRegDto dto) {
+    public NoticeDto.NoticeRegDto updateNotice(NoticeDto.NoticeRegDto dto, String loginUserId) {
         try {
-            Notice notice = this.noticeRepository.findNoticeOne(dto.getIdx());
+            if (loginUserId == null || loginUserId.isEmpty()) {
+                throw new IllegalArgumentException("User ID is missing. Cannot update notice without login user ID."); 
+            }
 
-            log.info("=== before update: {}", notice.toString());
+            boolean isMod = checkUpdateAndDeleteAuthority(dto.getIdx(), loginUserId);
 
-            notice.updateNoticeInfo(dto);
+            if (isMod) {
+                Notice notice = this.noticeRepository.findNoticeOne(dto.getIdx());
 
-            log.info("=== after update: {}", notice.toString());
+                log.info("=== before update: {}", notice.toString());
 
-            return NoticeMapper.toDto(notice);
+                notice.updateNoticeInfo(dto);
+
+                log.info("=== after update: {}", notice.toString());
+    
+                return NoticeMapper.toDto(notice);
+            }
+
+            log.warn("[updateNotice] Access without permission.");
+            return null;
+        } catch (IllegalArgumentException e) {
+            log.error("[updateNotice] Illegal argument error: {}", e.getMessage());
+            throw e;
         } catch (Exception e) {
             log.error("[updateNotice] error: {}", e.getMessage());
             return null;
@@ -189,9 +218,27 @@ public class NoticeService {
     
     // 공지사항 - 삭제(Invisible)
     @Transactional
-    public void deleteNotice(Long idx) {
-        Long count = this.noticeRepository.deleteNoticeOne(idx);
-        log.info("=== delete notice info: {}", count);
+    public void deleteNotice(Long idx, String loginUserId) {
+        try {
+            if (loginUserId == null || loginUserId.isEmpty()) {
+                throw new IllegalArgumentException("User ID is missing. Cannot delete notice without login user ID."); 
+            }
+
+            boolean isMod = checkUpdateAndDeleteAuthority(idx, loginUserId);
+
+            if (isMod) {
+                Long count = this.noticeRepository.deleteNoticeOne(idx);
+                log.info("=== delete notice info: {}", count);
+            } else {
+                log.warn("[deleteNotice] Access without permission.");
+            }
+
+        } catch (IllegalArgumentException e) {
+            log.error("[deleteNotice] Illegal argument error: {}", e.getMessage());
+            throw e;
+        } catch (Exception e) {
+            log.error("[deleteNotice] error: {}", e.getMessage());
+        }
     }
 
     // 공지사항 최신 조회
@@ -212,5 +259,79 @@ public class NoticeService {
             log.error("[findLatestNoticeList] error: {}", e.getMessage());
             return new ArrayList<>();
         }
+    }
+
+    // edit & delete button control
+    public boolean buttonControl(Long id, String loginUserId) {
+        try {
+            Notice notice = this.noticeRepository.findNoticeOne(id);
+            String writer = notice.getUser().getUserId();
+
+            Users user = this.usersRepository.findUserOne(writer);
+            String userAuthority = user.getAuthority();
+
+            Users loginUser = this.usersRepository.findUserOne(loginUserId); // 로그인 사용자
+            String loginUserAuthority = loginUser.getAuthority(); // 로그인 사용자 권한
+
+            if (loginUserAuthority.equals("SU")) {
+                return true;
+            }
+
+            if (loginUserAuthority.equals("AD")) {
+                return !userAuthority.equals("SU");
+            }
+
+            return writer.equals(loginUserId);
+        } catch (Exception e) {
+            log.error("[NoticeService >> buttonControl] error: {}", e.getMessage());
+            return false;
+        }
+    }
+
+    // notice save check
+    public boolean checkSaveAuthority(String loginUserId) {
+        Users loginUser = this.usersRepository.findUserOne(loginUserId); // 로그인 사용자
+        String loginUserAuthority = loginUser.getAuthority();            // 로그인 사용자 권한
+
+        if (loginUserAuthority.equals("SU")) {
+            log.info("[checkSaveAuthority] Super Admin");
+            return true;
+        }
+
+        // mod_yn check
+        MenuAuthorityBaseDto dto = this.menuAuthorityRepository.findUserMenuAuthority(loginUser.getCompany().getId(),
+            loginUserAuthority, MenuConstants.NOTICE);
+        return dto.getModYn().equals("Y");
+    }
+
+    // notice update, delete check
+    public boolean checkUpdateAndDeleteAuthority(Long id, String loginUserId) {
+        Users loginUser = this.usersRepository.findUserOne(loginUserId); // 로그인 사용자
+        String loginUserAuthority = loginUser.getAuthority();            // 로그인 사용자 권한
+
+        if (loginUserAuthority.equals("SU")) {
+            log.info("[NoticeService >> checkUpdateAndDeleteAuthority] Super Admin");
+            return true;
+        }
+
+        Notice notice = this.noticeRepository.findNoticeOne(id);
+        String writer = notice.getUser().getUserId();
+        Users user = this.usersRepository.findUserOne(writer); // 작성자
+        String userAuthority = user.getAuthority();            // 작성자 권한
+
+        // mod_yn check
+        MenuAuthorityBaseDto dto = this.menuAuthorityRepository.findUserMenuAuthority(loginUser.getCompany().getId(),
+            loginUserAuthority, MenuConstants.NOTICE);
+        String modYn = dto.getModYn();
+
+        if (modYn.equals("Y")) {
+            if (loginUserAuthority.equals("AD")) {
+                log.info("[NoticeService >> checkUpdateAndDeleteAuthority] Admin");
+                return !userAuthority.equals("SU");
+            }
+            return writer.equals(loginUserId);
+        }
+        log.info("[NoticeService >> checkUpdateAndDeleteAuthority] update & delete no permission");
+        return false;
     }
 }
