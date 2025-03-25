@@ -46,10 +46,7 @@
                         <div th:if="${menuAuthority.authority == 'SU' or menuAuthority.modYn == 'Y'}">
                             <button class="btn btn-data-add" id="addBtn" data-bs-toggle="modal" data-bs-target="#dataAddModal">
                                 <i class="bi bi-plus-square me-2"></i>등록</button>
-                            <button class="btn btn-data-edit" id="editBtn" data-bs-toggle="modal" data-bs-target="#dataAddModal" disabled>
-                                <i class="fa-regular fa-pen-to-square me-2"></i>수정</button>
-                            <button class="btn btn-data-delete" id="deleteBtn" disabled>
-                                <i class="bi bi-trash me-2"></i>삭제</button>
+                            <span id="buttonContainer"></span>
                         </div>
                         <span>
                             <span id="pageInfo">
@@ -62,7 +59,7 @@
                         </span>
                     </div>
                     <div class="w-100 table-responsive position-relative">
-                        <table class="table text-center mt-3 table-bg table-hover">
+                        <table class="table text-center mt-3 table-bg table-hover" style="min-width: 1200px;">
                             <thead>
                                 <tr class="table-border-top">
                                     <th scope="col" class="w-5"></th>
@@ -136,7 +133,7 @@
 
     <!-- Add Modal start -->
     <div class="modal fade" id="dataAddModal" tabindex="-1" aria-labelledby="dataAddModalLabel" data-bs-backdrop="static" data-bs-keyboard="false">
-        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width: 60vw; height: 90vh;"> <!-- height: 90vh; -->
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width: 60vw; height: 90vh;">
             <div class="modal-content mh-100 overflow-y-auto scrollbar">
                 <form th:object="${faqDto}">
                     <!-- modal body start -->
@@ -156,10 +153,6 @@
                                         </select>
                                     </td>
                                     <td colspan="2"></td>
-                                    <!-- <th class="w-20">문서번호</th>
-                                    <td colspan="w-30">
-                                        <input type="text" name="" id="" class="form-control" placeholder="" autocomplete="off" required disabled>
-                                    </td> -->
                                 </tr>
                                 <tr>
                                     <th class="w-20">제목<b class="required-data">*</b></th>
@@ -180,7 +173,7 @@
                         <!-- table:1 end -->
                     </div>
                     <!-- modal body end -->
-                    <div class="modal-footer justify-content-center" style="border-top: none;">
+                    <div class="modal-footer justify-content-center border-top-none">
                         <button type="button" id="cancelBtn" class="btn btn-outline-grey me-2" data-bs-dismiss="modal">취소</button>
                         <button type="submit" id="modalBtn" class="btn btn-data-add">등록</button>
                     </div>

@@ -1,6 +1,6 @@
 $(document).ready(function() {
-    let modalCon = false;   // false: 등록 / true: 수정
-    let selectRow, btnMsg = "등록";
+    let modalCon = false, selectRow, btnMsg = "등록";
+    var faqId;
 
     $('#resetBtn').on('click', function() {
         window.location.replace('/faq');
@@ -33,6 +33,39 @@ $(document).ready(function() {
 
     $('#pageList').on('click', 'tr', function() {
         selectRow = $(this);
+        faqId = selectRow.find('td').eq(0).attr('id');
+
+        const cbox = $(this).closest('tr').find('input[type="checkbox"]');
+        if (cbox.length > 0 && cbox.is(':checked')) {
+            console.log('Checkbox is checked.');
+
+            $.ajax({
+                url: `/faq/btncontrol/${faqId}`,
+                type: 'GET',
+                success: function(response) {
+                    if (response.btnControl) {
+                        $('#buttonContainer').html(`
+                            <button class="btn btn-data-edit" id="editBtn"
+                                data-bs-toggle="modal" data-bs-target="#dataAddModal">
+                                <i class="fa-regular fa-pen-to-square"></i>수정
+                            </button>
+                            <button class="btn btn-data-delete" id="deleteBtn">
+                                <i class="bi bi-trash"></i>삭제
+                            </button>
+                        `);
+                    } else {
+                        $('#buttonContainer').empty();
+                    }
+                },
+                error: function(error) {
+                    console.log(error);
+                }
+            });
+        } else {
+            console.log('Checkbox is not checked.');
+            btnControl = false;
+            $('#buttonContainer').empty();
+        }
     });
 
     $('#addBtn').on('click', function() {
@@ -45,19 +78,14 @@ $(document).ready(function() {
         $('#content').val('');
     });
 
-    $('#editBtn').on('click', function() {
+    $(document).on('click', '#editBtn', function() {
         modalCon = true;
         btnMsg = "수정";
         $('#modalBtn').text(btnMsg);
 
-        const id = selectRow.find('td').eq(0).attr('id');
-
-        console.log("id type: " + typeof(id) );
-        console.log("id: " + id );
-
         $.ajax({
             type: 'GET',
-            url: `/faq/get/${id}`,
+            url: `/faq/get/${faqId}`,
             contentType: "application/json",
             dataType: 'json',
             success: function(data) {
@@ -68,21 +96,19 @@ $(document).ready(function() {
         });
     });
 
-    $('#deleteBtn').on('click', function() {
+    $(document).on('click', '#deleteBtn', function() {
         btnMsg = "삭제";
 
         if(confirmSubmit(btnMsg)) {
-            const id = selectRow.find('td').eq(0).attr('id');
-
             $.ajax({
                 type: 'PATCH',
-                url: `/faq/delete/${id}`,
+                url: `/faq/delete/${faqId}`,
                 success: function(response) {
-                    console.log("FAQ 삭제 성공: ", response);
+                    alert(response);
                     window.location.reload();
                 },
                 error: function(error) {
-                    console.log("FAQ 삭제 실패: ", error);
+                    alert(error);
                 }
             });
         }
@@ -97,10 +123,8 @@ $(document).ready(function() {
                 title: $('#title').val(),
                 content: $('#content').val()
             }
-            let id;
-            if (modalCon) id = selectRow.find('td').eq(0).attr('id');
             
-            const URL = modalCon ? `/faq/update/${id}` : `/faq/new`;
+            const URL = modalCon ? `/faq/update/${faqId}` : `/faq/new`;
             const TYPE = modalCon ? 'PATCH' : 'POST';
 
             $.ajax({
@@ -108,12 +132,12 @@ $(document).ready(function() {
                 url: URL,
                 data: JSON.stringify(DATA),
                 contentType: "application/json",
-                success: function() {
-                    console.log("FAQ " + btnMsg +  " 성공");
+                success: function(response) {
+                    alert(response);
                     window.location.reload();
                 },
-                error: function() {
-                    console.log("FAQ " + btnMsg +  " 실패");
+                error: function(error) {
+                    alert(error);
                 }
             });
         }
