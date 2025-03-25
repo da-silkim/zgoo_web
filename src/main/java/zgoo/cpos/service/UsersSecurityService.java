@@ -31,18 +31,10 @@ public class UsersSecurityService implements UserDetailsService{
 
         List<GrantedAuthority> authorities = new ArrayList<>();
         switch (_users.getAuthority()) {
-            case "SU":
-                authorities.add(new SimpleGrantedAuthority(UserRole.SUPERADMIN.getValue()));
-                break;
-            case "AD":
-                authorities.add(new SimpleGrantedAuthority(UserRole.ADMIN.getValue()));
-                break;
-            case "AS":
-                authorities.add(new SimpleGrantedAuthority(UserRole.ASMANAGER.getValue()));
-                break;
-            default:
-                authorities.add(new SimpleGrantedAuthority(UserRole.USER.getValue()));
-                break;
+            case "SU" -> authorities.add(new SimpleGrantedAuthority(UserRole.SUPERADMIN.getValue()));
+            case "AD" -> authorities.add(new SimpleGrantedAuthority(UserRole.ADMIN.getValue()));
+            case "AS" -> authorities.add(new SimpleGrantedAuthority(UserRole.ASMANAGER.getValue()));
+            default -> authorities.add(new SimpleGrantedAuthority(UserRole.USER.getValue()));
         }
         
         return new User(_users.getUserId(), _users.getPassword(), authorities);

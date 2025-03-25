@@ -15,14 +15,17 @@ import lombok.extern.slf4j.Slf4j;
 import zgoo.cpos.domain.company.Company;
 import zgoo.cpos.domain.users.Users;
 import zgoo.cpos.dto.code.CodeDto.CommCdBaseDto;
+import zgoo.cpos.dto.menu.MenuAuthorityDto.MenuAuthorityBaseDto;
 import zgoo.cpos.dto.users.UsersDto;
 import zgoo.cpos.dto.users.UsersDto.UsersListDto;
 import zgoo.cpos.dto.users.UsersDto.UsersPasswordDto;
 import zgoo.cpos.mapper.UsersMapper;
 import zgoo.cpos.repository.code.CommonCodeRepository;
 import zgoo.cpos.repository.company.CompanyRepository;
+import zgoo.cpos.repository.menu.MenuAuthorityRepository;
 import zgoo.cpos.repository.users.UsersRepository;
 import zgoo.cpos.util.EncryptionUtils;
+import zgoo.cpos.util.MenuConstants;
 
 @Service
 @RequiredArgsConstructor
@@ -32,6 +35,7 @@ public class UsersService {
     private final CompanyRepository companyRepository;
     private final UsersRepository usersRepository;
     private final CommonCodeRepository commonCodeRepository;
+    private final MenuAuthorityRepository menuAuthorityRepository;
 
     // 사용자 - 전체 조회
     @Transactional
@@ -81,17 +85,35 @@ public class UsersService {
 
     // 사용자 - 등록
     @Transactional
-    public void saveUsers(UsersDto.UsersRegDto dto) {
+    public void saveUsers(UsersDto.UsersRegDto dto, String loginUserId) {
         Company company = this.companyRepository.findById(dto.getCompanyId())
             .orElseThrow(() -> new IllegalArgumentException("=== company not found ==="));
 
-        // password SHA-256
-        dto.setPassword(EncryptionUtils.encryptSHA256(dto.getPassword()));
+        try {
+            if (loginUserId == null || loginUserId.isEmpty()) {
+                throw new IllegalArgumentException("User ID is missing. Cannot save user info without login user ID."); 
+            }
 
-        // dto >> entity
-        Users user = UsersMapper.toEntity(dto, company);
+            boolean isMod = checkSaveAuthority(loginUserId);
 
-        usersRepository.save(user);
+            if (isMod) {
+                // password SHA-256
+                dto.setPassword(EncryptionUtils.encryptSHA256(dto.getPassword()));
+
+                // dto >> entity
+                Users user = UsersMapper.toEntity(dto, company);
+
+                usersRepository.save(user);
+            } else {
+                log.warn("[saveUsers] Access without permission.");
+            }
+
+        } catch (IllegalArgumentException e) {
+            log.error("[saveUsers] Illegal argument error: {}", e.getMessage());
+            throw e;
+        } catch (Exception e) {
+            log.error("[saveUsers] error: {}", e.getMessage());
+        }
     }
 
     // userId 중복 검사
@@ -101,25 +123,62 @@ public class UsersService {
 
     // 사용자 - 수정
     @Transactional
-    public UsersDto.UsersRegDto updateUsers(UsersDto.UsersRegDto dto) {
-        Users user = this.usersRepository.findUserOne(dto.getUserId());
+    public UsersDto.UsersRegDto updateUsers(UsersDto.UsersRegDto dto, String loginUserId) {
+        try {
+            if (loginUserId == null || loginUserId.isEmpty()) {
+                throw new IllegalArgumentException("User ID is missing. Cannot update user info without login user ID."); 
+            }
 
-        log.info("=== before update: {}", user.toString());
+            boolean isMod = checkUpdateAndDeleteAuthority(dto.getUserId(), loginUserId);
 
-        // password SHA-256
-        dto.setPassword(EncryptionUtils.encryptSHA256(dto.getPassword()));
-        user.updateUsersinfo(dto);
+            if (isMod) {
+                Users user = this.usersRepository.findUserOne(dto.getUserId());
 
-        log.info("=== after update: {}", user.toString());
+                log.info("=== before update: {}", user.toString());
+        
+                // password SHA-256
+                dto.setPassword(EncryptionUtils.encryptSHA256(dto.getPassword()));
+                user.updateUsersinfo(dto);
+        
+                log.info("=== after update: {}", user.toString());
+        
+                return UsersMapper.toDto(user);
+            }
 
-        return UsersMapper.toDto(user);
+            log.warn("[updateUsers] Access without permission.");
+            return null;
+        } catch (IllegalArgumentException e) {
+            log.error("[updateUsers] Illegal argument error: {}", e.getMessage());
+            throw e;
+        } catch (Exception e) {
+            log.error("[updateUsers] error: {}", e.getMessage());
+            return null;
+        }
     }
 
     // 사용자 - 삭제
     @Transactional
-    public void deleteUsers(String userId) {
-        Long count = this.usersRepository.deleteUserOne(userId);
-        log.info("=== delete user info: {}", count);
+    public void deleteUsers(String userId, String loginUserId) {
+        try {
+            if (loginUserId == null || loginUserId.isEmpty()) {
+                throw new IllegalArgumentException("User ID is missing. Cannot delete user info without login user ID."); 
+            }
+
+            boolean isMod = checkUpdateAndDeleteAuthority(userId, loginUserId);
+
+            if (isMod) {
+                Long count = this.usersRepository.deleteUserOne(userId);
+                log.info("=== delete user info: {}", count);
+            } else {
+                log.warn("[deleteUsers] Access without permission.");
+            }
+
+        } catch (IllegalArgumentException e) {
+            log.error("[deleteUsers] Illegal argument error: {}", e.getMessage());
+            throw e;
+        } catch (Exception e) {
+            log.error("[deleteUsers] error: {}", e.getMessage());
+        }
     }
 
     // 사용자 - 전체 조회 페이징
@@ -237,5 +296,72 @@ public class UsersService {
             log.error("[searchMenuAccessList] error: {}", e.getMessage());
             return new ArrayList<>();
         }
+    }
+
+    // edit & delete button control
+    public boolean buttonControl(String userId, String loginUserId) {
+        try {
+            Users user = this.usersRepository.findUserOne(userId);
+            String userAuthority = user.getAuthority();
+
+            Users loginUser = this.usersRepository.findUserOne(loginUserId);
+            String loginUserAuthority = loginUser.getAuthority();
+
+            if (loginUserAuthority.equals("SU")) {
+                return true;
+            }
+
+            if (loginUserAuthority.equals("AD")) {
+                return !userAuthority.equals("SU");
+            }
+
+            return userId.equals(loginUserId);
+        } catch (Exception e) {
+            log.error("[UsersService >> buttonControl] error: {}", e.getMessage());
+            return false;
+        }
+    }
+
+    // user save check
+    public boolean checkSaveAuthority(String loginUserId) {
+        Users loginUser = this.usersRepository.findUserOne(loginUserId);
+        String loginUserAuthority = loginUser.getAuthority();
+
+        if (loginUserAuthority.equals("SU")) {
+            log.info("[UsersService >> checkSaveAuthority] Super Admin");
+            return true;
+        }
+
+        MenuAuthorityBaseDto dto = this.menuAuthorityRepository.findUserMenuAuthority(loginUser.getCompany().getId(),
+            loginUserAuthority, MenuConstants.USER);
+        return dto.getModYn().equals("Y");
+    }
+
+    // user update, delete check
+    public boolean checkUpdateAndDeleteAuthority(String userId, String loginUserId) {
+        Users loginUser = this.usersRepository.findUserOne(loginUserId);
+        String loginUserAuthority = loginUser.getAuthority();
+
+        if (loginUserAuthority.equals("SU")) {
+            log.info("[UsersService >> checkUpdateAndDeleteAuthority] Super Admin");
+            return true;
+        }
+
+        Users user = this.usersRepository.findUserOne(userId);
+        String userAuthority = user.getAuthority();
+
+        MenuAuthorityBaseDto dto = this.menuAuthorityRepository.findUserMenuAuthority(loginUser.getCompany().getId(),
+            loginUserAuthority, MenuConstants.USER);
+        String modYn = dto.getModYn();
+
+        if (modYn.equals("Y")) {
+            if (loginUserAuthority.equals("AD")) {
+                log.info("[UsersService >> checkUpdateAndDeleteAuthority] Admin");
+                return !userAuthority.equals("SU");
+            }
+            return userId.equals(loginUserId);
+        }
+        log.info("[UsersService >> checkUpdateAndDeleteAuthority] update & delete no permission");
+        return false;
     }
 }

@@ -67,6 +67,7 @@ import zgoo.cpos.service.NoticeService;
 import zgoo.cpos.service.TariffService;
 import zgoo.cpos.service.UsersService;
 import zgoo.cpos.service.VocService;
+import zgoo.cpos.util.MenuConstants;
 
 @Controller
 @Slf4j
@@ -171,7 +172,7 @@ public class PageController {
             List<CommCdBaseDto> creditCardList = codeService.findCommonCdNamesByGrpcd("CREDITCARDCD"); // 카드사코드
             model.addAttribute("creditCardList", creditCardList);
             MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(),
-                    "C0100");
+                    MenuConstants.MEMBER_LIST);
             model.addAttribute("menuAuthority", menuAuthority);
         } catch (Exception e) {
             e.getStackTrace();
@@ -232,7 +233,7 @@ public class PageController {
             List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT"); // 그리드 row 수
             model.addAttribute("showListCnt", showListCnt);
             MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(),
-                    "C0300");
+                    MenuConstants.MEMBER_TAG);
             model.addAttribute("menuAuthority", menuAuthority);
         } catch (Exception e) {
             e.getStackTrace();
@@ -293,7 +294,7 @@ public class PageController {
             List<CommCdBaseDto> powerType = codeService.findCommonCdNamesByGrpcd("POWERTYPE"); // 전압종류
             model.addAttribute("powerType", powerType);
             MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(),
-                    "D0100");
+                    MenuConstants.STATION_LIST);
             model.addAttribute("menuAuthority", menuAuthority);
         } catch (Exception e) {
             e.getStackTrace();
@@ -465,7 +466,7 @@ public class PageController {
             List<CommCdBaseDto> connType = codeService.findCommonCdNamesByGrpcd("CONNTYPE"); // 커넥터타입
             model.addAttribute("connType", connType);
             MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(),
-                    "G0100");
+                    MenuConstants.MODEL);
             model.addAttribute("menuAuthority", menuAuthority);
         } catch (Exception e) {
             e.getStackTrace();
@@ -509,7 +510,7 @@ public class PageController {
             log.info("== commCode list found : ", ccdlist.size());
 
             MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(),
-                    "G0200");
+                MenuConstants.CODE);
             model.addAttribute("menuAuthority", menuAuthority);
         } catch (Exception e) {
 
@@ -571,7 +572,7 @@ public class PageController {
             model.addAttribute("showListCnt", showListCnt);
 
             MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(),
-                    "G0300");
+                MenuConstants.USER);
             model.addAttribute("menuAuthority", menuAuthority);
         } catch (Exception e) {
             log.error("Error occurred while fetching user list: {}", e.getMessage(), e);
@@ -638,7 +639,7 @@ public class PageController {
             model.addAttribute("showListCnt", showListCnt);
 
             MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(),
-                    "G0400");
+                    MenuConstants.NOTICE);
             model.addAttribute("menuAuthority", menuAuthority);
         } catch (Exception e) {
             e.getStackTrace();
@@ -711,7 +712,7 @@ public class PageController {
             model.addAttribute("companyMenuModalList", companyMenuModalList);
 
             MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(),
-                    "G0500");
+                MenuConstants.MENU);
             model.addAttribute("menuAuthority", menuAuthority);
         } catch (Exception e) {
             e.getStackTrace();
@@ -751,7 +752,7 @@ public class PageController {
             model.addAttribute("authorityList", authorityList);
 
             MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(),
-                    "G0600");
+                MenuConstants.MENU_AUTH);
             // System.out.println("권한: " + menuAuthority.getAuthority());
             // System.out.println("등록권한: " + menuAuthority.getModYn());
             // System.out.println("principal getName : " + principal.getName());
@@ -801,7 +802,7 @@ public class PageController {
             List<CommCdBaseDto> manfCd = codeService.findCommonCdNamesByGrpcd("CGMANFCD"); // 충전기제조사
             model.addAttribute("manfCd", manfCd);
             MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(),
-                    "G0700");
+                MenuConstants.ERRCODE);
             model.addAttribute("menuAuthority", menuAuthority);
         } catch (Exception e) {
             e.getStackTrace();
@@ -873,7 +874,7 @@ public class PageController {
             List<CommCdBaseDto> tariffStatCodeList = codeService.commonCodeStringToNum("TARIFFSTATCD");
             model.addAttribute("tariffStatCodeList", tariffStatCodeList);
             MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(),
-                    "G0800");
+                MenuConstants.TARIFF);
             model.addAttribute("menuAuthority", menuAuthority);
         } catch (Exception e) {
             log.error("Error occurred while fetching tariff list: {}", e.getMessage(), e);
@@ -898,7 +899,7 @@ public class PageController {
             List<ConditionCodeBaseDto> conList = this.conditionService.findConditionCodeAll();
             model.addAttribute("conList", conList);
             MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(),
-                    "G0900");
+                MenuConstants.CONDITION);
             model.addAttribute("menuAuthority", menuAuthority);
         } catch (Exception e) {
             e.getStackTrace();
@@ -954,7 +955,8 @@ public class PageController {
             List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT"); // 그리드 row 수
             model.addAttribute("showListCnt", showListCnt);
 
-            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(), "H0100");
+            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(),
+                MenuConstants.MAINTEN_ERR);
             model.addAttribute("menuAuthority", menuAuthority);
         } catch (Exception e) {
             e.getStackTrace();
@@ -1021,7 +1023,7 @@ public class PageController {
             List<CommCdBaseDto> vocPathList = codeService.findCommonCdNamesByGrpcd("VOCPATH"); // 문의경로
             model.addAttribute("vocPathList", vocPathList);
             MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(),
-                    "J0100");
+                MenuConstants.VOC);
             model.addAttribute("menuAuthority", menuAuthority);
         } catch (Exception e) {
             e.getStackTrace();
@@ -1073,7 +1075,7 @@ public class PageController {
             List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT"); // 그리드 row 수
             model.addAttribute("showListCnt", showListCnt);
             MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(),
-                    "J0200");
+                MenuConstants.FAQ);
             model.addAttribute("menuAuthority", menuAuthority);
         } catch (Exception e) {
             e.getStackTrace();
@@ -1121,7 +1123,8 @@ public class PageController {
             List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT"); // 그리드 row 수
             model.addAttribute("showListCnt", showListCnt);
 
-            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(), "K0100");
+            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(),
+                MenuConstants.HIST_CHARGING);
             model.addAttribute("menuAuthority", menuAuthority);
         } catch (Exception e) {
             e.getStackTrace();
@@ -1166,7 +1169,8 @@ public class PageController {
             List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT"); // 그리드 row 수
             model.addAttribute("showListCnt", showListCnt);
 
-            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(), "K0200");
+            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(),
+                MenuConstants.HIST_PAYMENT);
             model.addAttribute("menuAuthority", menuAuthority);
         } catch (Exception e) {
             e.getStackTrace();
@@ -1202,7 +1206,8 @@ public class PageController {
             List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT"); // 그리드 row 수
             model.addAttribute("showListCnt", showListCnt);
 
-            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(), "K0300");
+            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(),
+                MenuConstants.HIST_COMM);
             model.addAttribute("menuAuthority", menuAuthority);
         } catch (Exception e) {
             e.getStackTrace();
@@ -1237,7 +1242,8 @@ public class PageController {
             List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT"); // 그리드 row 수
             model.addAttribute("showListCnt", showListCnt);
 
-            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(), "K0400");
+            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(),
+                MenuConstants.HIST_ERR);
             model.addAttribute("menuAuthority", menuAuthority);
         } catch (Exception e) {
             e.getStackTrace();
@@ -1267,7 +1273,8 @@ public class PageController {
             List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT"); // 그리드 row 수
             model.addAttribute("showListCnt", showListCnt);
 
-            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(), "L0100");
+            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(),
+                MenuConstants.CALC_CHGPAYMENT);
             model.addAttribute("menuAuthority", menuAuthority);
         } catch (Exception e) {
             e.getStackTrace();
@@ -1303,7 +1310,8 @@ public class PageController {
             List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT"); // 그리드 row 수
             model.addAttribute("showListCnt", showListCnt);
 
-            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(), "L0200");
+            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(),
+                MenuConstants.CALC_PURCHASE);
             model.addAttribute("menuAuthority", menuAuthority);
         } catch (Exception e) {
             e.getStackTrace();
@@ -1467,7 +1475,7 @@ public class PageController {
             model.addAttribute("showListCnt", showListCnt);
 
             MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(),
-                    "N0100");
+                MenuConstants.BIZ);
             model.addAttribute("menuAuthority", menuAuthority);
         } catch (Exception e) {
 
@@ -1516,7 +1524,7 @@ public class PageController {
             // codeService.commonCodeStringToNum("CREDITCARDCD"); // 카드사코드
             // model.addAttribute("creditCardList", creditCardList);
             MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(),
-                    "N0200");
+                MenuConstants.CORP);
             model.addAttribute("menuAuthority", menuAuthority);
         } catch (Exception e) {
             e.getStackTrace();
@@ -1548,7 +1556,8 @@ public class PageController {
             List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT"); // 그리드 row 수
             model.addAttribute("showListCnt", showListCnt);
 
-            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(), "O0100");
+            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(),
+                MenuConstants.FW_VERSION);
             model.addAttribute("menuAuthority", menuAuthority);
         } catch (Exception e) {
             e.getStackTrace();
@@ -1580,7 +1589,8 @@ public class PageController {
             List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT"); // 그리드 row 수
             model.addAttribute("showListCnt", showListCnt);
 
-            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(), "O0200");
+            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(),
+                MenuConstants.FW_UPDATE);
             model.addAttribute("menuAuthority", menuAuthority);
         } catch (Exception e) {
             e.getStackTrace();

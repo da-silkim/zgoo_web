@@ -113,8 +113,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 var parentMenuHtml = '';
                 if (menu.menuUrl === '/map') {
                     parentMenuHtml = `
-                    <li class="nav-menu list-hover">
-                            <a href="#" onclick="openMap('${menu.menuUrl}')">
+                        <li class="nav-menu list-hover">
+                            <a href="javascript:openMap('${menu.menuUrl}')" target="_self">
                                 <span class="nav-list">
                                     <i class="${menu.iconClass}"></i>
                                     <span class="nav-list-txt">${menu.menuName}</span>
@@ -124,15 +124,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     `;
                 } else {
                     parentMenuHtml = `
-                    <li class="nav-menu list-hover">
-                        <a href="${menu.menuUrl}">
-                            <span class="nav-list">
-                                <i class="${menu.iconClass}"></i>
-                                <span class="nav-list-txt">${menu.menuName}</span>
-                            </span>
-                        </a>
-                    </li>
-                `;
+                        <li class="nav-menu list-hover">
+                            <a href="${menu.menuUrl}">
+                                <span class="nav-list">
+                                    <i class="${menu.iconClass}"></i>
+                                    <span class="nav-list-txt">${menu.menuName}</span>
+                                </span>
+                            </a>
+                        </li>
+                    `;
                 }
                 
                 $('#menuContainer').append(parentMenuHtml);
@@ -434,5 +434,5 @@ function isPasswordSpecial(asValue) {
 }
 
 function openMap(menuUrl) {
-    window.open(menuUrl, '/map', 'mapPopup', 'width=600,height=400,scrollbars=yes,resizable=yes');
+    window.open(menuUrl, 'mapPopup', 'width=1300,height=820,scrollbars=yes,resizable=yes');
 }
