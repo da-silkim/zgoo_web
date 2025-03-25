@@ -2,6 +2,7 @@ $(document).ready(function() {
     let modalCon = false;   // false: 등록 / true: 수정
     let selectRow; isDuplicateCheck = false, userIdCheck = false;
     let btnMsg = "등록";
+    var userId;
 
     var passwordContainer = document.getElementById('passwordContainer');
     var passwordEditBtn = document.getElementById('passwordEditBtn');
@@ -44,6 +45,41 @@ $(document).ready(function() {
     // 행 선택
     $('#pageList').on('click', 'tr', function() {
         selectRow = $(this);
+        userId = selectRow.find('td').eq(3).text();
+
+        // 가장 가까운 checkbox 요소 찾기
+        const cbox = $(this).closest('tr').find('input[type="checkbox"]');
+        if (cbox.length > 0 && cbox.is(':checked')) {
+            console.log('Checkbox is checked.');
+
+            // 해당 데이터에 대한 수정&삭제 권한 여부 확인
+            $.ajax({
+                url: `/system/user/btncontrol/${userId}`,
+                type: 'GET',
+                success: function(response) {
+                    if (response.btnControl) {
+                        $('#buttonContainer').html(`
+                            <button class="btn btn-data-edit" id="editBtn"
+                                data-bs-toggle="modal" data-bs-target="#dataAddModal">
+                                <i class="fa-regular fa-pen-to-square"></i>수정
+                            </button>
+                            <button class="btn btn-data-delete" id="deleteBtn">
+                                <i class="bi bi-trash"></i>삭제
+                            </button>
+                        `);
+                    } else {
+                        $('#buttonContainer').empty();
+                    }
+                },
+                error: function(error) {
+                    console.log(error);
+                }
+            });
+        } else {
+            console.log('Checkbox is not checked.');
+            btnControl = false;
+            $('#buttonContainer').empty();
+        }
     });
 
     // 사용자 - 등록
@@ -63,7 +99,7 @@ $(document).ready(function() {
     });
 
     // 사용자 - 수정
-    $('#editBtn').on('click', function() {
+    $(document).on('click', '#editBtn', function() {
         modalCon = true;
         btnMsg = "수정";
         $('#modalBtn').text(btnMsg);
@@ -75,12 +111,9 @@ $(document).ready(function() {
         passwordContainer.hidden = true;
         passwordEditBtn.hidden = false;
 
-        const $userId = selectRow.find('td').eq(3).text();
-        // console.log('userId: ' + $userId);
-
         $.ajax({
             type: 'GET',
-            url: `/system/user/get/${$userId}`,
+            url: `/system/user/get/${userId}`,
             contentType: "application/json",
             dataType: 'json',
             success: function(data) {
@@ -95,22 +128,20 @@ $(document).ready(function() {
         });
     });
 
-    $('#deleteBtn').on('click', function() {
+    $(document).on('click', '#deleteBtn', function() {
         btnMsg = "삭제";
 
         if(confirmSubmit(btnMsg)) {
-            const $userId = selectRow.find('td').eq(3).text();
-
             $.ajax({
                 type: 'DELETE',
-                url: `/system/user/delete/${$userId}`,
+                url: `/system/user/delete/${userId}`,
                 contentType: "application/json",
                 success: function(response) {
-                    console.log("사용자 정보 삭제 성공: ", response);
+                    alert(response);
                     window.location.replace('/system/user/list');
                 },
                 error: function(error) {
-                    console.log("사용자 정보 삭제 실패: ", error);
+                    alert(error);
                 }
             });
         }
@@ -177,12 +208,12 @@ $(document).ready(function() {
                 url: URL,
                 data: JSON.stringify(DATA),
                 contentType: "application/json",
-                success: function() {
-                    console.log("사용자 정보 처리 성공");
+                success: function(response) {
+                    alert(response);
                     window.location.replace('/system/user/list');
                 },
-                error: function() {
-                    console.log("사용자 정보 처리 실패");
+                error: function(error) {
+                    alert(error);
                 }
             });
         }        

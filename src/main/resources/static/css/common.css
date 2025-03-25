@@ -151,6 +151,11 @@ input.input-add-row-bb {
   color: white;
   font-size: 18px;
 }
+#logoutContainer > span:nth-child(1) {
+  color: white;
+  font-size: 18px;
+  margin-right: 10px;
+}
 
 /* 사이드바 */
 .side-nav {

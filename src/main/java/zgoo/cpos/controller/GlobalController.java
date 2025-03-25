@@ -6,6 +6,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
+import zgoo.cpos.dto.users.UsersDto.UsersRegDto;
 import zgoo.cpos.service.MenuService;
 import zgoo.cpos.service.UsersService;
 
@@ -30,6 +31,10 @@ public class GlobalController {
             model.addAttribute("loginUserId", loginUserId);
             // List<MenuDto.MenuListDto> menuList = menuService.findMenuListWithChild();
             // model.addAttribute("navList", menuList);
+
+            UsersRegDto user = this.usersService.findUserOne(loginUserId);
+            String loginUserName = user.getName();
+            model.addAttribute("loginUserName", loginUserName);
 
             Long companyId = this.usersService.findCompanyId(loginUserId);
             model.addAttribute("companyId", companyId);

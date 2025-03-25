@@ -1,5 +1,6 @@
 package zgoo.cpos.controller;
 
+import java.security.Principal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,17 +34,17 @@ public class UsersController {
 
     // 사용자 등록
     @PostMapping("/new")
-    public String createUsers(@RequestBody UsersDto.UsersRegDto dto) {
+    public ResponseEntity<String> createUsers(@RequestBody UsersDto.UsersRegDto dto, Principal principal) {
         log.info("=== create user info ===");
-        log.info("사용자 DTO 정보: {}", dto.toString());
 
         try {
-            this.usersService.saveUsers(dto);
+            this.usersService.saveUsers(dto, principal.getName());
+            return ResponseEntity.ok("사용자 정보가 정상적으로 등록되었습니다.");
         } catch (Exception e) {
-            log.error("[사용자 등록] 중 알 수 없는 오류 발생: {}", e.getMessage());
+            log.error("[createUsers] error: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                    .body("사용자 정보 등록 중 오류가 발생했습니다.");
         }
-
-        return "redirect:/system/user/list";
     }
 
     // userID 중복 검사
@@ -55,7 +56,7 @@ public class UsersController {
             boolean response = usersService.isUserIdDuplicate(userId);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            log.error("userID 중복 검사 중 알 수 없는 오류 발생: {}", e.getMessage());
+            log.error("[checkUserId] error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
@@ -70,11 +71,11 @@ public class UsersController {
 
             if ( userFindOne != null ) {
                 return ResponseEntity.ok(userFindOne);
-            } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
             }
+
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("[findUserOne] error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
@@ -85,7 +86,6 @@ public class UsersController {
             @RequestParam(required = false) Long companyId,
             @RequestParam(required = false) String companyType,
             @RequestParam(required = false) String name) {
-
         log.info("=== search user info ===");
         
         if (companyType != null && companyType.isEmpty()) {
@@ -103,47 +103,46 @@ public class UsersController {
             log.info("조회된 사용자 리스트 >> {}", usersList);
             return ResponseEntity.ok(usersList);
         } catch (Exception e) {
+            log.error("[searchUsers] error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build(); 
         }
     }
     
     // 사용자 수정
     @PatchMapping("/update")
-    public ResponseEntity<Map<String, Object>> updateUsers(@RequestBody UsersDto.UsersRegDto dto) {
-
-        Map<String, Object> response = new HashMap<>();
-
+    public ResponseEntity<String> updateUsers(@RequestBody UsersDto.UsersRegDto dto, Principal principal) {
         log.info("update user info: {}", dto.toString());
 
         try {
-            this.usersService.updateUsers(dto);
-            response.put("message", "사용자 정보 수정 성공");
-            return ResponseEntity.ok(response);
+            this.usersService.updateUsers(dto, principal.getName());
+            return ResponseEntity.ok("사용자 정보가 정상적으로 수정되었습니다.");
         } catch (Exception e) {
-            log.error("[사용자 수정] 중 알 수 없는 오류 발생: {}", e.getMessage());
-            response.put("message", "사용자 정보 수정 실패");
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+            log.error("[updateUsers] error: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                    .body("사용자 정보 수정 중 오류가 발생했습니다.");
         }
     }
 
     // 사용자 삭제
     @DeleteMapping("/delete/{userId}")
-    public ResponseEntity<String> deleteUsers(@PathVariable("userId") String userId) {
+    public ResponseEntity<String> deleteUsers(@PathVariable("userId") String userId, Principal principal) {
         log.info("=== delete user info ===");
 
         try {
-            this.usersService.deleteUsers(userId);
-            return ResponseEntity.ok("사용자 정보 삭제 성공");
+            this.usersService.deleteUsers(userId, principal.getName());
+            return ResponseEntity.ok("사용자 정보가 정상적으로 삭제되었습니다.");
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 사용자 정보를 찾을 수 없습니다.");
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("사용자 정보 삭제 중 오류 발생");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                    .body("사용자 정보 삭제 중 오류가 발생했습니다.");
         }
     }
 
     // 비밀번호 변경
     @PatchMapping("/update/password/{userId}")
-    public ResponseEntity<Map<String, Object>> updateUsersPassword(@PathVariable("userId") String userId, @RequestBody UsersPasswordDto dto) {
+    public ResponseEntity<Map<String, Object>> updateUsersPassword(@PathVariable("userId") String userId,
+            @RequestBody UsersPasswordDto dto) {
         log.info("=== update user password info ===");
 
         Map<String, Object> response = new HashMap<>();
@@ -156,13 +155,31 @@ public class UsersController {
                 case 1 -> response.put("message", "비밀번호가 변경되었습니다.");
                 case 2 -> response.put("message", "새 비밀번호 값이 일치하지 않습니다.");
                 default -> response.put("message", "비밀번호 변경에 실패했습니다.");
-            };
+            }
 
             response.put("state", result);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             log.error("[updateUsersPassword] error: {}", e.getMessage());
-            response.put("message", "비밀번호 변경 중 오류 발생");
+            response.put("message", "비밀번호 변경 중 오류가 발생했습니다.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
+    @GetMapping("/btncontrol/{userId}")
+    public ResponseEntity<Map<String, Object>> buttonControl(@PathVariable("userId") String userId, Principal principal) {
+        log.info("=== update & delete button authority info ===");
+
+        Map<String, Object> response = new HashMap<>();
+
+        try {
+            boolean btnControl = this.usersService.buttonControl(userId, principal.getName());
+            System.out.println("btnControl >> " + btnControl);
+            response.put("btnControl", btnControl);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            log.error("[UsersController >> buttonControl] error: {}", e.getMessage());
+            response.put("message", "버튼 권한 확인 중 오류가 발생했습니다.");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }

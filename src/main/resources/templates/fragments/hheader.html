@@ -7,9 +7,13 @@
             <a th:href="@{/}" id="loginContainer" sec:authorize="isAnonymous()">
                 <span class="me-4" id="login">Sign In<i class="fa-solid fa-right-to-bracket ms-3"></i></span>
             </a>
-            <a th:href="@{/logout}" id="logoutContainer" sec:authorize="isAuthenticated()">
-                <span class="me-4" id="logout">Sign Out<i class="fa-solid fa-right-from-bracket ms-3"></i></i></span>
-            </a>
+            <span id="logoutContainer" sec:authorize="isAuthenticated()">
+                <span>
+                    <i class="fa-solid fa-user"></i>
+                    <span th:text="${loginUserName}"></span>
+                </span>
+                <a th:href="@{/logout}" class="me-4" id="logout">Sign Out<i class="fa-solid fa-right-from-bracket ms-3"></i></i></a>
+            </span>
         </span>
     </div>
 </div>
