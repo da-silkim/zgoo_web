@@ -231,7 +231,8 @@
                     <!-- modal body end -->
                     <div class="modal-footer justify-content-center border-top-none">
                         <button type="button" id="modalCancelBtn" class="btn btn-outline-grey me-2" data-bs-dismiss="modal">취소</button>
-                        <button type="submit" id="modalBtn" class="btn btn-data-add">저장</button>
+                        <button type="submit" id="modalBtn" class="btn btn-data-add"
+                            th:if="${menuAuthority.authority == 'SU' or menuAuthority.modYn == 'Y'}">저장</button>
                     </div>
                 </form>              
             </div>
