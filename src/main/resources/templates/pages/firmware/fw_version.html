@@ -12,7 +12,7 @@
                     <div class="card-title"><span class="card-title-bar"></span><span>펌웨어 목록</span></div>
                     <div class="mt-3 btn-page-area">
                         <div th:if="${menuAuthority.authority == 'SU'}">
-                            <button class="btn btn-data-delete" id="deleteBtn" disabled>
+                            <button class="btn btn-data-delete" id="deleteBtn" hidden>
                                 <i class="bi bi-trash"></i>삭제</button>
                         </div>
                         <span>
@@ -115,8 +115,8 @@
                             </table>
                             <div class="search-btn">
                                 <button type="button" class="btn btn-data-add" id="addBtn"
-                                th:if="${menuAuthority.authority == 'SU' or menuAuthority.authority == 'AD'}">
-                                <i class="bi bi-search me-2"></i>등록</button>   
+                                    th:if="${menuAuthority.authority == 'SU' or menuAuthority.authority == 'AD'}">
+                                    <i class="bi bi-search me-2"></i>등록</button>   
                             </div>                       
                         </div>
                     </form>

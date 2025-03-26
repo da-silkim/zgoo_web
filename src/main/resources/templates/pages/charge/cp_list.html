@@ -65,27 +65,29 @@
             <!-- card:3 start -->
             <div class="card card-shadow mt-4">
                 <!-- card body:3 start -->
-                <div class="card-body">
-                    <div class="position-relative">
-                        <button class="btn btn-data-add" id="addBtn" data-bs-toggle="modal"
-                            data-bs-target="#dataAddModal"><i class="bi bi-plus-square me-2"></i>등록</button>
-                        <button class="btn btn-data-edit" id="editBtn" disabled><i
-                                class="fa-regular fa-pen-to-square me-2"></i>수정</button>
-                        <button class="btn btn-data-delete" id="deleteBtn" disabled><i
-                                class="bi bi-trash me-2"></i>삭제</button>
-                        <button class="btn btn-excel" onclick="excelDownload()">
+                <div class="card-body btn-page-container">
+                    <div class="btn-container">
+                        <button class="btn btn-excel" id="excelBtn" onclick="excelDownload()"
+                            th:if="${menuAuthority.authority == 'SU' or menuAuthority.excelYn == 'Y'}">
                             <i class="bi bi-file-earmark-spreadsheet"></i>엑셀다운로드</button>
-
-                        <span class="position-absolute" style="right: 0; bottom: 0;">
-                            <span id="page-info">
-                                <span
-                                    th:text="'Page ' + (${currentPage + 1}) + ' of ' + ${totalPages} + ' [총 ' + ${totalCount} + '건]'"></span>
-                            </span>
-                            <select class="mx-3 page-select" id="size" name="size">
-                                <option th:each="data : ${showListCnt}" th:value="${data.commonCode}"
-                                    th:text="${data.commonCodeName}" th:selected="${data.commonCode == size}"></option>
-                            </select>
+                        <div class="btn-mod" th:if="${menuAuthority.authority == 'SU' or menuAuthority.modYn == 'Y'}">
+                            <button class="btn btn-data-add" id="addBtn" data-bs-toggle="modal" data-bs-target="#dataAddModal">
+                                <i class="bi bi-plus-square"></i>등록</button>
+                            <button class="btn btn-data-edit"id="editBtn" data-bs-toggle="modal" data-bs-target="#dataAddModal" hidden>
+                                <i class="fa-regular fa-pen-to-square"></i>수정</button>
+                            <button class="btn btn-data-delete" id="deleteBtn" hidden>
+                                <i class="bi bi-trash"></i>삭제</button>
+                        </div>
+                    </div>
+                    <div class="page-container">
+                        <span id="pageInfo">
+                            <span
+                                th:text="'Page ' + (${currentPage + 1}) + ' of ' + ${totalPages} + ' [총 ' + ${totalCount} + '건]'"></span>
                         </span>
+                        <select class="mx-3 page-select" id="size" name="size">
+                            <option th:each="data : ${showListCnt}" th:value="${data.commonCode}"
+                                th:text="${data.commonCodeName}" th:selected="${data.commonCode == size}"></option>
+                        </select>
                     </div>
                     <div class="w-100 table-responsive">
                         <table class="table text-center mt-3 table-bg table-hover">
@@ -438,7 +440,7 @@
                         <!-- table:3 end -->
                     </div>
                     <!-- modal body end -->
-                    <div class="modal-footer justify-content-center" style="border-top: none;">
+                    <div class="modal-footer justify-content-center border-top-none">
                         <button type="button" id="modalCancel" class="btn btn-outline-grey me-2"
                             data-bs-dismiss="modal">취소</button>
                         <button type="button" id="modalClose" class="btn btn-outline-grey me-2" data-bs-dismiss="modal"

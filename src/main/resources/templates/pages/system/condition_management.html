@@ -14,7 +14,7 @@
                         <div th:if="${menuAuthority.authority == 'SU'}">
                             <button class="btn btn-data-add" id="addBtn" data-bs-toggle="modal" data-bs-target="#conAddModal">
                                 <i class="bi bi-plus-square me-2"></i>등록</button>
-                            <button class="btn btn-data-delete" id="deleteBtn" disabled>
+                            <button class="btn btn-data-delete" id="deleteBtn" hidden>
                                 <i class="bi bi-trash me-2"></i>삭제</button>
                         </div>
                     </div>
@@ -54,9 +54,9 @@
                     <div class="card-title title-btn-area">
                         <span class="card-title-bar"></span><span>약관 개정 히스토리</span>
                         <div th:if="${menuAuthority.authority == 'SU'}">
-                            <button class="btn btn-data-add" id="addBtnSub" data-bs-toggle="modal" data-bs-target="#conHistAddModal" disabled>
+                            <button class="btn btn-data-add" id="addBtnSub" data-bs-toggle="modal" data-bs-target="#conHistAddModal" hidden>
                                 <i class="bi bi-plus-square me-2"></i>등록</button>
-                            <button class="btn btn-data-delete" id="deleteBtnSub" disabled>
+                            <button class="btn btn-data-delete" id="deleteBtnSub" hidden>
                                 <i class="bi bi-trash me-2"></i>삭제</button>
                         </div>
                     </div>

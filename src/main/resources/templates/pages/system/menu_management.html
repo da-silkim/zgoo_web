@@ -14,9 +14,9 @@
                         <div th:if="${menuAuthority.authority == 'SU' or menuAuthority.modYn == 'Y'}">
                             <button class="btn btn-data-add" id="addBtn" data-bs-toggle="modal" data-bs-target="#menuAddModal">
                                 <i class="bi bi-plus-square me-2"></i>등록</button>
-                            <button class="btn btn-data-edit" id="editBtn" data-bs-toggle="modal" data-bs-target="#menuAddModal" disabled>
+                            <button class="btn btn-data-edit" id="editBtn" data-bs-toggle="modal" data-bs-target="#menuAddModal" hidden>
                                 <i class="fa-regular fa-pen-to-square me-2"></i>수정</button>
-                            <button class="btn btn-data-delete" id="deleteBtn" disabled>
+                            <button class="btn btn-data-delete" id="deleteBtn" hidden>
                                 <i class="bi bi-trash me-2"></i>삭제</button>
                         </div>
                     </div>
@@ -74,9 +74,9 @@
                         <div th:if="${menuAuthority.authority == 'SU' or menuAuthority.modYn == 'Y'}">
                             <button class="btn btn-data-add" id="addBtnSec" data-bs-toggle="modal" data-bs-target="#menuAuthorityAddModal">
                                 <i class="bi bi-plus-square"></i>등록</button>
-                            <button class="btn btn-data-edit" id="editBtnSec" data-bs-toggle="modal" data-bs-target="#menuAuthorityAddModal" disabled>
+                            <button class="btn btn-data-edit" id="editBtnSec" data-bs-toggle="modal" data-bs-target="#menuAuthorityAddModal" hidden>
                                 <i class="fa-regular fa-pen-to-square"></i>수정</button>
-                            <button class="btn btn-data-delete" id="deleteBtnSec" disabled>
+                            <button class="btn btn-data-delete" id="deleteBtnSec" hidden>
                                 <i class="bi bi-trash"></i>삭제</button>
                         </div>
                         <span>
@@ -101,11 +101,6 @@
                             <tbody id="pageList2">
                                 <tr th:each="company : ${companyMenuList}">
                                     <td th:id="${company.companyId}"><input type="checkbox" /></td>
-                                    <!-- <td>
-                                        <a href="#" class="no-underline">
-                                        <i class="bi bi-files detail-files"></i>
-                                    </a>
-                                    </td> -->
                                     <td th:text="${company.companyName}" class="text-start"></td>
                                 </tr>
                                 <tr th:if="${companyMenuList.size() == 0}">
@@ -221,7 +216,7 @@
                             </tbody>
                         </table>
                         <!-- table: end -->
-                        <div class="modal-footer justify-content-center" style="border-top: none;">
+                        <div class="modal-footer justify-content-center border-top-none">
                             <button type="button" class="btn btn-outline-grey me-2" data-bs-dismiss="modal">취소</button>
                             <button type="submit" id="modalBtn" class="btn btn-data-add">등록</button>
                         </div>
