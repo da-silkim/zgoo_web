@@ -49,17 +49,20 @@
             <!-- card:3 start -->
             <div class="card card-shadow mt-4">
                 <!-- card body:3 start -->
-                <div class="card-body">
-                    <div class="position-relative">
-                        <button class="btn btn-excel" id="excelBtn" onclick="excelDownload()">엑셀다운로드</button>
-                        <span class="position-absolute" style="right: 0; bottom: 0;">
-                            <span id="page-info"></span>
-                            <select class="mx-3 page-select" id="" name="">
-                                <option value='%'>10개</option>
-                                <option value="">30개</option>
-                                <option value="">50개</option>
-                            </select>
+                <div class="card-body btn-page-container">
+                    <div class="btn-container">
+                        <button class="btn btn-excel" id="excelBtn" onclick="excelDownload()">
+                            <i class="bi bi-file-earmark-spreadsheet"></i>엑셀다운로드</button>
+                    </div>
+                    <div class="page-container">
+                        <span id="pageInfo">
+                            <!-- <span th:text="'Page ' + (${currentPage + 1}) + ' of ' + ${totalPages} + ' [총 ' + ${totalCount} + '건]'"></span> -->
                         </span>
+                        <select class="mx-3 page-select" id="size" name="size">
+                            <option>10개</option>
+                            <!-- <option th:each="data : ${showListCnt}" th:value="${data.commonCode}"
+                                    th:text="${data.commonCodeName}" th:selected="${data.commonCode == size}"></option> -->
+                        </select>
                     </div>
                     <div class="w-100 table-responsive" >
                         <table class="table text-center mt-3 table-bg table-hover">
