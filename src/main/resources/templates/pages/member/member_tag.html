@@ -42,15 +42,15 @@
                 <!-- card body:3 start -->
                 <div class="card-body btn-page-container">
                     <div class="btn-container">
-                        <div th:if="${menuAuthority.authority == 'SU' or menuAuthority.modYn == 'Y'}">
-                            <button class="btn btn-data-edit" id="editBtn" data-bs-toggle="modal" data-bs-target="#dataAddModal" disabled>
-                                <i class="fa-regular fa-pen-to-square"></i>수정</button>
-                            <button class="btn btn-data-delete" id="deleteBtn" disabled>
-                                <i class="bi bi-trash"></i>삭제</button>
-                        </div>
                         <button class="btn btn-excel" id="excelBtn" onclick="excelDownload()"
                             th:if="${menuAuthority.authority == 'SU' or menuAuthority.excelYn == 'Y'}">
                             <i class="bi bi-file-earmark-spreadsheet"></i>엑셀다운로드</button>
+                        <div class="btn-mod" th:if="${menuAuthority.authority == 'SU' or menuAuthority.modYn == 'Y'}">
+                            <button class="btn btn-data-edit" id="editBtn" data-bs-toggle="modal" data-bs-target="#dataAddModal" hidden>
+                                <i class="fa-regular fa-pen-to-square"></i>수정</button>
+                            <button class="btn btn-data-delete" id="deleteBtn" hidden>
+                                <i class="bi bi-trash"></i>삭제</button>
+                        </div>
                     </div>
                     <div class="page-container">
                         <span id="pageInfo">

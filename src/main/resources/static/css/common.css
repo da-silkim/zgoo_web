@@ -670,6 +670,7 @@ table.table tbody tr.row-selected {
 }
 .btn-page-area {
   position: relative;
+  min-height: 38px;
 }
 .btn-page-area button > i {
   margin-right: 0.5rem !important;
@@ -689,9 +690,9 @@ table.table tbody tr.row-selected {
 .btn-container button > i {
   margin-right: 0.5rem !important;
 }
-.btn-container > div:nth-child(1),
+.btn-container .btn-mod,
 .btn-page-area > div:nth-child(1) {
-  display: inline-block;
+  display: inline-block !important;
 }
 .page-container {
   float: right;
