@@ -162,11 +162,12 @@ $(document).ready(function() {
                 type: 'DELETE',
                 url: `/station/list/delete/${stationId}`,
                 success: function(response) {
-                    alert('충전소가 정상적으로 삭제되었습니다.');
+                    alert(response);
                     window.location.reload();
                 },
-                error: function(error) {
-                    console.log("충전소 삭제 실패: ", error);
+                error: function(xhr, status, error) {
+                    var response = JSON.parse(xhr.responseText);
+                    alert(response);
                 }
             });
         }
@@ -232,13 +233,13 @@ $(document).ready(function() {
                             $("#modalClose").attr("hidden", false);
                             $(".attr-control").attr("disabled", true);
                         }
-                        alert(response.message);
-                    } else {
-                        window.location.reload();
                     }
+                    alert(response.message);
+                    window.location.reload();
                 },
                 error: function(xhr, status, error) {
-
+                    var response = JSON.parse(xhr.responseText);
+                    alert(response.message);
                 }
             });
         }

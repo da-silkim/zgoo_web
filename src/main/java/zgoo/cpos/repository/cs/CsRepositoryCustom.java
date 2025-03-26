@@ -5,7 +5,6 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import zgoo.cpos.dto.cs.CsInfoDto.CsInfoBaseDto;
 import zgoo.cpos.dto.cs.CsInfoDto.CsInfoDetailDto;
 import zgoo.cpos.dto.cs.CsInfoDto.CsInfoListDto;
 import zgoo.cpos.dto.cs.CsInfoDto.CsInfoRegDto;
@@ -30,10 +29,6 @@ public interface CsRepositoryCustom {
 
     // 충전소 단건 상세 조회
     CsInfoDetailDto findCsInfoDetailOne(String stationId);
-
-    // 이전글, 다음글 조회
-    CsInfoDetailDto findPreviousCsInfo(String stationId, Long companyId, String searchOp, String searchContent);
-    CsInfoDetailDto findNextCsInfo(String stationId, Long companyId, String searchOp, String searchContent);
 
     // 충전소 삭제
     Long deleteCsInfoOne(String stationId);

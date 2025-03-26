@@ -24,6 +24,7 @@ import zgoo.cpos.repository.company.CompanyRepository;
 import zgoo.cpos.repository.cs.CsKepcoContractInfoRepository;
 import zgoo.cpos.repository.cs.CsLandInfoRepository;
 import zgoo.cpos.repository.cs.CsRepository;
+import zgoo.cpos.util.MenuConstants;
 
 @Service
 @RequiredArgsConstructor
@@ -35,6 +36,7 @@ public class CsService {
     private final CsKepcoContractInfoRepository csKepcoContractInfoRepository;
     private final CsLandInfoRepository csLandInfoRepository;
     private final ChargerRepository chargerRepository;
+    private final ComService comService;
 
     // 충전소 조회
     public Page<CsInfoListDto> findCsInfoWithPagination(Long companyId, String searchOp, String searchContent, int page, int size) {
@@ -85,28 +87,6 @@ public class CsService {
         }
     }
 
-    // 이전글 조회
-    public CsInfoDetailDto findPreviousCsInfo(String stationId, Long companyId, String searchOp, String searchContent) {
-        try {
-            CsInfoDetailDto csInfo = this.csRepository.findPreviousCsInfo(stationId, companyId, searchOp, searchContent);
-            return csInfo;
-        } catch (Exception e) {
-            log.error("[findPreviousCsInfo] error : {}", e.getMessage());
-            return null;
-        }
-    }
-
-    // 다음글 조회
-    public CsInfoDetailDto findNextCsInfo(String stationId, Long companyId, String searchOp, String searchContent) {
-        try {
-            CsInfoDetailDto csInfo = this.csRepository.findNextCsInfo(stationId, companyId, searchOp, searchContent);
-            return csInfo;
-        } catch (Exception e) {
-            log.error("[findNextCsInfo] error : {}", e.getMessage());
-            return null;
-        }
-    }
-
     // 충전소명 중복 검사
     public boolean isStationNameDuplicate(String stationName) {
         return this.csRepository.isStationNameDuplicate(stationName);
@@ -114,9 +94,14 @@ public class CsService {
 
     // 충전소 저장
     @Transactional
-    public String saveCsInfo(CsInfoRegDto dto) {
-        
+    public String saveCsInfo(CsInfoRegDto dto, String loginUserId) {
         try {
+            if (loginUserId == null || loginUserId.isEmpty()) {
+                throw new IllegalArgumentException("User ID is missing. Cannot save charge station info without login user ID."); 
+            }
+            boolean isMod = comService.checkModYn(loginUserId, MenuConstants.STATION_LIST);
+            if (!isMod) return null;
+
             CsKepcoContractInfo kepcoInfo = CsMapper.toEntityKepco(dto);
             CsLandInfo landInfo = CsMapper.toEntityLand(dto);
             Company company = this.companyRepository.findCompanyOne(dto.getCompanyId());
@@ -136,6 +121,9 @@ public class CsService {
             CsInfo csInfo = CsMapper.toEntityCs(dto, stationId, company, landInfo, kepcoInfo);
             this.csRepository.save(csInfo);
             return stationId;
+        } catch (IllegalArgumentException e) {
+            log.error("[saveCsInfo] Illegal argument error: {}", e.getMessage());
+            throw e;
         } catch (Exception e) {
             log.error("[saveCsInfo] error: {}", e.getMessage());
             return null;
@@ -144,13 +132,23 @@ public class CsService {
 
     // 충전소 수정
     @Transactional
-    public CsInfo updateCsInfo(CsInfoRegDto dto) {
+    public CsInfo updateCsInfo(CsInfoRegDto dto, String loginUserId) {
         CsInfo csInfo = this.csRepository.findById(dto.getStationId())
                 .orElseThrow(() -> new IllegalArgumentException("cs not found with id: " + dto.getStationId()));
+
         try {
-            if (csInfo != null) {
-                csInfo.updateCsInfo(dto);
+            if (loginUserId == null || loginUserId.isEmpty()) {
+                throw new IllegalArgumentException("User ID is missing. Cannot update charge station info without login user ID."); 
             }
+            boolean isMod = comService.checkModYn(loginUserId, MenuConstants.STATION_LIST);
+            if (!isMod) return csInfo;
+
+            csInfo.updateCsInfo(dto);
+            updateCsKepcoContractInfo(csInfo, dto);
+            updateCsLandInfo(csInfo, dto);
+        } catch (IllegalArgumentException e) {
+            log.error("[updateCsInfo] Illegal argument error: {}", e.getMessage());
+            throw e;
         } catch (Exception e) {
             log.error("[updateCsInfo] error: {}", e.getMessage());
         }
@@ -207,9 +205,22 @@ public class CsService {
 
     // 충전소 삭제
     @Transactional
-    public void deleteCsInfo(String stationId) {
-        Long count = this.csRepository.deleteCsInfoOne(stationId);
-        log.info("=== delete cs Info: {}", count);
+    public void deleteCsInfo(String stationId, String loginUserId) {
+        try {
+            if (loginUserId == null || loginUserId.isEmpty()) {
+                throw new IllegalArgumentException("User ID is missing. Cannot delete charge station without login user ID."); 
+            }
+            boolean isMod = comService.checkModYn(loginUserId, MenuConstants.STATION_LIST);
+            if (!isMod) return;
+
+            Long count = this.csRepository.deleteCsInfoOne(stationId);
+            log.info("=== delete cs Info: {}", count);
+        } catch (IllegalArgumentException e) {
+            log.error("[deleteCsInfo] Illegal argument error: {}", e.getMessage());
+            throw e;
+        } catch (Exception e) {
+            log.error("[deleteCsInfo] error: {}", e.getMessage());
+        }
     }
 
     // 충전소 조회
