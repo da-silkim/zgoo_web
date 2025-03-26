@@ -1,5 +1,6 @@
 package zgoo.cpos.controller;
 
+import java.security.Principal;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import zgoo.cpos.domain.cs.CsInfo;
 import zgoo.cpos.dto.cs.CsInfoDto.CsInfoDetailDto;
 import zgoo.cpos.dto.cs.CsInfoDto.CsInfoRegDto;
 import zgoo.cpos.service.CsService;
@@ -49,7 +49,7 @@ public class CsController {
     // 충전소 단건 조회
     @GetMapping("/get/{stationId}")
     public ResponseEntity<CsInfoRegDto> findCsInfoOne(@PathVariable("stationId") String stationId) {
-        log.info("=== find cs info ===");
+        log.info("=== find charge station info ===");
 
         try {
             CsInfoRegDto csInfoFindOne = this.csService.findCsInfoOne(stationId);
@@ -72,19 +72,13 @@ public class CsController {
             @RequestParam(value = "contentSearch", required = false) String searchContent,
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "10") int size) {
-        log.info("=== detail cs info ===");
+        log.info("=== detail charge station info ===");
 
         try {
             CsInfoDetailDto csInfo = this.csService.findCsInfoDetailOne(stationId);
             model.addAttribute("csInfo", csInfo);
 
-            // 이전글, 다음글 조회
-            CsInfoDetailDto previousCsInfo = this.csService.findPreviousCsInfo(stationId, companyId, searchOp, searchContent);
-            CsInfoDetailDto nextCsInfo = this.csService.findNextCsInfo(stationId, companyId, searchOp, searchContent);
-            model.addAttribute("previousCsInfo", previousCsInfo);
-            model.addAttribute("nextCsInfo", nextCsInfo);
-
-            // pagination 관련 파라미터 추가
+            // 목록
             model.addAttribute("currentPage", page);
             model.addAttribute("size", size);
             model.addAttribute("selectedCompanyId", companyId);
@@ -99,13 +93,14 @@ public class CsController {
 
     // 충전소 등록
     @PostMapping("/new")
-    public ResponseEntity<Map<String, String>> createCsInfo(@Valid @RequestBody CsInfoRegDto dto) {
-        log.info("=== create cs info ===");
+    public ResponseEntity<Map<String, String>> createCsInfo(@Valid @RequestBody CsInfoRegDto dto,
+            Principal principal) {
+        log.info("=== create charge station info ===");
 
         Map<String, String> response = new HashMap<>();
 
         try {
-            String result = this.csService.saveCsInfo(dto);
+            String result = this.csService.saveCsInfo(dto, principal.getName());
             if (result == null) {
                 response.put("message", "충전소 정보 등록에 실패했습니다.");
                 return ResponseEntity.badRequest().body(response);
@@ -122,39 +117,41 @@ public class CsController {
 
     // 충전소 수정
     @PatchMapping("/update")
-    public ResponseEntity<String> updateCsInfo(@RequestBody CsInfoRegDto dto) {
-        log.info("=== update cs info ===");
+    public ResponseEntity<Map<String, String>> updateCsInfo(@RequestBody CsInfoRegDto dto, Principal principal) {
+        log.info("=== update charge station info ===");
+
+        Map<String, String> response = new HashMap<>();
 
         try {
-            CsInfo updatedCsInfo = this.csService.updateCsInfo(dto);
-            this.csService.updateCsKepcoContractInfo(updatedCsInfo, dto);
-            this.csService.updateCsLandInfo(updatedCsInfo, dto);
-
-            log.info("=== cs info update complete ===");
-            return ResponseEntity.ok("충전소가 정상적으로 수정되었습니다.");
+            this.csService.updateCsInfo(dto, principal.getName());
+            log.info("=== charge station info update complete ===");
+            response.put("message", "충전소 정보가 정상적으로 수정되었습니다.");
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
             log.error("[updateCsInfo] error: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            response.put("message", "충전소 정보 수정 중 오류가 발생했습니다.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
 
     // 충전소 삭제
     @DeleteMapping("/delete/{stationId}")
-    public ResponseEntity<String> deleteCsInfo(@PathVariable("stationId") String stationId) {
-        log.info("=== delete cs info ===");
+    public ResponseEntity<String> deleteCsInfo(@PathVariable("stationId") String stationId,
+            Principal principal) {
+        log.info("=== delete charge station info ===");
 
         try {
             if (stationId == null) {
-                log.error("cs info id is null");
+                log.error("[deleteCsInfo] error: stationId is null");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                                    .body("충전소ID가 없습니다.");
+                                    .body("충전소ID가 없어 정보를 삭제할 수 없습니다.");
             }
-            this.csService.deleteCsInfo(stationId);
-            return ResponseEntity.ok("충전소가 정상적으로 삭제되었습니다.");
+            this.csService.deleteCsInfo(stationId, principal.getName());
+            return ResponseEntity.ok("충전소 정보가 정상적으로 삭제되었습니다.");
         } catch (Exception e) {
             log.error("[deleteCsInfo] error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                    .body("충전소 삭제 중 오류 발생");
+                                    .body("충전소 정보 삭제 중 오류가 발생했습니다.");
         }
     }
 }

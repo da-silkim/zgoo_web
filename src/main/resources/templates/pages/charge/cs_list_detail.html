@@ -63,7 +63,8 @@
                                     <td class="w-30" colspan="3">
                                         <div class="address-detail-container">
                                             <span th:text="'[' + ${csInfo.zipcode} + '] ' + ${csInfo.address}"></span>
-                                            <span th:if="${csInfo.addressDetail != null and !csInfo.addressDetail.isEmpty()}" th:text="', ' + ${csInfo.addressDetail}"></span>
+                                            <span th:if="${csInfo.addressDetail != null and !csInfo.addressDetail.isEmpty()}"
+                                                th:text="', ' + ${csInfo.addressDetail}"></span>
                                         </div>
                                     </td>
                                 </tr>
@@ -188,28 +189,6 @@
                             </tbody>
                         </table>
                         <!-- table:4 end -->
-                        <!-- <div class="next-article">
-                            <i class="bi bi-caret-up me-2"></i>
-                            <span th:if="${nextCsInfo != null}">
-                                <a th:href="@{/station/list/detail/{stationId}(stationId=${nextCsInfo.stationId},page=${currentPage}, size=${size},
-                                    companyIdSearch=${selectedCompanyId != null ? selectedCompanyId : ''},
-                                    opSearch=${selectedOpSearch != null ? selectedOpSearch : ''},
-                                    contentSearch=${selectedContentSearch != null ? selectedContentSearch : ''})}"
-                                    th:text="|[${nextCsInfo.stationId}] ${nextCsInfo.stationName}(${nextCsInfo.companyName})|" class="no-underline"></a>
-                            </span>
-                            <span th:if="${nextCsInfo == null}">다음글이 없습니다.</span>
-                        </div>
-                        <div class="previous-article">
-                            <i class="bi bi-caret-down me-2"></i>
-                            <span th:if="${previousCsInfo != null}">
-                                <a th:href="@{/station/list/detail/{stationId}(stationId=${previousCsInfo.stationId}, page=${currentPage}, size=${size},
-                                    companyIdSearch=${selectedCompanyId != null ? selectedCompanyId : ''},
-                                    opSearch=${selectedOpSearch != null ? selectedOpSearch : ''},
-                                    contentSearch=${selectedContentSearch != null ? selectedContentSearch : ''})}"
-                                    th:text="|[${previousCsInfo.stationId}] ${previousCsInfo.stationName}(${previousCsInfo.companyName})|" class="no-underline"></a>
-                            </span>
-                            <span th:if="${previousCsInfo == null}">이전글이 없습니다.</span>
-                        </div> -->
                         <button type="button" class="list-btn"
                             th:data-page="${currentPage}" th:data-size="${size}" th:data-companyid="${selectedCompanyId}"
                             th:data-startdate="${selectedOpSearch}" th:data-enddate="${selectedContentSearch}"
