@@ -214,7 +214,6 @@ $(document).ready(function() {
     $('#pageList').on('click', 'tr', function() {
         selectRow = $(this);
         memberId = selectRow.find('td').eq(0).attr('id');
-        console.log("memberID: " + memberId);
     });
 
     $('#addBtn').on('click', function(event) {
@@ -396,11 +395,11 @@ $(document).ready(function() {
                 url: `/member/delete/${memberId}`,
                 contentType: "application/json",
                 success: function(response) {
-                    console.log(response);
-                    window.location.replace('/member/list');
+                    alert(response);
+                    window.location.reload();
                 },
                 error: function(error) {
-                    console.log(error);
+                    alert(error);
                 }
             });
         }
@@ -499,6 +498,7 @@ $(document).ready(function() {
                 contentType: 'application/json',
                 data: JSON.stringify(DATA),
                 success: function(response) {
+                    alert(response);
                     window.location.reload();
                 },
                 error: function(error) {

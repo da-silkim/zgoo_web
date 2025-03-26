@@ -50,26 +50,25 @@ document.addEventListener('DOMContentLoaded', () => {
         const selectedCheckboxes = document.querySelectorAll('#pageList input[type="checkbox"]:checked');
         if (selectedCheckboxes.length === 1) {
             // 체크된 항목이 하나일 때 버튼 활성화
-            if (editBtn) editBtn.disabled = false;
-            if (deleteBtn) deleteBtn.disabled = false;
-            if (addBtnSub) addBtnSub.disabled = false;
-            if (addBtnSub) addBtnSub.disabled = false;
+            if (editBtn) {editBtn.disabled = false; editBtn.removeAttribute("hidden");}
+            if (deleteBtn) {deleteBtn.disabled = false; deleteBtn.removeAttribute("hidden");}
+            if (addBtnSub) {addBtnSub.disabled = false; addBtnSub.removeAttribute("hidden");}
         } else {
             // 체크된 항목이 없거나 두 개 이상일 때 버튼 비활성화
-            if (editBtn) editBtn.disabled = true;
-            if (deleteBtn) deleteBtn.disabled = true;
-            if (addBtnSub) addBtnSub.disabled = true;
+            if (editBtn) {editBtn.disabled = true; editBtn.setAttribute("hidden", true);}
+            if (deleteBtn) {deleteBtn.disabled = true; deleteBtn.setAttribute("hidden", true);}
+            if (addBtnSub) {addBtnSub.disabled = true; addBtnSub.setAttribute("hidden", true);}
         }
     }
 
     function updateBtn2() {
         const selectedCheckboxes = document.querySelectorAll('#pageList2 input[type="checkbox"]:checked');
         if (selectedCheckboxes.length === 1) {
-            if (editBtnSec) editBtnSec.disabled = false;
-            if (deleteBtnSec) deleteBtnSec.disabled = false;
+            if (editBtnSec) {editBtnSec.disabled = false; editBtnSec.removeAttribute("hidden");}
+            if (deleteBtnSec) {deleteBtnSec.disabled = false; deleteBtnSec.removeAttribute("hidden");}
         } else {
-            if (editBtnSec) editBtnSec.disabled = true;
-            if (deleteBtnSec) deleteBtnSec.disabled = true;
+            if (editBtnSec) {editBtnSec.disabled = true; editBtnSec.setAttribute("hidden", true);}
+            if (deleteBtnSec) {deleteBtnSec.disabled = true; deleteBtnSec.setAttribute("hidden", true);}
         }
     }
 
@@ -78,12 +77,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const selectedCheckboxes = document.querySelectorAll('#pageListSub input[type="checkbox"]:checked');
         if (selectedCheckboxes.length === 1) {
             // 체크된 항목이 하나일 때 버튼 활성화
-            if (editBtnSub) editBtnSub.disabled = false;
-            if (deleteBtnSub) deleteBtnSub.disabled = false;
+            if (editBtnSub) {editBtnSub.disabled = false; editBtnSub.removeAttribute("hidden");}
+            if (deleteBtnSub) {deleteBtnSub.disabled = false; deleteBtnSub.removeAttribute("hidden");}
         } else {
             // 체크된 항목이 없거나 두 개 이상일 때 버튼 비활성화
-            if (editBtnSub) editBtnSub.disabled = true;
-            if (deleteBtnSub) deleteBtnSub.disabled = true;
+            if (editBtnSub) {editBtnSub.disabled = true; editBtnSub.setAttribute("hidden", true);}
+            if (deleteBtnSub) {deleteBtnSub.disabled = true; deleteBtnSub.setAttribute("hidden", true);}
         }
     }
 

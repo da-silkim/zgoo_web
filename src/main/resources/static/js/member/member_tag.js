@@ -83,7 +83,7 @@ $(document).ready(function() {
                 contentType: "application/json",
                 success: function(response) {
                     alert(response);
-                    window.location.replace('/member/tag/list');
+                    window.location.reload();
                 },
                 error: function(error) {
                     alert(error);

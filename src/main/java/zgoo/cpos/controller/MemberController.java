@@ -1,5 +1,6 @@
 package zgoo.cpos.controller;
 
+import java.security.Principal;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,7 +23,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import zgoo.cpos.domain.member.MemberAuth;
 import zgoo.cpos.dto.biz.BizInfoDto.BizInfoRegDto;
-import zgoo.cpos.dto.member.MemberDto;
 import zgoo.cpos.dto.member.MemberDto.MemberAuthDto;
 import zgoo.cpos.dto.member.MemberDto.MemberDetailDto;
 import zgoo.cpos.dto.member.MemberDto.MemberPasswordDto;
@@ -125,38 +125,40 @@ public class MemberController {
 
     // 회원 등록
     @PostMapping("/new")
-    public ResponseEntity<String> createMember(@Valid @RequestBody MemberRegDto dto) {
+    public ResponseEntity<String> createMember(@Valid @RequestBody MemberRegDto dto, Principal principal) {
         log.info("=== create member info ===");
 
         try {
-            this.memberService.saveMember(dto);
+            this.memberService.saveMember(dto, principal.getName());
             return ResponseEntity.ok("회원 정보가 정상적으로 등록되었습니다.");
         } catch (Exception e) {
             log.error("[createMember] error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                    .body("회원 정보 등록 중 오류 발생");
+                                    .body("회원 정보 등록 중 오류가 발생했습니다.");
         }
     }
 
     // 회원 수정
     @PatchMapping("/update/{memberId}")
-    public ResponseEntity<String> updateMember(@PathVariable("memberId") Long memberId, @RequestBody MemberRegDto dto) {
+    public ResponseEntity<String> updateMember(@PathVariable("memberId") Long memberId,
+        @RequestBody MemberRegDto dto, Principal principal) {
         log.info("=== update member info ===");
 
         try {
-            this.memberService.updateMemberInfo(memberId, dto);
+            this.memberService.updateMemberInfo(memberId, dto, principal.getName());
             log.info("=== member info update complete ===");
             return ResponseEntity.ok("회원 정보가 정상적으로 수정되었습니다.");
         } catch (Exception e) {
             log.error("[updateMember] error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                    .body("회원 정보 수정 중 오류 발생");
+                                    .body("회원 정보 수정 중 오류가 발생했습니다.");
         }
     }
 
     // 비밀번호 변경
     @PatchMapping("/update/password/{memberId}")
-    public ResponseEntity<Map<String, Object>> updateMemberPassword(@PathVariable("memberId") Long memberId, @RequestBody MemberPasswordDto dto) {
+    public ResponseEntity<Map<String, Object>> updateMemberPassword(@PathVariable("memberId") Long memberId,
+            @RequestBody MemberPasswordDto dto) {
         log.info("=== update member password info ===");
 
         Map<String, Object> response = new HashMap<>();
@@ -169,7 +171,7 @@ public class MemberController {
                 case 1 -> response.put("message", "비밀번호가 변경되었습니다.");
                 case 2 -> response.put("message", "새 비밀번호 값이 일치하지 않습니다.");
                 default -> response.put("message", "비밀번호 변경에 실패했습니다.");
-            };
+            }
             
             response.put("state", result);
             return ResponseEntity.ok(response);
@@ -182,7 +184,7 @@ public class MemberController {
 
     // 회원 삭제
     @DeleteMapping("/delete/{memberId}")
-    public ResponseEntity<String> deleteMember(@PathVariable("memberId") Long memberId) {
+    public ResponseEntity<String> deleteMember(@PathVariable("memberId") Long memberId, Principal principal) {
         log.info("=== delete member info ===");
 
         if (memberId == null) {
@@ -192,12 +194,12 @@ public class MemberController {
         }
 
         try {
-            this.memberService.deleteMember(memberId);
+            this.memberService.deleteMember(memberId, principal.getName());
             return ResponseEntity.ok("회원 정보가 정상적으로 삭제되었습니다.");
         } catch (Exception e) {
             log.error("[deleteMember] error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                    .body("회원 정보 삭제 중 오류 발생");
+                                    .body("회원 정보 삭제 중 오류가 발생했습니다.");
         }
     }
 
@@ -228,11 +230,11 @@ public class MemberController {
 
     // 회원카드정보 수정
     @PatchMapping("/tag/update")
-    public ResponseEntity<String> updateMemberAuth(@Valid @RequestBody MemberAuthDto dto) {
+    public ResponseEntity<String> updateMemberAuth(@Valid @RequestBody MemberAuthDto dto, Principal principal) {
         log.info("=== update member auth info ===");
         
         try {
-            MemberAuth auth = this.memberService.updateMemberAuthInfo(dto);
+            MemberAuth auth = this.memberService.updateMemberAuthInfo(dto, principal.getName());
 
             if (auth == null) {
                 log.info("=== member auth info update failure ===");
@@ -244,28 +246,28 @@ public class MemberController {
         } catch (Exception e) {
             log.error("[updateMemberAuth] error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                    .body("회원카드정보 수정 중 오류 발생");
+                                    .body("회원카드정보 수정 중 오류가 발생했습니다.");
         }
     }
 
     // 회원카드정보 삭제
     @DeleteMapping("/tag/delete/{idTag}")
-    public ResponseEntity<String> deleteMemberAuth(@PathVariable("idTag") String idTag) {
+    public ResponseEntity<String> deleteMemberAuth(@PathVariable("idTag") String idTag, Principal principal) {
         log.info("=== delete member auth info ===");
 
         if (idTag == null) {
             log.error("idTag is null");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                                    .body("회원카드번호 정보가 없습니다.");
+                                    .body("회원카드번호 정보가 없어서 삭제할 수 없습니다.");
         }
 
         try {
-            this.memberService.deleteMemberAuth(idTag);
+            this.memberService.deleteMemberAuth(idTag, principal.getName());
             return ResponseEntity.ok("회원카드정보가 정상적으로 삭제되었습니다.");
         } catch (Exception e) {
             log.error("[deleteMemberAuth] error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                    .body("회원카드정보 삭제 중 오류 발생");
+                                    .body("회원카드정보 삭제 중 오류가 발생했습니다.");
         }
     }
 
@@ -285,7 +287,7 @@ public class MemberController {
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             log.error("[readFile] error: {}", e.getMessage());
-            response.put("message", "회원약관 내용 조회 중 오류 발생");
+            response.put("message", "회원약관 내용 조회 중 오류가 발생했습니다.");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
