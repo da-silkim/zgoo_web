@@ -5,6 +5,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.security.Principal;
 import java.util.Collections;
 import java.util.List;
 
@@ -26,6 +27,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import zgoo.cpos.dto.member.ConditionDto.ConditionCodeBaseDto;
 import zgoo.cpos.dto.member.ConditionDto.ConditionVersionHistBaseDto;
+import zgoo.cpos.service.ComService;
 import zgoo.cpos.service.ConditionService;
 
 @Controller
@@ -35,6 +37,7 @@ import zgoo.cpos.service.ConditionService;
 public class ConditionController {
 
     private final ConditionService conditionService;
+    private final ComService comService;
 
     // 약관 개정 히스토리 조회
     @GetMapping("/hist/search/{conditionCode}")
@@ -59,45 +62,58 @@ public class ConditionController {
 
     // 약관 등록
     @PostMapping("/new")
-    public ResponseEntity<String> createConditionCode(@Valid @RequestBody ConditionCodeBaseDto dto) {
+    public ResponseEntity<String> createConditionCode(@Valid @RequestBody ConditionCodeBaseDto dto,
+            Principal principal) {
         log.info("=== create condition info ===");
 
         try {
+            ResponseEntity<String> permissionCheck = this.comService.checkSuperAdminPermissions(principal);
+            if (permissionCheck != null) {
+                return permissionCheck;
+            }
+
             this.conditionService.saveConditionCode(dto);
             return ResponseEntity.ok("약관 정보가 정상적으로 등록되었습니다.");
         } catch (Exception e) {
             log.error("[createConditionCode] error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                    .body("약관 등록 중 오류 발생");
+                                    .body("약관 등록 중 오류가 발생했습니다.");
         }
     }
 
     // 약관 개정 히스토리 등록
     @PostMapping("/hist/new")
     public ResponseEntity<String> createConditionHist(
-            @ModelAttribute @Valid ConditionVersionHistBaseDto dto) {
+            @ModelAttribute @Valid ConditionVersionHistBaseDto dto, Principal principal) {
         log.info("=== create condition version hist info ===");
 
         try {
-            // System.out.println("conditionHist: " + dto.toString());
+            ResponseEntity<String> permissionCheck = this.comService.checkSuperAdminPermissions(principal);
+            if (permissionCheck != null) {
+                return permissionCheck;
+            }
 
-            // 약관 버전 히스토리 저장
             this.conditionService.saveConditionVersionHist(dto);
 
             return ResponseEntity.ok("약관 개정 정보가 정상적으로 등록되었습니다.");
         } catch (Exception e) {
             log.error("[createConditionHist] error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                .body("약관 개정 등록 중 오류 발생");
+                                .body("약관 개정 등록 중 오류가 발생했습니다.");
         }
     }
 
     // 약관 다운로드
     @GetMapping("/hist/download")
-    public void downloadFile(@RequestParam("id") Long id, HttpServletResponse response) {
+    public void downloadFile(@RequestParam("id") Long id, HttpServletResponse response, Principal principal) {
         log.info("=== download condition file info ===");
 
         try {
+            ResponseEntity<String> permissionCheck = this.comService.checkSuperAdminPermissions(principal);
+            if (permissionCheck != null) {
+                return;
+            }
+
             ConditionVersionHistBaseDto conDto = this.conditionService.findHistOne(id);
             if (conDto == null) {
                 log.error("[downloadFile] condition hist is null");
@@ -128,31 +144,43 @@ public class ConditionController {
 
     // 약관 삭제
     @DeleteMapping("/delete/{conditionCode}")
-    public ResponseEntity<String> deleteConditionCode(@PathVariable("conditionCode") String conditionCode) {
+    public ResponseEntity<String> deleteConditionCode(@PathVariable("conditionCode") String conditionCode,
+            Principal principal) {
         log.info("=== delete condition info ===");
 
         try {
+            ResponseEntity<String> permissionCheck = this.comService.checkSuperAdminPermissions(principal);
+            if (permissionCheck != null) {
+                return permissionCheck;
+            }
+
             this.conditionService.deleteConditionCode(conditionCode);
             return ResponseEntity.ok("약관 정보가 정상적으로 삭제되었습니다.");
         } catch (Exception e) {
             log.error("[deleteConditionCode] error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                    .body("약관 정보 삭제 중 오류 발생");
+                                    .body("약관 정보 삭제 중 오류가 발생했습니다.");
         }
     }
 
     // 약관 개정 히스토리 삭제
     @DeleteMapping("/delete/hist/{conditionVersionHistId}")
-    public ResponseEntity<String> deleteConditionHist(@PathVariable("conditionVersionHistId") Long conditionVersionHistId) {
+    public ResponseEntity<String> deleteConditionHist(@PathVariable("conditionVersionHistId") Long conditionVersionHistId,
+            Principal principal) {
         log.info("=== delete condition version hist info ===");
 
         try {
+            ResponseEntity<String> permissionCheck = this.comService.checkSuperAdminPermissions(principal);
+            if (permissionCheck != null) {
+                return permissionCheck;
+            }
+            
             this.conditionService.deleteConditionHist(conditionVersionHistId);
             return ResponseEntity.ok("약관 개정 정보가 정상적으로 삭제되었습니다.");
         } catch (Exception e) {
             log.error("[deleteConditionHist] error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                    .body("약관 개정 정보 삭제 중 오류 발생");
+                                    .body("약관 개정 정보 삭제 중 오류가 발생했습니다.");
         }
     }
 }

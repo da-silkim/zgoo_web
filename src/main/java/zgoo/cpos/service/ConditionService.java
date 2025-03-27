@@ -59,13 +59,13 @@ public class ConditionService {
 
     // 약관 개정 단건 조회
     public ConditionVersionHistBaseDto findHistOne(Long id) {
-        ConditionVersionHistBaseDto con = null;
         try {
-            con = this.conditionVersionHistRepository.findByIdCustom(id);
+            ConditionVersionHistBaseDto con = this.conditionVersionHistRepository.findByIdCustom(id);
+            return con;
         } catch (Exception e) {
             log.error("[findHistOne] error : {}", e.getMessage());
+            return null;
         }
-        return con;
     }
 
     // 약관 저장
@@ -83,7 +83,6 @@ public class ConditionService {
     @Transactional
     public void saveConditionVersionHist(ConditionVersionHistBaseDto dto) {
         try {
-            // System.out.println("conditionCode: " + dto.getConditionCode());
             ConditionCode condition = this.conditionCodeRepository.findByConditionCode(dto.getConditionCode());
 
             if (condition == null) {
