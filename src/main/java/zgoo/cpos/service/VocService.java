@@ -19,7 +19,6 @@ import zgoo.cpos.mapper.VocMapper;
 import zgoo.cpos.dto.member.VocDto.VocListDto;
 import zgoo.cpos.repository.member.MemberRepository;
 import zgoo.cpos.repository.member.VocRepository;
-import zgoo.cpos.util.MenuConstants;
 
 @Service
 @RequiredArgsConstructor
@@ -27,7 +26,6 @@ import zgoo.cpos.util.MenuConstants;
 public class VocService {
     private final VocRepository vocRepository;
     private final MemberRepository memberRepository;
-    private final ComService comService;
 
     // 1:1문의 조회
     public Page<VocListDto> findVocInfoWithPagination(String type, String replyStat, String name, int page, int size) {
@@ -46,7 +44,7 @@ public class VocService {
 
             return vocList;
         } catch (Exception e) {
-            log.error("[findVocInfoWithPagination] error: {}", e.getMessage(), e);
+            log.error("[findVocInfoWithPagination] error: {}", e.getMessage());
             return Page.empty(pageable);
         }
     }
@@ -65,13 +63,6 @@ public class VocService {
     // 전화문의 등록
     public void saveVocCall(VocRegDto dto, String regUserId) {
         try {
-            if (regUserId == null || regUserId.isEmpty()) {
-                throw new IllegalArgumentException("User ID is missing. Cannot save voc without register user ID."); 
-            }
-
-            boolean isMod = comService.checkModYn(regUserId, MenuConstants.VOC);
-            if (!isMod) return;
-
             Member member = this.memberRepository.findById(dto.getMemberId())
                 .orElseThrow(() -> new IllegalArgumentException("member not found with id: " + dto.getMemberId()));
 
@@ -90,9 +81,6 @@ public class VocService {
 
             Voc voc = VocMapper.toEntity(dto, member);
             this.vocRepository.save(voc);
-        } catch (IllegalArgumentException e) {
-            log.error("[saveVocCall] Illegal argument error: {}", e.getMessage());
-            throw e;
         } catch (Exception e) {
             log.error("[saveVocCall] error: {}", e.getMessage());
         }
@@ -105,9 +93,6 @@ public class VocService {
             .orElseThrow(() -> new IllegalArgumentException("voc not found with id: " + vocId));
 
         try {
-            boolean isMod = comService.checkModYn(replyUserId, MenuConstants.VOC);
-            if (!isMod) return null;
-
             if (dto.getReplyContent() != null && !dto.getReplyContent().isEmpty()) {
                 dto.setReplyUserId(replyUserId);
                 dto.setReplyStat("COMPLETE");
@@ -127,7 +112,7 @@ public class VocService {
             List<MemberListDto> memberList = this.memberRepository.findMemberList(name, phoneNo);
             return memberList;
         } catch (Exception e) {
-            log.error("[findMemberList] error : {}", e.getMessage());
+            log.error("[findMemberList] error: {}", e.getMessage());
                 return null;
         }
     }

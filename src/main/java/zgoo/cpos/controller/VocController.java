@@ -22,7 +22,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import zgoo.cpos.dto.member.MemberDto.MemberListDto;
 import zgoo.cpos.dto.member.VocDto.VocRegDto;
+import zgoo.cpos.service.ComService;
 import zgoo.cpos.service.VocService;
+import zgoo.cpos.util.MenuConstants;
 
 @Controller
 @RequiredArgsConstructor
@@ -31,6 +33,7 @@ import zgoo.cpos.service.VocService;
 public class VocController {
 
     private final VocService vocService;
+    private final ComService comService;
 
     // 1:1 단건 조회
     @GetMapping("/get/{vocId}")
@@ -63,6 +66,12 @@ public class VocController {
         log.info("=== create voc info ===");
 
         try {
+            ResponseEntity<String> permissionCheck = this.comService.checkUserPermissions(principal,
+                MenuConstants.VOC);
+            if (permissionCheck != null) {
+                return permissionCheck;
+            }
+
             this.vocService.saveVocCall(dto, principal.getName());
             return ResponseEntity.ok("회원 정보가 정상적으로 등록되었습니다.");
         } catch (Exception e) {
@@ -79,6 +88,12 @@ public class VocController {
         log.info("=== update voc answer info ===");
 
         try {
+            ResponseEntity<String> permissionCheck = this.comService.checkUserPermissions(principal,
+                MenuConstants.VOC);
+            if (permissionCheck != null) {
+                return permissionCheck;
+            }
+
             Integer result = this.vocService.updateVocAnswer(vocId, dto, principal.getName());
             log.info("=== voc answer update complete ===");
             return switch (result) {
