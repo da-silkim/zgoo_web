@@ -28,8 +28,10 @@ import zgoo.cpos.dto.member.MemberDto.MemberDetailDto;
 import zgoo.cpos.dto.member.MemberDto.MemberPasswordDto;
 import zgoo.cpos.dto.member.MemberDto.MemberRegDto;
 import zgoo.cpos.service.BizService;
+import zgoo.cpos.service.ComService;
 import zgoo.cpos.service.ConditionService;
 import zgoo.cpos.service.MemberService;
+import zgoo.cpos.util.MenuConstants;
 
 @Controller
 @RequiredArgsConstructor
@@ -40,6 +42,7 @@ public class MemberController {
     private final MemberService memberService;
     private final BizService bizService;
     private final ConditionService conditionService;
+    private final ComService comService;
 
     // 회원 단건 조회
     @GetMapping("/get/{memberId}")
@@ -129,7 +132,12 @@ public class MemberController {
         log.info("=== create member info ===");
 
         try {
-            this.memberService.saveMember(dto, principal.getName());
+            ResponseEntity<String> permissionCheck = this.comService.checkUserPermissions(principal, MenuConstants.MEMBER_LIST);
+            if (permissionCheck != null) {
+                return permissionCheck;
+            }
+
+            this.memberService.saveMember(dto);
             return ResponseEntity.ok("회원 정보가 정상적으로 등록되었습니다.");
         } catch (Exception e) {
             log.error("[createMember] error: {}", e.getMessage());
@@ -145,7 +153,12 @@ public class MemberController {
         log.info("=== update member info ===");
 
         try {
-            this.memberService.updateMemberInfo(memberId, dto, principal.getName());
+            ResponseEntity<String> permissionCheck = this.comService.checkUserPermissions(principal, MenuConstants.MEMBER_LIST);
+            if (permissionCheck != null) {
+                return permissionCheck;
+            }
+
+            this.memberService.updateMemberInfo(memberId, dto);
             log.info("=== member info update complete ===");
             return ResponseEntity.ok("회원 정보가 정상적으로 수정되었습니다.");
         } catch (Exception e) {
@@ -187,14 +200,19 @@ public class MemberController {
     public ResponseEntity<String> deleteMember(@PathVariable("memberId") Long memberId, Principal principal) {
         log.info("=== delete member info ===");
 
-        if (memberId == null) {
-            log.error("memberId is null");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                                    .body("회원ID가 없습니다.");
-        }
-
         try {
-            this.memberService.deleteMember(memberId, principal.getName());
+            if (memberId == null) {
+                log.error("[deleteMember] memberId is null");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                                        .body("회원ID가 없습니다.");
+            }
+
+            ResponseEntity<String> permissionCheck = this.comService.checkUserPermissions(principal, MenuConstants.MEMBER_LIST);
+            if (permissionCheck != null) {
+                return permissionCheck;
+            }
+
+            this.memberService.deleteMember(memberId);
             return ResponseEntity.ok("회원 정보가 정상적으로 삭제되었습니다.");
         } catch (Exception e) {
             log.error("[deleteMember] error: {}", e.getMessage());
@@ -234,7 +252,12 @@ public class MemberController {
         log.info("=== update member auth info ===");
         
         try {
-            MemberAuth auth = this.memberService.updateMemberAuthInfo(dto, principal.getName());
+            ResponseEntity<String> permissionCheck = this.comService.checkUserPermissions(principal, MenuConstants.MEMBER_TAG);
+            if (permissionCheck != null) {
+                return permissionCheck;
+            }
+
+            MemberAuth auth = this.memberService.updateMemberAuthInfo(dto);
 
             if (auth == null) {
                 log.info("=== member auth info update failure ===");
@@ -255,14 +278,19 @@ public class MemberController {
     public ResponseEntity<String> deleteMemberAuth(@PathVariable("idTag") String idTag, Principal principal) {
         log.info("=== delete member auth info ===");
 
-        if (idTag == null) {
-            log.error("idTag is null");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                                    .body("회원카드번호 정보가 없어서 삭제할 수 없습니다.");
-        }
-
         try {
-            this.memberService.deleteMemberAuth(idTag, principal.getName());
+            if (idTag == null) {
+                log.error("[deleteMemberAuth] idTag is null");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                                        .body("회원카드번호 정보가 없어서 삭제할 수 없습니다.");
+            }
+
+            ResponseEntity<String> permissionCheck = this.comService.checkUserPermissions(principal, MenuConstants.MEMBER_TAG);
+            if (permissionCheck != null) {
+                return permissionCheck;
+            }
+
+            this.memberService.deleteMemberAuth(idTag);
             return ResponseEntity.ok("회원카드정보가 정상적으로 삭제되었습니다.");
         } catch (Exception e) {
             log.error("[deleteMemberAuth] error: {}", e.getMessage());

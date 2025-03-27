@@ -46,7 +46,6 @@ import zgoo.cpos.repository.member.MemberCreditCardRepository;
 import zgoo.cpos.repository.member.MemberRepository;
 import zgoo.cpos.util.AESUtil;
 import zgoo.cpos.util.EncryptionUtils;
-import zgoo.cpos.util.MenuConstants;
 
 @Service
 @RequiredArgsConstructor
@@ -62,7 +61,6 @@ public class MemberService {
     public final ConditionCodeRepository conditionCodeRepository;
     public final MemberAuthRepository memberAuthRepository;
     public final ConditionVersionHistRepository conditionVersionHistRepository;
-    public final ComService comService;
 
     // 회원 조회
     public Page<MemberListDto> findMemberInfoWithPagination(Long companyId, String idTag, String name, int page,
@@ -137,7 +135,6 @@ public class MemberService {
                 return this.memberRepository.findBizMemberDetailOne(memberId, carInfo, conditionInfo);
             }
 
-            log.error("[findMemberDetailOne] 사업자구분 조회 오류");
             return null;
         } catch (Exception e) {
             log.error("[findMemberDetailOne] error : {}", e.getMessage());
@@ -152,15 +149,8 @@ public class MemberService {
 
     // 회원 저장
     @Transactional
-    public void saveMember(MemberRegDto dto, String loginUserId) {
+    public void saveMember(MemberRegDto dto) {
         try {
-            if (loginUserId == null || loginUserId.isEmpty()) {
-                throw new IllegalArgumentException("User ID is missing. Cannot save member info without login user ID."); 
-            }
-
-            boolean isMod = comService.checkModYn(loginUserId, MenuConstants.MEMBER_LIST);
-            if (!isMod) return;
-
             Company company = this.companyRepository.findById(dto.getCompanyId())
                     .orElseThrow(
                             () -> new IllegalArgumentException("company not found with id: " + dto.getCompanyId()));
@@ -184,12 +174,12 @@ public class MemberService {
                 // 법인회원 결제카드 상태
                 if ((biz.getCardNum() != null || !biz.getCardNum().isEmpty())
                         && (biz.getBid() != null || !biz.getBid().isEmpty())) {
-                    member.updateCreditStatInfo("MCNORMAL"); // 정상
+                    member.updateCreditStatInfo("MCNORMAL");    // 정상
                 } else if ((biz.getCardNum() != null || !biz.getCardNum().isEmpty())
                         && (biz.getBid() == null || biz.getBid().isEmpty())) {
                     member.updateCreditStatInfo("MCNOBILLKEY"); // 빌키없음
                 } else {
-                    member.updateCreditStatInfo("MCNOTREG"); // 미등록
+                    member.updateCreditStatInfo("MCNOTREG");    // 미등록
                 }
             }
 
@@ -207,9 +197,6 @@ public class MemberService {
             // 회원카드관리 - 기본값 설정
             MemberAuth auth = MemberMapper.toEntityAuth(saved);
             this.memberAuthRepository.save(auth);
-        } catch (IllegalArgumentException e) {
-            log.error("[saveMember] Illegal argument error: {}", e.getMessage());
-            throw e;
         } catch (Exception e) {
             log.error("[saveMember] error: {}", e.getMessage());
         }
@@ -220,10 +207,10 @@ public class MemberService {
         try {
             // 카드 미등록
             if (dtos == null) {
-                log.info("[saveCondition] 카드 미등록");
+                log.info("[saveCreditCard] 카드 미등록");
                 member.updateCreditStatInfo("MCNOTREG");
             } else {
-                log.info("[saveCondition] 카드 등록 처리");
+                log.info("[saveCreditCard] 카드 등록 처리");
                 for (MemberCreditCardDto dto : dtos) {
                     if ("Y".equals(dto.getRepresentativeCard())) {
                         log.info("[updateRepresentativeCard] 결제카드 업데이트 실행 전");
@@ -273,16 +260,10 @@ public class MemberService {
 
     // 회원 리스트 수정
     @Transactional
-    public Member updateMemberInfo(Long memberId, MemberRegDto dto, String loginUserId) {
+    public Member updateMemberInfo(Long memberId, MemberRegDto dto) {
         Member member = this.memberRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("member not found with id: " + memberId));
         try {
-            if (loginUserId == null || loginUserId.isEmpty()) {
-                throw new IllegalArgumentException("User ID is missing. Cannot update member info without login user ID."); 
-            }
-            boolean isMod = comService.checkModYn(loginUserId, MenuConstants.MEMBER_LIST);
-            if (!isMod) return member;
-
             member.updateMemberInfo(dto);
 
             // 결제카드 정보 수정
@@ -307,9 +288,6 @@ public class MemberService {
 
             updateCarInfo(dto, member);
             updateMemberConditionInfo(dto, member);
-        } catch (IllegalArgumentException e) {
-            log.error("[updateMemberInfo] Illegal argument error: {}", e.getMessage());
-            throw e;
         } catch (Exception e) {
             log.error("[updateMemberInfo] error: {}", e.getMessage());
         }
@@ -456,26 +434,16 @@ public class MemberService {
 
     // 회원 리스트 삭제
     @Transactional
-    public void deleteMember(Long memberId, String loginUserId) {
+    public void deleteMember(Long memberId) {
         Member member = this.memberRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("member not found with id: " + memberId));
 
         try {
-            if (loginUserId == null || loginUserId.isEmpty()) {
-                throw new IllegalArgumentException("User ID is missing. Cannot delete member info without login user ID."); 
-            }
-
-            boolean isMod = comService.checkModYn(loginUserId, MenuConstants.MEMBER_LIST);
-            if (!isMod) return;
-
             this.memberCreditCardRepository.deleteAllByMemberId(memberId);
             this.memberCarRepository.deleteAllByMemberId(memberId);
             this.memberConditionRepository.deleteAllByMemberId(memberId);
             this.memberRepository.delete(member);
             log.info("==== memberId: {} is deleted..", memberId);
-        } catch (IllegalArgumentException e) {
-            log.error("[deleteMember] Illegal argument error: {}", e.getMessage());
-            throw e;
         } catch (Exception e) {
             log.error("[deleteMember] error: {}", e.getMessage());
         }
@@ -589,21 +557,11 @@ public class MemberService {
 
     // 회원카드정보 수정
     @Transactional
-    public MemberAuth updateMemberAuthInfo(MemberAuthDto dto, String loginUserId) {
+    public MemberAuth updateMemberAuthInfo(MemberAuthDto dto) {
         try {
-            if (loginUserId == null || loginUserId.isEmpty()) {
-                throw new IllegalArgumentException("User ID is missing. Cannot update member tag info without login user ID."); 
-            }
-
-            boolean isMod = comService.checkModYn(loginUserId, MenuConstants.MEMBER_TAG);
-            if (!isMod) return null;
-
             MemberAuth memberAuth = this.memberAuthRepository.findByIdTag(dto.getIdTag());
             memberAuth.updateMemberAuthInfo(dto);
             return memberAuth;
-        } catch (IllegalArgumentException e) {
-            log.error("[updateMemberAuthInfo] Illegal argument error: {}", e.getMessage());
-            throw e;
         } catch (Exception e) {
             log.error("[updateMemberAuthInfo] error: {}", e.getMessage());
             return null;
@@ -612,21 +570,11 @@ public class MemberService {
 
     // 회원카드정보 삭제
     @Transactional
-    public void deleteMemberAuth(String idTag, String loginUserId) {
+    public void deleteMemberAuth(String idTag) {
         try {
-            if (loginUserId == null || loginUserId.isEmpty()) {
-                throw new IllegalArgumentException("User ID is missing. Cannot delete member tag info without login user ID."); 
-            }
-
-            boolean isMod = comService.checkModYn(loginUserId, MenuConstants.MEMBER_TAG);
-            if (!isMod) return;
-
             MemberAuth memberAuth = this.memberAuthRepository.findByIdTag(idTag);
             this.memberAuthRepository.delete(memberAuth);
             log.info("==== idTag: {} is deleted..", idTag);
-        } catch (IllegalArgumentException e) {
-            log.error("[deleteMemberAuth] Illegal argument error: {}", e.getMessage());
-            throw e;
         } catch (Exception e) {
             log.error("[deleteMemberAuth] error: {}", e.getMessage());
         }
