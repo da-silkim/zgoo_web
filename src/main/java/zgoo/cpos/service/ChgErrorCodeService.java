@@ -1,6 +1,5 @@
 package zgoo.cpos.service;
 
-import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -22,40 +21,8 @@ public class ChgErrorCodeService {
 
     private final ChgErrorCodeRepository chgErrorCodeRepository;
 
-    // 에러코드 전체 조회
-    public Page<ChgErrorCodeListDto> findErrorCodeAll(int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
-
-        try {
-            Page<ChgErrorCodeListDto> errcdList = this.chgErrorCodeRepository.findErrorCodeWithPagination(pageable);
-            return errcdList;
-        } catch (DataAccessException dae) {
-            log.error("Database error occurred while fetching errcode with pagination: {}", dae.getMessage(), dae);
-            return Page.empty(pageable);
-        } catch (Exception e) {
-            log.error("Error occurred while fetching errcode with pagination: {}", e.getMessage(), e);
-            return Page.empty(pageable);
-        }
-    }
-
-    // 에러코드 검색 조회
-    public Page<ChgErrorCodeListDto> searchErrorCodeWithPagination(String manuf, String searchOp, String searchContent, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
-
-        try {
-            Page<ChgErrorCodeListDto> errcdList = this.chgErrorCodeRepository.searchErrorCodeWithPagination(manuf, searchOp, searchContent, pageable);
-            return errcdList;
-        } catch (DataAccessException dae) {
-            log.error("Database error occurred while fetching errcode with search pagination: {}", dae.getMessage(), dae);
-            return Page.empty(pageable);
-        } catch (Exception e) {
-            log.error("Error occurred while fetching errcode with search pagination: {}", e.getMessage(), e);
-            return Page.empty(pageable);
-        }
-    }
-
     // 에러코드 조회(전체 + 검색)
-    public Page<ChgErrorCodeListDto> findErrorCodeWithPagination(String manuf, String searchOp, String searchContent, int page, int size) {
+    public Page<ChgErrorCodeListDto> findErrorCodeInfoWithPagination(String manuf, String searchOp, String searchContent, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
 
         try {
@@ -67,7 +34,7 @@ public class ChgErrorCodeService {
                 return this.chgErrorCodeRepository.searchErrorCodeWithPagination(manuf, searchOp, searchContent, pageable);
             }
         } catch (Exception e) {
-            log.error("[findErrorCodeWithPagination] error: {}", e.getMessage(), e);
+            log.error("[findErrorCodeInfoWithPagination] error: {}", e.getMessage());
             return Page.empty(pageable);
         }
     }

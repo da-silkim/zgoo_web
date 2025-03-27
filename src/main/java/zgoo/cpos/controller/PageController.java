@@ -775,7 +775,7 @@ public class PageController {
 
         try {
             // 에러코드 list
-            Page<ChgErrorCodeListDto> errcdList = this.chgErrorCodeService.findErrorCodeWithPagination(manfCode,
+            Page<ChgErrorCodeListDto> errcdList = this.chgErrorCodeService.findErrorCodeInfoWithPagination(manfCode,
                     searchOp, searchContent, page, size);
 
             // 검색 조건 저장
