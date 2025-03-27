@@ -1,5 +1,6 @@
 package zgoo.cpos.controller;
 
+import java.security.Principal;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -8,7 +9,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,7 +23,9 @@ import zgoo.cpos.domain.cp.CpModel;
 import zgoo.cpos.dto.cp.CpModelDto.CpModelDetailDto;
 import zgoo.cpos.dto.cp.CpModelDto.CpModelListDto;
 import zgoo.cpos.dto.cp.CpModelDto.CpModelRegDto;
+import zgoo.cpos.service.ComService;
 import zgoo.cpos.service.CpModelService;
+import zgoo.cpos.util.MenuConstants;
 
 @Controller
 @RequiredArgsConstructor
@@ -32,8 +34,9 @@ import zgoo.cpos.service.CpModelService;
 public class CpModelController {
 
     private final CpModelService cpModelService;
+    private final ComService comService;
 
-    // 충전기 모델 단거조회 by 사업자ID
+    // 충전기 모델 단건 조회 by 사업자ID
     @GetMapping("/get/modal/list/{companyId}")
     public ResponseEntity<List<CpModelListDto>> findcpmodelList(@PathVariable("companyId") Long companyId) {
         log.info("=== find cp model List info by companyId ===");
@@ -101,7 +104,7 @@ public class CpModelController {
             CpModelDetailDto cpModel = this.cpModelService.findCpModelDetailOne(modelId);
             model.addAttribute("cpModel", cpModel);
 
-            // pagination 관련 파라미터 추가
+            // 목록
             model.addAttribute("currentPage", page);
             model.addAttribute("size", size);
             model.addAttribute("selectedCompanyId", companyId);
@@ -116,33 +119,37 @@ public class CpModelController {
 
     // 충전기 모델 등록
     @PostMapping("/new")
-    public ResponseEntity<String> createCpModel(@Valid @RequestBody CpModelRegDto dto,
-            @ModelAttribute("loginUserId") String loginUserId) {
+    public ResponseEntity<String> createCpModel(@Valid @RequestBody CpModelRegDto dto, Principal principal) {
         log.info("=== create cp model info ===");
 
         try {
-            if (loginUserId != null && !loginUserId.isEmpty()) {
-                dto.setUserId(loginUserId);
-            } else {
-                // dto.setUserId("daadmin"); // 비로그인, 테스트 사용자ID
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body("충전기 모델 정보를 등록할 사용자ID가 없습니다.");
+            ResponseEntity<String> permissionCheck = this.comService.checkUserPermissions(principal, MenuConstants.MODEL);
+            if (permissionCheck != null) {
+                return permissionCheck;
             }
+
+            dto.setUserId(principal.getName());
             this.cpModelService.saveCpModelInfo(dto);
             return ResponseEntity.ok("충전기 모델 정보가 정상적으로 등록되었습니다.");
         } catch (Exception e) {
             log.error("[createCpModel] error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("충전기 모델 등록 중 오류 발생");
+                                    .body("충전기 모델 등록 중 오류가 발생했습니다.");
         }
     }
 
     // 충전기 모델 수정
     @PatchMapping("/update/{modelId}")
-    public ResponseEntity<String> updateCpModel(@PathVariable("modelId") Long modelId, @RequestBody CpModelRegDto dto) {
+    public ResponseEntity<String> updateCpModel(@PathVariable("modelId") Long modelId, @RequestBody CpModelRegDto dto,
+            Principal principal) {
         log.info("=== update cp model info ===");
 
         try {
+            ResponseEntity<String> permissionCheck = this.comService.checkUserPermissions(principal, MenuConstants.MODEL);
+            if (permissionCheck != null) {
+                return permissionCheck;
+            }
+            
             CpModel model = this.cpModelService.updateCpModelInfo(dto, modelId);
             this.cpModelService.updateCpModelDetailInfo(dto, model);
             this.cpModelService.updateCpConnectorInfo(dto, model);
@@ -152,28 +159,33 @@ public class CpModelController {
         } catch (Exception e) {
             log.error("[updateCpModel] error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("충전기 모델 수정 중 오류 발생");
+                                    .body("충전기 모델 수정 중 오류가 발생했습니다.");
         }
     }
 
     // 충전기 모델 삭제
     @DeleteMapping("/delete/{modelId}")
-    public ResponseEntity<String> deleteCpModel(@PathVariable("modelId") Long modelId) {
+    public ResponseEntity<String> deleteCpModel(@PathVariable("modelId") Long modelId, Principal principal) {
         log.info("=== delete cp model info ===");
 
-        if (modelId == null) {
-            log.error("modelId id is null");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("충전소기 모델ID가 없습니다.");
-        }
-
         try {
+            if (modelId == null) {
+                log.error("modelId id is null");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                                        .body("충전기 모델ID가 없어 삭제할 수 없습니다.");
+            }
+
+            ResponseEntity<String> permissionCheck = this.comService.checkUserPermissions(principal, MenuConstants.MODEL);
+            if (permissionCheck != null) {
+                return permissionCheck;
+            }
+
             this.cpModelService.deleteCpModel(modelId);
-            return ResponseEntity.ok("충전소기 모델이 정상적으로 삭제되었습니다.");
+            return ResponseEntity.ok("충전기 모델이 정상적으로 삭제되었습니다.");
         } catch (Exception e) {
             log.error("[deleteCpModel] error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("충전기 모델 삭제 중 오류 발생");
+                                    .body("충전기 모델 삭제 중 오류가 발생했습니다.");
         }
     }
 }

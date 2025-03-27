@@ -432,13 +432,8 @@ public class PageController {
 
         try {
             // 충전기 모델 list
-            Page<CpModelListDto> modelList;
-            if (companyId == null && manfCode == null && chgSpeedCode == null) {
-                modelList = this.cpModelService.findCpModelAll(page, size);
-            } else {
-                modelList = this.cpModelService.searchCpModelWithPagination(companyId, manfCode, chgSpeedCode, page,
-                        size);
-            }
+            Page<CpModelListDto> modelList = this.cpModelService.findCpModelInfoWithPagination(companyId, manfCode, chgSpeedCode,
+                page, size); 
 
             model.addAttribute("selectedCompanyId", companyId);
             model.addAttribute("selectedManfCd", manfCode);
@@ -452,8 +447,7 @@ public class PageController {
             model.addAttribute("totalPages", totalPages); // 총 페이지 수
             model.addAttribute("totalCount", modelList.getTotalElements()); // 총 데이터
 
-            // 사업자 list(select option)
-            List<CompanyListDto> companyList = this.companyService.findCompanyListAll();
+            List<CompanyListDto> companyList = this.companyService.findCompanyListAll(); // 사업자 list
             model.addAttribute("companyList", companyList);
             List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT"); // 그리드 row 수
             model.addAttribute("showListCnt", showListCnt);
