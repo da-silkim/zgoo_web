@@ -27,6 +27,23 @@ public class ComService {
     private final MenuAuthorityRepository menuAuthorityRepository;
     private final UsersRepository usersRepository;
 
+    // Super Admin check
+    public boolean checkSuperAdmin(String loginUserId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+
+        for (GrantedAuthority authority : authorities) {
+            String authorityName = authority.getAuthority();
+
+            if (!"SU".equals(authorityName)) {
+                log.info("[checkSuperAdmin] not a super admin");
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     // mod_yn check
     public boolean checkModYn(String loginUserId, String menuCode) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -80,6 +97,20 @@ public class ComService {
         if (!isMod) {
             response.put("message", "FORBIDDEN");
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+        }
+
+        return null;
+    }
+
+    public ResponseEntity<String> checkSuperAdminPermissions(Principal principal) {
+        String loginUserId = principal.getName();
+        if (loginUserId == null || loginUserId.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("사용자 정보를 찾을 수 없습니다.");
+        }
+
+        boolean isSuperAdmin = checkSuperAdmin(loginUserId);
+        if (!isSuperAdmin) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
         return null;
