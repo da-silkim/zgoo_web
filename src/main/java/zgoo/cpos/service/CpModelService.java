@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -41,39 +40,24 @@ public class CpModelService {
     private final CpModelDetailRepository cpModelDetailRepository;
     private final CpConnectorRepository cpConnectorRepository;
 
-    // 충전기 모델 전체 조회
-    @Transactional
-    public Page<CpModelListDto> findCpModelAll(int page, int size) {
+    // 충전기 모델 조회
+    public Page<CpModelListDto> findCpModelInfoWithPagination(Long companyId, String manuf, String chgSpeed, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
 
         try {
-            Page<CpModelListDto> modelList = this.cpModelRepository.findCpModelWithPagination(pageable);
-            return modelList;
-        } catch (DataAccessException dae) {
-            log.error("Database error occurred while fetching model list with pagination: {}", dae.getMessage(), dae);
-            return Page.empty(pageable);
-        } catch (Exception e) {
-            log.error("Error occurred while fetching model list with pagination: {}", e.getMessage(), e);
-            return Page.empty(pageable);
-        }
-    }
+            Page<CpModelListDto> modelList;
 
-    // 충전기 모델 검색 조회
-    @Transactional
-    public Page<CpModelListDto> searchCpModelWithPagination(Long companyId, String manuf, String chgSpeed, int page,
-            int size) {
-        Pageable pageable = PageRequest.of(page, size);
+            if (companyId == null && (manuf == null || manuf.isEmpty()) && (chgSpeed == null || chgSpeed.isEmpty())) {
+                log.info("Executing the [findCpModelWithPagination]");      // 전체 조회
+                modelList = this.cpModelRepository.findCpModelWithPagination(pageable);
+            } else {
+                log.info("Executing the [searchCpModelWithPagination]");    // 검색 조회
+                modelList = this.cpModelRepository.searchCpModelWithPagination(companyId, manuf, chgSpeed, pageable);
+            }
 
-        try {
-            Page<CpModelListDto> modelList = this.cpModelRepository.searchCpModelWithPagination(companyId, manuf,
-                    chgSpeed, pageable);
             return modelList;
-        } catch (DataAccessException dae) {
-            log.error("Database error occurred while fetching model list with search pagination: {}", dae.getMessage(),
-                    dae);
-            return Page.empty(pageable);
         } catch (Exception e) {
-            log.error("Error occurred while fetching model list with search pagination: {}", e.getMessage(), e);
+            log.error("[findCpModelInfoWithPagination] error: {}", e.getMessage());
             return Page.empty(pageable);
         }
     }
@@ -157,7 +141,7 @@ public class CpModelService {
             if (model != null)
                 model.updateCpModelInfo(dto);
         } catch (Exception e) {
-            log.error("[updateCpModel] error: {}", e.getMessage());
+            log.error("[updateCpModelInfo] error: {}", e.getMessage());
         }
         return model;
     }
@@ -188,7 +172,7 @@ public class CpModelService {
         try {
             if (dto.getConnector() != null && !dto.getConnector().isEmpty()) {
                 List<CpConnector> connectorList = this.cpConnectorRepository.findAllByModelId(model.getId());
-                log.info("=== updateCpConnectorInfo >> cnt:{}", connectorList.size());
+                log.info("=== updateCpConnectorInfo >> count: {}", connectorList.size());
 
                 // 업데이트와 추가 처리를 위한 Set
                 Set<Integer> updatedConnectorId = new HashSet<>();
