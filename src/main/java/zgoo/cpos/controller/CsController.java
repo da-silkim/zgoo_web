@@ -22,7 +22,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import zgoo.cpos.dto.cs.CsInfoDto.CsInfoDetailDto;
 import zgoo.cpos.dto.cs.CsInfoDto.CsInfoRegDto;
+import zgoo.cpos.service.ComService;
 import zgoo.cpos.service.CsService;
+import zgoo.cpos.util.MenuConstants;
 
 @Controller
 @RequiredArgsConstructor
@@ -31,6 +33,7 @@ import zgoo.cpos.service.CsService;
 public class CsController {
 
     private final CsService csService;
+    private final ComService comService;
 
     // 충전소 이름 중복 검사
     @GetMapping("/checkStationName")
@@ -100,7 +103,13 @@ public class CsController {
         Map<String, String> response = new HashMap<>();
 
         try {
-            String result = this.csService.saveCsInfo(dto, principal.getName());
+            ResponseEntity<Map<String, String>> permissionCheck = this.comService.checkUserPermissionsMsg(principal,
+                MenuConstants.STATION_LIST);
+            if (permissionCheck != null) {
+                return permissionCheck;
+            }
+
+            String result = this.csService.saveCsInfo(dto);
             if (result == null) {
                 response.put("message", "충전소 정보 등록에 실패했습니다.");
                 return ResponseEntity.badRequest().body(response);
@@ -123,7 +132,13 @@ public class CsController {
         Map<String, String> response = new HashMap<>();
 
         try {
-            this.csService.updateCsInfo(dto, principal.getName());
+            ResponseEntity<Map<String, String>> permissionCheck = this.comService.checkUserPermissionsMsg(principal,
+                MenuConstants.STATION_LIST);
+            if (permissionCheck != null) {
+                return permissionCheck;
+            }
+
+            this.csService.updateCsInfo(dto);
             log.info("=== charge station info update complete ===");
             response.put("message", "충전소 정보가 정상적으로 수정되었습니다.");
             return ResponseEntity.ok(response);
@@ -144,9 +159,16 @@ public class CsController {
             if (stationId == null) {
                 log.error("[deleteCsInfo] error: stationId is null");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                                    .body("충전소ID가 없어 정보를 삭제할 수 없습니다.");
+                                        .body("충전소ID가 없어 정보를 삭제할 수 없습니다.");
             }
-            this.csService.deleteCsInfo(stationId, principal.getName());
+
+            ResponseEntity<String> permissionCheck = this.comService.checkUserPermissions(principal,
+                MenuConstants.STATION_LIST);
+            if (permissionCheck != null) {
+                return permissionCheck;
+            }
+
+            this.csService.deleteCsInfo(stationId);
             return ResponseEntity.ok("충전소 정보가 정상적으로 삭제되었습니다.");
         } catch (Exception e) {
             log.error("[deleteCsInfo] error: {}", e.getMessage());

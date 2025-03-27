@@ -1,7 +1,12 @@
 package zgoo.cpos.service;
 
+import java.security.Principal;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -45,5 +50,38 @@ public class ComService {
         }
 
         return false;
+    }
+
+    // loginUserId & authority check
+    public ResponseEntity<String> checkUserPermissions(Principal principal, String menuCode) {
+        String loginUserId = principal.getName();
+        if (loginUserId == null || loginUserId.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("사용자 정보를 찾을 수 없습니다.");
+        }
+
+        boolean isMod = checkModYn(loginUserId, menuCode);
+        if (!isMod) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        return null;
+    }
+
+    public ResponseEntity<Map<String, String>> checkUserPermissionsMsg(Principal principal, String menuCode) {
+        Map<String, String> response = new HashMap<>();
+        
+        String loginUserId = principal.getName();
+        if (loginUserId == null || loginUserId.isEmpty()) {
+            response.put("message", "사용자 정보를 찾을 수 없습니다.");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+
+        boolean isMod = checkModYn(loginUserId, menuCode);
+        if (!isMod) {
+            response.put("message", "FORBIDDEN");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+        }
+
+        return null;
     }
 }
