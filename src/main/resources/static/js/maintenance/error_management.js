@@ -74,7 +74,6 @@ $(document).ready(function() {
     });
 
     $('#chargerId').on('input', function() {
-        // console.log('Input detected: ' + this.value);
         chargerIdValid = false;
     });
 
