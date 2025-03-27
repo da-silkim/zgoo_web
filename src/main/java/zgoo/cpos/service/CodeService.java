@@ -28,96 +28,115 @@ public class CodeService {
     private final CommonCodeRepository commonCodeRepository;
 
     // 그룹코드 저장
-    public void saveGrpCode(GrpCodeDto dto) {
-        // dto >> entity
-        GrpCode grpCode = GrpCodeMapper.toEntity(dto);
+    public void saveGrpCode(GrpCodeDto dto, String loginUserId) {
+        try {
+            dto.setRegUserId(loginUserId);
 
-        grpCodeRepository.save(grpCode);
-
+            // dto >> entity
+            GrpCode grpCode = GrpCodeMapper.toEntity(dto);
+    
+            grpCodeRepository.save(grpCode);
+        } catch (Exception e) {
+            log.error("[saveGrpCode] error: {}", e.getMessage());
+        }
     }
 
     // 그룹코드 조회 - 단건
     public GrpCodeDto findGrpOne(String grpcode) {
-        GrpCode findOne = grpCodeRepository.findByGrpCode(grpcode);
-        GrpCodeDto dto = null;
-
-        if (findOne != null) {
-            dto = GrpCodeMapper.toDto(findOne);
+        try {
+            GrpCode findOne = grpCodeRepository.findByGrpCode(grpcode);
+            return findOne == null ? null : GrpCodeMapper.toDto(findOne);
+        } catch (Exception e) {
+            log.error("[findGrpOne] error: {}", e.getMessage());
+            return null;
         }
-
-        return dto;
     }
 
     // 그룹코드 조회 - by grpcodeName
     public GrpCodeDto findGrpCodeByName(String grpcdName) {
-        GrpCode findOne = grpCodeRepository.findByGrpCodeName(grpcdName);
-        GrpCodeDto dto = null;
-        if (findOne != null) {
-            dto = GrpCodeMapper.toDto(findOne);
+        try {
+            GrpCode findOne = grpCodeRepository.findByGrpCodeName(grpcdName);
+            return findOne == null ? null : GrpCodeMapper.toDto(findOne);
+        } catch (Exception e) {
+            log.error("[findGrpCodeByName] error: {}", e.getMessage());
+            return null;
         }
-
-        return dto;
     }
 
     // 그룹코드 조회 - 전체
     public List<CodeDto.GrpCodeDto> findGrpCodeAll() {
-
-        List<GrpCode> grpcdList = grpCodeRepository.findAll();
-        List<CodeDto.GrpCodeDto> list = null;
-
-        if (grpcdList.size() > 0) {
-            list = GrpCodeMapper.toDtoList(grpcdList);
+        try {
+            List<GrpCode> grpcdList = grpCodeRepository.findAll();
+            return grpcdList.isEmpty() ? Collections.emptyList() : GrpCodeMapper.toDtoList(grpcdList);
+        } catch (Exception e) {
+            log.error("[findGrpCodeAll] error: {}", e.getMessage());
+            return Collections.emptyList();
         }
-
-        return list;
     }
 
     // 그룹코드명의 일부분이 일치하는 그룹코드 조회
     public List<GrpCodeDto> findGrpCodeByGrpcdName(String grpcdName) {
-        List<GrpCode> grpCodeList = grpCodeRepository.findByGrpcdNameLike(grpcdName);
-
-        return GrpCodeMapper.toDtoList(grpCodeList);
+        try {
+            List<GrpCode> grpCodeList = grpCodeRepository.findByGrpcdNameLike(grpcdName);
+            return GrpCodeMapper.toDtoList(grpCodeList);
+        } catch (Exception e) {
+            log.error("[findGrpCodeByGrpcdName] error: {}", e.getMessage());
+            return Collections.emptyList();
+        }
     }
 
     // 공통코드 저장
-    public void saveCommonCode(CodeDto.CommCodeDto cdto) {
+    public void saveCommonCode(CodeDto.CommCodeDto cdto, String loginUserId) {
+        try {
+            cdto.setRegUserId(loginUserId);
 
-        GrpCode grpfind = grpCodeRepository.findByGrpCode(cdto.getGrpCode());
-
-        // dto >> entity
-        CommonCode commonCode = CommonCodeMapper.toEntity(cdto, grpfind);
-
-        commonCodeRepository.save(commonCode);
+            GrpCode grpfind = grpCodeRepository.findByGrpCode(cdto.getGrpCode());
+    
+            // dto >> entity
+            CommonCode commonCode = CommonCodeMapper.toEntity(cdto, grpfind);
+    
+            commonCodeRepository.save(commonCode);
+        } catch (Exception e) {
+            log.error("[saveCommonCode] error: {}", e.getMessage());
+        }
+        
     }
 
     // 그룹,공통코드 저장
     public void saveGrpAndCommonCode(CodeDto.CommCodeDto cdto, GrpCodeDto gdto) {
-        // dto >> entity
-        GrpCode grpCode = GrpCodeMapper.toEntity(gdto);
+        try {
+            // dto >> entity
+            GrpCode grpCode = GrpCodeMapper.toEntity(gdto);
 
-        // dto >> entity
-        CommonCode commonCode = CommonCodeMapper.toEntity(cdto, grpCode);
+            // dto >> entity
+            CommonCode commonCode = CommonCodeMapper.toEntity(cdto, grpCode);
 
-        commonCodeRepository.save(commonCode);
+            commonCodeRepository.save(commonCode);
+        } catch (Exception e) {
+            log.error("[saveGrpAndCommonCode] error: {}", e.getMessage());
+        }
     }
 
     // 공통코드 조회 (그룹코드, 공통코드)
     public CodeDto.CommCodeDto findCommonOne(String grpcd, String commoncd) {
-
-        CommonCode findOne = commonCodeRepository.findCommonCodeOne(grpcd, commoncd);
-        return CommonCodeMapper.toDto(findOne);
+        try {
+            CommonCode findOne = commonCodeRepository.findCommonCodeOne(grpcd, commoncd);
+            return CommonCodeMapper.toDto(findOne);
+        } catch (Exception e) {
+            log.error("[findCommonOne] error: {}", e.getMessage());
+            return null;
+        }
     }
 
     // 공통코드 조회 - 전체
     public List<CodeDto.CommCodeDto> findCommonCodeAll() {
-        List<CommonCode> findList = commonCodeRepository.findAll();
-        List<CodeDto.CommCodeDto> list = null;
-
-        if (findList.size() > 0) {
-            list = CommonCodeMapper.toDtoList(findList);
+        try {
+            List<CommonCode> findList = commonCodeRepository.findAll();
+            return findList.isEmpty() ? Collections.emptyList() : CommonCodeMapper.toDtoList(findList);
+        } catch (Exception e) {
+            log.error("[findCommonCodeAll] error: {}", e.getMessage());
+            return Collections.emptyList();
         }
-
-        return list;
     }
 
     // 공통코드 조회 - 조건(그룹코드)
@@ -127,9 +146,13 @@ public class CodeService {
 
     // 공통코드 조회
     public CodeDto.CommCodeDto findCommCdGrpCd(String grpcd, String commoncd) {
-        CommonCode findOne = commonCodeRepository.findCommonCodeOne(grpcd, commoncd);
-        // CommonCdDt
-        return CommonCodeMapper.toDto(findOne);
+        try {
+            CommonCode findOne = commonCodeRepository.findCommonCodeOne(grpcd, commoncd);
+            return CommonCodeMapper.toDto(findOne);
+        } catch (Exception e) {
+            log.error("[findCommonOne] error: {}", e.getMessage());
+            return null;
+        }
     }
 
     // 공통코드 조회 - 그룹코드 선택 시
@@ -186,7 +209,8 @@ public class CodeService {
      * 여러개의 data를 업데이트 해야 할 경우 벌크
      */
     @Transactional
-    public CodeDto.CommCodeDto updateCommonCodeInfo(CommCodeDto cdto) {
+    public CodeDto.CommCodeDto updateCommonCodeInfo(CommCodeDto cdto, String loginUserId) {
+        cdto.setModUserId(loginUserId);
 
         // @Transactional 어노테이션으로 조회시 영속성 상태로 전환
         CommonCode findOne = commonCodeRepository.findCommonCodeOne(cdto.getGrpCode(), cdto.getCommonCode());
@@ -205,37 +229,51 @@ public class CodeService {
      */
     @Transactional
     public void deleteGroupCode(String grpCode) {
-        // 공통코드 먼저 삭제(그룹코드 FK로 참조하고 있기 때문)
-        List<CommonCode> common = commonCodeRepository.findAllByGrpCode(grpCode);
-        if (common.size() > 0) {
-            Long count = commonCodeRepository.deleteAllCommonCodeByGrpCode(grpCode);
-            log.info("=== commoncode deleted : {}", count);
+        try {
+            // 공통코드 먼저 삭제(그룹코드 FK로 참조하고 있기 때문)
+            List<CommonCode> common = commonCodeRepository.findAllByGrpCode(grpCode);
+            if (common.size() > 0) {
+                Long count = commonCodeRepository.deleteAllCommonCodeByGrpCode(grpCode);
+                log.info("=== commoncode deleted : {}", count);
+            }
 
+            Long grpcdDelCount = grpCodeRepository.deleteGrpCode(grpCode);
+            log.info("=== grpcode deleted : {}", grpcdDelCount);
+        } catch (Exception e) {
+            log.error("[deleteGroupCode] error: {}", e.getMessage());
         }
-
-        Long grpcdDelCount = grpCodeRepository.deleteGrpCode(grpCode);
-        log.info("=== grpcode deleted : {}", grpcdDelCount);
     }
 
     @Transactional
     public void deleteCommonCode(String commonCode) {
-        Long count = commonCodeRepository.deleteCommonCodeOne(commonCode);
-        log.info("===commoncode deleted : {} ", count);
+        try {
+            Long count = commonCodeRepository.deleteCommonCodeOne(commonCode);
+            log.info("===commoncode deleted : {} ", count);
+        } catch (Exception e) {
+            log.error("[deleteCommonCode] error: {}", e.getMessage());
+        }
     }
 
     /*
      * 그룹코드 - 그룹코드명 수정
      */
     @Transactional
-    public GrpCodeDto updateGrpCode(GrpCodeDto grpcode) {
-        GrpCode findOne = grpCodeRepository.findByGrpCode(grpcode.getGrpCode());
+    public GrpCodeDto updateGrpCode(GrpCodeDto grpcode, String loginUserId) {
+        try {
+            grpcode.setModUserId(loginUserId);
 
-        log.info("=== before update: {}", findOne.toString());
-
-        findOne.updateGrpcdCode(grpcode);
-
-        log.info("=== after update: {}", findOne.toString());
-
-        return GrpCodeMapper.toDto(findOne);
+            GrpCode findOne = grpCodeRepository.findByGrpCode(grpcode.getGrpCode());
+    
+            log.info("=== before update: {}", findOne.toString());
+    
+            findOne.updateGrpcdCode(grpcode);
+    
+            log.info("=== after update: {}", findOne.toString());
+    
+            return GrpCodeMapper.toDto(findOne);
+        } catch (Exception e) {
+            log.error("[updateGrpCode] error: {}", e.getMessage());
+            return null;
+        }
     }
 }
