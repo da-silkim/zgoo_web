@@ -17,8 +17,9 @@
                             <div class="col d-flex align-items-center">
                                 <label for="companyIdSearch"
                                     class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">사업자</label>
-                                <select id="companyIdSearch" class="mx-3 form-control" name="companyIdSearch" required>
-                                    <option th:value="*{null}" th:text="'(없음)'"></option>
+                                <select id="companyIdSearch" class="mx-3 form-control" name="companyIdSearch">
+                                    <option value="" th:text="'(없음)'" th:selected="${selectedCompanyId == null}">
+                                    </option>
                                     <option th:each="company : ${companyList}" th:value="${company.companyId}"
                                         th:text="${company.companyName}"
                                         th:selected="${company.companyId == selectedCompanyId}"></option>
@@ -28,22 +29,22 @@
                                 <label for="opSearch"
                                     class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">검색조건</label>
                                 <select id="opSearch" name="opSearch" class="ms-3 form-control w-40">
-                                    <option th:value="null" th:selected="${selectedOpSearch == null}">(선택)</option>
-                                    <option th:value="'stationName'" th:text="충전소명"
+                                    <option value="" th:selected="${selectedOpSearch == null}">(선택)</option>
+                                    <option value="stationName" th:text="충전소명"
                                         th:selected="${selectedOpSearch == 'stationName'}"></option>
-                                    <option th:value="'stationId'" th:text="충전소ID"
+                                    <option value="stationId" th:text="충전소ID"
                                         th:selected="${selectedOpSearch == 'stationId'}"></option>
-                                    <option th:value="'chargerId'" th:text="충전기ID"
+                                    <option value="chargerId" th:text="충전기ID"
                                         th:selected="${selectedOpSearch == 'chargerId'}"></option>
                                 </select>
                                 <input type="text" name="contentSearch" id="contentSearch" class="mx-2 form-control"
                                     th:value="${selectedContentSearch}" autocomplete="off">
                             </div>
                             <div class="col d-flex align-items-center">
-                                <label for="business"
+                                <label for="manfCodeSearch"
                                     class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">제조사</label>
                                 <select id="manfCodeSearch" class="mx-3 form-control" name="manfCodeSearch">
-                                    <option th:value="*{null}" th:text="'(없음)'"></option>
+                                    <option value="" th:text="'(없음)'" th:selected="${selectedManfCd == null}"></option>
                                     <option th:each="data : ${manfCdList}" th:value="${data.commonCode}"
                                         th:text="${data.commonCodeName}"
                                         th:selected="${data.commonCode == selectedManfCd}"></option>
@@ -51,6 +52,11 @@
                             </div>
                         </div>
                         <!-- row:1 end -->
+
+                        <!-- size 선택 상자 추가 (숨겨진 필드로 유지) -->
+                        <input type="hidden" id="size" name="size"
+                            th:value="${selectedSize != null ? selectedSize : 10}">
+
                         <div class="search-btn">
                             <button type="button" class="btn btn-outline-grey me-2" id="cpSearchBtn"><i
                                     class="bi bi-search me-2"></i>검색</button>
@@ -69,11 +75,12 @@
                     <div class="position-relative">
                         <button class="btn btn-data-add" id="addBtn" data-bs-toggle="modal"
                             data-bs-target="#dataAddModal"><i class="bi bi-plus-square me-2"></i>등록</button>
-                        <button class="btn btn-data-edit" id="editBtn" disabled><i
+                        <button class="btn btn-data-edit" id="editBtn" data-bs-toggle="modal"
+                            data-bs-target="#dataAddModal" disabled><i
                                 class="fa-regular fa-pen-to-square me-2"></i>수정</button>
                         <button class="btn btn-data-delete" id="deleteBtn" disabled><i
                                 class="bi bi-trash me-2"></i>삭제</button>
-                        <button class="btn btn-excel" onclick="excelDownload()">
+                        <button class="btn btn-excel" onclick="cpExcelDownload()">
                             <i class="bi bi-file-earmark-spreadsheet"></i>엑셀다운로드</button>
 
                         <span class="position-absolute" style="right: 0; bottom: 0;">
@@ -109,10 +116,11 @@
                                 <tr th:each="data : ${chargerList}">
                                     <td th:id="${data.chargerId}"><input type="checkbox" /></td>
                                     <td>
-                                        <a th:href="@{/charger/list/detail/{chargerId}(chargerId=${data.chargerId}, page=${currentPage}, size=${size},
+                                        <a th:href="@{/charger/detail/{chargerId}(chargerId=${data.chargerId}, page=${currentPage}, size=${size},
                                             companyIdSearch=${selectedCompanyId != null ? selectedCompanyId : ''}, 
                                             opSearch=${selectedOpSearch != null ? selectedOpSearch : ''}, 
-                                            contentSearch=${selectedContentSearch != null ? selectedContentSearch : ''})}"
+                                            contentSearch=${selectedContentSearch != null ? selectedContentSearch : ''},
+                                            manfCodeSearch=${selectedManfCd != null ? selectedManfCd : ''})}"
                                             class="no-underline">
                                             <i class="bi bi-files detail-files"></i>
                                         </a>
@@ -126,19 +134,22 @@
                                     <td>
                                         <div class="connector-status">
                                             <th:block
-                                                th:each="status : ${connStatusMap[data.chargerId] != null ? connStatusMap[data.chargerId].split(',') : new String[0]}">
-                                                <i class="fa-solid fa-plug font-ico" data-bs-toggle="tooltip"
-                                                    th:attr="title=${status}" th:classappend="${status == 'CSTATAVAIL' ? 'available' 
-                                                            : (status == 'CSTATPREP' ? 'preparing'
-                                                            : (status == 'CSTATCHARGING' ? 'charging'
-                                                            : (status == 'CSTATSUSEV' ? 'suspendedev'
-                                                            : (status == 'CSTATSUSEVSE' ? 'suspendedevse'
-                                                            : (status == 'CSTATFIN' ? 'finising'
-                                                            : (status == 'CSTATRSVD' ? 'reserved'
-                                                            : (status == 'CSTATUNAVAIL' ? 'unavailable'
-                                                            : (status == 'CSTATFAULT' ? 'faulted'
-                                                            : 'disconnected'))))))))}">
-                                                </i>
+                                                th:if="${connStatusMap != null && connStatusMap.containsKey(data.chargerId)}">
+                                                <th:block
+                                                    th:each="status : ${connStatusMap.get(data.chargerId).split(',')}">
+                                                    <i class="fa-solid fa-plug font-ico" data-bs-toggle="tooltip"
+                                                        th:attr="title=${status}" th:classappend="${status == 'CSTATAVAIL' ? 'available' 
+                                                                : (status == 'CSTATPREP' ? 'preparing'
+                                                                : (status == 'CSTATCHARGING' ? 'charging'
+                                                                : (status == 'CSTATSUSEV' ? 'suspendedev'
+                                                                : (status == 'CSTATSUSEVSE' ? 'suspendedevse'
+                                                                : (status == 'CSTATFIN' ? 'finising'
+                                                                : (status == 'CSTATRSVD' ? 'reserved'
+                                                                : (status == 'CSTATUNAVAIL' ? 'unavailable'
+                                                                : (status == 'CSTATFAULT' ? 'faulted'
+                                                                : 'disconnected'))))))))}">
+                                                    </i>
+                                                </th:block>
                                             </th:block>
                                         </div>
                                     </td>
@@ -453,7 +464,9 @@
     </div>
     <!-- Add Modal end -->
     <script type="text/javascript" th:src="@{/js/table.js}"></script>
+    <script type="text/javascript" th:src="@{/js/charge/cp_excel_download.js}"></script>
     <script type="text/javascript" th:src="@{/js/charge/charger_list.js}"></script>
+
 </div>
 
 </html>

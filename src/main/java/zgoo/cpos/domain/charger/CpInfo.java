@@ -19,6 +19,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import zgoo.cpos.domain.company.CpPlanPolicy;
 import zgoo.cpos.domain.cs.CsInfo;
+import zgoo.cpos.dto.cp.ChargerDto.ChargerRegDto;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -55,4 +56,23 @@ public class CpInfo {
     private String modelCode;
     private String useYn;
     private String reason;
+
+    public void updateCpInfo(ChargerRegDto reqdto) {
+        this.cpmodemInfo.updateCpModemInfo(reqdto.getModemNo(), reqdto.getModemSerialNo(),
+                reqdto.getModemContractStart(),
+                reqdto.getModemContractEnd(), reqdto.getModemPricePlan(), reqdto.getModemdataCapacity(),
+                reqdto.getModemTelCorp(), reqdto.getModemModelName(), reqdto.getModemContractStatus());
+        this.chargerName = reqdto.getChargerName();
+        this.serialNo = reqdto.getChgSerialNo();
+        this.fwVersion = reqdto.getFwversion();
+        this.commonType = reqdto.getCommonType();
+        this.anydeskId = reqdto.getAnydeskId();
+        this.installDate = reqdto.getInstallDate();
+        this.regDt = LocalDateTime.now();
+        this.protocol = "OCPP1_6";
+        this.location = reqdto.getLocation();
+        this.modelCode = reqdto.getModelCode();
+        this.useYn = reqdto.getUseYn();
+        this.reason = reqdto.getReason();
+    }
 }

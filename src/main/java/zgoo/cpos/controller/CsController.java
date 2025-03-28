@@ -34,7 +34,7 @@ public class CsController {
 
     // 충전소 이름 중복 검사
     @GetMapping("/checkStationName")
-    public ResponseEntity<Boolean> checkStationName(@RequestParam String stationName) {
+    public ResponseEntity<Boolean> checkStationName(@RequestParam("stationName") String stationName) {
         log.info("=== duplicate check stationName ===");
 
         try {
@@ -60,7 +60,7 @@ public class CsController {
             return ResponseEntity.ok(csInfoFindOne);
         } catch (Exception e) {
             log.error("[findCsInfoOne] error: {}", e.getMessage());
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
@@ -79,7 +79,8 @@ public class CsController {
             model.addAttribute("csInfo", csInfo);
 
             // 이전글, 다음글 조회
-            CsInfoDetailDto previousCsInfo = this.csService.findPreviousCsInfo(stationId, companyId, searchOp, searchContent);
+            CsInfoDetailDto previousCsInfo = this.csService.findPreviousCsInfo(stationId, companyId, searchOp,
+                    searchContent);
             CsInfoDetailDto nextCsInfo = this.csService.findNextCsInfo(stationId, companyId, searchOp, searchContent);
             model.addAttribute("previousCsInfo", previousCsInfo);
             model.addAttribute("nextCsInfo", nextCsInfo);
@@ -147,14 +148,14 @@ public class CsController {
             if (stationId == null) {
                 log.error("cs info id is null");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                                    .body("충전소ID가 없습니다.");
+                        .body("충전소ID가 없습니다.");
             }
             this.csService.deleteCsInfo(stationId);
             return ResponseEntity.ok("충전소가 정상적으로 삭제되었습니다.");
         } catch (Exception e) {
             log.error("[deleteCsInfo] error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                    .body("충전소 삭제 중 오류 발생");
+                    .body("충전소 삭제 중 오류 발생");
         }
     }
 }

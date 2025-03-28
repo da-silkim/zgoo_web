@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-    <property name="LOG_DIR" value="/app/cpos/logs" />
+    <!-- 로컬 환경과 운영 환경에 따라 다른 로그 경로 설정 -->
+    <springProfile name="prod">
+        <property name="LOG_DIR" value="/app/cpos/logs" />
+    </springProfile>
+    <springProfile name="!prod">
+        <property name="LOG_DIR" value="./logs" />
+    </springProfile>
+    
     <property name="LOG_PATH_NAME" value="${LOG_DIR}/dailylog.log" />
 
     <appender name="ROLLING" class="ch.qos.logback.core.rolling.RollingFileAppender">

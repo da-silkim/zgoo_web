@@ -32,7 +32,7 @@ public class CompanyController {
     private final CompanyService companyService;
 
     @GetMapping("/biz/search/{companyId}")
-    public ResponseEntity<CompanyRegDto> searchForUpdate(@PathVariable String companyId) {
+    public ResponseEntity<CompanyRegDto> searchForUpdate(@PathVariable("companyId") String companyId) {
         log.info("=== search By Id >> companyId:{}", companyId);
         try {
             CompanyRegDto findOne = companyService.searchCompanyById(companyId);

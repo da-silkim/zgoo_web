@@ -36,4 +36,16 @@ public class CpModem {
     private String modelName; // 모델명
     private String contractStatus; // 계약상태(공통코드, 미계약:MODEMNC, 계약중:MODEMUC, 계약만료:MODEMCF)
 
+    public void updateCpModemInfo(String modemNo, String serialNo, LocalDate contractStart, LocalDate contractEnd,
+            String pricePlan, String dataCapacity, String telCorp, String modelName, String contractStatus) {
+        this.modemNo = modemNo;
+        this.serialNo = serialNo;
+        this.contractStart = contractStart;
+        this.contractEnd = contractEnd;
+        this.pricePlan = pricePlan;
+        this.dataCapacity = dataCapacity;
+        this.telCorp = telCorp;
+        this.modelName = modelName;
+        this.contractStatus = contractStatus;
+    }
 }

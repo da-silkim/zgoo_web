@@ -18,7 +18,12 @@ public interface ChargerRepositoryCustom {
 
     Optional<CpInfo> findCpByStationId(String stationId);
 
+    CpInfo findCpInfoByChargerId(String chargerId);
+
     List<ChargerSearchDto> findChargerListByStationId(String stationId);
 
     long countByStationId(String stationId);
+
+    List<ChargerListDto> findAllChargerListWithoutPagination(Long companyId, String manufCd, String searchOp,
+            String searchContent);
 }

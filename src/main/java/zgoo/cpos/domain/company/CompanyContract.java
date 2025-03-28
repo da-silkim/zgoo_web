@@ -27,11 +27,22 @@ public class CompanyContract {
     @Column(name = "company_contract_id")
     private Long id;
 
+    @Column(name = "contract_status")
     private String contractStatus;
+
+    @Column(name = "contracted_at")
     private LocalDateTime contractedAt;
+
+    @Column(name = "contract_start")
     private LocalDateTime contractStart;
+
+    @Column(name = "contract_end")
     private LocalDateTime contractEnd;
+
+    @Column(name = "as_company")
     private String asCompany;
+
+    @Column(name = "as_num")
     private String asNum;
 
     public void updateContractInfo(CompanyRegDto dto) {

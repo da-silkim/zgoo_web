@@ -4,6 +4,7 @@ import java.security.Principal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -260,7 +261,8 @@ public class PageController {
 
         try {
             // 충전소 list
-            Page<CsInfoListDto> csList = this.csService.findCsInfoWithPagination(companyId, searchOp, searchContent, page, size);
+            Page<CsInfoListDto> csList = this.csService.findCsInfoWithPagination(companyId, searchOp, searchContent,
+                    page, size);
 
             // 검색 조건 저장
             model.addAttribute("selectedCompanyId", companyId);
@@ -326,8 +328,16 @@ public class PageController {
             Model model) {
 
         log.info("=== Charger List Page ===");
-        log.info("== companyId: {}, page: {}, size: {}", reqCompanyId, page, size);
-        log.info("== companyId: {}, page: {}, size: {}", reqCompanyId, page, size);
+        log.info("== companyId: {}, manfCd: {}, opSearch: {}, contentSearch: {}",
+                reqCompanyId, reqManfCd, reqOpSearch, reqSearchContent);
+        log.info("== page: {}, size: {}", page, size);
+
+        // 검색 조건을 모델에 추가 (중요: 이 부분이 누락되어 있었음)
+        model.addAttribute("selectedCompanyId", reqCompanyId);
+        model.addAttribute("selectedManfCd", reqManfCd);
+        model.addAttribute("selectedOpSearch", reqOpSearch);
+        model.addAttribute("selectedContentSearch", reqSearchContent);
+        model.addAttribute("selectedSize", size);
 
         // 충전기 등록폼 전달
         model.addAttribute("chargerRegDto", new ChargerRegDto());
@@ -342,7 +352,6 @@ public class PageController {
             if (reqCompanyId == null && reqManfCd == null && reqOpSearch == null) {
                 log.info("Search all charger list >>");
                 chargerList = chargerService.searchCpListPageAll(page, size);
-
             } else {
                 log.info("Search charger list by options:companyid:{},manfcode:{},op:{},content:{} >>",
                         reqCompanyId, reqManfCd, reqOpSearch, reqSearchContent);
@@ -360,13 +369,27 @@ public class PageController {
             log.info("===ChargerList_PageInfo >> totalPages:{}, totalCount:{}", totalPages,
                     chargerList.getTotalElements());
 
-            // 충전기 커넥터 상태 리스트 조회
-            List<ConnectorStatusDto> connStatList = chargerService.searchConStatListAll();
-            Map<String, String> connStatusMap = connStatList.stream()
-                    .collect(Collectors.groupingBy(ConnectorStatusDto::getChargerId,
-                            Collectors.mapping(ConnectorStatusDto::getStatus, Collectors.joining(","))));
-            model.addAttribute("connStatusMap", connStatusMap);
-            log.info("=== connector_status map: {}", connStatusMap); // Map 전체 로깅
+            // 충전기 커넥터 상태 리스트 조회 - 예외 처리 강화
+            try {
+                List<ConnectorStatusDto> connStatList = chargerService.searchConStatListAll();
+
+                // 안전하게 Map 생성 - 예외가 발생해도 빈 Map 반환
+                Map<String, String> connStatusMap = new HashMap<>();
+
+                if (connStatList != null && !connStatList.isEmpty()) {
+                    connStatusMap = connStatList.stream()
+                            .filter(dto -> dto != null && dto.getChargerId() != null && dto.getStatus() != null)
+                            .collect(Collectors.groupingBy(ConnectorStatusDto::getChargerId,
+                                    Collectors.mapping(dto -> dto.getStatus().toString(), Collectors.joining(","))));
+                }
+
+                model.addAttribute("connStatusMap", connStatusMap);
+                log.info("=== connector_status map size: {}", connStatusMap.size());
+            } catch (Exception e) {
+                log.error("Error while fetching connector status: {}", e.getMessage());
+                // 오류 발생 시 빈 Map 추가
+                model.addAttribute("connStatusMap", new HashMap<String, String>());
+            }
 
             // 검색 select options 조회
             // 1.사업자 리스트
@@ -546,7 +569,8 @@ public class PageController {
             model.addAttribute("companyList", companyList);
 
             // 사용자 list
-            Page<UsersDto.UsersListDto> userList = this.usersService.findUsersWithPagination(companyId, companyType, name, page, size);
+            Page<UsersDto.UsersListDto> userList = this.usersService.findUsersWithPagination(companyId, companyType,
+                    name, page, size);
 
             // 검색 조건 저장
             model.addAttribute("selectedCompanyId", companyId);
@@ -614,8 +638,9 @@ public class PageController {
             List<CompanyListDto> companyList = this.companyService.findCompanyListAll();
             model.addAttribute("companyList", companyList);
 
-            Page<NoticeDto.NoticeListDto> noticeList  = this.noticeService.findNoticeWithPagintaion(companyId, startDateSearch,
-                endDateSearch, page, size);
+            Page<NoticeDto.NoticeListDto> noticeList = this.noticeService.findNoticeWithPagintaion(companyId,
+                    startDateSearch,
+                    endDateSearch, page, size);
 
             int totalPages = noticeList.getTotalPages() == 0 ? 1 : noticeList.getTotalPages();
 
@@ -923,8 +948,9 @@ public class PageController {
         log.info("=== Maintenance Error List Page ===");
 
         try {
-            Page<CpMaintainListDto> cpList = this.cpMaintainService.findCpMaintainInfoWithPagination(companyId, searchOp, searchContent,
-                processStatus, startDate, endDate, page, size);
+            Page<CpMaintainListDto> cpList = this.cpMaintainService.findCpMaintainInfoWithPagination(companyId,
+                    searchOp, searchContent,
+                    processStatus, startDate, endDate, page, size);
 
             // 검색 조건 저장
             model.addAttribute("selectedCompanyId", companyId);
@@ -945,16 +971,17 @@ public class PageController {
             List<CompanyListDto> companyList = this.companyService.findCompanyListAll();
             model.addAttribute("companyList", companyList);
 
-            List<CommCdBaseDto> frList = codeService.findCommonCdNamesByGrpcd("FRCODE");        // 장애접수유형코드
+            List<CommCdBaseDto> frList = codeService.findCommonCdNamesByGrpcd("FRCODE"); // 장애접수유형코드
             model.addAttribute("frList", frList);
 
-            List<CommCdBaseDto> fstatList = codeService.findCommonCdNamesByGrpcd("FSTATCODE");  // 장애처리상태코드
+            List<CommCdBaseDto> fstatList = codeService.findCommonCdNamesByGrpcd("FSTATCODE"); // 장애처리상태코드
             model.addAttribute("fstatList", fstatList);
 
             List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT"); // 그리드 row 수
             model.addAttribute("showListCnt", showListCnt);
 
-            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(), "H0100");
+            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(),
+                    "H0100");
             model.addAttribute("menuAuthority", menuAuthority);
         } catch (Exception e) {
             e.getStackTrace();
@@ -1121,7 +1148,8 @@ public class PageController {
             List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT"); // 그리드 row 수
             model.addAttribute("showListCnt", showListCnt);
 
-            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(), "K0100");
+            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(),
+                    "K0100");
             model.addAttribute("menuAuthority", menuAuthority);
         } catch (Exception e) {
             e.getStackTrace();
@@ -1166,7 +1194,8 @@ public class PageController {
             List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT"); // 그리드 row 수
             model.addAttribute("showListCnt", showListCnt);
 
-            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(), "K0200");
+            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(),
+                    "K0200");
             model.addAttribute("menuAuthority", menuAuthority);
         } catch (Exception e) {
             e.getStackTrace();
@@ -1202,7 +1231,8 @@ public class PageController {
             List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT"); // 그리드 row 수
             model.addAttribute("showListCnt", showListCnt);
 
-            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(), "K0300");
+            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(),
+                    "K0300");
             model.addAttribute("menuAuthority", menuAuthority);
         } catch (Exception e) {
             e.getStackTrace();
@@ -1237,7 +1267,8 @@ public class PageController {
             List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT"); // 그리드 row 수
             model.addAttribute("showListCnt", showListCnt);
 
-            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(), "K0400");
+            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(),
+                    "K0400");
             model.addAttribute("menuAuthority", menuAuthority);
         } catch (Exception e) {
             e.getStackTrace();
@@ -1267,7 +1298,8 @@ public class PageController {
             List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT"); // 그리드 row 수
             model.addAttribute("showListCnt", showListCnt);
 
-            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(), "L0100");
+            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(),
+                    "L0100");
             model.addAttribute("menuAuthority", menuAuthority);
         } catch (Exception e) {
             e.getStackTrace();
@@ -1303,7 +1335,8 @@ public class PageController {
             List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT"); // 그리드 row 수
             model.addAttribute("showListCnt", showListCnt);
 
-            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(), "L0200");
+            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(),
+                    "L0200");
             model.addAttribute("menuAuthority", menuAuthority);
         } catch (Exception e) {
             e.getStackTrace();
@@ -1333,7 +1366,6 @@ public class PageController {
 
         return "pages/statistics/purchaseandsales_statistics";
     }
-
 
     /*
      * 통계 > 이용률통계
@@ -1548,7 +1580,8 @@ public class PageController {
             List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT"); // 그리드 row 수
             model.addAttribute("showListCnt", showListCnt);
 
-            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(), "O0100");
+            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(),
+                    "O0100");
             model.addAttribute("menuAuthority", menuAuthority);
         } catch (Exception e) {
             e.getStackTrace();
@@ -1580,7 +1613,8 @@ public class PageController {
             List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT"); // 그리드 row 수
             model.addAttribute("showListCnt", showListCnt);
 
-            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(), "O0200");
+            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(),
+                    "O0200");
             model.addAttribute("menuAuthority", menuAuthority);
         } catch (Exception e) {
             e.getStackTrace();

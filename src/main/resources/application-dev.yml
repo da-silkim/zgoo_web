@@ -20,13 +20,24 @@ spring:
       hibernate:
         format_sql: true
         # show_sql: true
+    defer-datasource-initialization: false  # hibernate 초기화 후 SQL 스크립트 실행
   
   sql:
     init:
-      mode: always
+      mode: never
       platform: mariadb
       continue-on-error: true
       encoding: UTF-8
+      schema-locations: classpath:schema.sql
+      data-locations: classpath:data.sql
+
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+  mvc:
+    async:
+      request-timeout: 300000  # 5분 (밀리초)  
 
   devtools:
     livereload:
@@ -35,6 +46,9 @@ spring:
 # server 설정은 최상위 레벨에 추가
 server:
   port: 9080
+  tomcat:
+    max-http-form-post-size: 50MB
+    connection-timeout: 300000  # 5분 (밀리초)
   servlet:
     session:
       timeout: 1800 # 30분 - 초 설정
