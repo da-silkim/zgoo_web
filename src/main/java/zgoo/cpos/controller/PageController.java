@@ -977,7 +977,7 @@ public class PageController {
             model.addAttribute("showListCnt", showListCnt);
 
             MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(),
-                    MenuConstants.MAINTEN_ERR);
+                    "H0100");
             model.addAttribute("menuAuthority", menuAuthority);
         } catch (Exception e) {
             e.getStackTrace();
@@ -1145,7 +1145,7 @@ public class PageController {
             model.addAttribute("showListCnt", showListCnt);
 
             MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(),
-                    MenuConstants.HIST_CHARGING);
+                    "K0100");
             model.addAttribute("menuAuthority", menuAuthority);
         } catch (Exception e) {
             e.getStackTrace();
@@ -1191,7 +1191,7 @@ public class PageController {
             model.addAttribute("showListCnt", showListCnt);
 
             MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(),
-                    MenuConstants.HIST_PAYMENT);
+                    "K0200");
             model.addAttribute("menuAuthority", menuAuthority);
         } catch (Exception e) {
             e.getStackTrace();
@@ -1228,7 +1228,7 @@ public class PageController {
             model.addAttribute("showListCnt", showListCnt);
 
             MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(),
-                    MenuConstants.HIST_COMM);
+                    "K0300");
             model.addAttribute("menuAuthority", menuAuthority);
         } catch (Exception e) {
             e.getStackTrace();
@@ -1264,7 +1264,7 @@ public class PageController {
             model.addAttribute("showListCnt", showListCnt);
 
             MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(),
-                    MenuConstants.HIST_ERR);
+                    "K0400");
             model.addAttribute("menuAuthority", menuAuthority);
         } catch (Exception e) {
             e.getStackTrace();
@@ -1295,7 +1295,7 @@ public class PageController {
             model.addAttribute("showListCnt", showListCnt);
 
             MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(),
-                    MenuConstants.CALC_CHGPAYMENT);
+                    "L0100");
             model.addAttribute("menuAuthority", menuAuthority);
         } catch (Exception e) {
             e.getStackTrace();
@@ -1332,7 +1332,7 @@ public class PageController {
             model.addAttribute("showListCnt", showListCnt);
 
             MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(),
-                    MenuConstants.CALC_PURCHASE);
+                    "L0200");
             model.addAttribute("menuAuthority", menuAuthority);
         } catch (Exception e) {
             e.getStackTrace();
@@ -1577,7 +1577,7 @@ public class PageController {
             model.addAttribute("showListCnt", showListCnt);
 
             MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(),
-                    MenuConstants.FW_VERSION);
+                    "O0100");
             model.addAttribute("menuAuthority", menuAuthority);
         } catch (Exception e) {
             e.getStackTrace();
@@ -1610,7 +1610,7 @@ public class PageController {
             model.addAttribute("showListCnt", showListCnt);
 
             MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(),
-                    MenuConstants.FW_UPDATE);
+                    "O0200");
             model.addAttribute("menuAuthority", menuAuthority);
         } catch (Exception e) {
             e.getStackTrace();
