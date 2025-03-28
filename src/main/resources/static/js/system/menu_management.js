@@ -1,5 +1,5 @@
 $(document).ready(function() {
-    let modalCon = false;   // false: 등록 / true: 수정
+    let modalCon = false;
     let btnMsg = "등록", selectRow, selectRowSec;
 
     $('#resetBtn').on('click', function() {
@@ -30,9 +30,7 @@ $(document).ready(function() {
     });
 
     $('#pageList').on('click', 'tr', function() {
-        // const currMenuId = $(this).find('td').eq(3).text();
         selectRow = $(this).find('td').eq(3).text();
-        // console.log("현재 메뉴: " + currMenuId);
     });
 
     $('#pageList2').on('click', 'tr', function() {
@@ -72,7 +70,7 @@ $(document).ready(function() {
                 renderMenuTable(companyMenuList);
             },
             error: function(xhr, status, error) {
-                console.error("메뉴 데이터 불러오는 중 오류 발생: ", error);
+                console.error(error);
             }
         });
     });
@@ -109,8 +107,6 @@ $(document).ready(function() {
                     parentCodeSelect.prop('disabled', true);
                 }
 
-                console.log("useYn 값:", data.useYn);
-
                 if (data.useYn === 'Y') {
                     $('#useYnYes').prop('checked', true);
                 } else {
@@ -118,7 +114,7 @@ $(document).ready(function() {
                 }
             },
             error: function(xhr, status, error) {
-                console.error('AJAX error:', status, error);
+                console.error(error);
             }
         });
     });
@@ -142,7 +138,7 @@ $(document).ready(function() {
                 renderMenuTable(companyMenuList);
             },
             error: function(xhr, status, error) {
-                console.error("사업장별 메뉴 데이터 불러오는 중 오류 발생: ", error);
+                console.error(error);
             }
         });
     });
@@ -158,11 +154,11 @@ $(document).ready(function() {
                 url: `/system/menu/delete/${menuCode}`,
                 contentType: "application/json",
                 success: function(response) {
-                    console.log("메뉴 삭제 성공", response);
+                    alert(response);
                     window.location.reload();
                 },
                 error: function(xhr, status, error) {
-                    console.error("메뉴 삭제 중 오류 발생:", error);
+                    console.error(error);
                 }
             });
         }
@@ -179,11 +175,11 @@ $(document).ready(function() {
                 url: `/system/menu/company/delete/${companyId}`,
                 contentType: "application/json",
                 success: function(response) {
-                    console.log("메뉴 권한 삭제 성공", response);
+                    alert(response);
                     window.location.reload();
                 },
                 error: function(xhr, status, error) {
-                    console.error("메뉴 권한 삭제 중 오류 발생:", error);
+                    console.error(error);
                 }
             });
         }
@@ -212,12 +208,12 @@ $(document).ready(function() {
                 contentType: 'application/json',
                 data: JSON.stringify(data),
                 success: function(response) {
-                    console.log("메뉴 등록/수정 성공", response);
+                    alert(response);
                     // $('#menuModal').modal('hide');  // 모달 창 닫기
                     window.location.reload();
                 },
                 error: function(xhr, status, error) {
-                    console.error("메뉴 등록/수정 중 오류 발생:", error);
+                    console.error(error);
                 }
             });
         }
@@ -257,8 +253,7 @@ $(document).ready(function() {
                     alert(response);
                 },
                 error: function(xhr, status, error) {
-                    console.error("사업장별 메뉴 등록/수정 중 오류 발생:", error);
-                    alert(xhr.responseText);
+                    console.error(error);
                 }
             });
         }
@@ -267,9 +262,7 @@ $(document).ready(function() {
     $('#menuLv').change(function() {
         var selectedMenuLv = $(this).val();
         var parentCodeSelect = $('#parentCode');
-
         parentCodeSelect.empty();
-        // parentCodeSelect.append('<option value="null">선택</option>');
 
         if (selectedMenuLv == '1') {
             fetchParentMenuData('0');
@@ -312,6 +305,9 @@ $(document).ready(function() {
                 }
     
                 parentCodeSelect.prop('disabled', false);
+            },
+            error: function(xhr, status, error) {
+                console.log(error);
             }
         });
     }
@@ -376,16 +372,6 @@ $(document).ready(function() {
 
             menuTable.append(row);
         });
-
-        // 라디오 버튼 클릭 이벤트 처리
-        // $('input[type="radio"]').on('change', function() {
-        //     var radio = $(this);
-        //     var menuCode = radio.closest('tr').attr('id');  // 클릭된 라디오 버튼이 포함된 tr의 id(menuCode)
-        //     var useYn = radio.val(); // 클릭된 라디오 버튼의 값 (Y 또는 N)
-
-        //     // 부모 메뉴의 useYn을 업데이트
-        //     updateParentMenuUseYn(menuCode, menuList);
-        // });
     }
 
     function updateParentMenuUseYn(menuCode, menuList) {

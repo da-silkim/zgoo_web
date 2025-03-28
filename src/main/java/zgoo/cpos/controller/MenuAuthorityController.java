@@ -1,5 +1,6 @@
 package zgoo.cpos.controller;
 
+import java.security.Principal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import zgoo.cpos.dto.menu.MenuAuthorityDto;
 import zgoo.cpos.dto.menu.MenuAuthorityDto.MenuAuthorityBaseDto;
+import zgoo.cpos.service.ComService;
 import zgoo.cpos.service.MenuAuthorityService;
 
 @Controller
@@ -26,6 +28,7 @@ import zgoo.cpos.service.MenuAuthorityService;
 public class MenuAuthorityController {
 
     private final MenuAuthorityService menuAuthorityService;
+    private final ComService comService;
 
     @GetMapping("/get/{companyId}/{authority}")
     public ResponseEntity<Map<String, Object>> findMenuAuthority(@PathVariable("companyId") Long companyId,
@@ -46,10 +49,16 @@ public class MenuAuthorityController {
     }
 
     @PostMapping("/new")
-    public ResponseEntity<String> createMenuAuthority(@RequestBody List<MenuAuthorityBaseDto> dto) {
+    public ResponseEntity<String> createMenuAuthority(@RequestBody List<MenuAuthorityBaseDto> dto,
+            Principal principal) {
         log.info("=== create menu authority info ===");
 
         try {
+            ResponseEntity<String> permissionCheck = this.comService.checkAdminPermissions(principal);
+            if (permissionCheck != null) {
+                return permissionCheck;
+            }
+
             this.menuAuthorityService.saveMenuAuthorities(dto);
             return ResponseEntity.ok("권한이 정상적으로 저장되었습니다.");
         } catch (Exception e) {

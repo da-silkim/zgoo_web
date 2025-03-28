@@ -44,6 +44,23 @@ public class ComService {
         return true;
     }
 
+    // Super Admin & Admin check
+    public boolean checkAdmin(String loginUserId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+
+        for (GrantedAuthority authority : authorities) {
+            String authorityName = authority.getAuthority();
+
+            if ("SU".equals(authorityName) || "AD".equals(authorityName)) {
+                log.info("[checkAdmin] Super Admin or Admin");
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     // mod_yn check
     public boolean checkModYn(String loginUserId, String menuCode) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -103,6 +120,20 @@ public class ComService {
     }
 
     public ResponseEntity<String> checkSuperAdminPermissions(Principal principal) {
+        String loginUserId = principal.getName();
+        if (loginUserId == null || loginUserId.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("사용자 정보를 찾을 수 없습니다.");
+        }
+
+        boolean isSuperAdmin = checkSuperAdmin(loginUserId);
+        if (!isSuperAdmin) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        return null;
+    }
+
+    public ResponseEntity<String> checkAdminPermissions(Principal principal) {
         String loginUserId = principal.getName();
         if (loginUserId == null || loginUserId.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("사용자 정보를 찾을 수 없습니다.");

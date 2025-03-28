@@ -49,8 +49,8 @@ $(document).ready(function() {
             success: function(response) {
                 renderMenuTable(response.authorityList);
             },
-            error: function(error) {
-                alert(error);
+            error: function(xhr, status, error) {
+                console.error(error);
             }
         });
     });
@@ -183,8 +183,8 @@ $(document).ready(function() {
                 success: function(response) {
                     alert(response);
                 },
-                error: function(error) {
-                    alert(error);
+                error: function(xhr, status, error) {
+                    console.error(error);
                 }
             });
         }

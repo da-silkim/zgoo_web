@@ -1,5 +1,6 @@
 package zgoo.cpos.controller;
 
+import java.security.Principal;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -19,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import zgoo.cpos.dto.menu.CompanyMenuAuthorityDto;
 import zgoo.cpos.dto.menu.MenuDto;
+import zgoo.cpos.service.ComService;
 import zgoo.cpos.service.MenuService;
 
 @Controller
@@ -26,20 +28,27 @@ import zgoo.cpos.service.MenuService;
 @RequiredArgsConstructor
 @RequestMapping("/system/menu")
 public class MenuController {
+    
     private final MenuService menuService;
+    private final ComService comService;
     
     // 메뉴 등록
     @PostMapping("/new")
-    public ResponseEntity<String> createMenu(@RequestBody MenuDto.MenuRegDto dto) {
+    public ResponseEntity<String> createMenu(@RequestBody MenuDto.MenuRegDto dto, Principal principal) {
         log.info("=== create menu info ===");
         
         try {
+            ResponseEntity<String> permissionCheck = this.comService.checkSuperAdminPermissions(principal);
+            if (permissionCheck != null) {
+                return permissionCheck;
+            }
+
             this.menuService.saveMenu(dto);
             return ResponseEntity.ok("메뉴가 정상적으로 등록되었습니다.");
         } catch (Exception e) {
             log.error("[createMenu] error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                 .body("메뉴 등록 중 오류 발생");
+                                 .body("메뉴 등록 중 오류가 발생했습니다.");
         }
     }
 
@@ -60,10 +69,9 @@ public class MenuController {
 
             if ( menuFindOne != null) {
                 return ResponseEntity.ok(menuFindOne);
-            } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
             }
-            
+
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         } catch (Exception e) {
             log.error("[findMenuOne] error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -72,31 +80,44 @@ public class MenuController {
 
     // 메뉴 수정
     @PatchMapping("/update")
-    public ResponseEntity<String> updateMenu(@RequestBody MenuDto.MenuRegDto dto) {
+    public ResponseEntity<String> updateMenu(@RequestBody MenuDto.MenuRegDto dto, Principal principal) {
         log.info("=== update menu info ===");
 
         try {
+            ResponseEntity<String> permissionCheck = this.comService.checkSuperAdminPermissions(principal);
+            if (permissionCheck != null) {
+                return permissionCheck;
+            }
+
             this.menuService.updateMenu(dto);
             return ResponseEntity.ok("메뉴가 정상적으로 수정되었습니다.");
         } catch (Exception e) {
             log.error("[updateMenu] error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                  .body("메뉴 수정 중 오류 발생");
+                                  .body("메뉴 수정 중 오류가 발생했습니다.");
         }
     }
 
     // 메뉴 삭제
     @DeleteMapping("/delete/{menuCode}")
-    public ResponseEntity<String> deleteMenu(@PathVariable("menuCode") String menuCode) {
+    public ResponseEntity<String> deleteMenu(@PathVariable("menuCode") String menuCode, Principal principal) {
         log.info("=== delete menu info ===");
 
         try {
+            ResponseEntity<String> permissionCheck = this.comService.checkSuperAdminPermissions(principal);
+            if (permissionCheck != null) {
+                return permissionCheck;
+            }
+
             this.menuService.deleteMenu(menuCode);
             return ResponseEntity.ok("메뉴가 정상적으로 삭제되었습니다.");
         } catch (EntityNotFoundException e) {
+            log.error("[deleteMenu] EntityNotFoundException: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("메뉴 정보를 찾을 수 없습니다.");
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("메뉴 삭제 중 오류 발생");
+            log.error("[deleteMenu] error: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                    .body("메뉴 삭제 중 오류가 발생했습니다.");
         }
     }
 
@@ -109,22 +130,28 @@ public class MenuController {
 
     // 사업자별 메뉴 권한 저장
     @PostMapping("/company/new")
-    public ResponseEntity<String> createCompanuMenuAuthority(@RequestBody List<CompanyMenuAuthorityDto.CompanyMenuAuthorityBaseDto> dto) {
+    public ResponseEntity<String> createCompanuMenuAuthority(@RequestBody List<CompanyMenuAuthorityDto.CompanyMenuAuthorityBaseDto> dto,
+            Principal principal) {
         log.info("=== create company menu info ===");
         
         try {
-            int result = this.menuService.saveCompanyMenuAuthorities(dto);
+            ResponseEntity<String> permissionCheck = this.comService.checkSuperAdminPermissions(principal);
+            if (permissionCheck != null) {
+                return permissionCheck;
+            }
 
+            int result = this.menuService.saveCompanyMenuAuthorities(dto);
             return switch (result) {
                 case 0 -> ResponseEntity.status(HttpStatus.CONFLICT).body("이미 등록된 데이터입니다.");
-                case -1-> ResponseEntity.status(HttpStatus.BAD_REQUEST).body("DTO가 비어 있습니다.");
+                case -1-> ResponseEntity.status(HttpStatus.BAD_REQUEST).body("등록할 정보가 없습니다.");
                 case 1 -> ResponseEntity.status(HttpStatus.OK).body("정상적으로 등록되었습니다.");
                 default -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("예상치 못한 오류가 발생했습니다.");
             };
 
         } catch (Exception e) {
             log.error("[createCompanuMenuAuthority] error: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 오류가 발생했습니다.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                    .body("사업장별 메뉴 권한 등록 중 오류가 발생했습니다.");
         }
     }
 
@@ -137,31 +164,46 @@ public class MenuController {
 
     // 사업자별 메뉴 권한 수정
     @PatchMapping("/company/update")
-    public ResponseEntity<String> updateCompanyMenuAuthority(@RequestBody List<CompanyMenuAuthorityDto.CompanyMenuAuthorityBaseDto> dto) {
+    public ResponseEntity<String> updateCompanyMenuAuthority(@RequestBody List<CompanyMenuAuthorityDto.CompanyMenuAuthorityBaseDto> dto,
+            Principal principal) {
         log.info("=== update company menu info ===");
 
         try {
+            ResponseEntity<String> permissionCheck = this.comService.checkSuperAdminPermissions(principal);
+            if (permissionCheck != null) {
+                return permissionCheck;
+            }
+
             this.menuService.updateCompanyMenuAuthority(dto);
             return ResponseEntity.ok("메뉴 권한이 정상적으로 수정되었습니다.");
         } catch (Exception e) {
-            log.error("[updateCompanyMenu] error: {}", e.getMessage());
+            log.error("[updateCompanyMenuAuthority] error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                  .body("사업장별 메뉴 권한 수정 중 오류 발생");
+                                    .body("사업장별 메뉴 권한 수정 중 오류가 발생했습니다.");
         }
     }
 
     // 사업장별 메뉴 권한 삭제
     @DeleteMapping("/company/delete/{companyId}")
-    public ResponseEntity<String> deleteCompanyMenuAuthority(@PathVariable("companyId") Long companyId) {
+    public ResponseEntity<String> deleteCompanyMenuAuthority(@PathVariable("companyId") Long companyId,
+            Principal principal) {
         log.info("=== delete company menu info ===");
 
         try {
+            ResponseEntity<String> permissionCheck = this.comService.checkSuperAdminPermissions(principal);
+            if (permissionCheck != null) {
+                return permissionCheck;
+            }
+
             this.menuService.deleteCompanyMenuAuthority(companyId);
             return ResponseEntity.ok("메뉴 권한이 정상적으로 삭제되었습니다.");
         } catch (EntityNotFoundException e) {
+            log.error("[deleteCompanyMenuAuthority] EntityNotFoundException: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("메뉴 권한 정보를 찾을 수 없습니다.");
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("메뉴 권한 삭제 중 오류 발생");
+            log.error("[deleteCompanyMenuAuthority] error: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                    .body("사업장별 메뉴 권한 삭제 중 오류가 발생했습니다.");
         }
     }
 }
