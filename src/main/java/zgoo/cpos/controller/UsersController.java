@@ -49,7 +49,7 @@ public class UsersController {
 
     // userID 중복 검사
     @GetMapping("/checkUserId")
-    public ResponseEntity<Boolean> checkUserId(@RequestParam String userId) {
+    public ResponseEntity<Boolean> checkUserId(@RequestParam("userId") String userId) {
         log.info("=== duplicate check userId ===");
         
         try {

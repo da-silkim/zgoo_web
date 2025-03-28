@@ -46,7 +46,7 @@ public class MemberController {
 
     // 회원 단건 조회
     @GetMapping("/get/{memberId}")
-    public ResponseEntity<?> findMemberOne(@PathVariable("memberId") Long memberId) {
+    public ResponseEntity<Map<String, Object>> findMemberOne(@PathVariable("memberId") Long memberId) {
         log.info("=== find member info ===");
 
         Map<String, Object> response = new HashMap<>();
@@ -79,7 +79,7 @@ public class MemberController {
 
     // 사용자ID 중복 검사
     @GetMapping("/memLoginId")
-    public ResponseEntity<Boolean> checkMemLoginId(@RequestParam String memLoginId) {
+    public ResponseEntity<Boolean> checkMemLoginId(@RequestParam("memLoginId") String memLoginId) {
         log.info("=== duplicate check memLoginId ===");
 
         try {
@@ -223,7 +223,7 @@ public class MemberController {
 
     // 회원카드 조회
     @GetMapping("/tag/get/{idTag}")
-    public ResponseEntity<?> findMemberAuthOne(@PathVariable("idTag") String idTag) {
+    public ResponseEntity<Map<String, Object>> findMemberAuthOne(@PathVariable("idTag") String idTag) {
         log.info("=== find member auth info ===");
 
         Map<String, Object> response = new HashMap<>();

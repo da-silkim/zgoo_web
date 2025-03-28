@@ -37,7 +37,7 @@ public class VocController {
 
     // 1:1 단건 조회
     @GetMapping("/get/{vocId}")
-    public ResponseEntity<?> findVocOne(@PathVariable("vocId") Long vocId) {
+    public ResponseEntity<Map<String, Object>> findVocOne(@PathVariable("vocId") Long vocId) {
         log.info("=== find voc info ===");
 
         Map<String, Object> response = new HashMap<>();
@@ -110,7 +110,8 @@ public class VocController {
 
     // 회원정보 검색
     @GetMapping("/search/member")
-    public ResponseEntity<?> searchMember(@RequestParam String memName, @RequestParam String memPhone) {
+    public ResponseEntity<Map<String, Object>> searchMember(
+            @RequestParam("memName") String memName, @RequestParam("memPhone") String memPhone) {
         log.info("=== search member info ===");
 
         Map<String, Object> response = new HashMap<>();

@@ -18,12 +18,17 @@ import org.springframework.web.multipart.MultipartFile;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import zgoo.cpos.domain.cp.CpMaintain;
+import zgoo.cpos.domain.users.Users;
 import zgoo.cpos.dto.cp.CpMaintainDto.CpInfoDto;
 import zgoo.cpos.dto.cp.CpMaintainDto.CpMaintainListDto;
 import zgoo.cpos.dto.cp.CpMaintainDto.CpMaintainRegDto;
+import zgoo.cpos.dto.menu.MenuAuthorityDto.MenuAuthorityBaseDto;
 import zgoo.cpos.mapper.CpMaintainMapper;
 import zgoo.cpos.repository.cp.CpMaintainRepository;
+import zgoo.cpos.repository.menu.MenuAuthorityRepository;
+import zgoo.cpos.repository.users.UsersRepository;
 import zgoo.cpos.util.FileNameUtils;
+import zgoo.cpos.util.MenuConstants;
 
 @Service
 @RequiredArgsConstructor
@@ -31,10 +36,11 @@ import zgoo.cpos.util.FileNameUtils;
 public class CpMaintainService {
 
     public final CpMaintainRepository cpMaintainRepository;
+    public final UsersRepository usersRepository;
+    public final MenuAuthorityRepository menuAuthorityRepository;
 
     @Value("${file.img}")
     private String filepath;
-
 
     // 조회
     public Page<CpMaintainListDto> findCpMaintainInfoWithPagination(Long companyId, String searchOp, String searchContent,
@@ -42,7 +48,7 @@ public class CpMaintainService {
         Pageable pageable = PageRequest.of(page, size);
 
         try {
-            Page<CpMaintainListDto> cpList = Page.empty(pageable);
+            Page<CpMaintainListDto> cpList;
 
             if (companyId == null && (searchOp == null || searchOp.isEmpty()) && (searchContent == null || searchContent.isEmpty()) &&
                      (processStatus == null || processStatus.isEmpty()) && startDate == null && endDate == null) {
@@ -149,35 +155,43 @@ public class CpMaintainService {
     }
 
     private String saveImageFile(MultipartFile file, String logName) {
-        if (file != null && !file.isEmpty()) {
-                try {
-                    System.out.println("fileLoc: " + file);
-                    String originalFileName = file.getOriginalFilename();
-                    System.out.println("originalFileName: " + originalFileName);
-                    String saveFileName = FileNameUtils.fileNameConver(originalFileName);
-                    String fullPath = filepath + saveFileName;
-                    file.transferTo(new File(fullPath));
-                    return fullPath;
-                } catch (Exception e) {
-                    log.info("[saveMaintain] {} save failure: {}", logName, e.getMessage());
-                }
+        try {
+            if (file != null && !file.isEmpty()) {
+                System.out.println("fileLoc: " + file);
+                String originalFileName = file.getOriginalFilename();
+                System.out.println("originalFileName: " + originalFileName);
+                String saveFileName = FileNameUtils.fileNameConver(originalFileName);
+                String fullPath = filepath + saveFileName;
+                file.transferTo(new File(fullPath));
+                return fullPath;
             }
-        return null;
+            return null;
+        } catch (Exception e) {
+            log.info("[saveImageFile] {} save failure: {}", logName, e.getMessage());
+            return null;
+        }
     }
 
     // 충전기 장애정보 수정
     @Transactional
-    public void updateMaintain(Long cpmaintainId, CpMaintainRegDto dto) {
+    public void updateMaintain(Long cpmaintainId, CpMaintainRegDto dto, String loginUserId) {
         CpMaintain cpMaintain = this.cpMaintainRepository.findById(cpmaintainId)
             .orElseThrow(() -> new IllegalArgumentException("cpmaintain not found with id: " + cpmaintainId));
 
-            try {
-                if ("FSTATFINISH".equals(dto.getProcessStatus())) {
-                    cpMaintain.updateProcessInfo(dto);
-                }
-            } catch (Exception e) {
-                log.error("[updateMaintain] error: {}", e.getMessage());
+        try {
+            if (loginUserId == null || loginUserId.isEmpty()) {
+                throw new IllegalArgumentException("User ID is missing. Cannot update cpmaintain info without login user ID."); 
             }
+
+            boolean isMod = checkUpdateAndDeleteAuthority(cpmaintainId, loginUserId);
+            if (!isMod) return;
+
+            if ("FSTATFINISH".equals(dto.getProcessStatus())) {
+                cpMaintain.updateProcessInfo(dto);
+            }
+        } catch (Exception e) {
+            log.error("[updateMaintain] error: {}", e.getMessage());
+        }
     }
 
     // @Transactional
@@ -225,17 +239,27 @@ public class CpMaintainService {
 
     // 충전기 장애정보 삭제
     @Transactional
-    public void deleteMaintain(Long cpmaintainId) {
+    public void deleteMaintain(Long cpmaintainId, String loginUserId) {
         CpMaintain cpMaintain = this.cpMaintainRepository.findById(cpmaintainId)
             .orElseThrow(() -> new IllegalArgumentException("cpmaintain not found with id: " + cpmaintainId));
 
         try {
+            if (loginUserId == null || loginUserId.isEmpty()) {
+                throw new IllegalArgumentException("User ID is missing. Cannot delete cpmaintain info without login user ID."); 
+            }
+
+            boolean isMod = checkUpdateAndDeleteAuthority(cpmaintainId, loginUserId);
+            if (!isMod) return;
+
             // image delete
             deleteImage(cpMaintain.getPictureLoc1());
             deleteImage(cpMaintain.getPictureLoc2());
             deleteImage(cpMaintain.getPictureLoc3());
             this.cpMaintainRepository.deleteById(cpmaintainId);
             log.info("=== cpmaintainId: {} is deleted..", cpmaintainId);
+        } catch (IllegalArgumentException e) {
+            log.error("[deleteMaintain] Illegal argument error: {}", e.getMessage());
+            throw e;
         } catch (Exception e) {
             log.error("[deleteMaintain] error: {}", e.getMessage());
         }
@@ -256,5 +280,65 @@ public class CpMaintainService {
                 log.warn("=== Image file not found at path: {}", imagePath);
             }
         } 
+    }
+
+    // edit & delete button control
+    public boolean buttonControl(Long cpmaintainId, String loginUserId) {
+        CpMaintain cpMaintain = this.cpMaintainRepository.findById(cpmaintainId)
+            .orElseThrow(() -> new IllegalArgumentException("cpmaintain not found with id: " + cpmaintainId));
+
+        try {
+            String writer = cpMaintain.getRegUserId();
+
+            Users user = this.usersRepository.findUserOne(writer);
+            String userAuthority = user.getAuthority();
+
+            Users loginUser = this.usersRepository.findUserOne(loginUserId);
+            String loginUserAuthority = loginUser.getAuthority();
+
+            if (loginUserAuthority.equals("SU")) {
+                return true;
+            }
+
+            if (loginUserAuthority.equals("AD")) {
+                return !userAuthority.equals("SU");
+            }
+
+            return writer.equals(loginUserId);
+        } catch (Exception e) {
+            log.error("[CpMaintainService >> buttonControl] error: {}", e.getMessage());
+            return false;
+        }
+    }
+
+    // update & delete check
+    public boolean checkUpdateAndDeleteAuthority(Long cpmaintainId, String loginUserId) {
+        Users loginUser = this.usersRepository.findUserOne(loginUserId);
+        String loginUserAuthority = loginUser.getAuthority();
+
+        if (loginUserAuthority.equals("SU")) {
+            log.info("[CpMaintainService >> checkUpdateAndDeleteAuthority] Super Admin");
+            return true;
+        }
+
+        CpMaintain cpMaintain = this.cpMaintainRepository.findById(cpmaintainId)
+            .orElseThrow(() -> new IllegalArgumentException("cpmaintain not found with id: " + cpmaintainId));
+        String writer = cpMaintain.getRegUserId();
+        Users user = this.usersRepository.findUserOne(writer);
+        String userAuthority = user.getAuthority();
+
+        MenuAuthorityBaseDto dto = this.menuAuthorityRepository.findUserMenuAuthority(loginUser.getCompany().getId(),
+            loginUserAuthority, MenuConstants.MAINTEN_ERR);
+        String modYn = dto.getModYn();
+
+        if (modYn.equals("Y")) {
+            if (loginUserAuthority.equals("AD")) {
+                log.info("[CpMaintainService >> checkUpdateAndDeleteAuthority] Admin");
+                return !userAuthority.equals("SU");
+            }
+            return writer.equals(loginUserId);
+        }
+        log.info("[CpMaintainService >> checkUpdateAndDeleteAuthority] update & delete no permission");
+        return false;
     }
 }

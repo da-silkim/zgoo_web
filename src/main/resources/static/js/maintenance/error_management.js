@@ -45,6 +45,37 @@ $(document).ready(function() {
     $('#pageList').on('click', 'tr', function() {
         selectRow = $(this);
         cpmaintainId = selectRow.find('td').eq(0).attr('id');
+
+        const cbox = $(this).closest('tr').find('input[type="checkbox"]');
+        if (cbox.length > 0 && cbox.is(':checked')) {
+            console.log('Checkbox is checked.');
+            $.ajax({
+                url: `/errlist/btncontrol/${cpmaintainId}`,
+                type: 'GET',
+                success: function(response) {
+                    if (response.btnControl) {
+                        $('#buttonContainer').html(`
+                            <button class="btn btn-data-edit" id="editBtn"
+                                data-bs-toggle="modal" data-bs-target="#dataAddModal">
+                                <i class="fa-regular fa-pen-to-square"></i>수정
+                            </button>
+                            <button class="btn btn-data-delete" id="deleteBtn">
+                                <i class="bi bi-trash"></i>삭제
+                            </button>
+                        `);
+                    } else {
+                        $('#buttonContainer').empty();
+                    }
+                },
+                error: function(error) {
+                    console.error(error);
+                }
+            });
+        } else {
+            console.log('Checkbox is not checked.');
+            btnControl = false;
+            $('#buttonContainer').empty();
+        }
     });
 
     $('#chargerIdSearchBtn').on('click', function() {
@@ -67,7 +98,7 @@ $(document).ready(function() {
                 }
                 
             },
-            error: function(error) {
+            error: function(xhr, status, error) {
                 alert(error.message);
             }
         });
@@ -99,7 +130,7 @@ $(document).ready(function() {
         showImage.hidden = true;
     });
 
-    $('#editBtn').on('click', function(event) {
+    $(document).on('click', '#editBtn', function() {
         event.preventDefault();
         modalCon = true;
         btnMsg = "수정";
@@ -170,7 +201,7 @@ $(document).ready(function() {
         });
     });
 
-    $('#deleteBtn').on('click', function() {
+    $(document).on('click', '#deleteBtn', function() {
         if(confirmSubmit("삭제")) {
             $.ajax({
                 type: 'DELETE',
@@ -264,6 +295,7 @@ $(document).ready(function() {
                     data: JSON.stringify(DATA),
                     success: function(response) {
                         alert(response);
+                        window.location.reload();
                     },
                     error: function(error) {
                         alert(error);
@@ -297,13 +329,13 @@ $(document).ready(function() {
                     success: function(response) {
                         alert(response);
                         $('#dataAddModal').modal('hide');
+                        window.location.reload();
                     },
                     error: function(error) {
                         alert(error);
                     }
                 });
             }
-
         }
     });
 

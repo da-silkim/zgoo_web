@@ -21,7 +21,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import zgoo.cpos.dto.cp.CpMaintainDto.CpInfoDto;
 import zgoo.cpos.dto.cp.CpMaintainDto.CpMaintainRegDto;
+import zgoo.cpos.service.ComService;
 import zgoo.cpos.service.CpMaintainService;
+import zgoo.cpos.util.MenuConstants;
 
 @Controller
 @RequiredArgsConstructor
@@ -30,6 +32,7 @@ import zgoo.cpos.service.CpMaintainService;
 public class CpMaintainController {
 
     private final CpMaintainService cpMaintainService;
+    private final ComService comService;
 
     @GetMapping("/search/{chargerId}")
     public ResponseEntity<Map<String, Object>> searchCsCpInfo(@PathVariable("chargerId") String chargerId) {
@@ -91,34 +94,45 @@ public class CpMaintainController {
         log.info("=== create maintain info ===");
 
         try {
+            ResponseEntity<String> permissionCheck = this.comService.checkUserPermissions(principal, MenuConstants.MAINTEN_ERR);
+            if (permissionCheck != null) {
+                return permissionCheck;
+            }
+
             this.cpMaintainService.saveMaintain(dto, principal.getName());
             return ResponseEntity.ok("충전기 장애 정보가 정상적으로 등록되었습니다.");
         } catch (Exception e) {
             log.error("[createMaintain] error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                    .body("충전기 장애 정보 등록 중 오류 발생");
+                                    .body("충전기 장애 정보 등록 중 오류가 발생했습니다.");
         }
     }
 
     // 수정
     @PatchMapping("/update/{cpmaintainId}")
-    public ResponseEntity<String> updateMaintain(@PathVariable("cpmaintainId") Long cpmaintainId, @RequestBody CpMaintainRegDto dto) {
+    public ResponseEntity<String> updateMaintain(@PathVariable("cpmaintainId") Long cpmaintainId, @RequestBody CpMaintainRegDto dto,
+            Principal principal) {
         log.info("=== update maintain info ===");
 
-        if (cpmaintainId == null) {
-            log.error("cpmaintainId id null");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                                    .body("충전기 장애 정보ID가 없습니다.");
-        }
-
         try {
-            this.cpMaintainService.updateMaintain(cpmaintainId, dto);
+            if (cpmaintainId == null) {
+                log.error("cpmaintainId id null");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                                        .body("충전기 장애 정보ID가 없어 수정할 수 없습니다.");
+            }
+
+            ResponseEntity<String> permissionCheck = this.comService.checkUserPermissions(principal, MenuConstants.MAINTEN_ERR);
+            if (permissionCheck != null) {
+                return permissionCheck;
+            }
+
+            this.cpMaintainService.updateMaintain(cpmaintainId, dto, principal.getName());
             log.info("=== maintain info update complete ===");
             return ResponseEntity.ok("충전기 장애 정보가 정상적으로 수정되었습니다.");
         } catch (Exception e) {
             log.error("[updateMaintain] error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                    .body("충전기 장애 정보 수정 중 오류 발생");
+                                    .body("충전기 장애 정보 수정 중 오류가 발생했습니다.");
         }
     }
 
@@ -139,22 +153,44 @@ public class CpMaintainController {
 
     // 삭제
     @DeleteMapping("/delete/{cpmaintainId}")
-    public ResponseEntity<String> deleteMaintain(@PathVariable("cpmaintainId") Long cpmaintainId) {
+    public ResponseEntity<String> deleteMaintain(@PathVariable("cpmaintainId") Long cpmaintainId, Principal principal) {
         log.info("=== delete maintain info ===");
 
-        if (cpmaintainId == null) {
-            log.error("cpmaintainId id null");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                                    .body("충전기 장애 정보ID가 없습니다.");
-        }
-
         try {
-            this.cpMaintainService.deleteMaintain(cpmaintainId);
+            if (cpmaintainId == null) {
+                log.error("cpmaintainId id null");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                                        .body("충전기 장애 정보ID가 없어 삭제할 수 없습니다.");
+            }
+
+            ResponseEntity<String> permissionCheck = this.comService.checkUserPermissions(principal, MenuConstants.MAINTEN_ERR);
+            if (permissionCheck != null) {
+                return permissionCheck;
+            }
+
+            this.cpMaintainService.deleteMaintain(cpmaintainId, principal.getName());
             return ResponseEntity.ok("충전기 장애 정보가 정상적으로 삭제되었습니다.");
         } catch (Exception e) {
             log.error("[deleteMaintain] error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                    .body("충전기 장애 정보 삭제 중 오류 발생");
+                                    .body("충전기 장애 정보 삭제 중 오류가 발생했습니다.");
+        }
+    }
+
+    @GetMapping("/btncontrol/{cpmaintainId}")
+    public ResponseEntity<Map<String, Object>> buttonControl(@PathVariable("cpmaintainId") Long cpmaintainId, Principal principal) {
+        log.info("=== update & delete button authority info ===");
+
+        Map<String, Object> response = new HashMap<>();
+
+        try {
+            boolean btnControl = this.cpMaintainService.buttonControl(cpmaintainId, principal.getName());
+            System.out.println("btnControl >> " + btnControl);
+            response.put("btnControl", btnControl);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            log.error("[CpMaintainControll >> buttonControl] error: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 }
