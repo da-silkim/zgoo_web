@@ -30,6 +30,7 @@ public class CompanyRelationInfo {
     // @JoinColumn(name = "company_id")
     // private Company company;
 
+    @Column(name = "parent_company_name")
     private String parentCompanyName;
 
     public void updateRelationInfo(CompanyRegDto dto) {

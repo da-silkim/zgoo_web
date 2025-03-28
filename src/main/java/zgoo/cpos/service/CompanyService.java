@@ -145,8 +145,15 @@ public class CompanyService {
      */
     // 업체 정보 저장
     public Company saveCompany(CompanyDto.CompanyRegDto dto) {
-
         log.info("== company dto : {}", dto.toString());
+
+        // bizType 값 검증 및 로깅
+        if (dto.getBizType() == null || dto.getBizType().isEmpty()) {
+            log.error("bizType is null or empty!");
+            // 기본값 설정 또는 예외 처리
+            dto.setBizType("CB"); // 기본값 설정
+        }
+        log.info("bizType value: '{}'", dto.getBizType());
 
         // dto >> entity(relation)
         CompanyRelationInfo companyRelationInfo = CompanyMapper.toEntityRelation(dto);
@@ -167,7 +174,6 @@ public class CompanyService {
         log.info(">>> Company saved : {}", saved.toString());
 
         return saved;
-
     }
 
     // 업체 로밍정보 저장

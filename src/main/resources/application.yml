@@ -22,19 +22,45 @@ spring:
       hibernate:
         format_sql: true
         # show_sql: true
+    defer-datasource-initialization: false  # hibernate 초기화 후 SQL 스크립트 실행
   
   sql:
     init:
-      mode: always
+      mode: never
       platform: mysql
       continue-on-error: true
       encoding: UTF-8
+      # 중요: Hibernate 초기화 후 SQL 스크립트 실행
+      schema-locations: classpath:schema.sql  # 필요한 경우
+      data-locations: classpath:data.sql
 
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+  mvc:
+    async:
+      request-timeout: 300000  # 5분 (밀리초)  
 
-logging.level:
-  org.hibernate.SQL: debug
-  org.hibernate.type.descriptor.sql.BasicBinder: trace
-  org.hibernate.stat: debug
+# 톰캣 설정
+server:
+  tomcat:
+    max-http-form-post-size: 50MB
+    connection-timeout: 300000  # 5분 (밀리초)
+  servlet:
+    session:
+      timeout: 30m  # 30분
+
+# p6spy 설정 추가
+decorator:
+  datasource:
+    p6spy:
+      enable-logging: false  # p6spy 로깅 비활성화
+
+logging:
+  level:
+    org.hibernate.type: trace
+  config: classpath:logback-spring.xml
 
 
 # WEB - WAS Ajp 방화벽 (내장 톰캣 설정 시) - (짐작)
@@ -45,7 +71,7 @@ fwaccess:
     tomcat_ajp_redirect_port: 9443
     tomcat_ajp_address: 192.168.30.120
     tomcat_ajp_allowed_request_attributes_pattern: .*
-    tomcat_ajp_enable: true
+    tomcat_ajp_enable: false
 
 file:
   dir: C:/Users/N-426/Desktop/store/

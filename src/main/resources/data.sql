@@ -1,5 +1,5 @@
--- 외래 키 제약 조건 비활성화
-SET FOREIGN_KEY_CHECKS = 0;
+-- -- 외래 키 제약 조건 비활성화
+-- SET FOREIGN_KEY_CHECKS = 0;
 
 
 /* insert default menu */
@@ -114,56 +114,56 @@ VALUES ('/fw/update', '펌웨어 업데이트', '1', 'O0000', 'O0200', 'Y', null
 
 /* insert default menu authority */
 DELETE FROM company_menu_authority;
-INSERT INTO company_menu_authority (company_id, company_menu_authority, menu_code, use_yn) 
+INSERT INTO company_menu_authority (company_id, menu_code, use_yn) 
 VALUES
-('1', '1', 'A0000', 'Y'),
-('1', '2', 'B0000', 'Y'),
-('1', '3', 'C0000', 'Y'),
-('1', '4', 'C0100', 'Y'),
-('1', '5', 'C0200', 'Y'),
-('1', '6', 'C0300', 'Y'),
-('1', '7', 'D0000', 'Y'),
-('1', '8', 'D0100', 'Y'),
-('1', '9', 'E0000', 'Y'),
-('1', '10', 'E0100', 'Y'),
-('1', '11', 'F0000', 'Y'),
-('1', '12', 'F0100', 'Y'),
-('1', '13', 'G0000', 'Y'),
-('1', '14', 'G0100', 'Y'),
-('1', '15', 'G0200', 'Y'),
-('1', '16', 'G0300', 'Y'),
-('1', '17', 'G0400', 'Y'),
-('1', '18', 'G0500', 'Y'),
-('1', '19', 'G0600', 'Y'),
-('1', '20', 'G0700', 'Y'),
-('1', '21', 'G0800', 'Y'),
-('1', '22', 'G0900', 'Y'),
-('1', '23', 'H0000', 'Y'),
-('1', '24', 'H0100', 'Y'),
-('1', '25', 'I0000', 'Y'),
-('1', '26', 'I0100', 'Y'),
-('1', '27', 'J0000', 'Y'),
-('1', '28', 'J0100', 'Y'),
-('1', '29', 'J0200', 'Y'),
-('1', '30', 'K0000', 'Y'),
-('1', '31', 'K0100', 'Y'),
-('1', '32', 'K0200', 'Y'),
-('1', '33', 'K0300', 'Y'),
-('1', '34', 'K0400', 'Y'),
-('1', '35', 'L0000', 'Y'),
-('1', '36', 'L0100', 'Y'),
-('1', '37', 'L0200', 'Y'),
-('1', '38', 'M0000', 'Y'),
-('1', '39', 'M0100', 'Y'),
-('1', '40', 'M0200', 'Y'),
-('1', '41', 'M0300', 'Y'),
-('1', '42', 'M0400', 'Y'),
-('1', '43', 'N0000', 'Y'),
-('1', '44', 'N0100', 'Y'),
-('1', '45', 'N0200', 'Y'),
-('1', '46', 'O0000', 'Y'),
-('1', '47', 'O0100', 'Y'),
-('1', '48', 'O0200', 'Y');
+('1',  'A0000', 'Y'),
+('1',  'B0000', 'Y'),
+('1',  'C0000', 'Y'),
+('1',  'C0100', 'Y'),
+('1',  'C0200', 'Y'),
+('1',  'C0300', 'Y'),
+('1',  'D0000', 'Y'),
+('1',  'D0100', 'Y'),
+('1',  'E0000', 'Y'),
+('1',  'E0100', 'Y'),
+('1',  'F0000', 'Y'),
+('1',  'F0100', 'Y'),
+('1',  'G0000', 'Y'),
+('1',  'G0100', 'Y'),
+('1',  'G0200', 'Y'),
+('1',  'G0300', 'Y'),
+('1',  'G0400', 'Y'),
+('1',  'G0500', 'Y'),
+('1',  'G0600', 'Y'),
+('1',  'G0700', 'Y'),
+('1',  'G0800', 'Y'),
+('1',  'G0900', 'Y'),
+('1',  'H0000', 'Y'),
+('1',  'H0100', 'Y'),
+('1',  'I0000', 'Y'),
+('1',  'I0100', 'Y'),
+('1',  'J0000', 'Y'),
+('1',  'J0100', 'Y'),
+('1',  'J0200', 'Y'),
+('1',  'K0000', 'Y'),
+('1',  'K0100', 'Y'),
+('1',  'K0200', 'Y'),
+('1',  'K0300', 'Y'),
+('1',  'K0400', 'Y'),
+('1',  'L0000', 'Y'),
+('1',  'L0100', 'Y'),
+('1',  'L0200', 'Y'),
+('1',  'M0000', 'Y'),
+('1',  'M0100', 'Y'),
+('1',  'M0200', 'Y'),
+('1',  'M0300', 'Y'),
+('1',  'M0400', 'Y'),
+('1',  'N0000', 'Y'),
+('1',  'N0100', 'Y'),
+('1',  'N0200', 'Y'),
+('1',  'O0000', 'Y'),
+('1',  'O0100', 'Y'),
+('1',  'O0200', 'Y');
 
 
 /* insert default condition code */
@@ -222,6 +222,7 @@ VALUES (
     1
 );
 
+DELETE FROM grp_code;
 INSERT INTO grp_code (grp_code, grpcd_name, reg_user_id, reg_dt, mod_user_id, mod_dt)
 VALUES
 ('COKIND', '사업자유형', 'zgoodev', NOW(), NULL, NULL),
@@ -253,9 +254,14 @@ VALUES
 ('FRCODE', '장애접수유형코드', 'zgoodev', NOW(), NULL, NULL),
 ('FSTATCODE', '장애처리상태코드', 'zgoodev', NOW(), NULL, NULL),
 ('ACCOUNTCD', '계정과목', 'zgoodev', NOW(), NULL, NULL),
-('PURCHASEMTH', '매입거래지불수단', 'zgoodev', NOW(), NULL, NULL);
+('PURCHASEMTH', '매입거래지불수단', 'zgoodev', NOW(), NULL, NULL),
+('CGCOMMONCD', '충전기공용구분코드', 'zgoodev', NOW(), NULL, NULL),
+('NOTUSINGRSN', '충전기미사용사유', 'zgoodev', NOW(), NULL, NULL),
+('MODEMCORP', '모뎀통신사', 'zgoodev', NOW(), NULL, NULL),
+('MODEMCTCD', '모뎀계약상태', 'zgoodev', NOW(), NULL, NULL);
 
 
+DELETE FROM common_code;
 INSERT INTO common_code (grp_code, common_code, name, reserved, ref_code1, ref_code2, ref_code3, reg_user_id, reg_dt, mod_user_id, mod_dt)
 VALUES
 ('FSTATCODE', 'FSTATREADY', '대기중', NULL, NULL, NULL, NULL, 'zgoodev', NOW(), NULL, NULL),
@@ -358,7 +364,19 @@ VALUES
 ('PURCHASEMTH', 'PM03', '현금영수증(현금)', NULL, NULL, NULL, NULL, 'daadmin', NOW(), NULL, NULL),
 ('PURCHASEMTH', 'PM04', '현금', NULL, NULL, NULL, NULL, 'daadmin', NOW(), NULL, NULL),
 ('PURCHASEMTH', 'PM05', '계좌이체', NULL, NULL, NULL, NULL, 'daadmin', NOW(), NULL, NULL),
-('PURCHASEMTH', 'PM06', '세금계산서(청구)', NULL, NULL, NULL, NULL, 'daadmin', NOW(), NULL, NULL);
+('PURCHASEMTH', 'PM06', '세금계산서(청구)', NULL, NULL, NULL, NULL, 'daadmin', NOW(), NULL, NULL),
+('CGCOMMONCD', 'PUB', '공용', NULL, NULL, NULL, NULL, 'zgoodev', NOW(), NULL, NULL),
+('CGCOMMONCD', 'NOTPUB', '비공용', NULL, NULL, NULL, NULL, 'zgoodev', NOW(), NULL, NULL),
+('CGCOMMONCD', 'PARTIALPUB', '부분공용', NULL, NULL, NULL, NULL, 'zgoodev', NOW(), NULL, NULL),
+('NOTUSINGRSN', 'NUR01', '철거', NULL, NULL, NULL, NULL, 'zgoodev', NOW(), NULL, NULL),
+('NOTUSINGRSN', 'NUR02', '교체', NULL, NULL, NULL, NULL, 'zgoodev', NOW(), NULL, NULL),
+('NOTUSINGRSN', 'NUR03', '기타', NULL, NULL, NULL, NULL, 'zgoodev', NOW(), NULL, NULL),
+('MODEMCORP', 'SKT', 'SKT', NULL, NULL, NULL, NULL, 'zgoodev', NOW(), NULL, NULL),
+('MODEMCORP', 'KT', 'KT', NULL, NULL, NULL, NULL, 'zgoodev', NOW(), NULL, NULL),
+('MODEMCORP', 'LGU+', 'LGU+', NULL, NULL, NULL, NULL, 'zgoodev', NOW(), NULL, NULL),
+('MODEMCTCD', 'MODEMNC', '미계약', NULL, NULL, NULL, NULL, 'zgoodev', NOW(), NULL, NULL),
+('MODEMCTCD', 'MODEMUC', '계약중', NULL, NULL, NULL, NULL, 'zgoodev', NOW(), NULL, NULL),
+('MODEMCTCD', 'MODEMCF', '계약만료', NULL, NULL, NULL, NULL, 'zgoodev', NOW(), NULL, NULL);
 
 -- 외래 키 제약 조건 다시 활성화
 SET FOREIGN_KEY_CHECKS = 1;

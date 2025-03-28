@@ -29,12 +29,25 @@ public class CompanyPG {
     @Column(name = "company_pg_id")
     private Long id;
 
+    @Column(name = "mid")
     private String mid;
+
+    @Column(name = "merchant_key")
     private String merchantKey;
+
+    @Column(name = "ssp_mall_id")
     private String sspMallId;
+
+    @Column(name = "reg_user_id")
     private String regUserId;
+
+    @Column(name = "reg_dt")
     private LocalDateTime regDt;
+
+    @Column(name = "mod_user_id")
     private String modUserId;
+
+    @Column(name = "mod_dt")
     private LocalDateTime modDt;
 
     public void updatePgInfo(CompanyRegDto dto) {

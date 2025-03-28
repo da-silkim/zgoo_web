@@ -31,6 +31,10 @@ repositories {
 
 def queryDslVersion = '5.0.0'
 
+ext {
+	poiVersion = '5.2.3'
+}
+
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
@@ -46,6 +50,9 @@ dependencies {
 	implementation 'org.apache.poi:poi-ooxml:5.4.0'
 	implementation 'org.mariadb.jdbc:mariadb-java-client:3.1.4'
 	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+	// Apache POI - 엑셀 파일 처리를 위한 라이브러리
+    implementation "org.apache.poi:poi:${poiVersion}"
+    implementation "org.apache.poi:poi-ooxml:${poiVersion}"
 
 	
 	//QueryDsl

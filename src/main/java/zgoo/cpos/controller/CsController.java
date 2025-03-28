@@ -37,7 +37,7 @@ public class CsController {
 
     // 충전소 이름 중복 검사
     @GetMapping("/checkStationName")
-    public ResponseEntity<Boolean> checkStationName(@RequestParam String stationName) {
+    public ResponseEntity<Boolean> checkStationName(@RequestParam("stationName") String stationName) {
         log.info("=== duplicate check stationName ===");
 
         try {
@@ -63,7 +63,7 @@ public class CsController {
             return ResponseEntity.ok(csInfoFindOne);
         } catch (Exception e) {
             log.error("[findCsInfoOne] error: {}", e.getMessage());
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
@@ -104,7 +104,7 @@ public class CsController {
 
         try {
             ResponseEntity<Map<String, String>> permissionCheck = this.comService.checkUserPermissionsMsg(principal,
-                MenuConstants.STATION_LIST);
+                    MenuConstants.STATION_LIST);
             if (permissionCheck != null) {
                 return permissionCheck;
             }
@@ -133,7 +133,7 @@ public class CsController {
 
         try {
             ResponseEntity<Map<String, String>> permissionCheck = this.comService.checkUserPermissionsMsg(principal,
-                MenuConstants.STATION_LIST);
+                    MenuConstants.STATION_LIST);
             if (permissionCheck != null) {
                 return permissionCheck;
             }
@@ -159,11 +159,11 @@ public class CsController {
             if (stationId == null) {
                 log.error("[deleteCsInfo] error: stationId is null");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                                        .body("충전소ID가 없어 정보를 삭제할 수 없습니다.");
+                        .body("충전소ID가 없어 정보를 삭제할 수 없습니다.");
             }
 
             ResponseEntity<String> permissionCheck = this.comService.checkUserPermissions(principal,
-                MenuConstants.STATION_LIST);
+                    MenuConstants.STATION_LIST);
             if (permissionCheck != null) {
                 return permissionCheck;
             }
@@ -173,7 +173,7 @@ public class CsController {
         } catch (Exception e) {
             log.error("[deleteCsInfo] error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                    .body("충전소 정보 삭제 중 오류가 발생했습니다.");
+                    .body("충전소 정보 삭제 중 오류가 발생했습니다.");
         }
     }
 }

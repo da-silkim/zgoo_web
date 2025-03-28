@@ -38,56 +38,58 @@ public class Company {
     // @EmbeddedId
     // private CompanyCompositeKey compkey;
 
-    @Column(nullable = false)
+    @Column(name = "company_type", nullable = false)
     private String companyType; // 사업자유형
 
-    @Column(nullable = false)
+    @Column(name = "company_lv", nullable = false)
     private String companyLv; // 사업자레벨
 
-    @Column(nullable = false)
+    @Column(name = "company_name", nullable = false)
     private String companyName; // 사업자명
 
-    @Column(length = 20)
+    @Column(name = "biz_num", length = 20)
     private String bizNum; // 사업자번호
 
-    @Column(length = 10, nullable = false)
+    @Column(name = "biz_type", length = 10)
     private String bizType; // 사업자구분(법인/개인)
 
-    @Column()
+    @Column(name = "biz_kind")
     private String bizKind; // 업종
 
-    @Column(length = 20)
+    @Column(name = "ceo_name", length = 20)
     private String ceoName; // 대표자명
 
-    @Column(length = 20)
+    @Column(name = "head_phone", length = 20)
     private String headPhone; // 대표전화
 
-    @Column(length = 10)
+    @Column(name = "zipcode", length = 10)
     private String zipcode;
 
-    @Column()
+    @Column(name = "address")
     private String address;
 
-    @Column()
+    @Column(name = "address_detail")
     private String addressDetail;
 
-    @Column(length = 20)
+    @Column(name = "staff_name", length = 20)
     private String staffName; // 담당자명
 
-    @Column(length = 50)
+    @Column(name = "staff_email", length = 50)
     private String staffEmail;
 
-    @Column(length = 30)
+    @Column(name = "staff_tel", length = 30)
     private String staffTel;
 
-    @Column(length = 30)
+    @Column(name = "staff_phone", length = 30)
     private String staffPhone;
 
-    @Column(nullable = false)
+    @Column(name = "consignment_payment", nullable = false)
     private String consignmentPayment; // 위탁결제구분
 
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
 
+    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
     @Column(name = "logo_url")

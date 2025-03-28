@@ -30,8 +30,13 @@ public class CompanyRoaming {
     @Column(name = "company_roaming_id")
     private Long romaing_id;
 
+    @Column(name = "institution_email")
     private String institutionEmail;
+
+    @Column(name = "institution_code")
     private String institutionCode;
+
+    @Column(name = "institution_key")
     private String institutionKey;
 
     @JoinColumn(name = "company_id")

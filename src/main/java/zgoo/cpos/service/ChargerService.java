@@ -17,16 +17,20 @@ import zgoo.cpos.domain.charger.CpInfo;
 import zgoo.cpos.domain.charger.CpModem;
 import zgoo.cpos.domain.company.CpPlanPolicy;
 import zgoo.cpos.domain.cs.CsInfo;
+import zgoo.cpos.dto.cp.ChargerDto.ChargerDetailListDto;
 import zgoo.cpos.dto.cp.ChargerDto.ChargerListDto;
 import zgoo.cpos.dto.cp.ChargerDto.ChargerRegDto;
 import zgoo.cpos.dto.cp.ChargerDto.ChargerSearchDto;
 import zgoo.cpos.dto.cp.ChargerDto.ConnectorStatusDto;
+import zgoo.cpos.dto.cp.CpModelDto.CpModelListDto;
 import zgoo.cpos.mapper.CpMapper;
 import zgoo.cpos.mapper.CpModemMapper;
 import zgoo.cpos.repository.charger.ChargerRepository;
 import zgoo.cpos.repository.charger.ConnectorStatusRepository;
 import zgoo.cpos.repository.charger.CpModemRepository;
+import zgoo.cpos.repository.code.CommonCodeRepository;
 import zgoo.cpos.repository.company.CpPlanPolicyRepository;
+import zgoo.cpos.repository.cpmodel.CpModelRepository;
 import zgoo.cpos.repository.cs.CsRepository;
 
 @Service
@@ -39,6 +43,8 @@ public class ChargerService {
     private final CsRepository csRepository;
     private final CpPlanPolicyRepository cpPlanPolicyRepository;
     private final ConnectorStatusRepository connectorStatusRepository;
+    private final CpModelRepository cpModelRepository;
+    private final CommonCodeRepository commonCodeRepository;
 
     /*
      * 저장 > 충전기 정보 저장
@@ -164,7 +170,7 @@ public class ChargerService {
         }
     }
 
-    /* 
+    /*
      * stationId로 충전기 전체 조회
      */
     public List<ChargerSearchDto> searchChargerList(String stationId) {
@@ -174,5 +180,92 @@ public class ChargerService {
             log.error("[ChargerService >> searchChargerList] error:", e.getMessage(), e);
             return Collections.emptyList();
         }
+    }
+
+    /*
+     * 충전기 정보 update
+     */
+    @Transactional
+    public boolean updateCpInfo(ChargerRegDto reqdto) {
+        try {
+            // 충전기 정보 수정
+            CpInfo cpInfo = chargerRepository.findById(reqdto.getChargerId()).orElseThrow(
+                    () -> new IllegalArgumentException("Charger not found with chargerId:" + reqdto.getChargerId()));
+
+            // 충전기 정보 수정
+            cpInfo.updateCpInfo(reqdto);
+
+            return true;
+        } catch (Exception e) {
+            log.error("[ChargerService >> updateCpInfo] error:", e.getMessage(), e);
+            return false;
+        }
+    }
+
+    /*
+     * 충전기 정보 삭제
+     */
+    @Transactional
+    public boolean deleteCpInfo(String chargerId) {
+        try {
+            chargerRepository.deleteById(chargerId);
+            return true;
+        } catch (Exception e) {
+            log.error("[ChargerService >> deleteCpInfo] error:", e.getMessage(), e);
+            return false;
+        }
+    }
+
+    /*
+     * 충전기 정보 조회
+     */
+    @Transactional(readOnly = true)
+    public ChargerDetailListDto getChargerInfo(String chargerId) {
+        try {
+            CpInfo cpInfo = chargerRepository.findCpInfoByChargerId(chargerId);
+
+            CpModelListDto cpModel = cpModelRepository.findCpModelModalOne(cpInfo.getModelCode());
+
+            // get commoncode names
+            String commonTypeName = "";
+            String noUseReason = "";
+            String modemContractStatus = "";
+            if (cpInfo != null) {
+                if (cpInfo.getCommonType() != null && !cpInfo.getCommonType().isEmpty()) {
+                    commonTypeName = commonCodeRepository.findCommonCodeName(cpInfo.getCommonType());
+                }
+                if (cpInfo.getReason() != null && !cpInfo.getReason().isEmpty()) {
+                    noUseReason = commonCodeRepository.findCommonCodeName(cpInfo.getReason());
+                }
+                if (cpInfo.getCpmodemInfo().getContractStatus() != null
+                        && !cpInfo.getCpmodemInfo().getContractStatus().isEmpty()) {
+                    modemContractStatus = commonCodeRepository
+                            .findCommonCodeName(cpInfo.getCpmodemInfo().getContractStatus());
+                }
+            }
+
+            ChargerDetailListDto resDto = CpMapper.toDetailDto(cpInfo, cpModel);
+            resDto.setCommonTypeName(commonTypeName);
+            resDto.setReasonName(noUseReason);
+            resDto.setModemContractStatusNm(modemContractStatus);
+
+            return resDto;
+        } catch (Exception e) {
+            log.error("[ChargerService >> getChargerInfo] error:", e.getMessage(), e);
+            return null;
+        }
+    }
+
+    /*
+     * 조회 > 충전기 전체 조회
+     */
+    @Transactional(readOnly = true)
+    public List<ChargerListDto> findAllChargerListWithoutPagination(Long companyId, String manufCd,
+            String searchOp, String searchContent) {
+        log.info("=== Finding all charger list: companyId={}, manufCd={}, searchOp={}, searchContent={} ===",
+                companyId, manufCd, searchOp, searchContent);
+
+        // 대용량 데이터 처리를 위한 스트림 처리 또는 배치 처리 고려
+        return chargerRepository.findAllChargerListWithoutPagination(companyId, manufCd, searchOp, searchContent);
     }
 }

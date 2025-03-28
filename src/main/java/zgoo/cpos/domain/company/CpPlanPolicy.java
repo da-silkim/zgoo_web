@@ -38,7 +38,7 @@ public class CpPlanPolicy {
     @ManyToOne(fetch = FetchType.LAZY)
     private Company company;
 
-    // 요금정책명
+    @Column(name = "name")
     private String name;
 
     /*
