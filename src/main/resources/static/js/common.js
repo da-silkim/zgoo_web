@@ -436,3 +436,35 @@ function isPasswordSpecial(asValue) {
 function openMap(menuUrl) {
     window.open(menuUrl, 'mapPopup', 'width=1300,height=820,scrollbars=yes,resizable=yes');
 }
+
+function replacePage(pageUrl) {
+    window.location.replace(pageUrl);
+}
+
+function searchOption() {
+    const selectedSize = document.getElementById('size').value;
+    const form = document.getElementById('searchForm');
+
+    const hiddenSizeInput = document.createElement('input');
+    hiddenSizeInput.type = 'hidden';
+    hiddenSizeInput.name = 'size';
+    hiddenSizeInput.value = selectedSize;
+    hiddenSizeInput.id = 'hiddenSizeInput';
+
+    form.appendChild(hiddenSizeInput);
+    form.submit();
+}
+
+function updatePageSize(selectElement, baseUrl, paramKeys) {
+    const urlParams = new URLSearchParams(window.location.search);
+    const selectedSize = selectElement.value;
+
+    let newUrl = `${baseUrl}?page=0&size=${selectedSize}`;
+
+    paramKeys.forEach(key => {
+        const value = urlParams.get(key) || '';
+        newUrl += `&${key}=${encodeURIComponent(value)}`;
+    });
+
+    window.location.href = newUrl;
+}

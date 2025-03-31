@@ -1,49 +1,19 @@
 $(document).ready(function() {
-    let modalCon = false;   // false: 등록 / true: 수정
+    let modalCon = false;
     let selectRow, btnMsg = "등록";
     var idx;
 
-    $('#resetBtn').on('click', function() {
-        window.location.replace('/system/notice/list');
-    });
-
-    $('#searchBtn').on('click', function() {
-        const selectedSize = document.getElementById('size').value;
-        const form = document.getElementById('searchForm');
-
-        const hiddenSizeInput = document.createElement('input');
-        hiddenSizeInput.type = 'hidden';
-        hiddenSizeInput.name = 'size';
-        hiddenSizeInput.value = selectedSize;
-        hiddenSizeInput.id = 'hiddenSizeInput';
-
-        form.appendChild(hiddenSizeInput);
-        form.submit();
-    });
-
     $('#size').on('change', function() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const selectedSize = document.getElementById("size").value;
-        const selectedCompanyId = urlParams.get('companyIdSearch') || '';
-        const selectedStartDate = urlParams.get('startDateSearch') || '';
-        const selectedEndDate = urlParams.get('endDateSearch') || '';
-
-        window.location.href = "/system/notice/list?page=0&size=" + selectedSize +
-                               "&companyIdSearch=" + (selectedCompanyId) +
-                               "&startDateSearch=" + encodeURIComponent(selectedStartDate) +
-                               "&endDateSearch=" + encodeURIComponent(selectedEndDate);
+        updatePageSize(this, "/system/notice/list", ["companyIdSearch", "startDateSearch", "endDateSearch"]);
     });
 
     $('#pageList').on('click', 'tr', function() {
         selectRow = $(this);
         idx = selectRow.find('td').eq(0).attr('id');
 
-        // 가장 가까운 checkbox 요소 찾기
         const cbox = $(this).closest('tr').find('input[type="checkbox"]');
         if (cbox.length > 0 && cbox.is(':checked')) {
             console.log('Checkbox is checked.');
-
-            // 해당 데이터에 대한 수정/삭제 권한 여부 확인
             $.ajax({
                 url: `/system/notice/btncontrol/${idx}`,
                 type: 'GET',
@@ -77,10 +47,7 @@ $(document).ready(function() {
         modalCon = false;
         btnMsg = "등록";
         $('#modalBtn').text(btnMsg);
-
-        $('#type').prop('selectedIndex', 0);
-        $('#title').val('');
-        $('#content').val('');
+        $('#noticeForm')[0].reset();
     });
 
     $(document).on('click', '#editBtn', function() {
@@ -97,6 +64,8 @@ $(document).ready(function() {
                 $('#type').val(data.type || '');
                 $('#title').val(data.title || '');
                 $('#content').val(data.content || '');
+                $('#startDate').val(data.startDate || '');
+                $('#endDate').val(data.endDate || '');
             }
         });
     });
@@ -126,7 +95,9 @@ $(document).ready(function() {
             const DATA = {
                 type: $('#type').val(),
                 title: $('#title').val(),
-                content: $('#content').val()
+                content: $('#content').val(),
+                startDate: $('#startDate').val(),
+                endDate: $('#endDate').val()
             }
             
             const URL = modalCon ? `/system/notice/update/${idx}` : `/system/notice/new`;

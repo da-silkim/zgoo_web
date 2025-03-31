@@ -20,6 +20,8 @@ public class NoticeMapper {
                             .delYn("N")
                             .user(users)
                             .regDt(LocalDateTime.now())
+                            .startDate(dto.getStartDate())
+                            .endDate(dto.getEndDate())
                             .build();
         return notice;
     }
@@ -36,6 +38,8 @@ public class NoticeMapper {
                             .userId(entity.getUser().getUserId())
                             .delYn(entity.getDelYn())
                             .regDt(entity.getRegDt())
+                            .startDate(entity.getStartDate())
+                            .endDate(entity.getEndDate())
                             .build();
         return dto;
     }

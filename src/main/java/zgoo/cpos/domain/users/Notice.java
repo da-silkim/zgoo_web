@@ -1,5 +1,6 @@
 package zgoo.cpos.domain.users;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import jakarta.persistence.CascadeType;
@@ -52,6 +53,12 @@ public class Notice {
     @Column(name = "del_yn")
     private String delYn;
 
+    @Column(name = "start_date")
+    private LocalDate startDate;
+
+    @Column(name = "end_date")
+    private LocalDate endDate;
+
     @JoinColumn(name = "user_id")
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     private Users user;
@@ -60,6 +67,8 @@ public class Notice {
         this.type = notice.getType();
         this.title = notice.getTitle();
         this.content = notice.getContent();
+        this.startDate = notice.getStartDate();
+        this.endDate = notice.getEndDate();
     }
 
     public void setViews(Long views) {

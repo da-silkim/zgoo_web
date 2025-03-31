@@ -33,9 +33,9 @@
                             </div>
                         </div>
                         <div class="search-btn">
-                            <button type="button" class="btn btn-outline-grey me-2" id="searchBtn">
+                            <button type="button" class="btn btn-outline-grey me-2" id="searchBtn" onclick="searchOption()">
                                 <i class="bi bi-search me-2"></i>검색</button>
-                            <button type="button" class="btn btn-outline-grey me-2" id="resetBtn">
+                            <button type="button" class="btn btn-outline-grey me-2" id="resetBtn" onclick="replacePage('/system/notice/list')">
                                 <i class="bi bi-arrow-repeat me-2"></i>초기화</button>
                         </div>
                         <!-- row:1 end -->
@@ -148,48 +148,58 @@
 
     <!-- Add Modal start -->
     <div class="modal fade" id="dataAddModal" tabindex="-1" aria-labelledby="dataAddModalLabel" data-bs-backdrop="static" data-bs-keyboard="false">
-        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width: 60vw; height: 90vh;"> <!-- height: 90vh; -->
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width: 60vw; height: 90vh;">
             <div class="modal-content mh-100 overflow-y-auto scrollbar">
-                <form th:object="${noticeDto}">
-                <!-- modal body start -->
-                <div class="modal-body">
-                    <!-- 모달 내용 -->
-                    <div class="modal-title mb-2"><span class="modal-title-bar"></span><span>공지사항 등록</span></div>
-                    <!-- table:1 start -->
-                    <table class="table table-bg-v table-fixed w-100 text-center align-middle">
-                        <tbody>
-                            <tr class="table-border-top">
-                                <th class="w-20">제목<b class="required-data">*</b></th>
-                                <td colspan="3">
-                                    <input type="text" name="title" id="title" class="form-control"
-                                            th:field="*{title}" placeholder="" autocomplete="off" required>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th class="w-20">공지유형<b class="required-data">*</b></th>
-                                <td class="w-30">
-                                    <select id="type" class="form-control" th:field="*{type}" required>
-                                        <option th:each="type : ${noticeTypeList}" th:value="${type.commonCode}"
-                                                th:text="${type.commonCodeName}"></option>
-                                    </select>
-                                </td>
-                                <td colspan="2"></td>
-                            </tr>
-                            <tr>
-                                <th class="w-20">내용<b class="required-data">*</b></th>
-                                <td colspan="3">
-                                    <textarea class="form-control textarea-content" name="content" id="content" 
-                                            rows="10" th:field="*{content}" autocomplete="off" required></textarea>
-                                </td>
-                            </tr>                 
-                        </tbody>
-                    </table>
-                    <!-- table:1 end -->
+                <form id="noticeForm" th:object="${noticeDto}">
+                    <!-- modal body start -->
+                    <div class="modal-body">
+                        <!-- 모달 내용 -->
+                        <div class="modal-title mb-2"><span class="modal-title-bar"></span><span>공지사항 등록</span></div>
+                        <!-- table:1 start -->
+                        <table class="table table-bg-v table-fixed w-100 text-center align-middle">
+                            <tbody>
+                                <tr class="table-border-top">
+                                    <th class="w-20">공지 시작일</th>
+                                    <td class="w-30">
+                                        <input type="date" id="startDate" class="form-control" required>
+                                    </td>
+                                    <th class="w-20">공지 종료일</th>
+                                    <td class="w-30">
+                                        <input type="date" id="endDate" class="form-control" required>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="w-20">제목<b class="required-data">*</b></th>
+                                    <td colspan="3">
+                                        <input type="text" name="title" id="title" class="form-control"
+                                                th:field="*{title}" placeholder="" autocomplete="off" required>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="w-20">공지유형<b class="required-data">*</b></th>
+                                    <td class="w-30">
+                                        <select id="type" class="form-control" th:field="*{type}" required>
+                                            <option th:each="type : ${noticeTypeList}" th:value="${type.commonCode}"
+                                                    th:text="${type.commonCodeName}"></option>
+                                        </select>
+                                    </td>
+                                    <td colspan="2"></td>
+                                </tr>  
+                                <tr>
+                                    <th class="w-20">내용<b class="required-data">*</b></th>
+                                    <td colspan="3">
+                                        <textarea class="form-control textarea-content" name="content" id="content" 
+                                                rows="10" th:field="*{content}" autocomplete="off" required></textarea>
+                                    </td>
+                                </tr>                 
+                            </tbody>
+                        </table>
+                        <!-- table:1 end -->
                     </div>
                     <!-- modal body end -->
-                    <div class="modal-footer justify-content-center" style="border-top: none;">
+                    <div class="modal-footer justify-content-center border-top-none">
                         <button type="button" id="cancelBtn" class="btn btn-outline-grey me-2" data-bs-dismiss="modal">취소</button>
-                        <button type="submit" id="modalBtn" class="btn btn-data-add">등록</button>
+                        <button type="button" id="modalBtn" class="btn btn-data-add">등록</button>
                     </div>
                 </form>              
             </div>

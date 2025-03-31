@@ -1,9 +1,7 @@
 package zgoo.cpos.repository.users;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -32,6 +30,7 @@ public class NoticeRepositoryCustomImpl implements NoticeRepositoryCustom {
     QUsers users = QUsers.users;
     QCompany company = QCompany.company;
     QCommonCode typeCommonCode = new QCommonCode("type");
+    LocalDate today = LocalDate.now();
 
     @Override
     public Page<NoticeListDto> findNoticeWithPagination(Pageable pageable) {
@@ -51,7 +50,11 @@ public class NoticeRepositoryCustomImpl implements NoticeRepositoryCustom {
             .leftJoin(users).on(notice.user.userId.eq(users.userId))
             .leftJoin(company).on(users.company.id.eq(company.id))
             .leftJoin(typeCommonCode).on(notice.type.eq(typeCommonCode.commonCode))
-            .where(notice.delYn.eq("N"))
+            .where(
+                notice.delYn.eq("N"),
+                notice.startDate.loe(today),
+                notice.endDate.goe(today)
+            )
             .orderBy(notice.regDt.desc(), notice.idx.desc())
             .offset(pageable.getOffset())
             .limit(pageable.getPageSize())
@@ -66,14 +69,13 @@ public class NoticeRepositoryCustomImpl implements NoticeRepositoryCustom {
     }
 
     @Override
-    public Page<NoticeListDto> searchNoticeListwithPagination(Long companyId, LocalDate startDate, LocalDate endDate, Pageable pageable) {
-        // DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        // LocalDate startDateSearch = (startDate != null) ? LocalDate.parse(startDate, formatter) : null;
-        // LocalDate endDateSearch = (endDate != null) ? LocalDate.parse(endDate, formatter) : null;
-
+    public Page<NoticeListDto> searchNoticeListwithPagination(Long companyId, LocalDate startDate,
+            LocalDate endDate, Pageable pageable) {
         BooleanBuilder builder = new BooleanBuilder();
 
         builder.and(notice.delYn.eq("N"));
+        builder.and(notice.startDate.loe(today));
+        builder.and(notice.endDate.goe(today));
 
         if (companyId != null) {
             builder.and(company.id.eq(companyId));
@@ -162,7 +164,9 @@ public class NoticeRepositoryCustomImpl implements NoticeRepositoryCustom {
     public NoticeDetailDto findPreviousNotice(Long idx, Long companyId, LocalDate startDate, LocalDate endDate) {
         BooleanBuilder builder = new BooleanBuilder();
         builder.and(notice.delYn.eq("N"));
-        
+        builder.and(notice.startDate.loe(today));
+        builder.and(notice.endDate.goe(today));
+
         if (companyId != null) {
             builder.and(company.id.eq(companyId));
         }
@@ -189,17 +193,18 @@ public class NoticeRepositoryCustomImpl implements NoticeRepositoryCustom {
                 .leftJoin(users).on(notice.user.userId.eq(users.userId))
                 .leftJoin(company).on(users.company.id.eq(company.id))
                 .leftJoin(typeCommonCode).on(notice.type.eq(typeCommonCode.commonCode))
-                .where(builder) // 위에서 구성한 조건들 적용
+                .where(builder)
                 .orderBy(notice.idx.desc())
                 .fetchFirst(); // 가장 큰 idx를 조회
-        // return Optional.ofNullable(result);
     }
 
     @Override
     public NoticeDetailDto findNextNotice(Long idx, Long companyId, LocalDate startDate, LocalDate endDate) {
         BooleanBuilder builder = new BooleanBuilder();
         builder.and(notice.delYn.eq("N"));
-        
+        builder.and(notice.startDate.loe(today));
+        builder.and(notice.endDate.goe(today));
+
         if (companyId != null) {
             builder.and(company.id.eq(companyId));
         }
@@ -229,7 +234,6 @@ public class NoticeRepositoryCustomImpl implements NoticeRepositoryCustom {
                 .where(builder)
                 .orderBy(notice.idx.asc())
                 .fetchFirst(); // 가장 작은 idx를 조회
-        // return Optional.ofNullable(result);
     }
 
     @Override
@@ -260,7 +264,11 @@ public class NoticeRepositoryCustomImpl implements NoticeRepositoryCustom {
             .leftJoin(users).on(notice.user.userId.eq(users.userId))
             .leftJoin(company).on(users.company.id.eq(company.id))
             .leftJoin(typeCommonCode).on(notice.type.eq(typeCommonCode.commonCode))
-            .where(notice.delYn.eq("N"))
+            .where(
+                notice.delYn.eq("N"),
+                notice.startDate.loe(today),
+                notice.endDate.goe(today)
+            )
             .orderBy(notice.regDt.desc(), notice.idx.desc())
             .limit(5)
             .fetch();

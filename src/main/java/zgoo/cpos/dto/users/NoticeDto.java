@@ -1,5 +1,6 @@
 package zgoo.cpos.dto.users;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import lombok.Data;
@@ -46,6 +47,8 @@ public class NoticeDto {
     @ToString(callSuper = true)
     public static class NoticeRegDto extends BaseNoticeDto {
         private String content;
+        private LocalDate startDate;
+        private LocalDate endDate;
     }
 
     @Data

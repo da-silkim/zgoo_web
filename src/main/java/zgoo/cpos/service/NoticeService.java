@@ -166,15 +166,14 @@ public class NoticeService {
             dto.setUserId(loginUserId);
 
             boolean isMod = checkSaveAuthority(loginUserId);
-
-            if (isMod) {
-                Users users = this.usersRepository.finsUserOneNotJoinedComapny(dto.getUserId());
-                Notice notice = NoticeMapper.toEntity(dto, users);
-                this.noticeRepository.save(notice);
-            } else {
+            if (!isMod) {
                 log.warn("[saveNotice] Access without permission.");
+                return;
             }
-
+            
+            Users users = this.usersRepository.finsUserOneNotJoinedComapny(dto.getUserId());
+            Notice notice = NoticeMapper.toEntity(dto, users);
+            this.noticeRepository.save(notice);
         } catch (IllegalArgumentException e) {
             log.error("[saveNotice] Illegal argument error: {}", e.getMessage());
             throw e;
@@ -192,21 +191,17 @@ public class NoticeService {
             }
 
             boolean isMod = checkUpdateAndDeleteAuthority(dto.getIdx(), loginUserId);
+            if (!isMod) return null;
 
-            if (isMod) {
-                Notice notice = this.noticeRepository.findNoticeOne(dto.getIdx());
+            Notice notice = this.noticeRepository.findNoticeOne(dto.getIdx());
 
-                log.info("=== before update: {}", notice.toString());
+            log.info("=== before update: {}", notice.toString());
 
-                notice.updateNoticeInfo(dto);
+            notice.updateNoticeInfo(dto);
 
-                log.info("=== after update: {}", notice.toString());
-    
-                return NoticeMapper.toDto(notice);
-            }
+            log.info("=== after update: {}", notice.toString());
 
-            log.warn("[updateNotice] Access without permission.");
-            return null;
+            return NoticeMapper.toDto(notice);
         } catch (IllegalArgumentException e) {
             log.error("[updateNotice] Illegal argument error: {}", e.getMessage());
             throw e;
@@ -225,14 +220,13 @@ public class NoticeService {
             }
 
             boolean isMod = checkUpdateAndDeleteAuthority(idx, loginUserId);
-
-            if (isMod) {
-                Long count = this.noticeRepository.deleteNoticeOne(idx);
-                log.info("=== delete notice info: {}", count);
-            } else {
+            if (!isMod) {
                 log.warn("[deleteNotice] Access without permission.");
+                return;
             }
 
+            Long count = this.noticeRepository.deleteNoticeOne(idx);
+            log.info("=== delete notice info: {}", count);
         } catch (IllegalArgumentException e) {
             log.error("[deleteNotice] Illegal argument error: {}", e.getMessage());
             throw e;
