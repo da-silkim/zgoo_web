@@ -27,6 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 import zgoo.cpos.dto.code.CodeDto.CommCodeDto;
 import zgoo.cpos.dto.code.CodeDto.GrpCodeDto;
 import zgoo.cpos.service.CodeService;
+import zgoo.cpos.service.ComService;
 
 @Controller
 @Slf4j
@@ -35,6 +36,7 @@ import zgoo.cpos.service.CodeService;
 public class CommonController {
 
     private final CodeService codeService;
+    private final ComService comService;
 
     // @PostMapping("/system/code/grpcode/new")
     // public String createGrpCode(@Valid GrpCodeDto dto, BindingResult result) {
@@ -93,6 +95,11 @@ public class CommonController {
         log.info("groupcode_dto >> {}", dto.toString());
 
         try {
+            ResponseEntity<Map<String, String>> permissionCheck = this.comService.checkSuperAdminPermissionsMsg(principal);
+            if (permissionCheck != null) {
+                return permissionCheck;
+            }
+
             codeService.saveGrpCode(dto, principal.getName());
         } catch (Exception e) {
             log.error("[createGrpCode] error: {}", e.getMessage());
@@ -149,24 +156,38 @@ public class CommonController {
 
     // 그룹코드 - 그룹코드명 수정
     @PatchMapping("/grpcode/update")
-    public ResponseEntity<String> updateGrpCode(@RequestBody GrpCodeDto grpCodeDto, Principal principal) {
+    public ResponseEntity<Map<String, String>> updateGrpCode(@RequestBody GrpCodeDto grpCodeDto, Principal principal) {
         log.info("==== update group code(list) ======");
 
+        Map<String, String> response = new HashMap<>();
+
         try {
+            ResponseEntity<Map<String, String>> permissionCheck = this.comService.checkSuperAdminPermissionsMsg(principal);
+            if (permissionCheck != null) {
+                return permissionCheck;
+            }
+
             this.codeService.updateGrpCode(grpCodeDto, principal.getName());
-            return ResponseEntity.ok().build();
+            response.put("message", "그룹코드가 성공적으로 수정되었습니다.");
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
             log.error("[updateGrpCode] error: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("그룹코드 수정 중 오류가 발생했습니다.");
+            response.put("message", "그룹코드 수정 중 오류가 발생했습니다.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
 
     // 그룹코드 - 삭제
     @DeleteMapping("/grpcode/delete/{grpcd}")
-    public ResponseEntity<String> deleteGrpcd(@PathVariable("grpcd") String grpCode) {
+    public ResponseEntity<String> deleteGrpcd(@PathVariable("grpcd") String grpCode, Principal principal) {
         log.info("==== delete group code(list) ======");
 
         try {
+            ResponseEntity<String> permissionCheck = this.comService.checkSuperAdminPermissions(principal);
+            if (permissionCheck != null) {
+                return permissionCheck;
+            }
+
             this.codeService.deleteGroupCode(grpCode);
             return ResponseEntity.ok("그룹코드가 정상적으로 삭제되었습니다.");
         } catch (EntityNotFoundException e) {
@@ -202,6 +223,11 @@ public class CommonController {
         log.info("commoncd_dto >> {}", dto.toString());
 
         try {
+            ResponseEntity<Map<String, String>> permissionCheck = this.comService.checkSuperAdminPermissionsMsg(principal);
+            if (permissionCheck != null) {
+                return permissionCheck;
+            }
+
             codeService.saveCommonCode(dto, principal.getName());
             response.put("message", "공통코드가 성공적으로 등록되었습니다.");
             return ResponseEntity.ok(response);
@@ -248,6 +274,11 @@ public class CommonController {
         Map<String, String> response = new HashMap<>();
         
         try {
+            ResponseEntity<Map<String, String>> permissionCheck = this.comService.checkSuperAdminPermissionsMsg(principal);
+            if (permissionCheck != null) {
+                return permissionCheck;
+            }
+
             CommCodeDto updatedCommonCode = this.codeService.updateCommonCodeInfo(commonCdDto, principal.getName());
             response.put("message", "공통코드가 성공적으로 수정되었습니다.");
             response.put("updatedCommonCode", updatedCommonCode.toString()); // 필요 시 수정된 코드 정보를 포함할 수 있습니다.
@@ -266,10 +297,15 @@ public class CommonController {
     // 공통코드 - 삭제
     @DeleteMapping("/commoncd/delete/{grpcd}/{commoncd}")
     public ResponseEntity<String> deleteCommonCode(@PathVariable("grpcd") String grpCode,
-            @PathVariable("commoncd") String commonCode) {
+            @PathVariable("commoncd") String commonCode, Principal principal) {
         log.info("==== delete common code(list) ======");
 
         try {
+            ResponseEntity<String> permissionCheck = this.comService.checkSuperAdminPermissions(principal);
+            if (permissionCheck != null) {
+                return permissionCheck;
+            }
+
             this.codeService.deleteCommonCode(commonCode);
             return ResponseEntity.ok("공통코드가 정상적으로 삭제되었습니다.");
         } catch (EntityNotFoundException e) {

@@ -1,27 +1,29 @@
 $(document).ready(function() {
-    let grpModalCon = false, comModalCon = false;    // false: 등록 / true: 수정
-    let grpSelectRow, comSelectRow; // 선택한 행, 열 저장
-    let btnMsg = "등록";            // 등록/수정에 따른 버튼 메시지
+    let grpModalCon = false, comModalCon = false;
+    let grpSelectRow, comSelectRow;
+    let btnMsg = "등록";
+    let currGrpCode;
 
-    // 그룹코드 테이블 클릭 시 실행
     $('#pageList').on('click', 'tr', function() {
         grpSelectRow = $(this);
-        const currGrpCode = grpSelectRow.find('td').eq(1).text();    // 그룹코드
-        // const currGrpcdName = grpSelectRow.find('td').eq(2).text();  // 그룹코드명
-        // console.log('curr grpCode: ' + currGrpCode);    // 현재 클릭한 그룹코드 정보 확인
-
-        // 그룹코드 정보 공통코드 모달창에 자동 입력
+        currGrpCode = grpSelectRow.find('td').eq(1).text();    // 그룹코드
         $('.grpCodeInput').val(currGrpCode);
-        // console.log("선택한 그룹코드 값: " + grpcdVal);
+        showCommoncd(currGrpCode);
+    });
 
-        // 선택한 그룹코드에 연관된 공통코드 조회
+    $('#pageListSub').on('click', 'tr', function() {
+        comSelectRow = $(this);
+    });
+
+    // 선택한 그룹코드에 연관된 공통코드 조회
+    function showCommoncd(currGrpCode) {
         $.ajax({
             type: 'GET',
             url: `/system/code/commoncd/search/${currGrpCode}`,
             success: function(data) {
-                $('#pageListSub').empty();  // 기존 내용 삭제
+                $('#pageListSub').empty();
 
-                if (!data || data.length === 0) {   // 빈 리스트 처리
+                if (!data || data.length === 0) {
                     $('#pageListSub').append(`
                         <tr>
                             <td colspan="9">조회된 데이터가 없습니다.</td>
@@ -46,24 +48,17 @@ $(document).ready(function() {
                 }
             },
             error: function(error) {
-                console.log("공통코드 조회 실패: ", error);
+                console.error(error);
             }
         });
-    });
-
-    $('#pageListSub').on('click', 'tr', function() {
-        comSelectRow = $(this);
-        // const currComCode = comSelectRow.find('td').eq(2).text();    // 공통코드
-        // const currComcdName = comSelectRow.find('td').eq(3).text();  // 공통코드명
-    });
+    }
 
     // 그룹코드 - 등록
     $('#addBtn').on('click', function() {
         grpModalCon = false;
         btnMsg = "등록";
         $('#grpModalBtn').text(btnMsg);
-        $('#grpCodeM').val('');
-        $('#grpcdNameM').val('');
+        $('#grpForm')[0].reset();
         $('#grpCodeM').prop('disabled', false);
     });
 
@@ -78,8 +73,6 @@ $(document).ready(function() {
         if (grpSelectRow) {
             const currGrpCode = grpSelectRow.find('td').eq(1).text();    // 그룹코드
             const currGrpcdName = grpSelectRow.find('td').eq(2).text();  // 그룹코드명
-
-            // 그룹코드 수정 모달창에 데이터 자동 입력
             $('#grpCodeM').val(currGrpCode);
             $('#grpcdNameM').val(currGrpcdName);
         } else {
@@ -92,21 +85,18 @@ $(document).ready(function() {
         btnMsg = "삭제";
         
         if(confirmSubmit(btnMsg)) {
-            // 선택된 행이 있는 경우
             if(grpSelectRow) {
                 const currGrpCd = grpSelectRow.find('td').eq(1).text();  // 그룹코드
-                // console.log("삭제 테스트: " + currGrpCd);
-
                 $.ajax({
                     type: 'DELETE',
                     url: `/system/code/grpcode/delete/${currGrpCd}`,
                     contentType: "application/json",
                     success: function(response) {
-                        console.log("그룹코드 데이터 삭제 완료: ", response);
-                        window.location.replace('/system/code/list');
+                        alert(response);
+                        window.location.reload();
                     },
                     error: function(error) {
-                        console.log("그룹코드 데이터 삭제 실패: ", error);
+                        console.error(error);
                     }
                 });
             }
@@ -118,11 +108,8 @@ $(document).ready(function() {
         comModalCon = false;
         btnMsg = "등록";
         $('#comModalBtn').text(btnMsg);
-        $('#commonCode').val('');
-        $('#commonCodeName').val('');
-        $('#referenceCode1').val('');
-        $('#referenceCode2').val('');
-        $('#referenceCode3').val('');
+        $('#commForm')[0].reset();
+        $('.grpCodeInput').val(currGrpCode);
         $('#commonCode').prop('disabled', false);
     });
 
@@ -137,15 +124,12 @@ $(document).ready(function() {
         if (comSelectRow) {
             const currGrpCd = comSelectRow.find('td').eq(1).text();  // 그룹코드
             const currComcd = comSelectRow.find('td').eq(2).text();  // 공통코드
-
-            console.log("수정 테스트: " + currGrpCd + ', ' + currComcd);
             $.ajax({
                 type: 'GET',
                 url: `/system/code/commoncd/get/${currGrpCd}/${currComcd}`,
                 contentType: "application/json",
                 dataType: 'json',
                 success: function(data) {
-                    // 조회된 데이터 폼에 입력
                     $('#grpCode').val(data.grpCode);
                     $('#commonCode').val(data.commonCode);
                     $('#commonCodeName').val(data.commonCodeName);
@@ -153,8 +137,8 @@ $(document).ready(function() {
                     $('#referenceCode2').val(data.refCode2 || '');
                     $('#referenceCode3').val(data.refCode3 || '');
                 },
-                error: function() {
-                    console.log('공통코드 데이터 조회 실패');
+                error: function(xhr, status, error) {
+                    console.error(error);
                 }
             });
         }
@@ -165,22 +149,19 @@ $(document).ready(function() {
         btnMsg = "삭제";
 
         if(confirmSubmit(btnMsg)) {
-            // 선택된 행이 있는 경우
             if(comSelectRow) {
                 const currGrpCd = comSelectRow.find('td').eq(1).text();  // 그룹코드
                 const currComcd = comSelectRow.find('td').eq(2).text();  // 공통코드
-
-                console.log("삭제 테스트: " + currGrpCd + ', ' + currComcd);
                 $.ajax({
                     type: 'DELETE',
                     url: `/system/code/commoncd/delete/${currGrpCd}/${currComcd}`,
                     contentType: "application/json",
                     success: function(response) {
-                        console.log("공통코드 데이터 삭제 완료: ", response);
-                        window.location.replace('/system/code/list');
+                        alert(response);
+                        showCommoncd(currGrpCode);
                     },
-                    error: function(error) {
-                        console.log("공통코드 데이터 삭제 실패: ", error);
+                    error: function(xhr, status, error) {
+                        console.error(error);
                     }
                 });
             }
@@ -205,19 +186,11 @@ $(document).ready(function() {
                 data: JSON.stringify(data),
                 contentType: "application/json",
                 success: function(response) {
-                    console.log("그룹코드 데이터 처리 응답:", response);
-                    // window.location.href = '/system/code/list';
-                    window.location.replace('/system/code/list');
-
-                    // 서버에서 반환한 리다이렉트 URL이 있는지 확인
-                    // if (response.redirect) {
-                    //     window.location.replace(response.redirect); // 서버에서 제공한 리다이렉트 URL로 이동 (히스토리 기록 X)
-                    // } else {
-                    //     console.warn("리다이렉트 URL 없음");
-                    // }
+                    alert(response.message);
+                    window.location.reload();
                 },
                 error: function(error) {
-                    console.error("AJAX 요청 실패:", error);
+                    console.error(error);
                 }
             });
         }
@@ -225,9 +198,6 @@ $(document).ready(function() {
 
     // 공통코드 - Modal
     $('#comModalBtn').on('click', function() {
-        // console.log("입력한 그룹코드 값: " + $('.grpCodeInput').val());
-        // console.log("입력한 공통코드 값: " + $('#commonCode').val());
-        
         if (confirmSubmit(btnMsg)) {
             const URL = comModalCon ? '/system/code/commoncd/update' : '/system/code/commoncd/new';
             const TYPE = comModalCon ? 'PATCH' : 'POST';
@@ -245,13 +215,14 @@ $(document).ready(function() {
                 url: URL,
                 data: JSON.stringify(data),
                 contentType: "application/json",
-                dataType: 'json', // 서버 응답을 JSON으로 처리
+                dataType: 'json',
                 success: function(response) {
-                    console.log("공통코드 데이터 처리 응답:", response);
-                    window.location.href = '/system/code/list';
+                    alert(response.message);
+                    showCommoncd(currGrpCode);
+                    $('#commonAddModal').modal('hide');
                 },
                 error: function(error) {
-                    console.error("AJAX 요청 실패:", error);
+                    console.error(error);
                 }
             });
         }        
@@ -265,7 +236,7 @@ $(document).ready(function() {
     // 검색창 Enter 처리
     $('#searchGrpcdName').on('keydown', function(event) {
         if(event.key == 'Enter') {
-            event.preventDefault(); // 기본 동작 방지
+            event.preventDefault();
             searchGrpcdName();
         }
     });
@@ -277,14 +248,11 @@ $(document).ready(function() {
 
     // 그룹코드 - 조회
     function searchGrpcdName() {
-        const searchGrpcdName = $('#searchGrpcdName').val();
-        console.log(searchGrpcdName + ' 그룹코드 조회');
         $.ajax({
             type: 'GET',
             url: '/system/code/grpcode/search',
-            data: { grpcdName: searchGrpcdName },
+            data: { grpcdName: $('#searchGrpcdName').val() },
             success: function(data) {
-                // 그룹, 공통 테이블 내용 삭제
                 $('#pageList').empty();
                 $('#pageListSub').empty();
 
@@ -313,6 +281,9 @@ $(document).ready(function() {
                         <td colspan="9">그룹코드를 선택 시 공통코드가 조회됩니다.</td>
                     </tr>
                 `);
+            },
+            error: function(xhr, status, error) {
+                console.error(error);
             }
         });
     }
@@ -320,9 +291,8 @@ $(document).ready(function() {
 
 // 날짜 포맷팅 함수(ex. 2024-10-29 12:13:00)
 function formatDate(date) {
-    // padStart(2, '0'): 2자리 수로 포맷팅
     const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0'); // 월은 0부터 시작하므로 + 1
+    const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
     const hours = String(date.getHours()).padStart(2, '0');
     const minutes = String(date.getMinutes()).padStart(2, '0');

@@ -139,9 +139,27 @@ public class ComService {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("사용자 정보를 찾을 수 없습니다.");
         }
 
+        boolean isAdmin = checkAdmin(loginUserId);
+        if (!isAdmin) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        return null;
+    }
+
+    public ResponseEntity<Map<String, String>> checkSuperAdminPermissionsMsg(Principal principal) {
+        Map<String, String> response = new HashMap<>();
+        
+        String loginUserId = principal.getName();
+        if (loginUserId == null || loginUserId.isEmpty()) {
+            response.put("message", "사용자 정보를 찾을 수 없습니다.");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+
         boolean isSuperAdmin = checkSuperAdmin(loginUserId);
         if (!isSuperAdmin) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            response.put("message", "FORBIDDEN");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
         }
 
         return null;
