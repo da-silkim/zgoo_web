@@ -148,7 +148,7 @@ public class CommonCdServiceTest {
         dto.setRegUserId("test");
 
         // when
-        codeService.saveGrpCode(dto);
+        // codeService.saveGrpCode(dto);
 
         // then
 

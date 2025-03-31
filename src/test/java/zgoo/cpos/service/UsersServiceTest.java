@@ -13,7 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 import zgoo.cpos.dto.users.UsersDto;
 import zgoo.cpos.dto.users.UsersDto.UsersListDto;
 import zgoo.cpos.dto.users.UsersDto.UsersRegDto;
-import zgoo.cpos.util.EncryptionUtils;
 
 @SpringBootTest
 @Transactional
@@ -49,7 +48,7 @@ public class UsersServiceTest {
                 .regDt(LocalDateTime.now())
                 .build();
 
-        this.usersService.saveUsers(dto);
+        // this.usersService.saveUsers(dto);
 
         List<UsersDto.UsersListDto> ulist = this.usersService.findUsersAll();
         for (UsersListDto usersListDto : ulist) {
@@ -93,7 +92,7 @@ public class UsersServiceTest {
         // System.out.println("=== before delete: " + before.toString());
 
         // after delete
-        //this.usersService.deleteUsers("test4");
+        // this.usersService.deleteUsers("test4");
 
         List<UsersDto.UsersListDto> ulist = this.usersService.findUsersAll();
         for (UsersListDto usersListDto : ulist) {

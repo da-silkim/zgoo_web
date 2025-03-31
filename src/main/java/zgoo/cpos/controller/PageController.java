@@ -34,6 +34,7 @@ import zgoo.cpos.dto.cp.ChargerDto.ConnectorStatusDto;
 import zgoo.cpos.dto.cp.CpMaintainDto.CpMaintainListDto;
 import zgoo.cpos.dto.cp.CpModelDto;
 import zgoo.cpos.dto.cp.CpModelDto.CpModelListDto;
+import zgoo.cpos.dto.cp.CurrentChargingListDto;
 import zgoo.cpos.dto.cs.CsInfoDto;
 import zgoo.cpos.dto.cs.CsInfoDto.CsInfoListDto;
 import zgoo.cpos.dto.member.ConditionDto.ConditionCodeBaseDto;
@@ -57,6 +58,7 @@ import zgoo.cpos.service.ChgErrorCodeService;
 import zgoo.cpos.service.CodeService;
 import zgoo.cpos.service.CompanyService;
 import zgoo.cpos.service.ConditionService;
+import zgoo.cpos.service.CpCurrentTxService;
 import zgoo.cpos.service.CpMaintainService;
 import zgoo.cpos.service.CpModelService;
 import zgoo.cpos.service.CsService;
@@ -92,6 +94,7 @@ public class PageController {
     private final ChargerService chargerService;
     private final ConditionService conditionService;
     private final CpMaintainService cpMaintainService;
+    private final CpCurrentTxService cpCurrentTxService;
 
     /*
      * 대시보드
@@ -326,7 +329,7 @@ public class PageController {
             @RequestParam(value = "contentSearch", required = false) String reqSearchContent,
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "10") int size,
-            Model model) {
+            Model model, Principal principal) {
 
         log.info("=== Charger List Page ===");
         log.info("== companyId: {}, manfCd: {}, opSearch: {}, contentSearch: {}",
@@ -415,6 +418,11 @@ public class PageController {
             List<CommCdBaseDto> modemContractOptionList = codeService.commonCodeStringToNum("MODEMCTCD");
             model.addAttribute("modemContractOptionList", modemContractOptionList);
 
+            // 8. 메뉴권한조회
+            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(),
+                    MenuConstants.CHARGER_LIST);
+            model.addAttribute("menuAuthority", menuAuthority);
+
         } catch (Exception e) {
             log.error("Error occurered while fetching charger list: {}", e.getMessage(), e);
 
@@ -434,8 +442,77 @@ public class PageController {
      * 실시간충전리스트
      */
     @GetMapping("/charging/list")
-    public String showcharginglist(Model model) {
-        log.info("=== Charging List Page ===");
+    public String showcharginglist(@RequestParam(value = "companyIdSearch", required = false) Long reqCompanyId,
+            @RequestParam(value = "chgStartTimeFrom", required = false) String reqChgStartTimeFrom,
+            @RequestParam(value = "chgStartTimeTo", required = false) String reqChgStartTimeTo,
+            @RequestParam(value = "opSearch", required = false) String reqOpSearch,
+            @RequestParam(value = "contentSearch", required = false) String reqSearchContent,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size,
+            Model model, Principal principal) {
+        log.info("=== Current Charging List Page ===");
+        log.info("== companyId: {}, chgStartTimeFrom: {}, chgStartTimeTo: {}, opSearch: {}, contentSearch: {}",
+                reqCompanyId, reqChgStartTimeFrom, reqChgStartTimeTo, reqOpSearch, reqSearchContent);
+        log.info("== page: {}, size: {}", page, size);
+
+        // 검색 조건을 모델에 추가 (중요: 이 부분이 누락되어 있었음)
+        model.addAttribute("selectedCompanyId", reqCompanyId);
+        model.addAttribute("selectedTimeFrom", reqChgStartTimeFrom);
+        model.addAttribute("selectedTimeTo", reqChgStartTimeTo);
+        model.addAttribute("selectedOpSearch", reqOpSearch);
+        model.addAttribute("selectedContentSearch", reqSearchContent);
+        model.addAttribute("selectedSize", size);
+
+        Page<CurrentChargingListDto> chargingList;
+
+        try {
+            log.info("=== Current Charging List DB search result >>>");
+
+            // current charging list 조회
+            // 검색조건 check
+            if (reqCompanyId == null && reqChgStartTimeFrom == null && reqChgStartTimeTo == null
+                    && reqOpSearch == null) {
+                log.info("Search all current charging list >>");
+                chargingList = cpCurrentTxService.findCurrentChargingListAll(page, size);
+            } else {
+                log.info(
+                        "Search current charging list by options:companyid:{},chgStartTimeFrom:{},chgStartTimeTo:{},op:{},content:{} >>",
+                        reqCompanyId, reqChgStartTimeFrom, reqChgStartTimeTo, reqOpSearch, reqSearchContent);
+                chargingList = cpCurrentTxService.findCurrentChargingList(reqCompanyId, reqChgStartTimeFrom,
+                        reqChgStartTimeTo, reqOpSearch, reqSearchContent, page, size);
+            }
+
+            // page 처리
+            int totalPages = chargingList.getTotalPages() == 0 ? 1 : chargingList.getTotalPages();
+            model.addAttribute("chargingList", chargingList.getContent());
+            model.addAttribute("size", String.valueOf(size));
+            model.addAttribute("currentPage", page);
+            model.addAttribute("totalPages", totalPages);
+            model.addAttribute("totalCount", chargingList.getTotalElements());
+            log.info("===CurrentChargingList_PageInfo >> totalPages:{}, totalCount:{}", totalPages,
+                    chargingList.getTotalElements());
+
+            // 검색 select options 조회
+            // 1.사업자 리스트
+            List<BaseCompnayDto> companyList = companyService.searchAllCompanyForSelectOpt();
+            model.addAttribute("companyList", companyList);
+            // 2.grid row count
+            List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT");
+            model.addAttribute("showListCnt", showListCnt);
+            // // 3. 메뉴권한조회
+            // MenuAuthorityBaseDto menuAuthority =
+            // this.menuAuthorityService.searchUserAuthority(principal.getName(),
+            // MenuConstants.CHARGING_LIST);
+            // model.addAttribute("menuAuthority", menuAuthority);
+
+        } catch (Exception e) {
+            log.error("Error occurered while fetching current charging list: {}", e.getMessage(), e);
+
+            chargingList = Page.empty();
+            model.addAttribute("companyList", Collections.emptyList());
+            model.addAttribute("showListCnt", Collections.emptyList());
+        }
+
         return "pages/charge/cp_real_time_list";
     }
 
