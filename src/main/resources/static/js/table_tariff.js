@@ -15,16 +15,25 @@ document.addEventListener('DOMContentLoaded', () => {
             // Find the corresponding row for the selected checkbox
             const selectedRow = selectedCheckboxes[0].closest('tr');
             const applyCode = selectedRow.cells[5]?.innerText.trim(); // Get applyCode from the 6th cell
+            console.log("적용코드:", applyCode);
 
-            // Enable buttons only if applyCode is "적용예정"
-            editBtn.disabled = applyCode !== "적용예정";
-            deleteBtn.disabled = false; // Allow deletion regardless of applyCode
-            if (addBtnSub) addBtnSub.disabled = false;
+            if (editBtn) {
+                let editvisible = applyCode === "적용예정";
+                console.log("editvisible:", editvisible);
+                editBtn.disabled = !editvisible;
+                if (editvisible) {
+                    editBtn.removeAttribute("hidden");
+                } else {
+                    editBtn.setAttribute("hidden", true);
+                }
+            }
+            if (deleteBtn) { deleteBtn.disabled = false; deleteBtn.removeAttribute("hidden"); }
+            if (addBtnSub) { addBtnSub.disabled = false; addBtnSub.removeAttribute("hidden"); }
         } else {
             // 체크된 항목이 없거나 두 개 이상일 때 버튼 비활성화
-            editBtn.disabled = true;
-            deleteBtn.disabled = true;
-            if (addBtnSub) addBtnSub.disabled = true;
+            if (editBtn) { editBtn.disabled = true; editBtn.setAttribute("hidden", true); }
+            if (deleteBtn) { deleteBtn.disabled = true; deleteBtn.setAttribute("hidden", true); }
+            if (addBtnSub) { addBtnSub.disabled = true; addBtnSub.setAttribute("hidden", true); }
         }
     }
 

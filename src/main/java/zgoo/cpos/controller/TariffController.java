@@ -107,14 +107,15 @@ public class TariffController {
             // Tariff Info 저장
             tariffService.saveTariffInfo(requestDto, tariffId);
 
+            response.put("message", "성공적으로 등록되었습니다.");
+            return ResponseEntity.ok(response);
+
         } catch (Exception e) {
             log.error("TariffController >> createPlan Error:{}", e, e.getMessage());
             response.put("message", "서버 오류");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
 
-        response.put("message", "성공적으로 등록되었습니다.");
-        return ResponseEntity.ok(response);
     }
 
     // 요금제 수정

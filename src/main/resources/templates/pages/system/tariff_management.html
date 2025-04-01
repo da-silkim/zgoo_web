@@ -18,13 +18,18 @@
                                 <label for="companyIdSearch"
                                     class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">사업자</label>
                                 <select id="companyIdSearch" class="mx-3 form-control" name="companyIdSearch" required>
-                                    <option th:value="*{null}" th:text="'(없음)'"></option>
+                                    <option value="" th:text="'(없음)'" th:selected="${selectedCompanyId == null}">
+                                    </option>
                                     <option th:each="company : ${companyList}" th:value="${company.companyId}"
                                         th:text="${company.companyName}"
                                         th:selected="${company.companyId == selectedCompanyId}"></option>
                                 </select>
                             </div>
                         </div>
+                        <!-- size 선택 상자 추가 (숨겨진 필드로 유지) -->
+                        <input type="hidden" id="size" name="size"
+                            th:value="${selectedSize != null ? selectedSize : 10}">
+
                         <div class="search-btn">
                             <button type="button" class="btn btn-outline-grey me-2" id="tariffSearchBtn"><i
                                     class="bi bi-search me-2"></i>검색</button>
@@ -144,7 +149,9 @@
                                     <th scope="col">비회원</th>
                                 </tr>
                             </thead>
-                            <tbody id="pageListSub"></tbody>
+                            <tbody id="pageListSub">
+                                <td colspan="9">요금제 정보를 클릭 시, 요금 정보가 조회됩니다.</td>
+                            </tbody>
                         </table>
                     </div>
                 </div>
@@ -235,7 +242,9 @@
                                         <th scope="col">비회원</th>
                                     </tr>
                                 </thead>
-                                <tbody id="modalTariffInfoTable"></tbody>
+                                <tbody id="modalTariffInfoTable">
+
+                                </tbody>
                             </table>
                         </div>
                         <!-- 모달 내용 끝 -->
@@ -243,7 +252,7 @@
                     <!-- modal body end -->
                     <div class="modal-footer justify-content-center border-top-none">
                         <button type="button" class="btn btn-outline-grey me-2" data-bs-dismiss="modal">취소</button>
-                        <button type="submit" id="planModalBtn" class="btn btn-data-add">등록</button>
+                        <button type="button" id="planModalBtn" class="btn btn-data-add">등록</button>
                     </div>
                 </form>
             </div>

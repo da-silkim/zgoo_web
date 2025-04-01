@@ -925,14 +925,16 @@ public class PageController {
         log.info("=== Tariff List Page ===");
         log.info("== companyId: {}, page: {}, size: {}", companyId, page, size);
 
+        // 검색 조건을 모델에 추가
+        model.addAttribute("selectedCompanyId", companyId);
+        model.addAttribute("selectedSize", size);
+
         // 요금제 등록폼 전달
         model.addAttribute("tariffRegDto", new TariffRegDto());
 
         Page<TariffPolicyDto> tariffpolicyList;
 
         try {
-
-            log.info("=== Tariff DB search result >>>");
 
             // tariff policy list 조회
             // check null and call the approrpiate search method
@@ -1504,6 +1506,12 @@ public class PageController {
         log.info("== companyId: {}, companyType:{}, companyLv: {}, page: {}, size: {}", companyId, companyType,
                 companyLv, page, size);
 
+        // 검색 조건유지
+        model.addAttribute("selectedCompanyId", companyId);
+        model.addAttribute("selectedCompanyKind", companyType);
+        model.addAttribute("selectedCompanyLv", companyLv);
+        model.addAttribute("selectedSize", size);
+
         // 업체 등록폼 전달
         model.addAttribute("companyRegDto", new CompanyRegDto());
 
@@ -1538,6 +1546,11 @@ public class PageController {
             model.addAttribute("totalCount", companyList.getTotalElements()); // 총 데이터
 
             // select options 조회
+
+            // 전체 사업자 리스트
+            List<BaseCompnayDto> allCompanyList = companyService.searchAllCompanyForSelectOpt();
+            model.addAttribute("allCompanyList", allCompanyList);
+
             List<CommCdBaseDto> lvList = codeService.findCommonCdNamesByGrpcd("COLV"); // 사업자레벨
             log.info("== lvList : {}", lvList.toString());
             model.addAttribute("clvlist", lvList);
@@ -1559,7 +1572,7 @@ public class PageController {
             model.addAttribute("consignmentList", consignmentList);
 
             // 계약상태
-            List<CommCdBaseDto> contractStatList = codeService.findCommonCdNamesByGrpcd("CONSTAT");
+            List<CommCdBaseDto> contractStatList = codeService.findCommonCdNamesByGrpcd("CONTSTAT");
             log.info("=== contractStatList : {}", contractStatList.toString());
             model.addAttribute("contractStatList", contractStatList);
 
@@ -1567,6 +1580,10 @@ public class PageController {
             List<CommCdBaseDto> mcompanyList = codeService.findCommonCdNamesByGrpcd("MCOMPANY");
             log.info("=== mcompanyList : {}", mcompanyList.toString());
             model.addAttribute("mcompanyList", mcompanyList);
+
+            // 사업자코드
+            List<CommCdBaseDto> companyCodeList = codeService.findCommonCdNamesByGrpcd("COMPANYCD");
+            model.addAttribute("companyCodeList", companyCodeList);
 
             List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT"); // 그리드 row 수
             model.addAttribute("showListCnt", showListCnt);

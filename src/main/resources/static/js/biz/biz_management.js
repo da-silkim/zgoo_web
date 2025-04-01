@@ -6,30 +6,76 @@ document.addEventListener("DOMContentLoaded", function () {
     // '검색' 버튼 클릭 이벤트 처리
     document.getElementById("companySearchBtn").addEventListener("click", function () {
 
-        const selectedSize = document.getElementById('size').value;
-        const form = document.getElementById('searchForm');
-
-        const hiddenSizeInput = document.createElement('input');
-        hiddenSizeInput.type = 'hidden';
-        hiddenSizeInput.name = 'size';
-        hiddenSizeInput.value = selectedSize;
-        hiddenSizeInput.id = 'hiddenSizeInput';
-
-        form.appendChild(hiddenSizeInput);
-        form.submit();
+        document.getElementById('searchForm').submit();
     });
 
 
     // '초기화' 버튼 클릭 이벤트 처리
     document.getElementById("resetBtn").addEventListener("click", function () {
         // 폼 필드 초기화
-        document.getElementById("companyIdSearch").selectedIndex = 0; // 사업자명 초기화 (첫 번째 옵션)
-        document.getElementById("companyTypeSearch").selectedIndex = 0; // 사업자유형 초기화 (첫 번째 옵션)
-        document.getElementById("companyLvSearch").selectedIndex = 0; // 사업자레벨 초기화 (첫 번째 옵션)
+        document.getElementById('companyIdSearch').value = '';
+        document.getElementById('companyTypeSearch').value = '';
+        document.getElementById('companyLvSearch').value = '';
 
-        // 로그 출력 (디버깅용)
-        console.log("폼 필드가 초기화되었습니다.");
+        // 폼 제출 (초기화된 상태로)
+        document.getElementById('searchForm').submit();
     });
+
+    // 모달 취소 버튼 클릭 시 폼 초기화
+    document.querySelector('[data-bs-dismiss="modal"]').addEventListener('click', function () {
+        resetModalForm();
+    });
+
+    // 폼 초기화 함수
+    function resetModalForm() {
+        // 폼 요소 가져오기
+        const form = document.querySelector('#dataAddModal form');
+
+        // 폼 리셋
+        form.reset();
+
+        // select 요소들 초기값으로 설정
+        document.getElementById('companyType').selectedIndex = 0;
+        document.getElementById('companyLv').selectedIndex = 0;
+        document.getElementById('bizType').selectedIndex = 0;
+        document.getElementById('bizKind').selectedIndex = 0;
+        document.getElementById('companyCode').selectedIndex = 0;
+        document.getElementById('parentCompanyOptions').selectedIndex = 0;
+        document.getElementById('consignmentState').selectedIndex = 0;
+        document.getElementById('contractState').selectedIndex = 0;
+        document.getElementById('asCompany').selectedIndex = 0;
+
+        // 주소 관련 필드 초기화
+        document.getElementById('zipCode').value = '';
+        document.getElementById('address').value = '';
+        document.getElementById('addressDetail').value = '';
+
+        // 날짜 필드 초기화
+        document.getElementById('contractAt').value = '';
+        document.getElementById('contractStart').value = '';
+        document.getElementById('contractEnd').value = '';
+
+        // 로밍 테이블 초기화
+        const roamingTable = document.getElementById('roamingTable').getElementsByTagName('tbody')[0];
+        // 첫 번째 행만 남기고 모두 삭제
+        while (roamingTable.rows.length > 1) {
+            roamingTable.deleteRow(1);
+        }
+
+        // 첫 번째 행의 입력 필드 초기화
+        const firstRow = roamingTable.rows[0];
+        const inputs = firstRow.querySelectorAll('input[type="text"]');
+        inputs.forEach(input => {
+            input.value = '';
+        });
+
+        // 체크박스 해제
+        const checkbox = firstRow.querySelector('input[type="checkbox"]');
+        if (checkbox) checkbox.checked = false;
+
+        // 모달 제목 및 버튼 텍스트 초기화 (등록 모드로)
+        document.getElementById('companyModalBtn').textContent = '등록';
+    }
 
     // pagination
     $('#size').on('change', function () {

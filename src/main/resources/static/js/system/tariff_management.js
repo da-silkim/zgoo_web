@@ -15,29 +15,14 @@ document.addEventListener("DOMContentLoaded", function () {
     // '검색' 버튼 클릭 이벤트 처리
     document.getElementById("tariffSearchBtn").addEventListener("click", function () {
 
-        console.log("tariff search by companyId");
-        const selectedSize = document.getElementById('size').value;
-        const form = document.getElementById('searchForm');
-
-        const hiddenSizeInput = document.createElement('input');
-        hiddenSizeInput.type = 'hidden';
-        hiddenSizeInput.name = 'size';
-        hiddenSizeInput.value = selectedSize;
-        hiddenSizeInput.id = 'hiddenSizeInput';
-
-        form.appendChild(hiddenSizeInput);
-        form.submit();
+        document.getElementById('searchForm').submit();
     });
 
 
     // '초기화' 버튼 클릭 이벤트 처리
     document.getElementById("resetBtn").addEventListener("click", function () {
-        console.log("폼 필드가 초기화.");
-        // 폼 필드 초기화
-        document.getElementById("companyIdSearch").selectedIndex = 0; // 사업자명 초기화 (첫 번째 옵션)
-
-        // 로그 출력 (디버깅용)
-        console.log("폼 필드가 초기화되었습니다.");
+        document.getElementById('companyIdSearch').value = '';
+        document.getElementById('searchForm').submit();
     });
 
 
@@ -343,6 +328,7 @@ document.addEventListener("DOMContentLoaded", function () {
             })
             .then(data => {
                 console.log("처리결과:", data);
+                alert("요금제 등록/수정 처리 완료");
                 window.location.replace('/system/tariff/list');
             })
             .catch(error => {
