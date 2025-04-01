@@ -14,7 +14,7 @@ public interface MenuAuthorityRepositoryCustom {
 
     // 메뉴권한접근 조회
     List<MenuAuthorityListDto> findMenuAuthorityList(Long companyId, String authority);
-    List<MenuAuthorityListDto> defaultMenuAuthorityList();
+    List<MenuAuthorityListDto> defaultMenuAuthorityList(Long companyId, String authority);
 
     // 메뉴접근권한이 저장되어 있는지 확인
     Long menuAuthorityRegCheck(Long companyId, String authority);

@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 
 import zgoo.cpos.domain.menu.CompanyMenuAuthority;
 import zgoo.cpos.dto.menu.CompanyMenuAuthorityDto;
+import zgoo.cpos.dto.menu.CompanyMenuAuthorityDto.CompanyMenuRegDto;
 
 public interface CompanyMenuAuthorityRepositoryCustom {
     // 메뉴권한이 등록된 사업자 조회(중복제거)
@@ -36,4 +37,7 @@ public interface CompanyMenuAuthorityRepositoryCustom {
 
     // Menu 테이블 메뉴 삭제에 의한 사업장별 해당 메뉴코드 일괄 삭제
     Long deleteCompanyMenuAuthorityMenuCodeAll(String menuCode);
+
+    // 사업장 메뉴권한 조회
+    List<CompanyMenuRegDto> findCompanyMenuList(Long companyId);
 }
