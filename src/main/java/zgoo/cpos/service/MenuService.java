@@ -14,12 +14,19 @@ import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import zgoo.cpos.domain.company.Company;
 import zgoo.cpos.domain.menu.CompanyMenuAuthority;
 import zgoo.cpos.domain.menu.Menu;
+import zgoo.cpos.domain.menu.MenuAuthority;
 import zgoo.cpos.dto.menu.CompanyMenuAuthorityDto;
+import zgoo.cpos.dto.menu.MenuAuthorityDto.MenuAuthorityBaseDto;
 import zgoo.cpos.dto.menu.MenuDto;
+import zgoo.cpos.dto.menu.CompanyMenuAuthorityDto.CompanyMenuRegDto;
+import zgoo.cpos.mapper.MenuAuthorityMapper;
 import zgoo.cpos.mapper.MenuMapper;
+import zgoo.cpos.repository.company.CompanyRepository;
 import zgoo.cpos.repository.menu.CompanyMenuAuthorityRepository;
+import zgoo.cpos.repository.menu.MenuAuthorityRepository;
 import zgoo.cpos.repository.menu.MenuRepository;
 
 @Service
@@ -28,6 +35,8 @@ import zgoo.cpos.repository.menu.MenuRepository;
 public class MenuService {
 
     private final MenuRepository menuRepository;
+    private final CompanyRepository companyRepository;
+    private final MenuAuthorityRepository menuAuthorityRepository;
     private final CompanyMenuAuthorityRepository companyMenuAuthorityRepository;
 
     // 메뉴 - 전체 조회
@@ -42,7 +51,7 @@ public class MenuService {
             List<MenuDto.MenuListDto> menuListDto = MenuMapper.toDtoList(menuList);
             return menuListDto;
         } catch (Exception e) {
-            log.error("[findMenuList] error : {}", e.getMessage());
+            log.error("[findMenuList] error: {}", e.getMessage());
             return new ArrayList<>();
         }
     }
@@ -53,7 +62,7 @@ public class MenuService {
             List<MenuDto.MenuAuthorityListDto> menuList = this.menuRepository.findMenuListWithParentName();
             return menuList;
         } catch (Exception e) {
-            log.error("[findMenuListWithParentName] error : {}", e.getMessage());
+            log.error("[findMenuListWithParentName] error: {}", e.getMessage());
             return new ArrayList<>();
         }
     }
@@ -64,7 +73,7 @@ public class MenuService {
             List<MenuDto.MenuListDto> menuListDto =this.menuRepository.getMuenListWithChildCount();
             return menuListDto;
         } catch (Exception e) {
-            log.error("[findMenuListWithChild] error : {}", e.getMessage());
+            log.error("[findMenuListWithChild] error: {}", e.getMessage());
             return new ArrayList<>();
         }
     }
@@ -75,8 +84,7 @@ public class MenuService {
             Menu menu = this.menuRepository.findMenuOne(menuCode);
             return MenuMapper.toDto(menu);
         } catch (Exception e) {
-            log.error("[findMenuOne] error : {}", e.getMessage());
-            e.printStackTrace();
+            log.error("[findMenuOne] error: {}", e.getMessage());
             return null;
         }
     }
@@ -89,8 +97,7 @@ public class MenuService {
                         .map(MenuMapper::toDto)
                         .collect(Collectors.toList());
         } catch (Exception e) {
-            e.printStackTrace();
-            log.error("[getParentMenuByMenuLv] error : {}", e.getMessage());
+            log.error("[getParentMenuByMenuLv] error: {}", e.getMessage());
             return Collections.emptyList();
         }
     }
@@ -102,7 +109,9 @@ public class MenuService {
             Menu menu = MenuMapper.toEntity(dto);
             this.menuRepository.save(menu);
 
-            // 사업장에 새메뉴 추가
+            /* 
+             * 메뉴 권한이 설정된 사업장이 존재하면, 새메뉴 정보 추가
+             */
             List<Long> companyIds = this.companyMenuAuthorityRepository.findDistinctCompanyIds();
             log.info("companyIds: {}", companyIds);
             if (companyIds != null && !companyIds.isEmpty()) {
@@ -116,7 +125,7 @@ public class MenuService {
                 System.out.println("companyIds is null or empty");
             }
         } catch (Exception e) {
-            log.error("[saveMenu] error : {}", e.getMessage());
+            log.error("[saveMenu] error: {}", e.getMessage());
         }
     }
 
@@ -148,8 +157,7 @@ public class MenuService {
 
             return MenuMapper.toDto(menu);
         } catch (Exception e) {
-            log.error("[updateMenu] error : {}", e.getMessage());
-            e.printStackTrace();
+            log.error("[updateMenu] error: {}", e.getMessage());
             return null;
         }
     }
@@ -157,12 +165,17 @@ public class MenuService {
     // 메뉴 삭제
     @Transactional
     public void deleteMenu(String menuCode) {
-        // 메뉴(Master) 삭제 전 사업장별 메뉴 접근 권한에 있는 메뉴 먼저 삭제
-        Long cmaCount = this.companyMenuAuthorityRepository.deleteCompanyMenuAuthorityMenuCodeAll(menuCode);
-        log.info("=== delete company menu info: {}", cmaCount);
+        try {
+            // 메뉴(Master) 삭제 전 사업장별 메뉴 접근 권한에 있는 메뉴 먼저 삭제
+            Long cmaCount = this.companyMenuAuthorityRepository.deleteCompanyMenuAuthorityMenuCodeAll(menuCode);
+            log.info("=== delete company menu info: {}", cmaCount);
 
-        Long menuCount = this.menuRepository.deleteMenuOne(menuCode);
-        log.info("=== delete menu info: {}", menuCount);
+            Long menuCount = this.menuRepository.deleteMenuOne(menuCode);
+            log.info("=== delete menu info: {}", menuCount);
+        } catch (Exception e) {
+            log.error("[deleteMenu] error: {}", e.getMessage());
+        }
+
     }
 
     // 사업장별 메뉴 접근 권한 전체 조회
@@ -173,10 +186,10 @@ public class MenuService {
             Page<CompanyMenuAuthorityDto.CompanyMenuRegDto> cmaList = this.companyMenuAuthorityRepository.findCompanyMenuWithPagination(pageable);
             return cmaList;
         } catch (DataAccessException dae) {
-            log.error("[findCompanyMenuAll] database error : {}", dae.getMessage());
+            log.error("[findCompanyMenuAll] database error: {}", dae.getMessage());
             return Page.empty(pageable);
         } catch (Exception e) {
-            log.error("[findCompanyMenuAll] error : {}", e.getMessage());
+            log.error("[findCompanyMenuAll] error: {}", e.getMessage());
             return Page.empty(pageable);
         }
     }
@@ -189,10 +202,10 @@ public class MenuService {
             Page<CompanyMenuAuthorityDto.CompanyMenuRegDto> cmaList = this.companyMenuAuthorityRepository.searchCompanyMenuWithPagination(companyName, pageable);
             return cmaList;
         } catch (DataAccessException dae) {
-            log.error("[searchCompanyMenuWithPagination] database error : {}", dae.getMessage());
+            log.error("[searchCompanyMenuWithPagination] database error: {}", dae.getMessage());
             return Page.empty(pageable);
         } catch (Exception e) {
-            log.error("[searchCompanyMenuWithPagination] error : {}", e.getMessage());
+            log.error("[searchCompanyMenuWithPagination] error: {}", e.getMessage());
             return Page.empty(pageable);
         }
     }
@@ -203,7 +216,7 @@ public class MenuService {
             List<CompanyMenuAuthorityDto.CompanyMenuRegDto> cmaList = this.companyMenuAuthorityRepository.findDistinctCompanyWithCompanyName();
             return cmaList;
         } catch (Exception e) {
-            log.error("[findCompanyList] error : {}", e.getMessage());
+            log.error("[findCompanyDistinctList] error: {}", e.getMessage());
             return new ArrayList<>();
         }
     }
@@ -211,10 +224,9 @@ public class MenuService {
     public List<CompanyMenuAuthorityDto.CompanyMenuAuthorityListDto> findCompanyMenuAuthorityList(Long companyId) {
         try {
             List<CompanyMenuAuthorityDto.CompanyMenuAuthorityListDto> cmaList = this.companyMenuAuthorityRepository.findCompanyMenuAuthorityList(companyId);
-            // log.info("companyMenuList 조회: {}", cmaList.toString());
             return cmaList;
         } catch (Exception e) {
-            log.error("[findCompanyMenuAuthorityList] error : {}", e.getMessage());
+            log.error("[findCompanyMenuAuthorityList] error: {}", e.getMessage());
             return new ArrayList<>();
         }
     }
@@ -241,11 +253,58 @@ public class MenuService {
                 this.companyMenuAuthorityRepository.save(cma);
                 this.companyMenuAuthorityRepository.companyMenuAuthorityUseYnUpdate(cma);
             }
-            return 1;
 
+            // 등록이 완료된 사업장별 메뉴 권한 조회
+            List<CompanyMenuRegDto> comList = this.companyMenuAuthorityRepository.findCompanyMenuList(companyId);
+            Company company = this.companyRepository.findById(companyId)
+                .orElseThrow(() -> new IllegalArgumentException("=== company not found ==="));
+
+            // AD, AS, NO authority
+            userAuthorityDefault(comList, company, "AD");
+            userAuthorityDefault(comList, company, "AS");
+            userAuthorityDefault(comList, company, "NO");
+
+            return 1;
         } catch (Exception e) {
             log.error("[saveCompanyMenuAuthorities] error: {}", e.getMessage());
             return -2;
+        }
+    }
+
+    // AD, AS, NO setting permissions
+    private void userAuthorityDefault(List<CompanyMenuRegDto> comList, Company company, String authority) {
+        try {
+            Long companyId = company.getId();
+
+            /* 
+             * 1. 권한이 이미 설정되어 있는지 확인
+             * 2. 권한이 설정되어 있으면 return;
+             * 3. 권한이 설정되어 있지 않으면, 사용자 권한 설정
+             * 
+             *     read_yn     mod_yn      excel_yn
+             * AD    Y           Y            Y
+             * AS    Y           Y            Y
+             * NO    Y           N            Y
+             */
+            Long authorityIsExis = this.menuAuthorityRepository.menuAuthorityRegCheck(companyId, authority);
+            if (authorityIsExis > 0) return;
+
+            String modYn = authority.equals("NO") ? "N" : "Y";
+            for (CompanyMenuRegDto dto : comList) {
+                String menuCode = dto.getMenuCode();
+                Menu menu = this.menuRepository.findMenuOne(menuCode);
+
+                MenuAuthorityBaseDto menuAuth = new MenuAuthorityBaseDto();
+                menuAuth.setAuthority(authority);
+                menuAuth.setReadYn("Y");
+                menuAuth.setModYn(modYn);
+                menuAuth.setExcelYn("Y");
+
+                MenuAuthority menuAuthority = MenuAuthorityMapper.toEntity(menuAuth, company, menu);
+                this.menuAuthorityRepository.save(menuAuthority);
+            }
+        } catch (Exception e) {
+            log.error("[userAuthorityDefault] error: {}", e.getMessage());
         }
     }
 
@@ -259,15 +318,18 @@ public class MenuService {
                 this.companyMenuAuthorityRepository.companyMenuAuthorityUseYnUpdate(cma);
             }
         } catch (Exception e) {
-            log.error("[updateCompanyMenuAuthority] error : {}", e.getMessage());
-            e.printStackTrace();
+            log.error("[updateCompanyMenuAuthority] error: {}", e.getMessage());
         }
     }
 
     // 사업장별 메뉴 권한 삭제
     @Transactional
     public void deleteCompanyMenuAuthority(Long companyId) {
-        Long count = this.companyMenuAuthorityRepository.deleteCompanyMenuAuthorityOne(companyId);
-        log.info("=== delete company menu info: {}", count);
+        try {
+            Long count = this.companyMenuAuthorityRepository.deleteCompanyMenuAuthorityOne(companyId);
+            log.info("=== delete company menu info: {}", count);
+        } catch (Exception e) {
+            log.error("[deleteCompanyMenuAuthority] error: {}", e.getMessage());
+        }
     }
 }

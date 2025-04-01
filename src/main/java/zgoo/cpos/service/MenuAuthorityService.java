@@ -35,31 +35,30 @@ public class MenuAuthorityService {
 
     // 사업자 권한 리스트 조회
     public List<MenuAuthorityDto.CompanyAuthorityListDto> findCompanyAuthorityList() {
-        List<Tuple> companyAuthorityList = this.menuAuthorityRepository.companyAuthorityList();
-        // log.info("사업자 권한 리스트 조회 >> {}", companyAuthorityList.toString());
-
-        if (companyAuthorityList.isEmpty() || companyAuthorityList == null) {
-            return new ArrayList<>();
-        }
-
         try {
+            List<Tuple> companyAuthorityList = this.menuAuthorityRepository.companyAuthorityList();
+            if (companyAuthorityList.isEmpty()) {
+                return new ArrayList<>();
+            }
+
             List<MenuAuthorityDto.CompanyAuthorityListDto> comAuthList = MenuAuthorityMapper.toComListDto(companyAuthorityList);
-            // log.info("사업자 권한 리스트 조회 >> {}", comAuthList);
             return comAuthList;
         } catch (Exception e) {
-            log.error("[findCompanyAuthorityList] error:", e);
+            log.error("[findCompanyAuthorityList] error: {}", e.getMessage());
             return new ArrayList<>();
         }
         
     }
 
     // 접근권한조회
+    @Transactional
     public List<MenuAuthorityListDto> findMenuAuthorityList(Long companyId, String authority) {
         try {
             List<MenuAuthorityListDto> authorityList = this.menuAuthorityRepository.findMenuAuthorityList(companyId, authority);
-
+            // log.info("[findMenuAuthorityList] >> {}", authorityList.toString());
+                
             if (authorityList.isEmpty()) {
-                return this.menuAuthorityRepository.defaultMenuAuthorityList();
+                return this.menuAuthorityRepository.defaultMenuAuthorityList(companyId, authority);
             }
 
             return authorityList;
@@ -72,14 +71,14 @@ public class MenuAuthorityService {
     // 접근권한 저장 및 업데이트
     @Transactional
     public void saveMenuAuthorities(List<MenuAuthorityBaseDto> dtos) {
-        if (dtos.isEmpty()) {
-            log.error("[saveMenuAuthorities] error");
-        }
-
         try {
+            if (dtos.isEmpty()) {
+                log.error("[saveMenuAuthorities] dto empty error");
+                return;
+            }
+
             Long companyId = dtos.get(0).getCompanyId();
             String authority = dtos.get(0).getAuthority();
-            // String menuCode = dtos.get(0).getMenuCode();
 
             Long authorityIsExis = this.menuAuthorityRepository.menuAuthorityRegCheck(companyId, authority);
             Company company = this.companyRepository.findById(companyId)
@@ -110,19 +109,8 @@ public class MenuAuthorityService {
         log.info("=== search login user menu authority ===");
 
         try {
-            // 로그인X 테스트용도
-            if (userId == null || userId.trim().isEmpty()) {
-                MenuAuthorityBaseDto authorityTest = new MenuAuthorityBaseDto();
-                authorityTest.setAuthority("SU");
-                authorityTest.setMenuCode(menuCode);
-                authorityTest.setReadYn("Y");
-                authorityTest.setModYn("Y");
-                authorityTest.setExcelYn("Y");
-                authorityTest.setCompanyId(1L);
-                authorityTest.setCompanyName("동아일렉콤");
-                return authorityTest;
-            }
-
+            if (userId == null || userId.isEmpty()) return null;
+            
             Users user = this.usersRepository.findUserOne(userId);
             String authority = user.getAuthority();
             Long companyId = user.getCompany().getId();
@@ -140,21 +128,7 @@ public class MenuAuthorityService {
             }
 
             MenuAuthorityBaseDto dto = this.menuAuthorityRepository.findUserMenuAuthority(companyId, authority, menuCode);
-
-            // 권한설정이 안 되어있을 경우
-            if (dto == null) {
-                Company company = this.companyRepository.findById(companyId)
-                    .orElseThrow(() -> new IllegalArgumentException("=== company not found ==="));
-
-                dto = new MenuAuthorityBaseDto();
-                dto.setCompanyId(companyId);
-                dto.setCompanyName(company.getCompanyName());
-                dto.setAuthority(authority);
-                dto.setMenuCode(menuCode);
-                dto.setReadYn("Y");
-                dto.setModYn("N");
-                dto.setExcelYn("N");
-            }
+            if (dto == null) return null;
 
             return dto;
         } catch (Exception e) {

@@ -13,7 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 import zgoo.cpos.dto.users.UsersDto;
 import zgoo.cpos.dto.users.UsersDto.UsersListDto;
 import zgoo.cpos.dto.users.UsersDto.UsersRegDto;
-import zgoo.cpos.util.EncryptionUtils;
 
 @SpringBootTest
 @Transactional
@@ -37,6 +36,7 @@ public class UsersServiceTest {
     @Rollback(false)
     @DisplayName("사용자 - 등록")
     public void createUsers() throws Exception {
+        String loginUserId = "zgoodev";
 
         UsersRegDto dto = UsersRegDto.builder()
                 .companyId(1L)
@@ -49,7 +49,7 @@ public class UsersServiceTest {
                 .regDt(LocalDateTime.now())
                 .build();
 
-        this.usersService.saveUsers(dto);
+        this.usersService.saveUsers(dto, loginUserId);
 
         List<UsersDto.UsersListDto> ulist = this.usersService.findUsersAll();
         for (UsersListDto usersListDto : ulist) {

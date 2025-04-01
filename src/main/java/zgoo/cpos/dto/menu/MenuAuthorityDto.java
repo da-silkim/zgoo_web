@@ -52,5 +52,6 @@ public class MenuAuthorityDto {
         private String parentCodeName;
         private LocalDateTime regAt;
         private LocalDateTime modAt;
+        private String useYn;
     }
 }

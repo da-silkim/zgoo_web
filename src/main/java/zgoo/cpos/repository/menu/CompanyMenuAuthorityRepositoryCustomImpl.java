@@ -213,4 +213,18 @@ public class CompanyMenuAuthorityRepositoryCustomImpl implements CompanyMenuAuth
             .where(companyMenuAuthority.menuCode.eq(menuCode))
             .execute();
     }
+
+    @Override
+    public List<CompanyMenuRegDto> findCompanyMenuList(Long companyId) {
+        List<CompanyMenuRegDto> companyList = queryFactory
+            .select(Projections.fields(CompanyMenuRegDto.class,
+                companyMenuAuthority.companyId.as("companyId"),
+                companyMenuAuthority.menuCode.as("menuCode"),
+                companyMenuAuthority.useYn.as("useYn")))
+            .from(companyMenuAuthority)
+            .where(companyMenuAuthority.companyId.eq(companyId))
+            .orderBy(companyMenuAuthority.menuCode.asc())
+            .fetch();
+        return companyList;
+    }
 }

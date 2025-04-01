@@ -140,6 +140,7 @@ public class CommonCdServiceTest {
     @Rollback(false)
     public void 그룹코드_저장() throws Exception {
 
+        String loginUserId = "zgoodev";
         // given
         GrpCodeDto dto = new GrpCodeDto();
         dto.setGrpCode("GTEST3");
@@ -148,7 +149,7 @@ public class CommonCdServiceTest {
         dto.setRegUserId("test");
 
         // when
-        codeService.saveGrpCode(dto);
+        codeService.saveGrpCode(dto, loginUserId);
 
         // then
 
