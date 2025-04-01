@@ -37,7 +37,6 @@ public class UsersServiceTest {
     @DisplayName("사용자 - 등록")
     public void createUsers() throws Exception {
         String loginUserId = "zgoodev";
-        String loginUserId = "zgoodev";
 
         UsersRegDto dto = UsersRegDto.builder()
                 .companyId(1L)
