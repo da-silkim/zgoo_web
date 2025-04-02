@@ -468,3 +468,24 @@ function updatePageSize(selectElement, baseUrl, paramKeys) {
 
     window.location.href = newUrl;
 }
+
+function excelDownload(baseUrl, paramKeys) {
+    const urlParams = new URLSearchParams(window.location.search);
+    let newUrl = `${baseUrl}?`;
+
+    paramKeys.forEach(key => {
+        const value = urlParams.get(key) || '';
+        newUrl += `&${key}=${encodeURIComponent(value)}`;
+    });
+
+    const a = document.createElement('a');
+    a.style.display = 'none';
+    a.href = newUrl;
+    document.body.appendChild(a);
+    a.click();
+
+    // 링크 제거
+    setTimeout(() => {
+        document.body.removeChild(a);
+    }, 1000);
+}

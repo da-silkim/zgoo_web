@@ -605,4 +605,18 @@ public class MemberService {
 
         return fileContent.toString();
     }
+
+    // 회원리스트 조회
+    public List<MemberListDto> findAllMemberListWithoutPagination(Long companyId, String idTag, String name) {
+        log.info("=== Finding all member list: companyId={}, idTag={}, name={} ===", companyId, idTag, name);
+
+        return this.memberRepository.findAllMemberListWithoutPagination(companyId, idTag, name);
+    }
+
+    // 회원카드정보 조회
+    public List<MemberAuthDto> findAllMemberTagWithoutPagination(String idTag, String name) {
+        log.info("=== Finding all member tag: idTag={}, name={} ===", idTag, name);
+
+        return this.memberAuthRepository.findAllMemberTagWithoutPagination(idTag, name);
+    }
 }

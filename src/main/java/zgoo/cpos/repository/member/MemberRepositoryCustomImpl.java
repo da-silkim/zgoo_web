@@ -298,4 +298,39 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
 
         return memberList;
     }
+
+    @Override
+    public List<MemberListDto> findAllMemberListWithoutPagination(Long companyId, String idTag, String name) {
+        BooleanBuilder builder = new BooleanBuilder();
+
+        if (companyId != null) {
+            builder.and(member.company.id.eq(companyId));
+        }
+
+        if (idTag != null && !idTag.isEmpty()) {
+            builder.and(member.idTag.contains(idTag));
+        }
+
+        if (name != null && !name.isEmpty()) {
+            builder.and(member.name.contains(name));
+        }
+
+        return queryFactory.select(Projections.fields(MemberListDto.class,
+            member.id.as("memberId"),
+            member.memLoginId.as("memLoginId"),
+            member.bizType.as("bizType"),
+            member.name.as("name"),
+            member.phoneNo.as("phoneNo"),
+            member.idTag.as("idTag"),
+            member.email.as("email"),
+            member.joinedDt.as("joinedDt"),
+            company.companyName.as("companyName"),
+            bizTypeName.name.as("bizTypeName")))
+            .from(member)
+            .leftJoin(company).on(member.company.eq(company))
+            .leftJoin(bizTypeName).on(member.bizType.eq(bizTypeName.commonCode))
+            .where(builder)
+            .orderBy(member.joinedDt.desc())
+            .fetch();
+    }
 }
