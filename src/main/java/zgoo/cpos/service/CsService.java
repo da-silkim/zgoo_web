@@ -239,4 +239,24 @@ public class CsService {
             return new ArrayList<>();
         }
     }
+
+    // 충전소 조회
+    public List<CsInfoListDto> findAllStationWithoutPagination(Long companyId, String searchOp, String searchContent) {
+        log.info("=== Finding all station list: searchOp={}, searchContent={} ===", searchOp, searchContent);
+
+        try {
+            List<CsInfoListDto> csList = this.csRepository.findAllStationWithoutPagination(companyId, searchOp, searchContent);
+
+            for (CsInfoListDto station : csList) {
+                long cpCount = this.chargerRepository.countByStationId(station.getStationId());
+                station.setCpCount(cpCount);
+            }
+    
+            return csList;
+        } catch (Exception e) {
+            log.error("[findAllStationWithoutPagination] error: {}", e.getMessage());
+            return new ArrayList<>();
+        }
+
+    }
 }

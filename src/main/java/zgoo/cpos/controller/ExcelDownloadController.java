@@ -26,8 +26,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import zgoo.cpos.dto.cs.CsInfoDto.CsInfoListDto;
 import zgoo.cpos.dto.member.MemberDto.MemberAuthDto;
 import zgoo.cpos.dto.member.MemberDto.MemberListDto;
+import zgoo.cpos.service.CsService;
 import zgoo.cpos.service.MemberService;
 
 @Controller
@@ -37,6 +39,7 @@ import zgoo.cpos.service.MemberService;
 public class ExcelDownloadController {
 
     private final MemberService memberService;
+    private final CsService csService;
 
     /*
      * member list excel download
@@ -85,6 +88,30 @@ public class ExcelDownloadController {
 
         Workbook workbook = createExcelFile(memtagList, "회원카드관리", headers, dataMapper);
         writeExcelToResponse(response, workbook, "member_tag");
+    }
+
+    /* 
+     * station list excel download
+     */
+    @GetMapping("/download/station")
+    public void downloadStation(
+            @RequestParam(required = false, value = "companyIdSearch") Long companyIdSearch,
+            @RequestParam(required = false, value = "opSearch") String opSearch,
+            @RequestParam(required = false, value = "contentSearch") String contentSearch,
+            HttpServletResponse response) {
+        log.info("=== station list excel download info ===");
+
+        List<CsInfoListDto> csList = this.csService.findAllStationWithoutPagination(companyIdSearch, opSearch, contentSearch);
+
+        String[] headers = { "사업자", " 충전소명", "충전소ID", "설치주소", "충전기수", "운영상태", "운영시작시간", "운영종료시간" };
+        Function<CsInfoListDto, Object[]> dataMapper = station -> new Object[] {
+            station.getCompanyName(), station.getStationName(), station.getStationId(),
+            station.getAddress(), station.getCpCount(), station.getOpStatusName(),
+            station.getOpenStartTime(), station.getOpenEndTime()
+        };
+
+        Workbook workbook = createExcelFile(csList, "충전소리스트", headers, dataMapper);
+        writeExcelToResponse(response, workbook, "station_list");
     }
 
     private <T> Workbook createExcelFile(List<T> data, String sheetName, String[] headers, Function<T, Object[]> dataMapper) {

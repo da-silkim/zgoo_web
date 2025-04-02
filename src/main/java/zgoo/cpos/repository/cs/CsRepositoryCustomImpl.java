@@ -329,4 +329,39 @@ public class CsRepositoryCustomImpl implements CsRepositoryCustom {
             .fetch();
         return csList;
     }
+
+    @Override
+    public List<CsInfoListDto> findAllStationWithoutPagination(Long companyId, String searchOp, String searchContent) {
+        BooleanBuilder builder = new BooleanBuilder();
+
+        if (companyId != null) {
+            builder.and(csInfo.company.id.eq(companyId));
+        }
+
+        if (searchOp != null && (searchContent != null && !searchContent.isEmpty())) {
+            if (searchOp.equals("stationId")) {
+                builder.and(csInfo.id.contains(searchContent));
+            } else if (searchOp.equals("stationName")) {
+                builder.and(csInfo.stationName.contains(searchContent));
+            }
+        }
+
+        return queryFactory.select(Projections.fields(CsInfoListDto.class,
+            csInfo.id.as("stationId"),
+            csInfo.stationName.as("stationName"),
+            csInfo.address.as("address"),
+            csInfo.openStartTime.as("openStartTime"),
+            csInfo.openEndTime.as("openEndTime"),
+            csInfo.opStatus.as("opStatus"),
+            opStatusCode.name.as("opStatusName"),
+            company.companyName.as("companyName")))
+            .from(csInfo)
+            .leftJoin(company).on(csInfo.company.eq(company))
+            .leftJoin(kepco).on(csInfo.csKepcoContractInfo.eq(kepco))
+            .leftJoin(land).on(csInfo.csLandInfo.eq(land))
+            .leftJoin(opStatusCode).on(csInfo.opStatus.eq(opStatusCode.commonCode))
+            .orderBy(csInfo.id.desc())
+            .where(builder)
+            .fetch();
+    }
 }

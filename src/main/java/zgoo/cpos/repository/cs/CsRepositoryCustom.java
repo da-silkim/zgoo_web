@@ -41,4 +41,6 @@ public interface CsRepositoryCustom {
 
     // 사용자 위치 기반, 주변 충전소 조회
     List<CsInfoDetailDto> findStationsWithinRadius(double latitude, double longitude, double radiusInKm);
+
+    List<CsInfoListDto> findAllStationWithoutPagination(Long companyId, String searchOp, String searchContent);
 }

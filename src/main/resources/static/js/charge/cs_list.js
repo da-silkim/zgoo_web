@@ -4,35 +4,8 @@ $(document).ready(function() {
     let selectRow, btnMsg = "등록";
     var stationId;
 
-    $('#resetBtn').on('click', function() {
-        window.location.replace('/station/list');
-    });
-
-    $('#searchBtn').on('click', function() {
-        const selectedSize = document.getElementById('size').value;
-        const form = document.getElementById('searchForm');
-
-        const hiddenSizeInput = document.createElement('input');
-        hiddenSizeInput.type = 'hidden';
-        hiddenSizeInput.name = 'size';
-        hiddenSizeInput.value = selectedSize;
-        hiddenSizeInput.id = 'hiddenSizeInput';
-
-        form.appendChild(hiddenSizeInput);
-        form.submit();
-    });
-
     $('#size').on('change', function() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const selectedSize = document.getElementById("size").value;
-        const selectedCompanyId = urlParams.get('companyIdSearch') || '';
-        const selectedOpSearch = urlParams.get('opSearch') || '';
-        const selectedContentSearch = urlParams.get('contentSearch') || '';
-
-        window.location.href = "/station/list?page=0&size=" + selectedSize +
-                               "&companyIdSearch=" + (selectedCompanyId) +
-                               "&opSearch=" + (selectedOpSearch) +
-                               "&contentSearch=" + (selectedContentSearch);
+        updatePageSize(this, "/station/list", ["companyIdSearch", "opSearch", "contentSearch"]);
     });
 
     $('#pageList').on('click', 'tr', function() {
