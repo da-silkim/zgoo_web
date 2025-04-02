@@ -30,4 +30,6 @@ public interface MemberRepositoryCustom {
 
     // 회원정보 검색(1:1문의에서 사용)
     List<MemberListDto> findMemberList(String name, String phoneNo);
+
+    List<MemberListDto> findAllMemberListWithoutPagination(Long companyId, String idTag, String name);
 }

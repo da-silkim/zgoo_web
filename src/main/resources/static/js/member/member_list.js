@@ -175,40 +175,13 @@ $(document).ready(function() {
                 }
             },
             error: function(error) {
-                console.log(error);
+                console.error(error);
             }
         });
     });
 
-    $('#resetBtn').on('click', function() {
-        window.location.replace('/member/list');
-    });
-
-    $('#searchBtn').on('click', function() {
-        const selectedSize = document.getElementById('size').value;
-        const form = document.getElementById('searchForm');
-
-        const hiddenSizeInput = document.createElement('input');
-        hiddenSizeInput.type = 'hidden';
-        hiddenSizeInput.name = 'size';
-        hiddenSizeInput.value = selectedSize;
-        hiddenSizeInput.id = 'hiddenSizeInput';
-
-        form.appendChild(hiddenSizeInput);
-        form.submit();
-    });
-
     $('#size').on('change', function() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const selectedSize = document.getElementById("size").value;
-        const selectedCompanyId = urlParams.get('companyIdSearch') || '';
-        const selectedIdTag = urlParams.get('idTagSearch') || '';
-        const selectedName = urlParams.get('nameSearch') || '';
-
-        window.location.href = "/member/list?page=0&size=" + selectedSize +
-                               "&companyIdSearch=" + (selectedCompanyId) +
-                               "&idTagSearch=" + (selectedIdTag) +
-                               "&nameSearch=" + (selectedName);
+        updatePageSize(this, "/system/notice/list", ["companyIdSearch", "idTagSearch", "nameSearch"]);
     });
 
     $('#pageList').on('click', 'tr', function() {
@@ -221,16 +194,13 @@ $(document).ready(function() {
         modalCon = false;
         btnMsg = "등록";
         $('#modalBtn').text(btnMsg);
-
         $('#memberForm')[0].reset();
         handleBizYnChange();
         clearCarTable();
         clearCardTable();
 
         $('#companyId').prop('disabled', false);
-        $('#companyId').prop('selectedIndex', 0);
         $('#bizType').prop('disabled', false);
-        $('#bizType').prop('selectedIndex', 0);
         $('#bizSearchBtn').prop('disabled', false);
         $('#memLoginId').prop('disabled', false);
         $('#userState').val('MSTNORMAL');

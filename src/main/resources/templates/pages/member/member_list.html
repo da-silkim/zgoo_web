@@ -39,9 +39,9 @@
                         </div>
                         <!-- row: end -->
                         <div class="search-btn">
-                            <button type="button" class="btn btn-outline-grey me-2" id="searchBtn">
+                            <button type="button" class="btn btn-outline-grey me-2" id="searchBtn" onclick="searchOption()">
                                 <i class="bi bi-search me-2"></i>검색</button>
-                            <button type="button" class="btn btn-outline-grey me-2" id="resetBtn">
+                            <button type="button" class="btn btn-outline-grey me-2" id="resetBtn" onclick="replacePage('/member/list')">
                                 <i class="bi bi-arrow-repeat me-2"></i>초기화</button>
                         </div>
                     </form>
@@ -54,7 +54,7 @@
                 <!-- card body:3 start -->
                 <div class="card-body btn-page-container">
                     <div class="btn-container">
-                        <button class="btn btn-excel" id="excelBtn" onclick="excelDownload()"
+                        <button class="btn btn-excel" id="excelBtn" onclick="excelDownload('/excel/download/member_list', ['companyIdSearch', 'idTagSearch', 'nameSearch'])"
                             th:if="${menuAuthority.authority == 'SU' or menuAuthority.excelYn == 'Y'}">
                             <i class="bi bi-file-earmark-spreadsheet"></i>엑셀다운로드</button>
                         <div class="btn-mod" th:if="${menuAuthority.authority == 'SU' or menuAuthority.modYn == 'Y'}">
@@ -603,7 +603,6 @@
     </div>
     <!-- Condition Detail Modal end -->
 
-    <!-- <script type="text/javascript" th:src="@{/js/table.js}"></script> -->
     <script type="text/javascript" th:src="@{/js/member/member_list.js}"></script>
     <script type="text/javascript">
         function addRow(tableId) {

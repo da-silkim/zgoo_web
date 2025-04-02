@@ -118,4 +118,36 @@ public class MemberAuthRepositoryCustomImpl implements MemberAuthRepositoryCusto
             .fetchOne();
         return memberAuthDto;
     }
+
+    @Override
+    public List<MemberAuthDto> findAllMemberTagWithoutPagination(String idTag, String name) {
+        BooleanBuilder builder = new BooleanBuilder();
+
+        if (idTag != null && !idTag.isEmpty()) {
+            builder.and(memberAuth.idTag.contains(idTag));
+        }
+
+        if (name != null && !name.isEmpty()) {
+            builder.and(memberAuth.member.name.contains(name));
+        }
+
+        return queryFactory.select(Projections.fields(MemberAuthDto.class,
+            memberAuth.idTag.as("idTag"),
+            memberAuth.expireDate.as("expireDate"),
+            memberAuth.useYn.as("useYn"),
+            memberAuth.parentIdTag.as("parentIdTag"),
+            memberAuth.totalChargingPower.as("totalChargingPower"),
+            memberAuth.status.as("status"),
+            memberAuth.totalChargingPrice.as("totalChargingPrice"),
+            memberAuth.regDt.as("regDt"),
+            member.name.as("name"),
+            member.phoneNo.as("phoneNo"),
+            company.companyName.as("companyName")))
+            .from(memberAuth)
+            .leftJoin(memberAuth.member, member)
+            .leftJoin(member.company, company)
+            .where(builder)
+            .orderBy(memberAuth.regDt.desc())
+            .fetch();
+    }
 }
