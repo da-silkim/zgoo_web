@@ -55,26 +55,26 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById('contractStart').value = '';
         document.getElementById('contractEnd').value = '';
 
-        // 로밍 테이블 초기화
-        const roamingTable = document.getElementById('roamingTable').getElementsByTagName('tbody')[0];
-        // 첫 번째 행만 남기고 모두 삭제
-        while (roamingTable.rows.length > 1) {
-            roamingTable.deleteRow(1);
+        // 로밍 테이블 완전 초기화 - 모든 행 제거
+        const roamingTable = document.getElementById('roamingTable');
+        if (roamingTable) {
+            // 테이블 바디 가져오기
+            const tbody = roamingTable.querySelector('tbody') || roamingTable;
+
+            // 모든 행 제거
+            while (tbody.rows.length > 0) {
+                tbody.deleteRow(0);
+            }
         }
-
-        // 첫 번째 행의 입력 필드 초기화
-        const firstRow = roamingTable.rows[0];
-        const inputs = firstRow.querySelectorAll('input[type="text"]');
-        inputs.forEach(input => {
-            input.value = '';
-        });
-
-        // 체크박스 해제
-        const checkbox = firstRow.querySelector('input[type="checkbox"]');
-        if (checkbox) checkbox.checked = false;
 
         // 모달 제목 및 버튼 텍스트 초기화 (등록 모드로)
         document.getElementById('companyModalBtn').textContent = '등록';
+
+        // 숨겨진 필드 초기화 (있다면)
+        const hiddenCompanyId = document.getElementById('companyId');
+        if (hiddenCompanyId) {
+            hiddenCompanyId.value = '';
+        }
     }
 
     // pagination
@@ -139,22 +139,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
         console.log("결제위탁: ", selectedOption);
 
-        const f_mallid = document.getElementById("mallID");
         const f_mid = document.getElementById("mID");
-        const f_merchantkey = document.getElementById("merchantKey");
 
         //자체 : S, 위탁 : C
         if (selectedOption === "S") {
             //활성화
-            f_mallid.disabled = false;
             f_mid.disabled = false;
-            f_merchantkey.disabled = false;
 
         } else {
             //비활성화
-            f_mallid.disabled = true;
             f_mid.disabled = true;
-            f_merchantkey.disabled = true;
         }
     }
 
@@ -287,8 +281,6 @@ document.addEventListener("DOMContentLoaded", function () {
                     document.getElementById("consignmentState").value = data.consignmentPayment ? data.consignmentPayment : "";
                     consignmentOptionCheck();
                     document.getElementById("mID").value = data.mid ? data.mid : "";
-                    document.getElementById("merchantKey").value = data.merchantKey ? data.merchantKey : "";
-                    document.getElementById("mallID").value = data.sspMallId ? data.sspMallId : "";
                     document.getElementById("contractState").value = data.contractStatus ? data.contractStatus : "";
                     document.getElementById("contractAt").value = data.contractedAt ? formatDateStringToLocalDate(data.contractedAt) : "";
                     document.getElementById("contractStart").value = data.contractStart ? formatDateStringToLocalDate(data.contractStart) : "";
@@ -335,9 +327,7 @@ document.addEventListener("DOMContentLoaded", function () {
             staffTel: document.getElementById("staffTel").value,
             staffPhone: document.getElementById("staffPhone").value,
             consignmentPayment: document.getElementById("consignmentState").value,
-            sspMallId: document.getElementById("mallID").value,
             mid: document.getElementById("mID").value,
-            merchantKey: document.getElementById("merchantKey").value,
             contractStatus: document.getElementById("contractState").value,
             contractedAt: formatToLocalDateTimeString(document.getElementById("contractAt").value),
             contractStart: formatToLocalDateTimeString(document.getElementById("contractStart").value),

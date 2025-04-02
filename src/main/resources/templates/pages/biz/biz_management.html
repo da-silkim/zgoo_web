@@ -364,28 +364,30 @@
                                             </option>
                                         </select>
                                     </td>
-                                    <td class="w-20"></td>
-                                    <td class="w-30"></td>
-                                </tr>
-                                <tr>
-                                    <th class="w-20">SSP Mall ID<b class="required-data">*</b></th>
-                                    <td class="w-30">
-                                        <input type="text" name="mallID" id="mallID" class="form-control" placeholder=""
-                                            th:field="*{sspMallId}" required>
-                                    </td>
                                     <th class="w-20">MID<b class="required-data">*</b></th>
                                     <td class="w-30">
                                         <input type="text" name="mID" id="mID" class="form-control" placeholder=""
                                             th:field="*{mid}" required>
                                     </td>
                                 </tr>
+                                <!-- <tr>
+                                    <th class="w-20">SSP Mall ID<b class="required-data" style="display: none;"></b>
+                                    </th>
+                                    <td class="w-30">
+                                        <input type="text" name="mallID" id="mallID" class="form-control" placeholder=""
+                                            th:field="*{sspMallId}" hidden>
+                                    </td>
+                                    <td class="w-20"></td>
+                                    <td class="w-30"></td>
+                                </tr>
                                 <tr>
-                                    <th class="w-20">Merchant Key<b class="required-data">*</b></th>
+                                    <th class="w-20">Merchant Key<b class="required-data" style="display: none;"></b>
+                                    </th>
                                     <td class="w-80" colspan="3">
                                         <input type="text" name="merchantKey" id="merchantKey" class="form-control"
-                                            placeholder="" th:field="*{merchantKey}" required>
+                                            placeholder="" th:field="*{merchantKey}" hidden>
                                     </td>
-                                </tr>
+                                </tr> -->
                             </tbody>
                         </table>
                         <!-- table:5 end -->

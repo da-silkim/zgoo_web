@@ -95,17 +95,11 @@ public class CompanyController {
         log.info("==== update Request Company(dto):{}", dto.toString());
 
         try {
-            Company updatedComapny = companyService.updateCompanyInfo(dto);
-            companyService.updateRelationInfo(updatedComapny, dto);
-            companyService.updateContractInfo(updatedComapny, dto);
-            companyService.updatePgInfo(updatedComapny, dto);
-            companyService.updateCompanyRoamingInfo(dto, updatedComapny);
-
-            // companyService.updateCompanyRoamingInfo(dto, updatedComapny);
-
+            companyService.updateCompanyAll(dto);
             log.info("=== update complete!!");
             return ResponseEntity.ok("업체정보 수정 성공");
         } catch (Exception e) {
+            log.error("Company update failed", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("업체정보 수정 오류");
         }
     }

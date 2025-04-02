@@ -2,8 +2,12 @@ package zgoo.cpos.service;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.BiFunction;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -193,153 +197,116 @@ public class CompanyService {
      * 수정
      */
     @Transactional
-    public Company updateCompanyInfo(CompanyRegDto dto) {
-        // 업체 정보 조회
+    public void updateCompanyAll(CompanyRegDto dto) {
+        // 한 번의 조회로 회사 정보 가져오기
         Company company = companyRepository.findById(dto.getCompanyId())
                 .orElseThrow(() -> new IllegalArgumentException("Company not found with id: " + dto.getCompanyId()));
-        try {
-            if (company != null) {
 
-                // company 기본정보 업데이트
-                company.updateCompanyBasicInfo(dto);
-            }
+        try {
+            // 기본 정보 업데이트
+            company.updateCompanyBasicInfo(dto);
+
+            // 관계 정보 업데이트
+            updateEntityInfo(company, dto,
+                    company.getCompanyRelationInfo(),
+                    CompanyMapper::toEntityRelation,
+                    (c, r) -> c.toBuilder().companyRelationInfo(r).build(),
+                    "relation");
+
+            // 계약 정보 업데이트
+            updateEntityInfo(company, dto,
+                    company.getCompanyContract(),
+                    CompanyMapper::toEntityContract,
+                    (c, contract) -> c.toBuilder().companyContract(contract).build(),
+                    "contract");
+
+            // PG 정보 업데이트
+            updateEntityInfo(company, dto,
+                    company.getCompanyPG(),
+                    CompanyMapper::toEntityPg,
+                    (c, pg) -> c.toBuilder().companyPG(pg).build(),
+                    "PG");
+
+            // 로밍 정보 업데이트
+            updateRoamingInfo(dto, company);
 
         } catch (Exception e) {
-            log.error("updateCompanyInfo Error: ", e);
+            log.error("Company update failed", e);
+            throw e;
         }
-
-        return company;
-
     }
 
-    @Transactional
-    public void updatePgInfo(Company company, CompanyRegDto dto) {
+    /**
+     * 엔티티 정보 업데이트를 위한 일반화된 메서드
+     */
+    private <T> void updateEntityInfo(Company company, CompanyRegDto dto,
+            T entityInfo,
+            Function<CompanyRegDto, T> toEntityMapper,
+            BiFunction<Company, T, Company> companyUpdater,
+            String infoType) {
         try {
-            if (company.getCompanyPG() == null) {
-                log.info("No information Compnay PG.. create new pg info start");
-                // pg정보 신규저장
-                CompanyPG entityPg = CompanyMapper.toEntityPg(dto);
-                company = company.toBuilder()
-                        .companyPG(entityPg)
-                        .build();
-
-                companyRepository.save(company);
+            if (entityInfo == null) {
+                log.info("== companyId:{} has no {} info", company.getId(), infoType);
+                // 새 정보 생성
+                T newEntity = toEntityMapper.apply(dto);
+                Company updatedCompany = companyUpdater.apply(company, newEntity);
+                companyRepository.save(updatedCompany);
             } else {
-                Long pgId = company.getCompanyPG().getId();
-                CompanyPG findOne = companyPgRepository.findById(pgId)
-                        .orElseThrow(() -> new IllegalArgumentException("Company PG ID not found: " + pgId));
-
-                findOne.updatePgInfo(dto);
+                // 기존 정보가 있는 경우 업데이트 로직
+                // 이 부분은 각 엔티티 타입에 따라 다르므로 별도 처리 필요
+                if (entityInfo instanceof CompanyRelationInfo) {
+                    ((CompanyRelationInfo) entityInfo).updateRelationInfo(dto);
+                } else if (entityInfo instanceof CompanyContract) {
+                    ((CompanyContract) entityInfo).updateContractInfo(dto);
+                } else if (entityInfo instanceof CompanyPG) {
+                    ((CompanyPG) entityInfo).updatePgInfo(dto);
+                }
             }
-
         } catch (Exception e) {
-            log.error("updatePgInfo Error", e);
+            log.error("Update {} info error", infoType, e);
         }
     }
 
-    @Transactional
-    public void updateContractInfo(Company company, CompanyRegDto dto) {
-
+    /**
+     * 로밍 정보 업데이트를 위한 단순화된 메서드
+     */
+    private void updateRoamingInfo(CompanyRegDto dto, Company company) {
         try {
-            if (company.getCompanyContract() == null) {
-                log.info("== companyId:{} ,has no contract info", company.getId());
-                // 계약정보 저장
-                CompanyContract entityContract = CompanyMapper.toEntityContract(dto);
-                company = company.toBuilder()
-                        .companyContract(entityContract)
-                        .build();
-
-                companyRepository.save(company);
-            } else {
-                Long contractId = company.getCompanyContract().getId();
-                CompanyContract findOne = companyContractRepository.findById(contractId).orElseThrow(
-                        () -> new IllegalArgumentException("Company Contract not found with id: " + contractId));
-
-                findOne.updateContractInfo(dto);
-            }
-        } catch (Exception e) {
-            log.error("updateContractInfo Error", e);
-        }
-    }
-
-    @Transactional
-    public void updateRelationInfo(Company company, CompanyRegDto dto) {
-
-        try {
-            // 업체에 해당되는 관계정보 조회
-            if (company.getCompanyRelationInfo() == null) {
-
-                log.info("== companyId:{} ,has no relation info", company.getId());
-                // 관계정보 저장
-                CompanyRelationInfo entityRelation = CompanyMapper.toEntityRelation(dto);
-                company = company.toBuilder()
-                        .companyRelationInfo(entityRelation)
-                        .build();
-
-                companyRepository.save(company);
-
-            } else {
-                Long relationId = company.getCompanyRelationInfo().getId();
-                CompanyRelationInfo findOnd = companyRelationInfoRepository.findById(relationId).orElseThrow(
-                        () -> new IllegalArgumentException("Company Relation not found with id: " + relationId));
-
-                findOnd.updateRelationInfo(dto);
-            }
-
-        } catch (Exception e) {
-            log.error("updateRelationInfo Error", e);
-        }
-
-    }
-
-    @Transactional
-    public void updateCompanyRoamingInfo(CompanyRegDto dto, Company company) {
-        try {
-            // 로밍정보 업데이트
             if (dto.getRomaing() != null && !dto.getRomaing().isEmpty()) {
+                List<CompanyRoaming> existingRoamings = companyRoamingRepository.findAllByCompanyId(company.getId());
+                Map<String, CompanyRoaming> existingRoamingMap = existingRoamings.stream()
+                        .collect(Collectors.toMap(CompanyRoaming::getInstitutionCode, r -> r));
 
-                List<CompanyRoaming> roamingList = companyRoamingRepository.findAllByCompanyId(dto.getCompanyId());
-                log.info("=== updateCompanyRoamingInfo >> cnt:{}", roamingList.size());
+                // 새로운 로밍 정보 처리
+                Set<String> processedCodes = new HashSet<>();
+                for (CompanyRoamingtDto roamingDto : dto.getRomaing()) {
+                    String code = roamingDto.getInstitutionCode();
+                    processedCodes.add(code);
 
-                // 업데이트와 추가 처리를 위한 Set
-                Set<String> updatedInstitutionCodes = new HashSet<>();
-
-                for (CompanyRoamingtDto romaingDto : dto.getRomaing()) {
-                    // 기존 로밍 정보 중 institutionCode로 매칭되는 것이 있는지 확인
-                    CompanyRoaming matchedOne = roamingList.stream()
-                            .filter(r -> r.getInstitutionCode().equals(romaingDto.getInstitutionCode()))
-                            .findFirst()
-                            .orElse(null);
-
-                    if (matchedOne != null) {
-                        matchedOne.updateRoamingInfo(romaingDto);
-                        updatedInstitutionCodes.add(romaingDto.getInstitutionCode());
-
+                    if (existingRoamingMap.containsKey(code)) {
+                        // 기존 정보 업데이트
+                        existingRoamingMap.get(code).updateRoamingInfo(roamingDto);
                     } else {
-                        // 매칭되는 로밍정보 없으면 새로 추가
-                        CompanyRoaming newroaming = CompanyRoaming.builder()
-                                .institutionCode(romaingDto.getInstitutionCode())
-                                .institutionKey(romaingDto.getInstitutionKey())
-                                .institutionEmail(romaingDto.getInstitutionEmail())
+                        // 새 정보 추가
+                        companyRoamingRepository.save(CompanyRoaming.builder()
+                                .institutionCode(code)
+                                .institutionKey(roamingDto.getInstitutionKey())
+                                .institutionEmail(roamingDto.getInstitutionEmail())
                                 .company(company)
-                                .build();
-
-                        companyRoamingRepository.save(newroaming);
+                                .build());
                     }
                 }
 
-                // 2. dto에 없는 기존 로밍 정보를 삭제
-                for (CompanyRoaming companyRoaming : roamingList) {
-                    if (!updatedInstitutionCodes.contains(companyRoaming.getInstitutionCode())) {
-                        companyRoamingRepository.delete(companyRoaming);
-                    }
-                }
+                // 삭제할 로밍 정보 처리
+                existingRoamings.stream()
+                        .filter(r -> !processedCodes.contains(r.getInstitutionCode()))
+                        .forEach(companyRoamingRepository::delete);
             } else {
-                // dto에 로밍정보가 없을 경우 기존 로밍정보 모두삭제
+                // 모든 로밍 정보 삭제
                 companyRoamingRepository.deleteAllByCompanyId(company.getId());
             }
         } catch (Exception e) {
-            log.error("updateCompanyRoamingInfo Error: ", e);
+            log.error("Update roaming info error", e);
         }
     }
 
