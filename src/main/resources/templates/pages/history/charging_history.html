@@ -15,45 +15,58 @@
                         <!-- row:1 start -->
                         <div class="row mb-3 row-cols-2 row-cols-lg-3 g-2">
                             <div class="col d-flex align-items-center">
-                                <label for="companyIdSearch" class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">사업자</label>
-                                <select id="companyIdSearch" name="companyIdSearch" class="mx-3 form-control">
-                                    <option th:value="null">선택</option>
+                                <label for="companyIdSearch"
+                                    class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">사업자</label>
+                                <select id="companyIdSearch" class="mx-3 form-control" name="companyIdSearch">
+                                    <option value="" th:text="'(없음)'" th:selected="${selectedCompanyId == null}">
+                                    </option>
                                     <option th:each="company : ${companyList}" th:value="${company.companyId}"
-                                                th:text="${company.companyName}"
-                                                th:selected="${company.companyId == selectedCompanyId}"></option>
+                                        th:text="${company.companyName}"
+                                        th:selected="${company.companyId == selectedCompanyId}"></option>
                                 </select>
                             </div>
                             <div class="col d-flex align-items-center">
-                                <label for="opSearch" class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">검색조건</label>
+                                <label for="opSearch"
+                                    class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">검색조건</label>
                                 <select id="opSearch" name="opSearch" class="ms-3 form-control w-40">
-                                    <option th:value="null" th:selected="${selectedOpSearch == null}">선택</option>
-                                    <option th:value="'stationName'" th:text="충전소명" th:selected="${selectedOpSearch == 'stationName'}"></option>
-                                    <option th:value="'stationId'" th:text="충전소ID" th:selected="${selectedOpSearch == 'stationId'}"></option>
-                                    <option th:value="'chargerName'" th:text="충전기명" th:selected="${selectedOpSearch == 'chargerName'}"></option>
-                                    <option th:value="'chargerId'" th:text="충전기ID" th:selected="${selectedOpSearch == 'chargerId'}"></option>
-                                    <option th:value="'name'" th:text="회원명" th:selected="${selectedOpSearch == 'name'}"></option>
-                                    <option th:value="'idTag'" th:text="회원카드번호" th:selected="${selectedOpSearch == 'idTag'}"></option>
+                                    <option value="" th:selected="${selectedOpSearch == null}">(선택)</option>
+                                    <option value="stationName" th:text="충전소명"
+                                        th:selected="${selectedOpSearch == 'stationName'}"></option>
+                                    <option value="stationId" th:text="충전소ID"
+                                        th:selected="${selectedOpSearch == 'stationId'}"></option>
+                                    <option value="chargerId" th:text="충전기ID"
+                                        th:selected="${selectedOpSearch == 'chargerId'}"></option>
+                                    <option value="idTag" th:text="카드번호" th:selected="${selectedOpSearch == 'idTag'}">
+                                    </option>
                                 </select>
                                 <input type="text" name="contentSearch" id="contentSearch" class="mx-2 form-control"
                                     th:value="${selectedContentSearch}" autocomplete="off">
                             </div>
-                            <div class="col d-flex align-items-center">
-                                <label for="userType" class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">회원구분</label>
+                            <!-- <div class="col d-flex align-items-center">
+                                <label for="userType"
+                                    class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">회원구분</label>
                                 <select id="userType" name="userType" class="mx-3 form-control">
                                     <option th:value="null" th:selected="${selectedUserType == null}">선택</option>
-                                    <option th:value="'M'" th:text="회원" th:selected="${selectedUserType == 'M'}"></option>
-                                    <option th:value="'N'" th:text="비회원" th:selected="${selectedUserType == 'N'}"></option>
+                                    <option th:value="'M'" th:text="회원" th:selected="${selectedUserType == 'M'}">
+                                    </option>
+                                    <option th:value="'N'" th:text="비회원" th:selected="${selectedUserType == 'N'}">
+                                    </option>
                                 </select>
-                            </div>
+                            </div> -->
                             <div class="col d-flex align-items-center">
-                                <span class="flex-shrink-0 col-form-label font-weight-bold mr-3p text-right w-25">시작시간</span>
-                                <input type="date" min="1970-01-01" max="2199-12-31" th:value="${selectedStartDate}" name="startDateSearch"
-                                        id="startDateSearch" class="mx-3 form-control">
+                                <span
+                                    class="flex-shrink-0 col-form-label font-weight-bold mr-3p text-right w-25">시작시간</span>
+                                <input type="date" min="1970-01-01" max="2199-12-31" th:value="${selectedTimeFrom}"
+                                    name="chgStartTimeFrom" id="chgStartTimeFrom" class="mx-3 form-control">
                                 <span class="flex-shrink-0 col-form-label font-weight-bold">~</span>
-                                <input type="date" min="1970-01-01" max="2199-12-31" th:value="${selectedEndDate}" name="endDateSearch"
-                                        id="endDateSearch" class="mx-3 form-control">
+                                <input type="date" min="1970-01-01" max="2199-12-31" th:value="${selectedTimeTo}"
+                                    name="chgStartTimeTo" id="chgStartTimeTo" class="mx-3 form-control">
                             </div>
                         </div>
+                        <!-- size 선택 상자 추가 (숨겨진 필드로 유지) -->
+                        <input type="hidden" id="size" name="size"
+                            th:value="${selectedSize != null ? selectedSize : 10}">
+
                         <div class="search-btn">
                             <button type="button" class="btn btn-outline-grey me-2" id="searchBtn">
                                 <i class="bi bi-search me-2"></i>검색</button>
@@ -71,84 +84,119 @@
             <div class="card card-shadow mt-4">
                 <!-- card body:3 start -->
                 <div class="card-body">
-                    <div class="card-title"><span class="card-title-bar"></span><span>충전이력</span></div>
+                    <div class="card-title">
+                        <span class="card-title-bar"></span><span>충전이력</span>
+                    </div>
                     <div class="mt-3 btn-page-area">
+                        <button class="btn btn-excel" onclick="excelDownload()">
+                            <i class="bi bi-file-earmark-spreadsheet"></i>엑셀다운로드</button>
                         <span>
                             <span id="pageInfo">
-                                <!-- <span th:text="'Page ' + (${currentPage + 1}) + ' of ' + ${totalPages} + ' [총 ' + ${totalCount} + '건]'"></span> -->
+                                <span
+                                    th:text="'Page ' + (${currentPage + 1}) + ' of ' + ${totalPages} + ' [총 ' + ${totalCount} + '건]'"></span>
                             </span>
                             <select class="mx-3 page-select" id="size" name="size">
                                 <option th:each="data : ${showListCnt}" th:value="${data.commonCode}"
-                                        th:text="${data.commonCodeName}" th:selected="${data.commonCode == size}"></option>
+                                    th:text="${data.commonCodeName}" th:selected="${data.commonCode == size}"></option>
                             </select>
                         </span>
                     </div>
-                    <div class="w-100 table-responsive position-relative">
-                        <table class="table text-center mt-3 table-bg table-hover" style="overflow-x: auto; min-width: 3000px;">
-                            <thead>
-                                <tr class="table-border-top">
-                                    <th scope="col">사업자</th>
-                                    <th scope="col">충전소명</th>
-                                    <th scope="col">충전소ID</th>
-                                    <th scope="col">충전기ID</th>
-                                    <th scope="col">커넥터ID</th>
-                                    <th scope="col">충전기구분</th>
-                                    <th scope="col">회원명</th>
-                                    <th scope="col">회원카드번호</th>
-                                    <th scope="col">회원유형</th>
-                                    <th scope="col">회원구분</th>
-                                    <th scope="col">충전시작일시</th>
-                                    <th scope="col">충전종료일시</th>
-                                    <th scope="col">충전시간</th>
-                                    <th scope="col">충전종료사유</th>
-                                    <th scope="col">시작(SoC)</th>
-                                    <th scope="col">완료(SoC)</th>
-                                    <th scope="col">충전량</th>
-                                    <th scope="col">충전금액</th>
-                                    <th scope="col">충전단가</th>
-                                    <th scope="col">사전승인금액</th>
-                                    <th scope="col">부분취소금액</th>
-                                    <th scope="col">실결제금액</th>
-                                    <th scope="col">충전 시작 미터값</th>
-                                    <th scope="col">충전 종료 미터값</th>
-                                </tr>
-                            </thead>
-                            <tbody id="pageList">
-                            </tbody>
-                        </table>                                
+                    <div class="w-100 table-responsive">
+                        <div style="overflow-x: auto; white-space: nowrap;">
+                            <table class="table text-center mt-3 table-bg table-hover">
+                                <thead>
+                                    <tr class="table-border-top">
+                                        <th scope="col">사업자</th>
+                                        <th scope="col">충전소명</th>
+                                        <th scope="col">충전소ID</th>
+                                        <th scope="col">충전기ID</th>
+                                        <th scope="col">커넥터ID</th>
+                                        <th scope="col">충전기구분</th>
+                                        <th scope="col">회원명</th>
+                                        <th scope="col">카드번호</th>
+                                        <th scope="col">회원구분</th> <!-- 개인 or 법인 or 비회원 -->
+                                        <th scope="col">충전시작일시</th>
+                                        <th scope="col">충전종료일시</th>
+                                        <th scope="col">충전시간</th>
+                                        <th scope="col">종료사유</th>
+                                        <th scope="col">SOC</th>
+                                        <th scope="col">충전량</th>
+                                        <th scope="col">충전금액</th>
+                                        <th scope="col">적용단가</th>
+                                        <th scope="col">최초결제금액</th>
+                                        <th scope="col">취소금액</th>
+                                        <th scope="col">실결제금액</th>
+                                        <th scope="col">결제여부</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="pageList">
+                                    <tr th:each="data : ${chargingHistList}">
+                                        <td th:text="${data.companyName}"></td>
+                                        <td th:text="${data.stationName}"></td>
+                                        <td th:text="${data.stationId}"></td>
+                                        <td th:text="${data.chargerId}"></td>
+                                        <td th:text="${data.connectorId}"></td>
+                                        <td th:text="${data.cpType}"></td>
+                                        <td th:text="${data.memberName}"></td>
+                                        <td th:text="${data.idTag}"></td>
+                                        <td th:text="${data.memberType}"></td>
+                                        <td th:text="${#temporals.format(data.chgStartTime,'yyyy-MM-dd HH:mm:ss')}">
+                                        </td>
+                                        <td th:text="${#temporals.format(data.chgEndTime,'yyyy-MM-dd HH:mm:ss')}"></td>
+                                        <td th:text="${data.chgTime}"></td>
+                                        <td th:text="${data.chgEndReason}"></td>
+                                        <td th:text="${data.soc}"></td>
+                                        <td th:text="${data.chgAmount}"></td>
+                                        <td th:text="${data.chgPrice}"></td>
+                                        <td th:text="${data.unitCost}"></td>
+                                        <td th:text="${data.prepayCost}"></td>
+                                        <td th:text="${data.cancelCost}"></td>
+                                        <td th:text="${data.realCost}"></td>
+                                        <td th:text="${data.paymentYn}"></td>
+                                    </tr>
+                                    <tr th:if="${chargingHistList.size() == 0}">
+                                        <td colspan="21" class="text-center">정보가 없습니다.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                     <!-- paging navigation start -->
-                    <!-- <div th:if="${cpList.size() > 0}">
+                    <div th:if="${chargingHistList.size() > 0}">
                         <ul class="pagination justify-content-center">
                             <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled' : ''">
-                                <a class="page-link" th:href="@{/history/charging(page=0, size=${size}, companyIdSearch=${selectedCompanyId},
-                                opSearch=${selectedOpSearch}, contentSearch=${selectedContentSearch}, userType=${selectedUserType},
-                                startDate=${selectedStartDate}, endDate=${selectedEndDate})}"><i class="bi bi-chevron-double-left"></i></a>
+                                <a class="page-link"
+                                    th:href="@{/charging/list(page=0, size=${size}, companyIdSearch=${selectedCompanyId}, 
+                                    chgStartTimeFrom=${selectedTimeFrom}, chgStartTimeTo=${selectedTimeTo}, opSearch=${selectedOpSearch}, contentSearch=${selectedContentSearch})}"><i
+                                        class="bi bi-chevron-double-left"></i></a>
                             </li>
                             <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled' : ''">
-                                <a class="page-link" th:href="@{/history/charging(page=${currentPage-1}, size=${size}, companyIdSearch=${selectedCompanyId},
-                                opSearch=${selectedOpSearch}, contentSearch=${selectedContentSearch}, userType=${selectedUserType},
-                                startDate=${selectedStartDate}, endDate=${selectedEndDate})}"><i class="bi bi-chevron-left"></i></a>
+                                <a class="page-link"
+                                    th:href="@{/charging/list(page=${currentPage-1}, size=${size}, companyIdSearch=${selectedCompanyId}, 
+                                    chgStartTimeFrom=${selectedTimeFrom}, chgStartTimeTo=${selectedTimeTo}, opSearch=${selectedOpSearch}, contentSearch=${selectedContentSearch})}"><i
+                                        class="bi bi-chevron-left"></i></a>
                             </li>
                             <li class="page-item" th:each="i : ${#numbers.sequence(currentPage - 2, currentPage + 2)}"
                                 th:if="${i >= 0 && i < totalPages}">
-                                <a class="page-link" th:href="@{/history/charging(page=${i}, size=${size}, companyIdSearch=${selectedCompanyId},
-                                opSearch=${selectedOpSearch}, contentSearch=${selectedContentSearch}, userType=${selectedUserType},
-                                startDate=${selectedStartDate}, endDate=${selectedEndDate})}"
-                                th:text="${i+1}" th:classappend="${i == currentPage} ? 'active' : ''"></a>
+                                <a class="page-link"
+                                    th:href="@{/charging/list(page=${i}, size=${size}, companyIdSearch=${selectedCompanyId}, 
+                                    chgStartTimeFrom=${selectedTimeFrom}, chgStartTimeTo=${selectedTimeTo}, opSearch=${selectedOpSearch}, contentSearch=${selectedContentSearch})}"
+                                    th:text="${i+1}" th:classappend="${i == currentPage} ? 'active' : ''"></a>
                             </li>
                             <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled' : ''">
-                                <a class="page-link" th:href="@{/history/charging(page=${currentPage+1}, size=${size}, companyIdSearch=${selectedCompanyId},
-                                opSearch=${selectedOpSearch}, contentSearch=${selectedContentSearch}, userType=${selectedUserType},
-                                startDate=${selectedStartDate}, endDate=${selectedEndDate})}"><i class="bi bi-chevron-right"></i></a>
+                                <a class="page-link"
+                                    th:href="@{/charging/list(page=${currentPage+1}, size=${size}, companyIdSearch=${selectedCompanyId}, 
+                                    chgStartTimeFrom=${selectedTimeFrom}, chgStartTimeTo=${selectedTimeTo}, opSearch=${selectedOpSearch}, contentSearch=${selectedContentSearch})}"><i
+                                        class="bi bi-chevron-right"></i></a>
                             </li>
                             <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled' : ''">
-                                <a class="page-link" th:href="@{/history/charging(page=${totalPages - 1}, size=${size}, companyIdSearch=${selectedCompanyId},
-                                opSearch=${selectedOpSearch}, contentSearch=${selectedContentSearch}, userType=${selectedUserType},
-                                startDate=${selectedStartDate}, endDate=${selectedEndDate})}"><i class="bi bi-chevron-double-right"></i></a>
+                                <a class="page-link"
+                                    th:href="@{/charging/list(page=${totalPages - 1}, size=${size}, companyIdSearch=${selectedCompanyId}, 
+                                    chgStartTimeFrom=${selectedTimeFrom}, chgStartTimeTo=${selectedTimeTo}, opSearch=${selectedOpSearch}, contentSearch=${selectedContentSearch})}"><i
+                                        class="bi bi-chevron-double-right"></i></a>
                             </li>
                         </ul>
-                    </div> -->
+                    </div>
                     <!-- paging navigation end -->
                 </div>
                 <!-- card body:3 end -->
@@ -158,6 +206,8 @@
         <!-- card body:1 end -->
     </div>
     <!-- card:1 end -->
-    <!-- <script type="text/javascript" th:src="@{/js/maintenance/error_management.js}"></script> -->
+    <script type="text/javascript" th:src="@{/js/history/charging_history.js}"></script>
+    <script type="text/javascript" th:src="@{/js/history/charging_history_excel_download.js}"></script>
 </div>
+
 </html>
