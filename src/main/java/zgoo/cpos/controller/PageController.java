@@ -37,6 +37,7 @@ import zgoo.cpos.dto.cp.CpModelDto.CpModelListDto;
 import zgoo.cpos.dto.cp.CurrentChargingListDto;
 import zgoo.cpos.dto.cs.CsInfoDto;
 import zgoo.cpos.dto.cs.CsInfoDto.CsInfoListDto;
+import zgoo.cpos.dto.history.ChargingHistDto;
 import zgoo.cpos.dto.member.ConditionDto.ConditionCodeBaseDto;
 import zgoo.cpos.dto.member.MemberDto;
 import zgoo.cpos.dto.member.MemberDto.MemberAuthDto;
@@ -54,6 +55,7 @@ import zgoo.cpos.dto.users.NoticeDto.NoticeListDto;
 import zgoo.cpos.dto.users.UsersDto;
 import zgoo.cpos.service.BizService;
 import zgoo.cpos.service.ChargerService;
+import zgoo.cpos.service.ChargingHistService;
 import zgoo.cpos.service.ChgErrorCodeService;
 import zgoo.cpos.service.CodeService;
 import zgoo.cpos.service.CompanyService;
@@ -95,6 +97,7 @@ public class PageController {
     private final ConditionService conditionService;
     private final CpMaintainService cpMaintainService;
     private final CpCurrentTxService cpCurrentTxService;
+    private final ChargingHistService chargingHistService;
 
     /*
      * 대시보드
@@ -1199,24 +1202,50 @@ public class PageController {
             @RequestParam(value = "companyIdSearch", required = false) Long companyId,
             @RequestParam(value = "opSearch", required = false) String searchOp,
             @RequestParam(value = "contentSearch", required = false) String searchContent,
-            @RequestParam(value = "userType", required = false) String userType,
-            @RequestParam(value = "startDate", required = false) LocalDate startDate,
-            @RequestParam(value = "endDate", required = false) LocalDate endDate,
+            @RequestParam(value = "chgStartTimeFrom", required = false) String chgStartTimeFrom,
+            @RequestParam(value = "chgStartTimeTo", required = false) String chgStartTimeTo,
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "10") int size,
             Model model, Principal principal) {
         log.info("=== Charging History Page ===");
+        log.info("== companyId: {}, chgStartTimeFrom: {}, chgStartTimeTo: {}, opSearch: {}, contentSearch: {}",
+                companyId, chgStartTimeFrom, chgStartTimeTo, searchOp, searchContent);
+        log.info("== page: {}, size: {}", page, size);
 
+        // 검색 조건 저장
+        model.addAttribute("selectedCompanyId", companyId);
+        model.addAttribute("selectedOpSearch", searchOp);
+        model.addAttribute("selectedContentSearch", searchContent);
+        model.addAttribute("selectedTimeFrom", chgStartTimeFrom);
+        model.addAttribute("selectedTimeTo", chgStartTimeTo);
+
+        Page<ChargingHistDto> chargingHistList;
         try {
+            if (companyId == null && searchOp == null && searchContent == null && chgStartTimeFrom == null
+                    && chgStartTimeTo == null) {
+                log.info("=== >> Start find all charging history");
+                chargingHistList = this.chargingHistService.findAllChargingHist(page, size);
+            } else {
+                log.info("=== >> Start find charging history with search condition");
+                chargingHistList = this.chargingHistService.findChargingHist(companyId, chgStartTimeFrom,
+                        chgStartTimeTo, searchOp, searchContent, page, size);
+            }
 
-            // 검색 조건 저장
-            model.addAttribute("selectedCompanyId", companyId);
-            model.addAttribute("selectedOpSearch", searchOp);
-            model.addAttribute("selectedContentSearch", searchContent);
-            model.addAttribute("selectedUserType", userType);
-            model.addAttribute("selectedStartDate", startDate);
-            model.addAttribute("selectedEndDate", endDate);
+            // page 처리
+            int totalPages = chargingHistList.getTotalPages() == 0 ? 1 : chargingHistList.getTotalPages();
+            model.addAttribute("chargingHistList", chargingHistList.getContent());
+            model.addAttribute("size", String.valueOf(size));
+            model.addAttribute("currentPage", page);
+            model.addAttribute("totalPages", totalPages);
+            model.addAttribute("totalCount", chargingHistList.getTotalElements());
+            log.info("===ChargingHistory_PageInfo >> totalPages:{}, totalCount:{}", totalPages,
+                    chargingHistList.getTotalElements());
+            // 데이터 내용 확인을 위한 로그 추가
+            if (!chargingHistList.getContent().isEmpty()) {
+                log.info("===ChargingHistory_FirstData >> {}", chargingHistList.getContent().get(0));
+            }
 
+            // select option - 검색조건
             List<CompanyListDto> companyList = this.companyService.findCompanyListAll();
             model.addAttribute("companyList", companyList);
 
@@ -1228,6 +1257,8 @@ public class PageController {
             model.addAttribute("menuAuthority", menuAuthority);
         } catch (Exception e) {
             e.getStackTrace();
+            log.error("Error occurred while fetching charging history: {}", e.getMessage(), e);
+            model.addAttribute("chargingHistList", Collections.emptyList());
             model.addAttribute("companyList", Collections.emptyList());
             model.addAttribute("showListCnt", Collections.emptyList());
             model.addAttribute("menuAuthority", Collections.emptyList());

@@ -5,10 +5,11 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
+
 import zgoo.cpos.common.properties.EtcProperties;
 
 @SpringBootApplication
-@EnableConfigurationProperties({EtcProperties.class})
+@EnableConfigurationProperties({ EtcProperties.class })
 public class CposApplication extends SpringBootServletInitializer {
 
 	public CposApplication() {

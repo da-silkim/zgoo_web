@@ -8,6 +8,8 @@ spring:
     cache: false
     # prefix: classpath:/templates/
     # suffix: .html
+  hikari:
+    shutdown-timeout: 10000
 
 
   jpa:
