@@ -264,10 +264,8 @@
                             </tbody>
                         </table>
                         <!-- table:4 end -->
-                        <button type="button" class="list-btn"
-                            th:data-page="${currentPage}" th:data-size="${size}" th:data-companyid="${selectedCompanyId}"
-                            th:data-manfcd="${selectedManfCd}" th:data-chgspeedcd="${selectedChgSpeedCd}"
-                            onclick="goToList(this)"> 목록 </button>
+                        <button type="button" class="list-btn" onclick="goToList('/system/model/list',
+                            ['companyIdSearch', 'manfCdSearch', 'chgSpeedCdSearch'])"> 목록 </button>
                     </div>
                 </div>
                 <!-- card body:2 end -->
@@ -277,28 +275,5 @@
         <!-- card body:1 end -->
     </div>
     <!-- card:1 end -->
-    <script>
-        // const spans = document.querySelectorAll('.table-info-check tr td > span');
-        // spans.forEach(span => {
-        //     if (!span.textContent.trim()) {
-        //         span.textContent = '정보없음';
-        //     }
-        // });
-
-        function goToList(btn) {
-            const urlParams = new URLSearchParams(window.location.search);
-            const selectedPage = urlParams.get('page') || 0;
-            const selectedSize = urlParams.get('size') || 10;
-            const selectedCompanyId = urlParams.get('companyIdSearch') || '';
-            const selectedManfCd = urlParams.get('manfCdSearch') || '';
-            const selectedChgSpeedCd = urlParams.get('chgSpeedCdSearch') || '';
-
-            window.location.href = "/system/model/list?page=" + selectedPage +
-                                "&size=" + selectedSize +
-                                "&companyIdSearch=" + (selectedCompanyId) +
-                                "&manfCdSearch=" + (selectedManfCd) +
-                                "&chgSpeedCdSearch=" + (selectedChgSpeedCd);
-        }
-    </script>
 </div>
 </html>

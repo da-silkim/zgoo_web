@@ -68,6 +68,9 @@ public class CpMaintain {
     public void updateCpMaintainInfo(CpMaintainRegDto dto) {
         this.errorType = dto.getErrorType();
         this.errorContent = dto.getErrorContent();
+        this.pictureLoc1 = dto.getPictureLoc1();
+        this.pictureLoc2 = dto.getPictureLoc2();
+        this.pictureLoc3 = dto.getPictureLoc3();
     }
 
     public void updateProcessInfo(CpMaintainRegDto dto) {

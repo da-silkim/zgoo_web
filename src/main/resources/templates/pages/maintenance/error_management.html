@@ -52,9 +52,9 @@
                             </div>
                         </div>
                         <div class="search-btn">
-                            <button type="button" class="btn btn-outline-grey me-2" id="searchBtn">
+                            <button type="button" class="btn btn-outline-grey me-2" id="searchBtn" onclick="searchOption()">
                                 <i class="bi bi-search me-2"></i>검색</button>
-                            <button type="button" class="btn btn-outline-grey me-2" id="resetBtn">
+                            <button type="button" class="btn btn-outline-grey me-2" id="resetBtn" onclick="replacePage('/maintenance/errlist')">
                                 <i class="bi bi-arrow-repeat me-2"></i>초기화</button>
                         </div>
                         <!-- row:1 end -->
@@ -90,6 +90,7 @@
                             <thead>
                                 <tr class="table-border-top">
                                     <th scope="col"></th>
+                                    <th scope="col"></th>
                                     <th scope="col">장애유형</th>
                                     <th scope="col">장애내용</th>
                                     <th scope="col">처리상태</th>
@@ -104,6 +105,18 @@
                             <tbody id="pageList">
                                 <tr th:each="cp : ${cpList}">
                                     <td th:id="${cp.cpmaintainId}"><input type="checkbox" /></td>
+                                    <td>
+                                        <a th:href="@{/errlist/detail/{cpmaintainId}(cpmaintainId=${cp.cpmaintainId}, page=${currentPage}, size=${size},
+                                            companyIdSearch=${selectedCompanyId != null ? selectedCompanyId : ''}, 
+                                            opSearch=${selectedOpSearch != null ? selectedOpSearch : ''}, 
+                                            contentSearch=${selectedContentSearch != null ? selectedContentSearch : ''},
+                                            processStatusSearch=${selectedProcessStatus != null ? selectedProcessStatus : ''},
+                                            startDateSearch=${selectedStartDate != null ? selectedStartDate : ''},
+                                            endDateSearch=${selectedEndDate != null ? selectedEndDate : ''})}"
+                                            class="no-underline">
+                                            <i class="bi bi-files detail-files"></i>
+                                        </a>
+                                    </td>
                                     <td th:text="${cp.errorTypeName}"></td>
                                     <td th:text="${cp.errorContent}" class="text-left content-overflow"></td>
                                     <td th:text="${cp.processStatusName}"></td>
@@ -238,29 +251,21 @@
                                                 <input type="file" id="input-pictureLoc1" accept="image/*" onchange="loadFile(this, 'pictureLoc1')">
                                                 <img id="pictureLoc1" class="upload-preview" src="" alt="Image Preview"/>
                                                 <button type="button" id="remove-pictureLoc1" onclick="removeImage('pictureLoc1')">X</button>
+                                                <input id="existing-pictureLoc1" hidden></input>
                                             </div>
                                             <div class="upload-items">
                                                 <label for="input-pictureLoc2" id="label-pictureLoc2">업로드</label>
                                                 <input type="file" id="input-pictureLoc2" accept="image/*" onchange="loadFile(this, 'pictureLoc2')">
                                                 <img id="pictureLoc2" class="upload-preview" src="" alt="Image Preview"/>
                                                 <button type="button" id="remove-pictureLoc2" onclick="removeImage('pictureLoc2')">X</button>
+                                                <input id="existing-pictureLoc2" hidden></input>
                                             </div>
                                             <div class="upload-items">
                                                 <label for="input-pictureLoc3" id="label-pictureLoc3">업로드</label>
                                                 <input type="file" id="input-pictureLoc3" accept="image/*" onchange="loadFile(this, 'pictureLoc3')">
                                                 <img id="pictureLoc3" class="upload-preview" src="" alt="Image Preview"/>
                                                 <button type="button" id="remove-pictureLoc3" onclick="removeImage('pictureLoc3')">X</button>
-                                            </div>
-                                        </div>
-                                        <div class="upload-container" id="showImage" hidden>
-                                            <div class="upload-items show-picture1" id="showPicture1">
-                                                <img id="showPictureLoc1" class="show-image" src="" alt="없음"/>
-                                            </div>
-                                            <div class="upload-items show-picture2" id="showPicture2">
-                                                <img id="showPictureLoc2" class="show-image" src="" alt="없음"/>
-                                            </div>
-                                            <div class="upload-items show-picture3" id="showPicture3">
-                                                <img id="showPictureLoc3" class="show-image" src="" alt="없음"/>
+                                                <input id="existing-pictureLoc3" hidden></input>
                                             </div>
                                         </div>
                                     </td>

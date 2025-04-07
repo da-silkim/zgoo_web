@@ -1,10 +1,11 @@
 package zgoo.cpos.service;
 
 import java.io.File;
-import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -20,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import zgoo.cpos.domain.cp.CpMaintain;
 import zgoo.cpos.domain.users.Users;
 import zgoo.cpos.dto.cp.CpMaintainDto.CpInfoDto;
+import zgoo.cpos.dto.cp.CpMaintainDto.CpMaintainDetailDto;
 import zgoo.cpos.dto.cp.CpMaintainDto.CpMaintainListDto;
 import zgoo.cpos.dto.cp.CpMaintainDto.CpMaintainRegDto;
 import zgoo.cpos.dto.menu.MenuAuthorityDto.MenuAuthorityBaseDto;
@@ -95,19 +97,19 @@ public class CpMaintainService {
             // 이미지 경로를 웹 경로로 수정 (null 체크 추가)
             if (dto.getPictureLoc1() != null) {
                 System.out.println("pic1 (before): " + dto.getPictureLoc1());
-                dto.setPictureLoc1("/images/" + Paths.get(dto.getPictureLoc1()).getFileName());
+                dto.setPictureLoc1(convertToWebPath(dto.getPictureLoc1()));
                 System.out.println("pic1 (after): " + dto.getPictureLoc1());
             }
 
             if (dto.getPictureLoc2() != null) {
                 System.out.println("pic2 (before): " + dto.getPictureLoc2());
-                dto.setPictureLoc2("/images/" + Paths.get(dto.getPictureLoc2()).getFileName());
+                dto.setPictureLoc2(convertToWebPath(dto.getPictureLoc2()));
                 System.out.println("pic2 (after): " + dto.getPictureLoc2());
             }
 
             if (dto.getPictureLoc3() != null) {
                 System.out.println("pic3 (before): " + dto.getPictureLoc3());
-                dto.setPictureLoc3("/images/" + Paths.get(dto.getPictureLoc3()).getFileName());
+                dto.setPictureLoc3(convertToWebPath(dto.getPictureLoc3()));
                 System.out.println("pic3 (after): " + dto.getPictureLoc3());
             }
 
@@ -117,6 +119,46 @@ public class CpMaintainService {
             log.error("[findMaintainOne] error: {}", e.getMessage());
             return null;
         }
+    }
+
+    // 충전기 장애정보 단건 조회(detail)
+    public CpMaintainDetailDto findMaintainDetailOne(Long cpmaintainId) {
+        CpMaintain cpMaintain = this.cpMaintainRepository.findById(cpmaintainId)
+            .orElseThrow(() -> new IllegalArgumentException("cpmaintain not found with id: " + cpmaintainId));
+
+        try {
+            CpMaintainDetailDto dto = this.cpMaintainRepository.findMaintainDetailOne(cpmaintainId);
+
+            // 이미지 경로를 웹 경로로 수정 (null 체크 추가)
+            if (dto.getPictureLoc1() != null) {
+                System.out.println("pic1 (before): " + dto.getPictureLoc1());
+                dto.setPictureLoc1(convertToWebPath(dto.getPictureLoc1()));
+                System.out.println("pic1 (after): " + dto.getPictureLoc1());
+            }
+
+            if (dto.getPictureLoc2() != null) {
+                System.out.println("pic2 (before): " + dto.getPictureLoc2());
+                dto.setPictureLoc2(convertToWebPath(dto.getPictureLoc2()));
+                System.out.println("pic2 (after): " + dto.getPictureLoc2());
+            }
+
+            if (dto.getPictureLoc3() != null) {
+                System.out.println("pic3 (before): " + dto.getPictureLoc3());
+                dto.setPictureLoc3(convertToWebPath(dto.getPictureLoc3()));
+                System.out.println("pic3 (after): " + dto.getPictureLoc3());
+            }
+
+            return dto;
+        } catch (Exception e) {
+            log.error("[findMaintainDetailOne] error: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    private String convertToWebPath(String path) {
+        if (path == null || !path.contains("/images/")) return null;
+        String webPath = path.substring(path.indexOf("/images"));
+        return webPath.replace("\\", "/");
     }
 
     // 충전기 장애정보 등록
@@ -161,10 +203,20 @@ public class CpMaintainService {
                 String originalFileName = file.getOriginalFilename();
                 System.out.println("originalFileName: " + originalFileName);
                 String saveFileName = FileNameUtils.fileNameConver(originalFileName);
-                String fullPath = filepath + saveFileName;
+
+                String datePath = new SimpleDateFormat("yyyyMMdd").format(new Date());
+                String uploadDir = filepath + datePath + "/";
+                String fullPath = uploadDir + saveFileName;
+
+                File directory = new File(uploadDir);
+                if (!directory.exists()) {
+                    directory.mkdirs();
+                }
+
                 file.transferTo(new File(fullPath));
                 return fullPath;
             }
+
             return null;
         } catch (Exception e) {
             log.info("[saveImageFile] {} save failure: {}", logName, e.getMessage());
@@ -184,58 +236,70 @@ public class CpMaintainService {
             }
 
             boolean isMod = checkUpdateAndDeleteAuthority(cpmaintainId, loginUserId);
-            if (!isMod) return;
+            if (!isMod || "FSTATFINISH".equals(cpMaintain.getProcessStatus())) return;  // 권한이 없거나 이미 처리된 건
 
+            List<String> picturePaths = new ArrayList<>();
+            String pictureLoc1 = saveImageFile(dto.getFileLoc1(), "picture1");
+            String pictureLoc2 = saveImageFile(dto.getFileLoc2(), "picture2");
+            String pictureLoc3 = saveImageFile(dto.getFileLoc3(), "picture3");
+
+            log.info("[updateMaintain] getExistingPictureLoc1 >> {}", dto.getExistingPictureLoc1());
+            log.info("[updateMaintain] getExistingPictureLoc2 >> {}", dto.getExistingPictureLoc2());
+            log.info("[updateMaintain] getExistingPictureLoc3 >> {}", dto.getExistingPictureLoc3());
+
+            handlePicture(cpMaintain.getPictureLoc1(), dto.getExistingPictureLoc1(), pictureLoc1, "pictureLoc1", picturePaths);
+            handlePicture(cpMaintain.getPictureLoc2(), dto.getExistingPictureLoc2(), pictureLoc2, "pictureLoc2", picturePaths);
+            handlePicture(cpMaintain.getPictureLoc3(), dto.getExistingPictureLoc3(), pictureLoc3, "pictureLoc3", picturePaths);
+
+            dto.setPictureLoc1(!picturePaths.isEmpty() ? picturePaths.get(0) : null);
+            dto.setPictureLoc2(picturePaths.size() > 1 ? picturePaths.get(1) : null);
+            dto.setPictureLoc3(picturePaths.size() > 2 ? picturePaths.get(2) : null);
+
+            log.info("[updateMaintain] PictureLoc1 update>> {}", dto.getPictureLoc1());
+            log.info("[updateMaintain] PictureLoc2 update>> {}", dto.getPictureLoc2());
+            log.info("[updateMaintain] PictureLoc3 update>> {}", dto.getPictureLoc3());
+
+
+            cpMaintain.updateCpMaintainInfo(dto);
             if ("FSTATFINISH".equals(dto.getProcessStatus())) {
                 cpMaintain.updateProcessInfo(dto);
             }
+
+        } catch (IllegalArgumentException e) {
+            log.error("[updateMaintain] IllegalArgumentException: {}", e.getMessage());
+        } catch (NullPointerException e) {
+            log.error("[updateMaintain] NullPointerException: {}", e.getMessage());
         } catch (Exception e) {
             log.error("[updateMaintain] error: {}", e.getMessage());
         }
     }
 
-    // @Transactional
-    // public void updateMaintain2(Long cpmaintainId, CpMaintainRegDto dto) {
-    //     CpMaintain cpMaintain = this.cpMaintainRepository.findById(cpmaintainId)
-    //         .orElseThrow(() -> new IllegalArgumentException("cpmaintain not found with id: " + cpmaintainId));
+    /* 
+    * 1) 기존 이미지가 저장되어 있는 상태일 때
+    *     1. 이미지 웹경로가 null 또는 empty가 아닐 경우 => 이미지 유지
+    *     2. 이미지 웹경로가 null 또는 empty이면 => 이미지 삭제
+    * 
+    * 2) 기존에 이미지가 저장되어 있지 않은 상태일 때
+    *     1. 새로운 이미지가 있는지 확인
+    *     2. null 아니면 새로운 이미지 경로 추가
+    */
+    private void handlePicture(String pictureLoc, String existingPictureLoc, String uploadFileLoc, String label, List<String> picturePaths) {
+        if (pictureLoc != null) {
+            log.info("[handlePicture] {} >> {}", label, pictureLoc);
 
-    //         try {
-    //             if (dto.getFileLoc1() != null && !dto.getFileLoc1().isEmpty()) {
-    //                 String originalFileName = dto.getFileLoc1().getOriginalFilename();
-    //                 System.out.println("originalFileName1: " + originalFileName);
-    //                 String saveFileName = FileNameUtils.fileNameConver(originalFileName);
-    //                 System.out.println("saveFileName1: " + saveFileName);
-    //                 String fullPath = filepath + saveFileName;
-    //                 System.out.println("fullPath1: " + fullPath);
-    //             }
-
-    //             if (dto.getFileLoc2() != null && !dto.getFileLoc2().isEmpty()) {
-    //                 String originalFileName = dto.getFileLoc2().getOriginalFilename();
-    //                 System.out.println("originalFileName2: " + originalFileName);
-    //                 String saveFileName = FileNameUtils.fileNameConver(originalFileName);
-    //                 System.out.println("saveFileName2: " + saveFileName);
-    //                 String fullPath = filepath + saveFileName;
-    //                 System.out.println("fullPath2: " + fullPath);
-    //             }
-
-    //             if (dto.getFileLoc3() != null && !dto.getFileLoc3().isEmpty()) {
-    //                 String originalFileName = dto.getFileLoc3().getOriginalFilename();
-    //                 System.out.println("originalFileName3: " + originalFileName);
-    //                 String saveFileName = FileNameUtils.fileNameConver(originalFileName);
-    //                 System.out.println("saveFileName3: " + saveFileName);
-    //                 String fullPath = filepath + saveFileName;
-    //                 System.out.println("fullPath3: " + fullPath);
-    //             }
-
-    //             if ("FSTATFINISH".equals(dto.getProcessStatus())) {
-    //                 cpMaintain.updateProcessInfo(dto);
-    //             }
-
-    //             cpMaintain.updateCpMaintainInfo(dto);
-    //         } catch (Exception e) {
-    //             log.error("[updateMaintain] error: {}", e.getMessage());
-    //         }
-    // }
+            if (existingPictureLoc != null && !existingPictureLoc.isEmpty()) {
+                picturePaths.add(pictureLoc);
+            } else {
+                log.info("[handlePicture] {} delete", label);
+                deleteImage(pictureLoc);
+            }
+        } else {
+            log.info("[handlePicture] {} null");
+            if (uploadFileLoc != null) {
+                picturePaths.add(uploadFileLoc);
+            }
+        }
+    }
 
     // 충전기 장애정보 삭제
     @Transactional

@@ -74,5 +74,5 @@ fwaccess:
     tomcat_ajp_enable: false
 
 file:
-  dir: C:/Users/N-426/Desktop/store/
-  img: C:/Users/N-426/Desktop/img/
+  dir: C:/zgoo/files/
+  img: C:/zgoo/images/
