@@ -38,6 +38,7 @@ import zgoo.cpos.dto.cp.CurrentChargingListDto;
 import zgoo.cpos.dto.cs.CsInfoDto;
 import zgoo.cpos.dto.cs.CsInfoDto.CsInfoListDto;
 import zgoo.cpos.dto.history.ChargingHistDto;
+import zgoo.cpos.dto.history.ChgCommlogDto;
 import zgoo.cpos.dto.member.ConditionDto.ConditionCodeBaseDto;
 import zgoo.cpos.dto.member.MemberDto;
 import zgoo.cpos.dto.member.MemberDto.MemberAuthDto;
@@ -56,6 +57,7 @@ import zgoo.cpos.dto.users.UsersDto;
 import zgoo.cpos.service.BizService;
 import zgoo.cpos.service.ChargerService;
 import zgoo.cpos.service.ChargingHistService;
+import zgoo.cpos.service.ChgCommlogService;
 import zgoo.cpos.service.ChgErrorCodeService;
 import zgoo.cpos.service.CodeService;
 import zgoo.cpos.service.CompanyService;
@@ -98,6 +100,7 @@ public class PageController {
     private final CpMaintainService cpMaintainService;
     private final CpCurrentTxService cpCurrentTxService;
     private final ChargingHistService chargingHistService;
+    private final ChgCommlogService chgCommlogService;
 
     /*
      * 대시보드
@@ -1320,20 +1323,41 @@ public class PageController {
     public String showcommhistory(
             @RequestParam(value = "opSearch", required = false) String searchOp,
             @RequestParam(value = "contentSearch", required = false) String searchContent,
-            @RequestParam(value = "startDate", required = false) LocalDate startDate,
-            @RequestParam(value = "endDate", required = false) LocalDate endDate,
+            @RequestParam(value = "recvFromSearch", required = false) String recvFrom,
+            @RequestParam(value = "recvToSearch", required = false) String recvTo,
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "10") int size,
             Model model, Principal principal) {
         log.info("=== Communication History Page ===");
 
+        model.addAttribute("selectedOpSearch", searchOp);
+        model.addAttribute("selectedContentSearch", searchContent);
+        model.addAttribute("selectedRecvFrom", recvFrom);
+        model.addAttribute("selectedRecvTo", recvTo);
+
         try {
 
-            model.addAttribute("selectedOpSearch", searchOp);
-            model.addAttribute("selectedContentSearch", searchContent);
-            model.addAttribute("selectedStartDate", startDate);
-            model.addAttribute("selectedEndDate", endDate);
+            Page<ChgCommlogDto> chgCommlogList;
+            if (searchOp == null && searchContent == null && recvFrom == null && recvTo == null) {
+                log.info("=== >> Start find all communication history");
+                chgCommlogList = this.chgCommlogService.findAllChgCommlog(page, size);
+            } else {
+                log.info("=== >> Start find communication history with search condition");
+                chgCommlogList = this.chgCommlogService.findChgCommlog(searchOp, searchContent, recvFrom, recvTo,
+                        page, size);
+            }
 
+            // page 처리
+            int totalPages = chgCommlogList.getTotalPages() == 0 ? 1 : chgCommlogList.getTotalPages();
+            model.addAttribute("chgCommlogList", chgCommlogList.getContent());
+            model.addAttribute("size", String.valueOf(size));
+            model.addAttribute("currentPage", page);
+            model.addAttribute("totalPages", totalPages);
+            model.addAttribute("totalCount", chgCommlogList.getTotalElements());
+            log.info("===ChgCommlog_PageInfo >> totalPages:{}, totalCount:{}", totalPages,
+                    chgCommlogList.getTotalElements());
+
+            // 검색옵션
             List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT"); // 그리드 row 수
             model.addAttribute("showListCnt", showListCnt);
 
