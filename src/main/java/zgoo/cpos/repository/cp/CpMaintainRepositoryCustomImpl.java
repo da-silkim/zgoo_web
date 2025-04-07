@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,7 @@ import zgoo.cpos.domain.company.QCompany;
 import zgoo.cpos.domain.cp.QCpMaintain;
 import zgoo.cpos.domain.cs.QCsInfo;
 import zgoo.cpos.dto.cp.CpMaintainDto.CpInfoDto;
+import zgoo.cpos.dto.cp.CpMaintainDto.CpMaintainDetailDto;
 import zgoo.cpos.dto.cp.CpMaintainDto.CpMaintainListDto;
 import zgoo.cpos.dto.cp.CpMaintainDto.CpMaintainRegDto;
 
@@ -184,5 +186,39 @@ public class CpMaintainRepositoryCustomImpl implements CpMaintainRepositoryCusto
             .where(cpMaintain.id.eq(cpmaintainId))
             .fetchOne();
         return dto;
+    }
+
+    @Override
+    public CpMaintainDetailDto findMaintainDetailOne(Long cpmaintainId) {
+        CpMaintainDetailDto cpDetailOne = queryFactory.select(Projections.fields(CpMaintainDetailDto.class,
+            cpMaintain.id.as("cpmaintainId"),
+            cpMaintain.chargerId.as("chargerId"),
+            cpMaintain.regDt.as("regDt"),
+            cpMaintain.errorType.as("errorType"),
+            cpMaintain.errorContent.as("errorContent"),
+            cpMaintain.pictureLoc1.as("pictureLoc1"),
+            cpMaintain.pictureLoc2.as("pictureLoc2"),
+            cpMaintain.pictureLoc3.as("pictureLoc3"),
+            cpMaintain.processDate.as("processDate"),
+            cpMaintain.processStatus.as("processStatus"),
+            cpMaintain.processContent.as("processContent"),
+            cpMaintain.regUserId.as("regUserId"),
+            company.companyName.as("companyName"),
+            csInfo.id.as("stationId"),
+            csInfo.stationName.as("stationName"),
+            csInfo.zipcode.as("zipCode"),
+            csInfo.address.as("address"),
+            csInfo.addressDetail.as("addressDetail"),
+            errorTypeName.name.as("errorTypeName"),
+            processStatusName.name.as("processStatusName")))
+            .from(cpMaintain)
+            .leftJoin(cpInfo).on(cpMaintain.chargerId.eq(cpInfo.id))
+            .leftJoin(csInfo).on(cpInfo.stationId.id.eq(csInfo.id))
+            .leftJoin(company).on(csInfo.company.id.eq(company.id))
+            .leftJoin(errorTypeName).on(cpMaintain.errorType.eq(errorTypeName.commonCode))
+            .leftJoin(processStatusName).on(cpMaintain.processStatus.eq(processStatusName.commonCode))
+            .where(cpMaintain.id.eq(cpmaintainId))
+            .fetchOne();
+        return cpDetailOne;
     }
 }

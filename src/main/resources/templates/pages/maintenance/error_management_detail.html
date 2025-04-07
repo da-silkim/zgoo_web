@@ -1,0 +1,124 @@
+<html layout:decorate="~{fragments/layout}">
+<div layout:fragment="content" class="main-content">
+    <!-- card:1 start -->
+    <div class="card responsive-content">
+        <!-- card body:1 start -->
+        <div class="card-body">
+            <div class="content-title"><i class="fa-solid fa-wrench font-ico me-2"></i>유지보수 > 장애관리</div>
+            <!-- card:2 start -->
+            <div class="card card-shadow">
+                <!-- card body:2 start -->
+                <div class="card-body">
+                    <div class="detail-container">
+                        <!-- table:1 start -->
+                        <div class="card-title mb-2"><span class="card-title-bar"></span><span>충전소/충전기 정보</span></div>
+                        <table class="table table-bg-v table-fixed w-100 text-center align-middle">
+                            <tbody>
+                                <tr class="table-border-top">
+                                    <th class="w-20">사업자<b class="required-data">*</b></th>
+                                    <td class="w-30">
+                                        <span th:text="${cpmaintain.companyName}"></span>
+                                    </td>
+                                    <th class="w-20">충전기ID<b class="required-data">*</b></th>
+                                    <td class="w-30">
+                                        <span th:text="${cpmaintain.chargerId}"></span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>충전소ID<b class="required-data">*</b></th>
+                                    <td>
+                                        <span th:text="${cpmaintain.stationId}"></span>
+                                    </td>
+                                    <th>충전소명<b class="required-data">*</b></th>
+                                    <td>
+                                        <span th:text="${cpmaintain.stationName}"></span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>주소<b class="required-data">*</b></th>
+                                    <td colspan="3">
+                                        <div class="address-detail-container">
+                                            <span th:text="'[' + ${cpmaintain.zipCode} + '] ' + ${cpmaintain.address}"></span>
+                                            <span th:if="${cpmaintain.addressDetail != null and !cpmaintain.addressDetail.isEmpty()}" th:text="', ' + ${cpmaintain.addressDetail}"></span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <!-- table:1 end -->
+                        <!-- table:2 start -->
+                        <div class="card-title mb-2"><span class="card-title-bar"></span><span>접수내용</span></div>
+                        <table class="table table-bg-v table-fixed w-100 text-center align-middle">
+                            <tbody>
+                                <tr class="table-border-top">
+                                    <th class="w-20">장애유형<b class="required-data">*</b></th>
+                                    <td class="w-30">
+                                        <span th:text="${cpmaintain.errorTypeName}"></span>
+                                    </td>
+                                    <td colspan="2"></td>
+                                </tr>
+                                <tr>
+                                    <th>장애내용<b class="required-data">*</b></th>
+                                    <td colspan="3">
+                                        <span th:utext="${errorContent}" class="detail-content"></span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>현장사진<b class="required-data">*</b></th>
+                                    <td colspan="3">
+                                        <div class="show-image-container show-picture1" id="showPicture1"
+                                            th:if="${cpmaintain.pictureLoc1 != null and cpmaintain.pictureLoc1 != ''}">
+                                            <img id="showPictureLoc1" class="show-image" th:src="${cpmaintain.pictureLoc1}" alt="없음"/>
+                                        </div>
+                                        <div class="show-image-container show-picture2" id="showPicture2"
+                                            th:if="${cpmaintain.pictureLoc2 != null and cpmaintain.pictureLoc2 != ''}">
+                                            <img id="showPictureLoc2" class="show-image" th:src="${cpmaintain.pictureLoc2}" alt="없음"/>
+                                        </div>
+                                        <div class="show-image-container show-picture3" id="showPicture3"
+                                            th:if="${cpmaintain.pictureLoc3 != null and cpmaintain.pictureLoc3 != ''}">
+                                            <img id="showPictureLoc3" class="show-image" th:src="${cpmaintain.pictureLoc3}" alt="없음"/>
+                                        </div>
+                                        <span th:if="${cpmaintain.pictureLoc1 == null or cpmaintain.pictureLoc1 == '' and
+                                            cpmaintain.pictureLoc2 == null or cpmaintain.pictureLoc2 == '' and
+                                            cpmaintain.pictureLoc3 == null or cpmaintain.pictureLoc3 == ''}" class="float-left">
+                                            등록된 사진 정보가 없습니다.
+                                        </span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <!-- table:2 end -->
+                        <!-- table:3 start -->
+                        <div class="card-title mb-2"><span class="card-title-bar"></span><span>처리상태</span></div>
+                        <table class="table table-bg-v table-fixed w-100 text-center align-middle">
+                            <tbody>
+                                <tr class="table-border-top">
+                                    <th class="w-20">처리상태<b class="required-data">*</b></th>
+                                    <td class="w-30">
+                                        <span th:text="${cpmaintain.processStatusName}"></span>
+                                    </td>
+                                    <td colspan="2"></td>
+                                </tr>
+                                <tr th:if="${processContent != null and processContent != ''}">
+                                    <th>처리내용</th>
+                                    <td colspan="3">
+                                        <span th:utext="${processContent}" class="detail-content"></span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <!-- table:4 end -->
+                        <button type="button" class="list-btn" onclick="goToList('/maintenance/errlist',
+                            ['companyIdSearch', 'opSearch', 'contentSearch', 'processStatusSearch',
+                            'startDateSearch', 'endDateSearch'])"> 목록 </button>
+                    </div>
+                </div>
+                <!-- card body:2 end -->
+            </div>
+            <!-- card:2 end -->
+        </div>
+        <!-- card body:1 end -->
+    </div>
+    <!-- card:1 end -->
+</div>
+</html>

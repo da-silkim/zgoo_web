@@ -189,10 +189,8 @@
                             </tbody>
                         </table>
                         <!-- table:4 end -->
-                        <button type="button" class="list-btn"
-                            th:data-page="${currentPage}" th:data-size="${size}" th:data-companyid="${selectedCompanyId}"
-                            th:data-startdate="${selectedOpSearch}" th:data-enddate="${selectedContentSearch}"
-                            onclick="goToList(this)"> 목록 </button>
+                        <button type="button" class="list-btn" onclick="goToList('/station/list',
+                            ['companyIdSearch', 'opSearch', 'contentSearch'])"> 목록 </button>
                     </div>
                 </div>
                 <!-- card body:2 end -->
@@ -202,21 +200,5 @@
         <!-- card body:1 end -->
     </div>
     <!-- card:1 end -->
-    <script>
-        function goToList(btn) {
-            const urlParams = new URLSearchParams(window.location.search);
-            const selectedPage = urlParams.get('page') || 0;
-            const selectedSize = urlParams.get('size') || 10;
-            const selectedCompanyId = urlParams.get('companyIdSearch') || '';
-            const selectedOpSearch = urlParams.get('opSearch') || '';
-            const selectedContentSearch = urlParams.get('contentSearch') || '';
-
-            window.location.href = "/station/list?page=" + selectedPage +
-                                "&size=" + selectedSize +
-                                "&companyIdSearch=" + (selectedCompanyId) +
-                                "&opSearch=" + encodeURIComponent(selectedOpSearch) +
-                                "&contentSearch=" + encodeURIComponent(selectedContentSearch);
-        }
-    </script>
 </div>
 </html>

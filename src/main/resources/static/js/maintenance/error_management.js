@@ -2,80 +2,15 @@ $(document).ready(function() {
     let modalCon = false, selectRow, btnMsg = "등록", chargerIdValid = false;
     var cpmaintainId, chargerId;
 
-    var uploadImage = document.getElementById('uploadImage');
-    var showImage = document.getElementById('showImage');
-
-    $('#resetBtn').on('click', function() {
-        window.location.replace('/maintenance/errlist');
-    });
-
-    $('#searchBtn').on('click', function() {
-        const selectedSize = document.getElementById('size').value;
-        const form = document.getElementById('searchForm');
-
-        const hiddenSizeInput = document.createElement('input');
-        hiddenSizeInput.type = 'hidden';
-        hiddenSizeInput.name = 'size';
-        hiddenSizeInput.value = selectedSize;
-        hiddenSizeInput.id = 'hiddenSizeInput';
-
-        form.appendChild(hiddenSizeInput);
-        form.submit();
-    });
-
     $('#size').on('change', function() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const selectedSize = document.getElementById("size").value;
-        const selectedCompanyId = urlParams.get('companyIdSearch') || '';
-        const selectedOpSearch = urlParams.get('opSearch') || '';
-        const selectedContentSearch = urlParams.get('contentSearch') || '';
-        const selectedProcessStatus = urlParams.get('processStatusSearch') || '';
-        const selectedStartDate = urlParams.get('startDateSearch')|| '';
-        const selectedEndDate = urlParams.get('endDateSearch') || '';
-
-        window.location.href = "/maintenance/errlist?page=0&size=" + selectedSize +
-                               "&companyIdSearch=" + (selectedCompanyId) +
-                               "&opSearch=" + (selectedOpSearch) +
-                               "&contentSearch=" + (selectedContentSearch) +
-                               "&processStatusSearch=" + (selectedProcessStatus) +
-                               "&startDateSearch=" + (selectedStartDate) +
-                               "&endDateSearch=" + (selectedEndDate);
+        updatePageSize(this, "/maintenance/errlist", ["companyIdSearch", "opSearch", "contentSearch",
+            "processStatusSearch", "startDateSearch", "endDateSearch"]);
     });
 
     $('#pageList').on('click', 'tr', function() {
         selectRow = $(this);
         cpmaintainId = selectRow.find('td').eq(0).attr('id');
-
-        const cbox = $(this).closest('tr').find('input[type="checkbox"]');
-        if (cbox.length > 0 && cbox.is(':checked')) {
-            console.log('Checkbox is checked.');
-            $.ajax({
-                url: `/errlist/btncontrol/${cpmaintainId}`,
-                type: 'GET',
-                success: function(response) {
-                    if (response.btnControl) {
-                        $('#buttonContainer').html(`
-                            <button class="btn btn-data-edit" id="editBtn"
-                                data-bs-toggle="modal" data-bs-target="#dataAddModal">
-                                <i class="fa-regular fa-pen-to-square"></i>수정
-                            </button>
-                            <button class="btn btn-data-delete" id="deleteBtn">
-                                <i class="bi bi-trash"></i>삭제
-                            </button>
-                        `);
-                    } else {
-                        $('#buttonContainer').empty();
-                    }
-                },
-                error: function(error) {
-                    console.error(error);
-                }
-            });
-        } else {
-            console.log('Checkbox is not checked.');
-            btnControl = false;
-            $('#buttonContainer').empty();
-        }
+        buttonControl($(this), `/errlist/btncontrol/${cpmaintainId}`);
     });
 
     $('#chargerIdSearchBtn').on('click', function() {
@@ -114,7 +49,6 @@ $(document).ready(function() {
         btnMsg = "등록";
         $('#modalBtn').text(btnMsg);
         $('#modalBtn').show();
-
         $('#maintainForm')[0].reset();
         $('#processStatus').val('FSTATREADY');
         $('#chargerId').prop('disabled', false);
@@ -126,28 +60,21 @@ $(document).ready(function() {
         removeImage('pictureLoc1');
         removeImage('pictureLoc2');
         removeImage('pictureLoc3');
-        uploadImage.hidden = false;
-        showImage.hidden = true;
     });
 
-    $(document).on('click', '#editBtn', function() {
+    $(document).on('click', '#editBtn', function(event) {
         event.preventDefault();
         modalCon = true;
         btnMsg = "수정";
         $('#modalBtn').text(btnMsg);
         $('#modalBtn').show();
-
         $('#maintainForm')[0].reset();
         $('#chargerId').prop('disabled', true);
         $('#chargerIdSearchBtn').prop('disabled', true);
-        $('#errorType').prop('disabled', true);
-        $('#errorContent').prop('disabled', true);
         $('#processContent').prop('disabled', true);
-        uploadImage.hidden = true;
-        showImage.hidden = false;
-        showPicture(1);
-        showPicture(2);
-        showPicture(3);
+        removeImage('pictureLoc1');
+        removeImage('pictureLoc2');
+        removeImage('pictureLoc3');
 
         $.ajax({
             type: 'GET',
@@ -159,47 +86,41 @@ $(document).ready(function() {
                 $('#stationId').val(data.cpInfo.stationId || '');
                 $('#stationName').val(data.cpInfo.stationName || '');
                 $('#address').val(data.cpInfo.address || '');
-
                 $('#chargerId').val(data.cpMaintain.chargerId || '');
                 $('#errorType').val(data.cpMaintain.errorType || '');
                 $('#errorContent').val(data.cpMaintain.errorContent || '');
                 $('#processStatus').val(data.cpMaintain.processStatus || '');
                 $('#processContent').val(data.cpMaintain.processContent || '');
 
+                ['1', '2', '3'].forEach(function(i) {
+                    const pic = data.cpMaintain['pictureLoc' + i];
+                    if (pic) {
+                        $('#pictureLoc' + i).attr('src', pic);
+                        $('#existing-pictureLoc' + i).val(pic);
+                        editLoadImage('pictureLoc' + i, data.cpMaintain.processStatus);
+                    }
+                });
+
                 if (data.cpMaintain.processStatus === 'FSTATFINISH') {
                     $('#processStatus').prop('disabled', true);
                     $('#modalBtn').hide();
+                    $('#errorType').prop('disabled', true);
+                    $('#errorContent').prop('disabled', true);
                 } else {
                     $('#processStatus').prop('disabled', false);
-                }
-
-                const pic1 = data.cpMaintain.pictureLoc1;
-                const pic2 = data.cpMaintain.pictureLoc2;
-                const pic3 = data.cpMaintain.pictureLoc3;
-
-                if (!pic1 || pic1 === '') {
-                    document.getElementById('showPictureLoc1').style.display = 'none';
-                    document.getElementById('showPicture1').style.border = 'none';
-                } else {
-                    $('#showPictureLoc1').attr('src', data.cpMaintain.pictureLoc1 || '');
-                }
-                
-                if (!pic2 || pic2 === '') {
-                    document.getElementById('showPictureLoc2').style.display = 'none';
-                    document.getElementById('showPicture2').style.border = 'none';
-                } else {
-                    $('#showPictureLoc2').attr('src', data.cpMaintain.pictureLoc2 || '');
-                }
-                
-                if (!pic3 || pic3 === '') {
-                    document.getElementById('showPictureLoc3').style.display = 'none';
-                    document.getElementById('showPicture3').style.border = 'none';
-                } else {
-                    $('#showPictureLoc3').attr('src', data.cpMaintain.pictureLoc3 || '');
                 }
             }
         });
     });
+
+    function editLoadImage(imageId, processStatus) {
+        document.getElementById(imageId).style.display = 'block';
+        document.getElementById('label-' + imageId).style.display = 'none';
+
+        if (processStatus !== 'FSTATFINISH') {
+            document.getElementById('remove-' + imageId).style.display = 'block';
+        }
+    }
 
     $(document).on('click', '#deleteBtn', function() {
         if(confirmSubmit("삭제")) {
@@ -237,21 +158,19 @@ $(document).ready(function() {
 
         if (confirmSubmit(btnMsg)) {
             const formData = new FormData();
-            var chargerId =  $('#chargerId').val();
-            var errorType = $('#errorType').val();
-            var errorContent = $('#errorContent').val();
-            var pStatus = $('#processStatus').val();
-            var pContent = $('#processContent').val();
+            formData.append('chargerId', $('#chargerId').val());
+            formData.append('errorType', $('#errorType').val());
+            formData.append('errorContent',  $('#errorContent').val());
+            formData.append('processStatus', $('#processStatus').val());
+            formData.append('processContent', $('#processContent').val());
+            formData.append('existingPictureLoc1', $('#existing-pictureLoc1').val());
+            formData.append('existingPictureLoc2', $('#existing-pictureLoc2').val());
+            formData.append('existingPictureLoc3', $('#existing-pictureLoc3').val());
+
             var fileLoc1 = $('#input-pictureLoc1')[0].files[0];
             var fileLoc2 = $('#input-pictureLoc2')[0].files[0];
             var fileLoc3 = $('#input-pictureLoc3')[0].files[0];
-
-            formData.append('chargerId', chargerId);
-            formData.append('errorType', errorType);
-            formData.append('errorContent', errorContent);
-            formData.append('processStatus', pStatus);
-            formData.append('processContent', pContent);
-
+            
             if (fileLoc1) {
                 formData.append('fileLoc1', fileLoc1);
             }
@@ -262,80 +181,26 @@ $(document).ready(function() {
                 formData.append('fileLoc3', fileLoc3);
             }
 
-            // var fileLoc1 = $('#showPictureLoc1')[0].files[0];
-            // var fileLoc2 = $('#showPictureLoc2')[0].files[0];
-            // var fileLoc3 = $('#showPictureLoc3')[0].files[0];
-            // if (fileLoc1) {
-            //     formData.append('fileLoc1', fileLoc1);
-            // }
-            // if (fileLoc2) {
-            //     formData.append('fileLoc2', fileLoc2);
-            // }
-            // if (fileLoc3) {
-            //     formData.append('fileLoc3', fileLoc3);
-            // }
-
-            const DATA = {
-                chargerId: $('#chargerId').val(),
-                errorType: $('#errorType').val(),
-                errorContent: $('#errorContent').val(),
-                processStatus: $('#processStatus').val(),
-                processContent: $('#processContent').val()
-            }
-
             const URL = modalCon ? `/errlist/update/${cpmaintainId}` : `/errlist/new`;
             const TYPE = modalCon ? 'PATCH' : 'POST';
 
-            // 수정
-            if (modalCon) {
-                $.ajax({
-                    url: `/errlist/update/${cpmaintainId}`,
-                    method: 'PATCH',
-                    contentType: 'application/json',
-                    data: JSON.stringify(DATA),
-                    success: function(response) {
-                        alert(response);
-                        window.location.reload();
-                    },
-                    error: function(error) {
-                        alert(error);
-                    }
-                });
-                // $.ajax({
-                //     url: `/errlist/update/${cpmaintainId}`,
-                //     method: 'PATCH',
-                //     data: formData,
-                //     enctype: 'multipart/form-data',
-                //     contentType: false,
-                //     processData: false,
-                //     cache: false,
-                //     success: function(response) {
-                //         alert(response);
-                //         $('#dataAddModal').modal('hide');
-                //     },
-                //     error: function(error) {
-                //         alert(error);
-                //     }
-                // });
-            } else {
-                $.ajax({
-                    url: `/errlist/new`,
-                    type: 'POST',
-                    data: formData,
-                    enctype: 'multipart/form-data',
-                    contentType: false,
-                    processData: false,
-                    cache: false,
-                    success: function(response) {
-                        alert(response);
-                        $('#dataAddModal').modal('hide');
-                        window.location.reload();
-                    },
-                    error: function(error) {
-                        alert(error);
-                    }
-                });
-            }
+            $.ajax({
+                url: URL,
+                method: TYPE,
+                data: formData,
+                enctype: 'multipart/form-data',
+                contentType: false,
+                processData: false,
+                cache: false,
+                success: function(response) {
+                    alert(response);
+                    $('#dataAddModal').modal('hide');
+                    window.location.reload();
+                },
+                error: function(error) {
+                    alert(error);
+                }
+            });
         }
     });
 
@@ -380,17 +245,8 @@ function removeImage(imageId) {
     img.style.display = 'none';
     img.previousElementSibling.value = "";
 
-    const inputFile = document.getElementById('input-' + imageId);
-    inputFile.value = "";
-
-    const removeBtn = document.getElementById('remove-' + imageId);
-    removeBtn.style.display = 'none';
-
-    const label = document.getElementById('label-' + imageId);
-    label.style.display = 'block';
-}
-
-function showPicture(imageId) {
-    document.getElementById('showPictureLoc' + imageId).style.display = 'block';
-    document.getElementById('showPicture' + imageId).style.border = '1px #2e2e2e solid';
+    document.getElementById('input-' + imageId).value = "";
+    document.getElementById('remove-' + imageId).style.display = 'none';
+    document.getElementById('label-' + imageId).style.display = 'block';
+    document.getElementById('existing-' + imageId).value = "";
 }

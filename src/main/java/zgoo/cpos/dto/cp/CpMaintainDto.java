@@ -27,6 +27,9 @@ public class CpMaintainDto {
         private String pictureLoc1;
         private String pictureLoc2;
         private String pictureLoc3;
+        private String existingPictureLoc1;
+        private String existingPictureLoc2;
+        private String existingPictureLoc3;
         private MultipartFile fileLoc1;
         private MultipartFile fileLoc2;
         private MultipartFile fileLoc3;
@@ -60,5 +63,17 @@ public class CpMaintainDto {
         private String stationName;
         private String errorTypeName;
         private String processStatusName;
+    }
+
+    @Data
+    @NoArgsConstructor
+    @SuperBuilder
+    @EqualsAndHashCode(callSuper = true)
+    @ToString(callSuper = true)
+    public static class CpMaintainDetailDto extends CpMaintainListDto {
+        private String stationId;
+        private String zipCode;
+        private String address;
+        private String addressDetail;
     }
 }

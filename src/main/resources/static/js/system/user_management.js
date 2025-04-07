@@ -46,40 +46,7 @@ $(document).ready(function() {
     $('#pageList').on('click', 'tr', function() {
         selectRow = $(this);
         userId = selectRow.find('td').eq(3).text();
-
-        // 가장 가까운 checkbox 요소 찾기
-        const cbox = $(this).closest('tr').find('input[type="checkbox"]');
-        if (cbox.length > 0 && cbox.is(':checked')) {
-            console.log('Checkbox is checked.');
-
-            // 해당 데이터에 대한 수정&삭제 권한 여부 확인
-            $.ajax({
-                url: `/system/user/btncontrol/${userId}`,
-                type: 'GET',
-                success: function(response) {
-                    if (response.btnControl) {
-                        $('#buttonContainer').html(`
-                            <button class="btn btn-data-edit" id="editBtn"
-                                data-bs-toggle="modal" data-bs-target="#dataAddModal">
-                                <i class="fa-regular fa-pen-to-square"></i>수정
-                            </button>
-                            <button class="btn btn-data-delete" id="deleteBtn">
-                                <i class="bi bi-trash"></i>삭제
-                            </button>
-                        `);
-                    } else {
-                        $('#buttonContainer').empty();
-                    }
-                },
-                error: function(error) {
-                    console.log(error);
-                }
-            });
-        } else {
-            console.log('Checkbox is not checked.');
-            btnControl = false;
-            $('#buttonContainer').empty();
-        }
+        buttonControl($(this), `/system/user/btncontrol/${userId}`);
     });
 
     // 사용자 - 등록

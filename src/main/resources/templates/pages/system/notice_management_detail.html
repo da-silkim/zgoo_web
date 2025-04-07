@@ -41,10 +41,8 @@
                             </span>
                             <span th:if="${previousNotice == null}">이전글이 없습니다.</span>
                         </div>
-                        <button type="button" class="list-btn"
-                            th:data-page="${currentPage}" th:data-size="${size}" th:data-companyid="${selectedCompanyId}"
-                            th:data-startdate="${selectedStartDate}" th:data-enddate="${selectedEndDate}"
-                            onclick="goToList(this)"> 목록 </button>
+                        <button type="button" class="list-btn" onclick="goToList('/system/notice/list',
+                            ['companyIdSearch', 'startDateSearch', 'endDateSearch'])"> 목록 </button>
                     </div>
                 </div>
                 <!-- card body:2 end -->
@@ -54,21 +52,5 @@
         <!-- card body:1 end -->
     </div>
     <!-- card:1 end -->
-    <script>
-        function goToList(btn) {
-            const urlParams = new URLSearchParams(window.location.search);
-            const selectedPage = urlParams.get('page') || 0;
-            const selectedSize = urlParams.get('size') || 10;
-            const selectedCompanyId = urlParams.get('companyIdSearch') || '';
-            const selectedStartDate = urlParams.get('startDateSearch') || '';
-            const selectedEndDate = urlParams.get('endDateSearch') || '';
-
-            window.location.href = "/system/notice/list?page=" + selectedPage +
-                                "&size=" + selectedSize +
-                                "&companyIdSearch=" + (selectedCompanyId) +
-                                "&startDateSearch=" + encodeURIComponent(selectedStartDate) +
-                                "&endDateSearch=" + encodeURIComponent(selectedEndDate);
-        }
-    </script>
 </div>
 </html>

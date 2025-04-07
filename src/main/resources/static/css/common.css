@@ -1253,3 +1253,20 @@ table.table tbody tr.row-selected {
 .search-table > input[type="text"] {
   margin: 0 1rem !important;
 }
+.detail-content {
+  float: left;
+  min-height: 250px;
+  padding: 5px;
+}
+.show-image-container {
+  width: 30%;
+  aspect-ratio: 1;
+  position: relative;
+  border-radius: 20px;  
+  border: 1px #2e2e2e solid;
+  float: left;
+  margin-right: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

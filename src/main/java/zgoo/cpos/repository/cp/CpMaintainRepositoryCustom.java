@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import zgoo.cpos.dto.cp.CpMaintainDto.CpInfoDto;
+import zgoo.cpos.dto.cp.CpMaintainDto.CpMaintainDetailDto;
 import zgoo.cpos.dto.cp.CpMaintainDto.CpMaintainListDto;
 import zgoo.cpos.dto.cp.CpMaintainDto.CpMaintainRegDto;
 
@@ -23,4 +24,7 @@ public interface CpMaintainRepositoryCustom {
 
     // 장애 정보 - 단건 조회
     CpMaintainRegDto findMaintainOne(Long cpmaintainId);
+
+    // 장애 정보 - 단건 조회(detail)
+    CpMaintainDetailDto findMaintainDetailOne(Long cpmaintainId);
 }

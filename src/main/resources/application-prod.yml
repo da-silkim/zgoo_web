@@ -47,5 +47,5 @@ fwaccess:
     tomcat_ajp_enable: true
 
 file:
-  dir: C:/Users/N-426/Desktop/store/
-  img: C:/Users/N-426/Desktop/img/
+  dir: /app/cpos/files
+  img: /app/cpos/images
