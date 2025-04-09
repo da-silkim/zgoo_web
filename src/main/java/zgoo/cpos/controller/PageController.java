@@ -47,13 +47,12 @@ import zgoo.cpos.dto.member.VocDto;
 import zgoo.cpos.dto.member.VocDto.VocListDto;
 import zgoo.cpos.dto.menu.CompanyMenuAuthorityDto;
 import zgoo.cpos.dto.menu.MenuAuthorityDto.MenuAuthorityBaseDto;
-import zgoo.cpos.dto.statistics.TotalkwDto;
-import zgoo.cpos.dto.statistics.TotalkwDto.TotalkwBarDto;
-import zgoo.cpos.dto.statistics.TotalkwDto.TotalkwBaseDto;
-import zgoo.cpos.dto.statistics.TotalkwDto.TotalkwLineChartBaseDto;
-import zgoo.cpos.dto.statistics.TotalkwDto.TotalkwLineChartDto;
-import zgoo.cpos.dto.statistics.YearOptionDto;
 import zgoo.cpos.dto.menu.MenuDto;
+import zgoo.cpos.dto.statistics.TotalkwDto.TotalkwBarDto;
+import zgoo.cpos.dto.statistics.TotalkwDto.TotalkwLineChartDto;
+import zgoo.cpos.dto.statistics.UsageDto.UsageBarDto;
+import zgoo.cpos.dto.statistics.UsageDto.UsageLineChartDto;
+import zgoo.cpos.dto.statistics.YearOptionDto;
 import zgoo.cpos.dto.tariff.TariffDto.TariffPolicyDto;
 import zgoo.cpos.dto.tariff.TariffDto.TariffRegDto;
 import zgoo.cpos.dto.users.FaqDto;
@@ -1533,13 +1532,38 @@ public class PageController {
      * 통계 > 이용률통계
      */
     @GetMapping("/statistics/usage")
-    public String showusage(Model model, Principal principal) {
+    public String showusage(
+            @RequestParam(value = "companyIdSearch", required = false) Long companyId,
+            @RequestParam(value = "opSearch", required = false) String searchOp,
+            @RequestParam(value = "contentSearch", required = false) String searchContent,
+            @RequestParam(value = "yearSearch", required = false) Integer year,
+            Model model, Principal principal) {
         log.info("=== Usage Statistics Page ===");
+        log.info("companyId: {}, opSearch: {}, contentSearch: {}, yearSearch: {}", companyId, searchOp, searchContent, year);
 
         try {
+            model.addAttribute("selectedCompanyId", companyId);
+            model.addAttribute("selectedOpSearch", searchOp);
+            model.addAttribute("selectedContentSearch", searchContent);
+            model.addAttribute("selectedYear", year);
 
+            UsageBarDto usage = this.statisticsService.searchYearUsage(companyId, searchOp, searchContent, year);
+            model.addAttribute("usage", usage);
+            log.info("usage >> {}", usage.toString());
+
+            UsageLineChartDto lineChart = this.statisticsService.searchMonthlyUsage(companyId, searchOp, searchContent, year);
+            model.addAttribute("lineChart", lineChart);
+            log.info("lineChart >> {}", lineChart.toString());
+
+            List<CompanyListDto> companyList = this.companyService.findCompanyListAll();
+            model.addAttribute("companyList", companyList);
+
+            List<YearOptionDto> yearOption = this.comService.generateYearOptions();
+            model.addAttribute("yearOption", yearOption);
         } catch (Exception e) {
             e.getStackTrace();
+            model.addAttribute("companyList", Collections.emptyList());
+            model.addAttribute("yearOption", Collections.emptyList());
         }
 
         return "pages/statistics/usage_statistics";
@@ -1580,6 +1604,7 @@ public class PageController {
         } catch (Exception e) {
             e.getStackTrace();
             model.addAttribute("companyList", Collections.emptyList());
+            model.addAttribute("yearOption", Collections.emptyList());
         }
 
         return "pages/statistics/totalkw_statistics";
