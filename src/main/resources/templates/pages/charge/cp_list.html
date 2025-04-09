@@ -71,7 +71,8 @@
             <!-- card:3 start -->
             <div class="card card-shadow mt-4">
                 <!-- card body:3 start -->
-                <div class="card-body">
+                <div class="card-body btn-page-container">
+
                     <div class="btn-container">
                         <button class="btn btn-excel" onclick="cpExcelDownload()"
                             th:if="${menuAuthority.authority == 'SU' or menuAuthority.excelYn == 'Y'}">
@@ -96,7 +97,26 @@
                                 th:text="${data.commonCodeName}" th:selected="${data.commonCode == size}"></option>
                         </select>
                     </div>
+
                     <div class="w-100 table-responsive">
+                        <div
+                            class="page-container connector-legend d-flex justify-content-start align-items-center mb-3 mt-3 p-2 bg-light rounded">
+                            <span class="me-3 d-flex align-items-center">
+                                <i class="fa-solid fa-plug available me-1 fa-lg"></i> <strong>사용가능</strong>
+                            </span>
+                            <span class="me-3 d-flex align-items-center">
+                                <i class="fa-solid fa-plug charging me-1 fa-lg"></i> <strong>충전중</strong>
+                            </span>
+                            <span class="me-3 d-flex align-items-center">
+                                <i class="fa-solid fa-plug preparing me-1 fa-lg"></i> <strong>준비중</strong>
+                            </span>
+                            <span class="me-3 d-flex align-items-center">
+                                <i class="fa-solid fa-plug faulted me-1 fa-lg"></i> <strong>고장</strong>
+                            </span>
+                            <span class="me-3 d-flex align-items-center">
+                                <i class="fa-solid fa-plug disconnected me-1 fa-lg"></i> <strong>연결끊김</strong>
+                            </span>
+                        </div>
                         <table class="table text-center mt-3 table-bg table-hover">
                             <thead>
                                 <tr class="table-border-top">
@@ -137,19 +157,21 @@
                                         <div class="connector-status">
                                             <th:block
                                                 th:if="${connStatusMap != null && connStatusMap.containsKey(data.chargerId)}">
-                                                <th:block
-                                                    th:each="status : ${connStatusMap.get(data.chargerId).split(',')}">
+                                                <th:block th:each="connInfo : ${connStatusMap.get(data.chargerId)}">
                                                     <i class="fa-solid fa-plug font-ico" data-bs-toggle="tooltip"
-                                                        th:attr="title=${status}" th:classappend="${status == 'CSTATAVAIL' ? 'available' 
-                                                                : (status == 'CSTATPREP' ? 'preparing'
-                                                                : (status == 'CSTATCHARGING' ? 'charging'
-                                                                : (status == 'CSTATSUSEV' ? 'suspendedev'
-                                                                : (status == 'CSTATSUSEVSE' ? 'suspendedevse'
-                                                                : (status == 'CSTATFIN' ? 'finising'
-                                                                : (status == 'CSTATRSVD' ? 'reserved'
-                                                                : (status == 'CSTATUNAVAIL' ? 'unavailable'
-                                                                : (status == 'CSTATFAULT' ? 'faulted'
-                                                                : 'disconnected'))))))))}">
+                                                        th:with="displayStatus=${connInfo.connectionYn == 'N' ? 'Disconnected' : connInfo.status}"
+                                                        th:attr="title=${displayStatus}, data-connector-id=${connInfo.connectorId}, data-charger-id=${data.chargerId}"
+                                                        th:classappend="${displayStatus == 'Available' ? 'available' 
+                                                                : (displayStatus == 'Preparing' ? 'preparing'
+                                                                : (displayStatus == 'Charging' ? 'charging'
+                                                                : (displayStatus == 'SuspendedEV' ? 'suspendedev'
+                                                                : (displayStatus == 'SuspendedEVSE' ? 'suspendedevse'
+                                                                : (displayStatus == 'Finishing' ? 'finishing'
+                                                                : (displayStatus == 'Reserved' ? 'reserved'
+                                                                : (displayStatus == 'Unavailable' ? 'unavailable'
+                                                                : (displayStatus == 'Faulted' ? 'faulted'
+                                                                : (displayStatus == 'Disconnected' ? 'disconnected'
+                                                                : 'disconnected')))))))))}">
                                                     </i>
                                                 </th:block>
                                             </th:block>
@@ -465,9 +487,66 @@
         <!-- modal dialog end -->
     </div>
     <!-- Add Modal end -->
-    <script type="text/javascript" th:src="@{/js/table.js}"></script>
+    <!-- <script type="text/javascript" th:src="@{/js/table.js}"></script> -->
     <script type="text/javascript" th:src="@{/js/charge/cp_excel_download.js}"></script>
     <script type="text/javascript" th:src="@{/js/charge/charger_list.js}"></script>
+    <script th:inline="javascript">
+        document.addEventListener('DOMContentLoaded', function () {
+            // SSE 연결 함수
+            function connectSSE() {
+                const eventSource = new EventSource('/api/connector-status/stream');
+
+                // 상태 업데이트 이벤트 리스너
+                eventSource.addEventListener('connector-status-update', function (event) {
+                    const statusData = JSON.parse(event.data);
+                    updateConnectorStatus(statusData);
+                });
+
+                // 연결 성공 시
+                eventSource.onopen = function () {
+                    console.log('SSE 연결 성공');
+                };
+
+                // 오류 발생 시
+                eventSource.onerror = function (error) {
+                    console.error('SSE 연결 오류:', error);
+                    eventSource.close();
+                    // 연결 실패 시 5초 후 재시도
+                    setTimeout(connectSSE, 5000);
+                };
+            }
+
+            // 초기 연결 시작
+            connectSSE();
+
+            // 커넥터 상태 업데이트 함수
+            function updateConnectorStatus(statusData) {
+                const chargerId = statusData.chargerId;
+                const connectorId = statusData.connectorId;
+                const displayStatus = statusData.connectionYn === 'N' ? 'Disconnected' : statusData.status;
+
+                // 해당 커넥터 아이콘 찾기
+                const connectorIcon = document.querySelector(`.connector-status i[data-connector-id="${connectorId}"][data-charger-id="${chargerId}"]`);
+
+                if (connectorIcon) {
+                    // 기존 클래스 제거
+                    connectorIcon.classList.remove('available', 'preparing', 'charging', 'suspendedev',
+                        'suspendedevse', 'finishing', 'reserved', 'unavailable', 'faulted', 'disconnected');
+
+                    // 새 상태에 따른 클래스 추가
+                    connectorIcon.classList.add(displayStatus.toLowerCase());
+
+                    // 툴크 업데이트
+                    connectorIcon.setAttribute('title', displayStatus);
+
+                    // 콘솔에 상태 변경 로깅
+                    console.log(`충전기 ${chargerId}, 커넥터 ${connectorId} 상태 변경: ${displayStatus}`);
+                } else {
+                    console.warn(`충전기 ${chargerId}, 커넥터 ${connectorId}를 찾을 수 없습니다.`);
+                }
+            }
+        });
+    </script>
 
 </div>
 

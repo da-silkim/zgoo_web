@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import zgoo.cpos.domain.charger.QConnectorStatus;
 import zgoo.cpos.domain.charger.QCpInfo;
+import zgoo.cpos.domain.charger.QCpStatus;
 import zgoo.cpos.dto.cp.ChargerDto.ConnectorStatusDto;
 
 @RequiredArgsConstructor
@@ -18,14 +19,18 @@ public class ConnectorStatusRepositoryCustomImpl implements ConnectorStatusRepos
     private final JPAQueryFactory queryFactory;
     QConnectorStatus conn = QConnectorStatus.connectorStatus;
     QCpInfo cpInfo = QCpInfo.cpInfo;
+    QCpStatus cpStatus = QCpStatus.cpStatus;
 
     @Override
     public List<ConnectorStatusDto> findAllConnectorStatusList() {
         return queryFactory.select(Projections.fields(ConnectorStatusDto.class,
                 conn.id.chargerId.as("chargerId"),
                 conn.id.connectorId.as("connectorId"),
-                conn.status.as("status")))
+                conn.status.as("status"),
+                cpStatus.connectionYn.as("connectionYn")))
                 .from(conn)
+                .leftJoin(cpStatus)
+                .on(conn.id.chargerId.eq(cpStatus.chargerId))
                 .orderBy(conn.id.connectorId.asc())
                 .fetch();
     }
