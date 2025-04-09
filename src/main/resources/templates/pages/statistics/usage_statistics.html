@@ -16,56 +16,44 @@
                             <div class="col-12 search-table">
                                 <label for="companyIdSearch"
                                     class="col-form-label">사업자<b>*</b></label>
-                                <select id="companyIdSearch" class="mx-3 form-control" name="companyIdSearch" required>
-                                    <option th:value="*{null}" th:text="'(없음)'"></option>
+                                <select id="companyIdSearch" class="mx-3 form-control" name="companyIdSearch">
+                                    <option th:value="*{null}" th:text="'선택'"></option>
                                     <option th:each="company : ${companyList}" th:value="${company.companyId}"
                                         th:text="${company.companyName}"
                                         th:selected="${company.companyId == selectedCompanyId}"></option>
                                 </select>
                             </div>
                             <div class="col-12 search-table">
-                                <label for="stationSearch"
-                                    class="col-form-label">충전소<b>*</b></label>
-                                <select id="stationSearch" class="mx-3 form-control" name="stationSearch" required>
-                                    <option th:value="*{null}" th:text="'(없음)'"></option>
-                                    <!-- <option th:each="cs : ${csList}" th:value="${cs.stationId}"
-                                        th:text="${cs.stationName}"
-                                        th:selected="${cs.stationId == selectedStationId}"></option> -->
+                                <label for="opSearch"
+                                    class="col-form-label">검색조건<b>*</b></label>
+                                <select id="opSearch" class="ms-3 form-control" name="opSearch">
+                                    <option th:value="*{null}" th:text="'선택'"></option>
+                                    <option th:value="'stationName'" th:text="충전소명" 
+                                        th:selected="${selectedOpSearch == 'stationName'}"></option>
+                                    <option th:value="'stationId'" th:text="충전소ID" 
+                                        th:selected="${selectedOpSearch == 'stationId'}"></option>
+                                    <option th:value="'chargerId'" th:text="충전기ID" 
+                                        th:selected="${selectedOpSearch == 'chargerId'}"></option>
                                 </select>
+                                <input type="text" id="contentSearch" name="contentSearch" class="form-control" 
+                                    th:value="${selectedContentSearch}" autocomplete="off" />
                             </div>
                             <div class="col-12 search-table">
-                                <label for="chargerSearch"
-                                    class="col-form-label">충전기<b>*</b></label>
-                                <select id="chargerSearch" class="mx-3 form-control" name="chargerSearch" required>
-                                    <option th:value="*{null}" th:text="'(없음)'"></option>
-                                    <!-- <option th:each="cp : ${cpList}" th:value="${cp.chargerId}"
-                                        th:text="${cp.chargerName}"
-                                        th:selected="${cp.stationId == selectedChargerId}"></option> -->
+                                <label for="yearSearch"
+                                    class="col-form-label">조회연도<b>*</b></label>
+                                <select id="yearSearch" name="yearSearch" class="form-control mx-3">
+                                    <option th:each="year : ${yearOption}" th:value="${year.value}"
+                                        th:text="${year.text}"
+                                        th:selected="${year.value == selectedYear}"></option>
                                 </select>
-                                <select id="chargerType" class="form-control" name="chargerType" required>
-                                    <option th:value="'HIGH'" th:text="'급속'"></option>
-                                    <option th:value="'LOW'" th:text="'완속'"></option>
-                                </select>
-                            </div>
-                            <div class="col-12 search-table">
-                                <label for="dateSearch"
-                                    class="col-form-label">조회기간<b>*</b></label>
-                                <select id="dateSearch" class="mx-3 form-control" name="stationSearch" required>
-                                    <option th:value="'year'" th:text="년단위" th:selected="${selectedDateSearch == 'year'}"></option>
-                                    <option th:value="'month'" th:text="월단위" th:selected="${selectedDateSearch == 'month'}"></option>
-                                </select>
-                                <input type="date" class="form-control" id="startDate">
-                                <span class="mx-2">~</span>
-                                <input type="date" class="form-control" id="endDate">
                             </div>
                         </div>
                         <div>
-                            <button type="button" class="btn btn-outline-grey me-2" id="serachBtn">
+                            <button type="submit" class="btn btn-outline-grey me-2" id="serachBtn">
                                 <i class="bi bi-search me-2"></i>검색</button>
-                            <button type="button" class="btn btn-outline-grey me-2" id="resetBtn">
+                            <button type="button" class="btn btn-outline-grey me-2" id="resetBtn" onclick="replacePage('/statistics/usage')">
                                 <i class="bi bi-arrow-repeat me-2"></i>초기화</button>
                         </div>
-
                     </form>
                     <!-- form end -->
                 </div>
@@ -77,25 +65,28 @@
                 <!-- card body:3 start -->
                 <div class="card-body">
                     <!-- 조회연도 메출통계 -->
-                    <div class="card-title"><span class="card-title-bar"></span><span>조회연도 이용률 통계</span></div>
+                    <div class="card-title">
+                        <span class="card-title-bar"></span>
+                        <span th:text="|조회연도 이용률 통계(${usage.curYear.year}년)|"></span>
+                    </div>
                     <div class="w-100 table-responsive position-relative">
                         <table class="table text-center mt-2 table-bg">
                             <thead>
                                 <tr class="table-border-top">
                                     <th scope="col" class="w-20"></th>
+                                    <th scope="col">급속</th>
+                                    <th scope="col">완속</th>
+                                    <th scope="col">디스펜서</th>
                                     <th scope="col">합계</th>
-                                    <th scope="col">계정과목</th>
-                                    <th scope="col">매입</th>
-                                    <th scope="col">매출</th>
                                 </tr>
                             </thead>
                             <tbody id="pageList">
                                 <tr>
                                     <th style="background-color: #f5f7f8;">전체 충전 횟수</th>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
+                                    <td th:text="${usage.curYear.lowCount}"></td>
+                                    <td th:text="${usage.curYear.fastCount}"></td>
+                                    <td th:text="${usage.curYear.despnCount}"></td>
+                                    <td th:text="${usage.curYear.totalUsage}"></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -116,9 +107,116 @@
         <!-- card body:1 end -->
     </div>
     <!-- card:1 end -->
-    <script type="text/javascript" th:src="@{/js/statistics/statistics_chart.js}"></script>
-    <script type="text/javascript">
-        const STAT = 'USAGE';
+    <script th:inline="javascript">
+        var usage = /*[[${usage != null ? usage : '{}'}]]*/ {};
+        var lineChartData = /*[[${lineChart != null ? lineChart : '{}'}]]*/ {};
+
+        // line Chart
+        const speedFastList = lineChartData.speedFastList.map(item => item.totalUsage);
+        const speedLowList = lineChartData.speedLowList.map(item => item.totalUsage);
+        const speedDespnList = lineChartData.speedDespnList.map(item => item.totalUsage);
+
+        const lineChartConfig = [
+            { label: '급속', data: speedFastList, color: '#379C6D' },
+            { label: '완속', data: speedLowList, color: '#E58A10' },
+            { label: '디스펜서', data: speedDespnList, color: '#EFEFEF' }
+        ];
+        
+        const lineDatasets = lineChartConfig.map(item => ({
+            label: item.label,
+            data: item.data,
+            borderColor: [item.color],
+            backgroundColor: [item.color],
+            fill: false
+        }));
+        
+        const lineData = {
+            labels: [...Array(12).keys()].map(i => `${i + 1}월`),
+            datasets: lineDatasets
+        }
+
+        var ctx = document.getElementById("lineChart").getContext('2d');
+        var lineChart = new Chart(ctx, {
+            type: 'line',
+            data: lineData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                    },
+                    filler: {
+                        propagate: false,
+                    }
+                },
+                interaction: {
+                    intersect: false,
+                },
+                scales: {
+                    x: {
+                        ticks: {
+                            font: {
+                                size: 14,
+                            }
+                        },
+                    },
+                    y: {
+                        min: 0,
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+
+        // bar Chart
+        const barCharConfig = [
+            { label: '급속', data: [usage.preYear.lowCount, usage.curYear.lowCount], color: '#379C6D' },
+            { label: '완속', data: [usage.preYear.fastCount, usage.curYear.fastCount], color: '#E58A10' },
+            { label: '디스펜서', data: [usage.preYear.despnCount, usage.curYear.despnCount], color: '#EFEFEF' }
+        ];
+
+        const barDatasets = barCharConfig.map(item => ({
+            label: item.label,
+            data: item.data,
+            backgroundColor: [item.color],
+            minBarThickness: 10,
+            maxBarThickness: 200
+        }));
+
+        const barData = {
+            labels: [usage.preYear.year, usage.curYear.year],
+            datasets: barDatasets
+        }
+
+        var ctx = document.getElementById("barChart").getContext('2d');
+        var barChart = new Chart(ctx, {
+            type: 'bar',
+            data: barData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                    }
+                },
+                scales: {
+                    x: {
+                        ticks: {
+                            font: {
+                                size: 14,
+                            }
+                        },
+                    },
+                    y: {
+                        min: 0,
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
     </script>
 </div>
 </html>

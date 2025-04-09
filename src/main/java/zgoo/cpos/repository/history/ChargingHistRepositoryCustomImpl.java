@@ -13,6 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
+import com.graphbuilder.math.Expression;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Projections;
@@ -31,6 +32,8 @@ import zgoo.cpos.dto.history.ChargingHistDto;
 import zgoo.cpos.dto.statistics.TotalkwDto;
 import zgoo.cpos.dto.statistics.TotalkwDto.TotalkwBaseDto;
 import zgoo.cpos.dto.statistics.TotalkwDto.TotalkwLineChartBaseDto;
+import zgoo.cpos.dto.statistics.UsageDto.UsageBaseDto;
+import zgoo.cpos.dto.statistics.UsageDto.UsageLineChartBaseDto;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -405,6 +408,100 @@ public class ChargingHistRepositoryCustomImpl implements ChargingHistRepositoryC
             Integer month = tuple.get(0, Integer.class);
             BigDecimal amount = tuple.get(1, BigDecimal.class);
             monthlyResults.get(month - 1).setTotalkw(amount);
+        }
+
+        return monthlyResults;
+    }
+
+    @Override
+    public UsageBaseDto searchYearUsage(Long companyId, String searchOp, String searchContent, Integer year) {
+        BooleanBuilder builder = new BooleanBuilder();
+
+        if (companyId != null) {
+            builder.and(csInfo.company.id.eq(companyId));
+        }
+
+        if (searchOp != null && (searchContent != null && !searchContent.isEmpty())) {
+            switch (searchOp) {
+                case "stationId" -> builder.and(csInfo.id.contains(searchContent));
+                case "stationName" -> {
+                    builder.and(csInfo.stationName.contains(searchContent));
+                }
+                case "chargerId" -> builder.and(cpInfo.id.contains(searchContent));
+                default -> {
+                }
+            }
+        }
+
+        LocalDateTime startOfYear = LocalDate.of(year, 1, 1).atStartOfDay();
+        LocalDateTime endOfYear = LocalDate.of(year, 12, 31).atTime(LocalTime.MAX);
+        builder.and(hist.startTime.between(startOfYear, endOfYear));
+
+        UsageBaseDto dto = queryFactory.select(Projections.fields(UsageBaseDto.class,
+            Expressions.numberTemplate(Long.class, "COUNT(CASE WHEN {0} = 'SPEEDFAST' THEN 1 END)", model.cpType).as("fastCount"),
+            Expressions.numberTemplate(Long.class, "COUNT(CASE WHEN {0} = 'SPEEDLOW' THEN 1 END)", model.cpType).as("lowCount"),
+            Expressions.numberTemplate(Long.class, "COUNT(CASE WHEN {0} = 'SPEEDDESPN' THEN 1 END)", model.cpType).as("despnCount"),
+            Expressions.numberTemplate(Long.class, "COUNT(*)").as("totalUsage")))
+            .from(hist)
+            .leftJoin(cpInfo).on(hist.chargerID.eq(cpInfo.id))
+            .leftJoin(csInfo).on(csInfo.eq(cpInfo.stationId))
+            .leftJoin(model).on(cpInfo.modelCode.eq(model.modelCode))
+            .where(builder)
+            .fetchOne();
+        dto.setYear(year);
+
+        return dto;
+    }
+
+    @Override
+    public List<UsageLineChartBaseDto> searchMonthlyUsage(Long companyId, String searchOp, String searchContent,
+            Integer year, String cpType) {
+        BooleanBuilder builder = new BooleanBuilder();
+
+        if (companyId != null) {
+            builder.and(csInfo.company.id.eq(companyId));
+        }
+
+        if (searchOp != null && (searchContent != null && !searchContent.isEmpty())) {
+            switch (searchOp) {
+                case "stationId" -> builder.and(csInfo.id.contains(searchContent));
+                case "stationName" -> {
+                    builder.and(csInfo.stationName.contains(searchContent));
+                }
+                case "chargerId" -> builder.and(cpInfo.id.contains(searchContent));
+                default -> {
+                }
+            }
+        }
+
+        builder.and(model.cpType.eq(cpType));
+        builder.and(Expressions.numberTemplate(Integer.class, "YEAR({0})", hist.startTime).eq(year));
+
+        List<UsageLineChartBaseDto> monthlyResults = IntStream.rangeClosed(1, 12)
+            .mapToObj(month -> UsageLineChartBaseDto.builder()
+                .month(month)
+                .year(year)
+                .totalUsage(0L)
+                .build())
+            .collect(Collectors.toList());
+
+        List<Tuple> results = queryFactory
+            .select(
+                Expressions.numberTemplate(Integer.class, "MONTH({0})", hist.startTime).as("month"),
+                hist.id.count()
+            )
+            .from(hist)
+            .leftJoin(cpInfo).on(hist.chargerID.eq(cpInfo.id))
+            .leftJoin(csInfo).on(csInfo.eq(cpInfo.stationId))
+            .leftJoin(model).on(cpInfo.modelCode.eq(model.modelCode))
+            .where(builder)
+            .groupBy(Expressions.numberTemplate(Integer.class, "MONTH({0})", hist.startTime))
+            .fetch();
+
+        for (Tuple tuple : results) {
+            Integer month = tuple.get(0, Integer.class);
+            Long count = tuple.get(1, Long.class);
+            monthlyResults.get(month - 1).setTotalUsage(count);
         }
 
         return monthlyResults;

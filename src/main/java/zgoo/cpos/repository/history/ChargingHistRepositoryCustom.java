@@ -8,6 +8,8 @@ import org.springframework.data.domain.Pageable;
 import zgoo.cpos.dto.history.ChargingHistDto;
 import zgoo.cpos.dto.statistics.TotalkwDto.TotalkwBaseDto;
 import zgoo.cpos.dto.statistics.TotalkwDto.TotalkwLineChartBaseDto;
+import zgoo.cpos.dto.statistics.UsageDto.UsageBaseDto;
+import zgoo.cpos.dto.statistics.UsageDto.UsageLineChartBaseDto;
 
 public interface ChargingHistRepositoryCustom {
     Page<ChargingHistDto> findAllChargingHist(Pageable pageable);
@@ -21,4 +23,8 @@ public interface ChargingHistRepositoryCustom {
     TotalkwBaseDto searchYearChargeAmount(Long companyId, String searchOp, String searchContent, Integer year);
 
     List<TotalkwLineChartBaseDto> searchMonthlyChargeAmount(Long companyId, String searchOp, String searchContent, Integer year, String cpType);
+
+    UsageBaseDto searchYearUsage(Long companyId, String searchOp, String searchContent, Integer year);
+
+    List<UsageLineChartBaseDto> searchMonthlyUsage(Long companyId, String searchOp, String searchContent, Integer year, String cpType);
 }
