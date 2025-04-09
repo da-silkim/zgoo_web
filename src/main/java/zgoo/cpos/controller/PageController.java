@@ -384,21 +384,43 @@ public class PageController {
                 List<ConnectorStatusDto> connStatList = chargerService.searchConStatListAll();
 
                 // 안전하게 Map 생성 - 예외가 발생해도 빈 Map 반환
-                Map<String, String> connStatusMap = new HashMap<>();
+                Map<String, List<Map<String, String>>> connStatusMap = new HashMap<>();
 
                 if (connStatList != null && !connStatList.isEmpty()) {
+                    // chargerId별로 커넥터 상태 정보를 그룹화
                     connStatusMap = connStatList.stream()
-                            .filter(dto -> dto != null && dto.getChargerId() != null && dto.getStatus() != null)
-                            .collect(Collectors.groupingBy(ConnectorStatusDto::getChargerId,
-                                    Collectors.mapping(dto -> dto.getStatus().toString(), Collectors.joining(","))));
+                            .filter(dto -> dto != null && dto.getChargerId() != null)
+                            .collect(Collectors.groupingBy(
+                                    ConnectorStatusDto::getChargerId,
+                                    Collectors.mapping(
+                                            dto -> {
+                                                Map<String, String> connInfo = new HashMap<>();
+                                                connInfo.put("status",
+                                                        dto.getStatus() != null ? dto.getStatus().toString()
+                                                                : "Unknown");
+                                                connInfo.put("connectionYn",
+                                                        dto.getConnectionYn() != null ? dto.getConnectionYn().toString()
+                                                                : "N");
+                                                connInfo.put("connectorId",
+                                                        dto.getConnectorId() != null ? dto.getConnectorId().toString()
+                                                                : "0");
+                                                return connInfo;
+                                            },
+                                            Collectors.toList())));
                 }
 
                 model.addAttribute("connStatusMap", connStatusMap);
                 log.info("=== connector_status map size: {}", connStatusMap.size());
+                // connStatusMap의 내용을 로깅
+                connStatusMap.forEach((chargerId, statusList) -> {
+                    log.info("=== Charger ID: {}, Connector Count: {}", chargerId, statusList.size());
+                    statusList.forEach(connInfo -> log.info("===== Connector ID: {}, Status: {}, ConnectionYn: {}",
+                            connInfo.get("connectorId"), connInfo.get("status"), connInfo.get("connectionYn")));
+                });
             } catch (Exception e) {
                 log.error("Error while fetching connector status: {}", e.getMessage());
                 // 오류 발생 시 빈 Map 추가
-                model.addAttribute("connStatusMap", new HashMap<String, String>());
+                model.addAttribute("connStatusMap", new HashMap<String, List<Map<String, String>>>());
             }
 
             // 검색 select options 조회

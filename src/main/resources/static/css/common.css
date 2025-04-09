@@ -829,54 +829,6 @@ table.table tbody tr.row-selected {
   transition: filter 0.3s;
 }
 
-/* connector status */
-.connector-status i {
-  width: 30px;
-  height: 30px;
-  line-height: 30px;
-  aspect-ratio: 1 / 1; /* 1:1 비율로 원형 유지 */
-  text-align: center;
-  border-radius: 50%; /* 동그란 배경 */
-  font-size: 18px;
-  font-weight: bold;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: #ffffff !important; /* 아이콘 색상을 흰색으로 */
-  font-family: "Font Awesome 5 Free", "FontAwesome"; /* Font Awesome 아이콘 사용 */
-}
-
-.connector-status .available {
-  background-color: #78be39 !important;
-}
-.connector-status .preparing {
-  background-color: #78be39 !important;
-}
-.connector-status .charging {
-  background-color: #39afe2 !important;
-}
-.connector-status .finising {
-  background-color: #f1b30d !important;
-}
-.connector-status .reserved {
-  background-color: #c247e7 !important;
-}
-.connector-status .faulted {
-  background-color: #dd1e1e !important;
-}
-.connector-status .suspendedev {
-  background-color: #dd1e1e !important;
-}
-.connector-status .suspendedevse {
-  background-color: #dd1e1e !important;
-}
-.connector-status .unavailable {
-  background-color: #dd1e1e !important;
-}
-.connector-status .disconnected {
-  background-color: #505050 !important;
-}
-
 .biz-search-content,
 .mem-search-content {
   min-height: 76vh;
@@ -989,19 +941,19 @@ table.table tbody tr.row-selected {
 }
 
 .connector-status .available {
-  background-color: #78be39 !important;
+  background-color: #346906 !important;
 }
 .connector-status .preparing {
-  background-color: #78be39 !important;
+  background-color: #f0a503 !important;
 }
 .connector-status .charging {
   background-color: #39afe2 !important;
 }
-.connector-status .finising {
-  background-color: #f1b30d !important;
+.connector-status .finishing {
+  background-color: #6f03fd !important;
 }
 .connector-status .reserved {
-  background-color: #c247e7 !important;
+  background-color: #c4e605 !important;
 }
 .connector-status .faulted {
   background-color: #dd1e1e !important;
@@ -1097,7 +1049,7 @@ table.table tbody tr.row-selected {
   overflow-y: auto;
 }
 #searchList {
-  top: 46px; 
+  top: 46px;
   width: 300px;
   height: calc(80vh - 40px);
   max-height: 80vh;
@@ -1106,7 +1058,7 @@ table.table tbody tr.row-selected {
 #searchStationList {
   width: 100%;
   height: 100%;
-  background-color: rgba(0,0,0,0.1);
+  background-color: rgba(0, 0, 0, 0.1);
   overflow-y: auto;
 }
 .nearby-station {
@@ -1136,7 +1088,7 @@ table.table tbody tr.row-selected {
   position: absolute;
   width: 100%;
   height: 100%;
-  background-color: #fff; 
+  background-color: #fff;
   top: 0;
   left: 306px;
   display: none;
@@ -1167,10 +1119,12 @@ table.table tbody tr.row-selected {
   height: calc(100% - 45px);
   overflow-x: hidden;
 }
-#stationContainer, #chargerContainer {
+#stationContainer,
+#chargerContainer {
   padding: 5px;
 }
-#stationContainer > div:nth-child(1), #chargerContainer > div:nth-child(1) {
+#stationContainer > div:nth-child(1),
+#chargerContainer > div:nth-child(1) {
   border-bottom: 1px grey solid;
   font-size: 18px;
   font-weight: 600;
@@ -1181,10 +1135,12 @@ table.table tbody tr.row-selected {
   box-shadow: 0px 10px 10px -10px rgba(0, 0, 0, 0.3);
   padding: 5px;
 }
-.station-info > div, .charger-info > div {
+.station-info > div,
+.charger-info > div {
   margin: 6px 0;
 }
-.station-info .col-4, .charger-info .col-4 {
+.station-info .col-4,
+.charger-info .col-4 {
   font-weight: 600;
 }
 .charger-info {
@@ -1202,31 +1158,36 @@ table.table tbody tr.row-selected {
   padding: 6px;
 }
 .infowindow > div:nth-child(1) {
-  font-size: 18px; font-weight: 700;
+  font-size: 18px;
+  font-weight: 700;
 }
 .infowindow > div:nth-child(2) {
   font-size: 12px;
 }
 .new-article {
-  background-color: #3E5879;
+  background-color: #3e5879;
   color: white;
   border-radius: 6px;
   padding: 2px 6px;
   font-size: 13px;
 }
-.firmware-update, .statistics-form {
+.firmware-update,
+.statistics-form {
   margin-top: 1.5rem !important;
   position: relative;
 }
-.firmware-update > div:nth-child(1), .statistics-form > div:nth-child(1) {
+.firmware-update > div:nth-child(1),
+.statistics-form > div:nth-child(1) {
   border-top: 1px solid black;
 }
-.firmware-update > div:nth-child(2), .statistics-form > div:nth-child(2) {
+.firmware-update > div:nth-child(2),
+.statistics-form > div:nth-child(2) {
   position: absolute;
   right: 0;
   top: -50px;
 }
-.statistics-form .search-table select, .statistics-form .search-table input {
+.statistics-form .search-table select,
+.statistics-form .search-table input {
   max-width: 260px;
 }
 .statistics-chart {
@@ -1248,7 +1209,7 @@ table.table tbody tr.row-selected {
   flex-shrink: 0 !important;
   width: 25% !important;
   height: 54px;
-  background-color: #F5F5F5;
+  background-color: #f5f5f5;
 }
 .search-table > input[type="text"] {
   margin: 0 1rem !important;
@@ -1262,11 +1223,45 @@ table.table tbody tr.row-selected {
   width: 30%;
   aspect-ratio: 1;
   position: relative;
-  border-radius: 20px;  
+  border-radius: 20px;
   border: 1px #2e2e2e solid;
   float: left;
   margin-right: 10px;
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.connector-legend {
+  border: 1px solid #ddd;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-top: 15px !important;
+  margin-bottom: 15px !important;
+  padding: 10px !important;
+}
+
+.connector-legend span {
+  margin-right: 15px !important;
+  font-size: 14px;
+}
+
+.connector-legend i.fa-plug {
+  font-size: 18px !important;
+  margin-right: 5px !important;
+}
+
+.fa-plug.available {
+  color: #28a745;
+}
+.fa-plug.charging {
+  color: #007bff;
+}
+.fa-plug.preparing {
+  color: #ffc107;
+}
+.fa-plug.faulted {
+  color: #dc3545;
+}
+.fa-plug.disconnected {
+  color: #6c757d;
 }

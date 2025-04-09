@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import zgoo.cpos.type.ChargePointStatus;
+import zgoo.cpos.type.ConnectionStatus;
 
 @Data
 @SuperBuilder
@@ -118,6 +119,7 @@ public class ChargerDto {
         private String chargerId;
         private Integer connectorId;
         private ChargePointStatus status;
+        private ConnectionStatus connectionYn;
     }
 
     @Data
