@@ -1,8 +1,11 @@
 package zgoo.cpos.service;
 
 import java.security.Principal;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.HttpStatus;
@@ -16,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import zgoo.cpos.domain.users.Users;
 import zgoo.cpos.dto.menu.MenuAuthorityDto.MenuAuthorityBaseDto;
+import zgoo.cpos.dto.statistics.YearOptionDto;
 import zgoo.cpos.repository.menu.MenuAuthorityRepository;
 import zgoo.cpos.repository.users.UsersRepository;
 
@@ -163,5 +167,22 @@ public class ComService {
         }
 
         return null;
+    }
+
+    public List<YearOptionDto> generateYearOptions() {
+        int currentYear = LocalDate.now().getYear();
+
+        List<YearOptionDto> yearOptions = new ArrayList<>();
+
+        for (int year = currentYear; year >= 2024; year--) {
+            yearOptions.add(
+                YearOptionDto.builder()
+                    .text(year + "년")
+                    .value(year)
+                    .build()
+            );
+        }
+
+        return yearOptions;
     }
 }

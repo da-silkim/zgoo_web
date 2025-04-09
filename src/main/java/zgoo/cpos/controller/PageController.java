@@ -47,6 +47,12 @@ import zgoo.cpos.dto.member.VocDto;
 import zgoo.cpos.dto.member.VocDto.VocListDto;
 import zgoo.cpos.dto.menu.CompanyMenuAuthorityDto;
 import zgoo.cpos.dto.menu.MenuAuthorityDto.MenuAuthorityBaseDto;
+import zgoo.cpos.dto.statistics.TotalkwDto;
+import zgoo.cpos.dto.statistics.TotalkwDto.TotalkwBarDto;
+import zgoo.cpos.dto.statistics.TotalkwDto.TotalkwBaseDto;
+import zgoo.cpos.dto.statistics.TotalkwDto.TotalkwLineChartBaseDto;
+import zgoo.cpos.dto.statistics.TotalkwDto.TotalkwLineChartDto;
+import zgoo.cpos.dto.statistics.YearOptionDto;
 import zgoo.cpos.dto.menu.MenuDto;
 import zgoo.cpos.dto.tariff.TariffDto.TariffPolicyDto;
 import zgoo.cpos.dto.tariff.TariffDto.TariffRegDto;
@@ -60,6 +66,7 @@ import zgoo.cpos.service.ChargingHistService;
 import zgoo.cpos.service.ChgCommlogService;
 import zgoo.cpos.service.ChgErrorCodeService;
 import zgoo.cpos.service.CodeService;
+import zgoo.cpos.service.ComService;
 import zgoo.cpos.service.CompanyService;
 import zgoo.cpos.service.ConditionService;
 import zgoo.cpos.service.CpCurrentTxService;
@@ -71,6 +78,7 @@ import zgoo.cpos.service.MemberService;
 import zgoo.cpos.service.MenuAuthorityService;
 import zgoo.cpos.service.MenuService;
 import zgoo.cpos.service.NoticeService;
+import zgoo.cpos.service.StatisticsService;
 import zgoo.cpos.service.TariffService;
 import zgoo.cpos.service.UsersService;
 import zgoo.cpos.service.VocService;
@@ -101,6 +109,8 @@ public class PageController {
     private final CpCurrentTxService cpCurrentTxService;
     private final ChargingHistService chargingHistService;
     private final ChgCommlogService chgCommlogService;
+    private final StatisticsService statisticsService;
+    private final ComService comService;
 
     /*
      * 대시보드
@@ -1517,16 +1527,40 @@ public class PageController {
      * 통계 > 충전량통계
      */
     @GetMapping("/statistics/totalkw")
-    public String showtotalkw(Model model, Principal principal) {
+    public String showtotalkw(
+            @RequestParam(value = "companyIdSearch", required = false) Long companyId,
+            @RequestParam(value = "opSearch", required = false) String searchOp,
+            @RequestParam(value = "contentSearch", required = false) String searchContent,
+            @RequestParam(value = "yearSearch", required = false) Integer year,
+            Model model, Principal principal) {
         log.info("=== Charge Statistics Page ===");
+        log.info("companyId: {}, opSearch: {}, contentSearch: {}, yearSearch: {}", companyId, searchOp, searchContent, year);
 
         try {
+            model.addAttribute("selectedCompanyId", companyId);
+            model.addAttribute("selectedOpSearch", searchOp);
+            model.addAttribute("selectedContentSearch", searchContent);
+            model.addAttribute("selectedYear", year);
+            
+            TotalkwBarDto totalkw = this.statisticsService.searchYearChargeAmount(companyId, searchOp, searchContent, year);
+            model.addAttribute("totalkw", totalkw);
+            log.info("totalkw >> {}", totalkw.toString());
 
+            TotalkwLineChartDto lineChart = this.statisticsService.searchMonthlyChargeAmount(companyId, searchOp, searchContent, year);
+            model.addAttribute("lineChart", lineChart);
+            log.info("lineChart >> {}", lineChart.toString());
+
+            List<CompanyListDto> companyList = this.companyService.findCompanyListAll();
+            model.addAttribute("companyList", companyList);
+
+            List<YearOptionDto> yearOption = this.comService.generateYearOptions();
+            model.addAttribute("yearOption", yearOption);
         } catch (Exception e) {
             e.getStackTrace();
+            model.addAttribute("companyList", Collections.emptyList());
         }
 
-        return "pages/statistics/usage_statistics";
+        return "pages/statistics/totalkw_statistics";
     }
 
     /*
