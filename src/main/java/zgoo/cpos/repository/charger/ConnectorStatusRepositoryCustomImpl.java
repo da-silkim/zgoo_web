@@ -35,4 +35,18 @@ public class ConnectorStatusRepositoryCustomImpl implements ConnectorStatusRepos
                 .fetch();
     }
 
+    @Override
+    public List<ConnectorStatusDto> findConnectorStatusByChargerId(String chargerId) {
+        return queryFactory.select(Projections.fields(ConnectorStatusDto.class,
+                conn.id.chargerId.as("chargerId"),
+                conn.id.connectorId.as("connectorId"),
+                conn.status.as("status"),
+                cpStatus.connectionYn.as("connectionYn")))
+                .from(conn)
+                .leftJoin(cpStatus)
+                .on(conn.id.chargerId.eq(cpStatus.chargerId))
+                .orderBy(conn.id.connectorId.asc())
+                .where(conn.id.chargerId.eq(chargerId))
+                .fetch();
+    }
 }

@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,7 @@ import zgoo.cpos.domain.company.QCompany;
 import zgoo.cpos.domain.company.QCpPlanPolicy;
 import zgoo.cpos.domain.cp.QCpModel;
 import zgoo.cpos.domain.cs.QCsInfo;
+import zgoo.cpos.domain.history.QChargingHist;
 import zgoo.cpos.dto.cp.ChargerDto.ChargerListDto;
 import zgoo.cpos.dto.cp.ChargerDto.ChargerSearchDto;
 
@@ -36,6 +38,8 @@ public class ChargerRepositoryCustomImpl implements ChargerRepositoryCustom {
     QCpModel model = QCpModel.cpModel;
     // QConnectorStatus connector = QConnectorStatus.connectorStatus;
     QCpPlanPolicy cpplan = QCpPlanPolicy.cpPlanPolicy;
+    QChargingHist hist = QChargingHist.chargingHist;
+    QChargingHist histSub = new QChargingHist("histSub");
     QCommonCode commonTypeName = new QCommonCode("commonTypeCode");
     QCommonCode manufCdName = new QCommonCode("manufCd");
     QCommonCode cpTypeName = new QCommonCode("cpType");
@@ -167,11 +171,21 @@ public class ChargerRepositoryCustomImpl implements ChargerRepositoryCustom {
                 Expressions.stringTemplate("IF({0} IS NULL OR {0} = '', '-', {0})", cpInfo.location).as("location"),
                 Expressions.stringTemplate("IF({0} IS NULL OR {0} = '', '-', {0})", model.modelName).as("modelName"),
                 Expressions.stringTemplate("IF({0} IS NULL OR {0} = '', '-', {0})", manufCdName.name).as("manufCdName"),
-                Expressions.stringTemplate("IF({0} IS NULL OR {0} = '', '-', {0})", cpTypeName.name).as("cpTypeName")))
+                Expressions.stringTemplate("IF({0} IS NULL OR {0} = '', '-', {0})", cpTypeName.name).as("cpTypeName"),
+                hist.startTime.as("recentDt")))
                 .from(cpInfo)
                 .leftJoin(model).on(cpInfo.modelCode.eq(model.modelCode))
                 .leftJoin(manufCdName).on(model.manufCd.eq(manufCdName.commonCode))
                 .leftJoin(cpTypeName).on(model.cpType.eq(cpTypeName.commonCode))
+                .leftJoin(hist).on(
+                    hist.chargerID.eq(cpInfo.id)
+                        .and(hist.startTime.eq(
+                            JPAExpressions
+                                .select(histSub.startTime.max())
+                                .from(histSub)
+                                .where(histSub.chargerID.eq(cpInfo.id))
+                        ))
+                )
                 .where(cpInfo.stationId.id.eq(stationId))
                 .fetch();
         return chargerList;

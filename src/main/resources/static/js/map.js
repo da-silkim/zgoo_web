@@ -232,7 +232,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
             },
             error: function(error) {
-                console.log(error);
+                console.error(error);
             }
         });
     }
@@ -268,6 +268,29 @@ document.addEventListener("DOMContentLoaded", function() {
                     chargerList.empty();
 
                     response.cpList.forEach(function(cpList) {
+                        let connectorIcons = '-';
+                        if (cpList.connector && cpList.connector.length > 0) {
+                            connectorIcons = '';
+                            cpList.connector.forEach(function(conn) {
+                                switch (conn.status) {
+                                    case 'Available':
+                                        connectorIcons += `<i class="fa-solid fa-plug available me-1 fa-lg"></i>`;
+                                        break;
+                                    case 'Charging':
+                                        connectorIcons += `<i class="fa-solid fa-plug charging me-1 fa-lg"></i>`;
+                                        break;
+                                    case 'Preparing':
+                                        connectorIcons += `<i class="fa-solid fa-plug preparing me-1 fa-lg"></i>`;
+                                        break;
+                                    case 'Faulted':
+                                        connectorIcons += `<i class="fa-solid fa-plug faulted me-1 fa-lg"></i>`;
+                                        break;
+                                    default:
+                                        connectorIcons += `<i class="fa-solid fa-plug charging me-1 fa-lg"></i>`;
+                                        break;
+                                }
+                            });
+                        }
                         chargerList.append(`<div class="row row-cols-2 charger-info">
                                                 <div class="col-4">충전기ID</div>
                                                 <div class="col-8">${cpList.chargerId}</div>
@@ -276,7 +299,7 @@ document.addEventListener("DOMContentLoaded", function() {
                                                 <div class="col-4">제조사</div>
                                                 <div class="col-8">${cpList.manufCdName}</div>
                                                 <div class="col-4">상태</div>
-                                                <div class="col-8">-</div>
+                                                <div class="col-8">${connectorIcons}</div>
                                                 <div class="col-4">펌웨어버전</div>
                                                 <div class="col-8">${cpList.fwVersion}</div>
                                                 <div class="col-4">유형</div>
@@ -284,7 +307,7 @@ document.addEventListener("DOMContentLoaded", function() {
                                                 <div class="col-4">위치</div>
                                                 <div class="col-8">${cpList.location}</div>
                                                 <div class="col-4">최근<br>충전일시</div>
-                                                <div class="col-8 charging-time">-</div>
+                                                <div class="col-8 charging-time">${cpList.recentDt ? formatDate(new Date(cpList.recentDt)) : '-'}</div>
                                             </div>`);
                     });
                 } else {
@@ -294,7 +317,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
             },
             error: function(error) {
-                console.log(error);
+                console.error(error);
             }
         });
     }

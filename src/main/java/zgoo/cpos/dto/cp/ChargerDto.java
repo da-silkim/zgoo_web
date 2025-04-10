@@ -1,6 +1,8 @@
 package zgoo.cpos.dto.cp;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -134,5 +136,7 @@ public class ChargerDto {
         private String modelName;
         private String manufCdName;
         private String cpTypeName;
+        private LocalDateTime recentDt;
+        private List<ConnectorStatusDto> connector;
     }
 }

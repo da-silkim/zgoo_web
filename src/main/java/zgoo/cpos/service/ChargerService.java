@@ -175,7 +175,15 @@ public class ChargerService {
      */
     public List<ChargerSearchDto> searchChargerList(String stationId) {
         try {
-            return chargerRepository.findChargerListByStationId(stationId);
+            List<ChargerSearchDto> chargerList = chargerRepository.findChargerListByStationId(stationId);
+
+            for (ChargerSearchDto dto : chargerList) {
+                String chargerId = dto.getChargerId();
+                List<ConnectorStatusDto> connList = connectorStatusRepository.findConnectorStatusByChargerId(chargerId);
+                dto.setConnector(connList);
+            }
+
+            return chargerList;
         } catch (Exception e) {
             log.error("[ChargerService >> searchChargerList] error:", e.getMessage(), e);
             return Collections.emptyList();

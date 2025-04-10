@@ -6,4 +6,6 @@ import zgoo.cpos.dto.cp.ChargerDto.ConnectorStatusDto;
 
 public interface ConnectorStatusRepositoryCustom {
     List<ConnectorStatusDto> findAllConnectorStatusList();
+
+    List<ConnectorStatusDto> findConnectorStatusByChargerId(String chargerId);
 }
