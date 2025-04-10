@@ -72,8 +72,25 @@
             <div class="card card-shadow mt-4">
                 <!-- card body:3 start -->
                 <div class="card-body btn-page-container">
-
-                    <div class="btn-container">
+                    <div
+                        class="connector-container connector-legend bg-light rounded">
+                        <span class="me-3 d-flex align-items-center">
+                            <i class="fa-solid fa-plug available me-1 fa-lg"></i> <strong>사용가능</strong>
+                        </span>
+                        <span class="me-3 d-flex align-items-center">
+                            <i class="fa-solid fa-plug charging me-1 fa-lg"></i> <strong>충전중</strong>
+                        </span>
+                        <span class="me-3 d-flex align-items-center">
+                            <i class="fa-solid fa-plug preparing me-1 fa-lg"></i> <strong>준비중</strong>
+                        </span>
+                        <span class="me-3 d-flex align-items-center">
+                            <i class="fa-solid fa-plug faulted me-1 fa-lg"></i> <strong>고장</strong>
+                        </span>
+                        <span class="me-3 d-flex align-items-center">
+                            <i class="fa-solid fa-plug disconnected me-1 fa-lg"></i> <strong>연결끊김</strong>
+                        </span>
+                    </div>
+                    <div class="cp-btn-container">
                         <button class="btn btn-excel" onclick="cpExcelDownload()"
                             th:if="${menuAuthority.authority == 'SU' or menuAuthority.excelYn == 'Y'}">
                             <i class="bi bi-file-earmark-spreadsheet"></i>엑셀다운로드</button>
@@ -87,7 +104,7 @@
                                     class="bi bi-trash me-2"></i>삭제</button>
                         </div>
                     </div>
-                    <div class="page-container">
+                    <div class="cp-page-container">
                         <span id="pageInfo">
                             <span
                                 th:text="'Page ' + (${currentPage + 1}) + ' of ' + ${totalPages} + ' [총 ' + ${totalCount} + '건]'"></span>
@@ -98,25 +115,7 @@
                         </select>
                     </div>
 
-                    <div class="w-100 table-responsive">
-                        <div
-                            class="page-container connector-legend d-flex justify-content-start align-items-center mb-3 mt-3 p-2 bg-light rounded">
-                            <span class="me-3 d-flex align-items-center">
-                                <i class="fa-solid fa-plug available me-1 fa-lg"></i> <strong>사용가능</strong>
-                            </span>
-                            <span class="me-3 d-flex align-items-center">
-                                <i class="fa-solid fa-plug charging me-1 fa-lg"></i> <strong>충전중</strong>
-                            </span>
-                            <span class="me-3 d-flex align-items-center">
-                                <i class="fa-solid fa-plug preparing me-1 fa-lg"></i> <strong>준비중</strong>
-                            </span>
-                            <span class="me-3 d-flex align-items-center">
-                                <i class="fa-solid fa-plug faulted me-1 fa-lg"></i> <strong>고장</strong>
-                            </span>
-                            <span class="me-3 d-flex align-items-center">
-                                <i class="fa-solid fa-plug disconnected me-1 fa-lg"></i> <strong>연결끊김</strong>
-                            </span>
-                        </div>
+                    <div class="w-100 table-responsive"> 
                         <table class="table text-center mt-3 table-bg table-hover">
                             <thead>
                                 <tr class="table-border-top">
@@ -328,14 +327,14 @@
                                     <th class="w-20">F/W 버전<b class="required-data">*</b></th>
                                     <td class="w-30">
                                         <input type="text" name="modalCpFwver" id="modalCpFwver" class="form-control"
-                                            placeholder="" autocomplete="" disabled>
+                                            placeholder="" autocomplete="off" disabled>
                                     </td>
                                 </tr>
                                 <tr>
                                     <th class="w-20">원격접속ID<b class="required-data">*</b></th>
                                     <td class="w-30">
                                         <input type="text" name="modalAnydeskId" id="modalAnydeskId"
-                                            class="form-control" placeholder="" autocomplete="">
+                                            class="form-control" placeholder="" autocomplete="off">
                                     </td>
                                     <th class="w-20">공용구분<b class="required-data">*</b></th>
                                     <td class="w-30">
@@ -384,7 +383,7 @@
                                     <th class="w-20" scope="row">충전기 상세 위치<b class="required-data">*</b></th>
                                     <td class="w-30">
                                         <input type="text" name="cpLocation" id="cpLocation" class="form-control"
-                                            placeholder="" autocomplete="">
+                                            placeholder="" autocomplete="off">
                                     </td>
                                     <th class="w-20">동시채널 지원<b class="required-data">*</b></th>
                                     <td class="w-30">

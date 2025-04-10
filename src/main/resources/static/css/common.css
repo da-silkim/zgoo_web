@@ -687,18 +687,35 @@ table.table tbody tr.row-selected {
   position: absolute;
   top: 16px;
 }
-.btn-container button > i {
+.connector-container {
+  position: absolute;
+  right: 16px;
+  padding: .5rem !important;
+  display: flex !important;
+  justify-content: flex-start !important;
+  align-items: center !important;
+}
+.cp-btn-container {
+  position: absolute;
+  top: 60px;
+}
+.btn-container button > i,
+.cp-btn-container button > i {
   margin-right: 0.5rem !important;
 }
 .btn-container .btn-mod,
+.cp-btn-container .btn-mod,
 .btn-page-area > div:nth-child(1) {
   display: inline-block !important;
 }
-.page-container {
+.page-container, .cp-page-container {
   float: right;
   height: 38px;
   display: flex;
   align-items: flex-end;
+}
+.cp-page-container {
+  margin-top: 46px;
 }
 
 /* 공지사항상세 */
@@ -1235,8 +1252,6 @@ table.table tbody tr.row-selected {
 .connector-legend {
   border: 1px solid #ddd;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  margin-top: 15px !important;
-  margin-bottom: 15px !important;
   padding: 10px !important;
 }
 
