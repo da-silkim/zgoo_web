@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import zgoo.cpos.dto.cs.CsInfoDto.CsInfoDetailDto;
 import zgoo.cpos.dto.cs.CsInfoDto.CsInfoListDto;
 import zgoo.cpos.dto.cs.CsInfoDto.CsInfoRegDto;
+import zgoo.cpos.dto.cs.CsInfoDto.StationOpStatusDto;
 import zgoo.cpos.dto.cs.CsInfoDto.StationSearchDto;
 
 public interface CsRepositoryCustom {
@@ -43,4 +44,7 @@ public interface CsRepositoryCustom {
     List<CsInfoDetailDto> findStationsWithinRadius(double latitude, double longitude, double radiusInKm);
 
     List<CsInfoListDto> findAllStationWithoutPagination(Long companyId, String searchOp, String searchContent);
+
+    // 충전소 운영상태
+    StationOpStatusDto getStationOpStatusCount();
 }

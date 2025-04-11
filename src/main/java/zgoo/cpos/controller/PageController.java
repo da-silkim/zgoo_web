@@ -37,6 +37,7 @@ import zgoo.cpos.dto.cp.CpModelDto.CpModelListDto;
 import zgoo.cpos.dto.cp.CurrentChargingListDto;
 import zgoo.cpos.dto.cs.CsInfoDto;
 import zgoo.cpos.dto.cs.CsInfoDto.CsInfoListDto;
+import zgoo.cpos.dto.cs.CsInfoDto.StationOpStatusDto;
 import zgoo.cpos.dto.history.ChargingHistDto;
 import zgoo.cpos.dto.history.ChgCommlogDto;
 import zgoo.cpos.dto.member.ConditionDto.ConditionCodeBaseDto;
@@ -120,10 +121,14 @@ public class PageController {
         // 필요한 data를 model에 추가 !!!
 
         try {
+            StationOpStatusDto opStatus = this.csService.getStationOpStatusCount();
+            model.addAttribute("opStatus", opStatus);
+
             List<NoticeListDto> noticeList = this.noticeService.findLatestNoticeList();
             model.addAttribute("noticeList", noticeList);
         } catch (Exception e) {
             e.getStackTrace();
+            model.addAttribute("opStatus", null);
             model.addAttribute("noticeList", Collections.emptyList());
         }
 

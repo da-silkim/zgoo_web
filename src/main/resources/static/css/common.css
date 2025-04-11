@@ -1280,3 +1280,16 @@ table.table tbody tr.row-selected {
 .fa-plug.disconnected {
   color: #6c757d;
 }
+
+/*
+ * dashboard 
+ */
+.dashboard .dashboard-col,
+.dashboard-hfix .dashboard-col,
+.dashboard .dashboard-col .card,
+.dashboard-hfix .dashboard-col .card {
+  height: 100% !important;
+}
+.dashboard-hfix {
+  height: 300px;
+}

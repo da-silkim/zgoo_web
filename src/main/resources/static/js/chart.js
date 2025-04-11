@@ -5,11 +5,11 @@ document.addEventListener('DOMContentLoaded', function(){
     var doughnutChart =  new Chart(ctx, {
         type: 'doughnut',
         data: {
-            labels: ["운영중", "운영중지"],
+            labels: [`시운전(${opStatus.opTestPer}%)`, `운영중(${opStatus.operatingPer}%)`, `운영중지(${opStatus.opStopPer}%)`],
             datasets: [{
-                data: [60, 40],
-                backgroundColor: ['#144693', '#d9d9d9'], // 색상 추가
-                hoverBackgroundColor: ['#5073A8', '#E8EAEE'], // 호버 색상 추가                    
+                data: [opStatus.opTestCount, opStatus.operatingCount, opStatus.opStopCount],
+                backgroundColor: ['#EB5B00', '#144693', '#d9d9d9'],
+                hoverBackgroundColor: ['#EF9651', '#5073A8', '#E8EAEE'],                  
                 borderWidth: 0,
             }]
         },

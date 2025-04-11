@@ -111,4 +111,17 @@ public class CsInfoDto {
         private Double latitude;
         private Double longitude;
     }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class StationOpStatusDto {
+        private Long opTestCount;
+        private Long opStopCount;
+        private Long operatingCount;
+        private Double opTestPer;
+        private Double opStopPer;
+        private Double operatingPer;
+    }
 }

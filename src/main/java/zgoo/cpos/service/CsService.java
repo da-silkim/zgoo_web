@@ -17,6 +17,7 @@ import zgoo.cpos.domain.cs.CsLandInfo;
 import zgoo.cpos.dto.cs.CsInfoDto.CsInfoDetailDto;
 import zgoo.cpos.dto.cs.CsInfoDto.CsInfoListDto;
 import zgoo.cpos.dto.cs.CsInfoDto.CsInfoRegDto;
+import zgoo.cpos.dto.cs.CsInfoDto.StationOpStatusDto;
 import zgoo.cpos.dto.cs.CsInfoDto.StationSearchDto;
 import zgoo.cpos.mapper.CsMapper;
 import zgoo.cpos.repository.charger.ChargerRepository;
@@ -258,5 +259,20 @@ public class CsService {
             return new ArrayList<>();
         }
 
+    }
+
+    public StationOpStatusDto getStationOpStatusCount() {
+        try {
+            StationOpStatusDto dto = this.csRepository.getStationOpStatusCount();
+            log.info("[getStationOpStatusCount] dto >> {}", dto.toString());
+            Long total = dto.getOpStopCount() + dto.getOpTestCount() + dto.getOperatingCount();
+            dto.setOpTestPer((double)dto.getOpTestCount()/total*100);
+            dto.setOpStopPer((double)dto.getOpStopCount()/total*100);
+            dto.setOperatingPer((double)dto.getOperatingCount()/total*100);
+            return dto;
+        } catch (Exception e) {
+            log.error("[getStationOpStatusCount] error: {}", e.getMessage());
+            return null;
+        }
     }
 }

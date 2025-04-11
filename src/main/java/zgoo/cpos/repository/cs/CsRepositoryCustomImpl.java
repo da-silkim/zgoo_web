@@ -24,6 +24,7 @@ import zgoo.cpos.domain.cs.QCsLandInfo;
 import zgoo.cpos.dto.cs.CsInfoDto.CsInfoDetailDto;
 import zgoo.cpos.dto.cs.CsInfoDto.CsInfoListDto;
 import zgoo.cpos.dto.cs.CsInfoDto.CsInfoRegDto;
+import zgoo.cpos.dto.cs.CsInfoDto.StationOpStatusDto;
 import zgoo.cpos.dto.cs.CsInfoDto.StationSearchDto;
 
 @Slf4j
@@ -363,5 +364,20 @@ public class CsRepositoryCustomImpl implements CsRepositoryCustom {
             .orderBy(csInfo.id.desc())
             .where(builder)
             .fetch();
+    }
+
+    @Override
+    public StationOpStatusDto getStationOpStatusCount() {
+        StationOpStatusDto dto = queryFactory.select(Projections.fields(StationOpStatusDto.class,
+            Expressions.numberTemplate(Long.class, "COUNT(CASE WHEN {0} = 'OPTEST' THEN 1 END)", 
+                csInfo.opStatus).as("opTestCount"),
+            Expressions.numberTemplate(Long.class, "COUNT(CASE WHEN {0} = 'OPSTOP' THEN 1 END)", 
+                csInfo.opStatus).as("opStopCount"),
+            Expressions.numberTemplate(Long.class, "COUNT(CASE WHEN {0} = 'OPERATING' THEN 1 END)", 
+                csInfo.opStatus).as("operatingCount")))
+            .from(csInfo)
+            .fetchOne();
+
+        return dto;
     }
 }
