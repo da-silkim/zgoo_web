@@ -26,4 +26,6 @@ public interface ChargerRepositoryCustom {
 
     List<ChargerListDto> findAllChargerListWithoutPagination(Long companyId, String manufCd, String searchOp,
             String searchContent);
+
+    long countCharger();
 }

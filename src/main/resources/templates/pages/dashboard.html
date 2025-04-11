@@ -2,21 +2,21 @@
 <div layout:fragment="content" class="main-content">
     <div class="responsive-content">
         <!-- row:1 start -->
-        <div class="row main-row dashboard">
+        <div class="row main-row dashboard dashboard-row1">
             <div class="col-5 dashboard-col">
                 <div class="card">
                     <div class="card-body">
                         <div class="card-title"><span class="card-title-bar"></span><span>충전기 현황</span></div>
-                        <div class="ms-1">총 충전기 대수 <b class="price">1000</b>대</div>
-                        <canvas class="w-100 h-80 m-auto p-2" id="treeChart"></canvas>
+                        <div>총 충전기 대수 <b class="price" style="font-size: 20px;" th:text="${cpCount}"></b>대</div>
+                        <canvas id="treeChart"></canvas>
                     </div>
                 </div>
             </div>
             <div class="col-3 dashboard-col">
                 <div class="card">
-                    <div class="card-body" style="padding-top: 44px; position: relative;">
-                        <div class="card-title" style="position: absolute; top: 16px;"><span class="card-title-bar"></span><span>가동률</span></div>
-                        <canvas class="w-100 m-auto" id="doughnutChart"></canvas>
+                    <div class="card-body">
+                        <div class="card-title"><span class="card-title-bar"></span><span>가동률</span></div>
+                        <canvas id="doughnutChart"></canvas>
                     </div>
                 </div>
             </div>
@@ -67,7 +67,7 @@
         </div>
         <!-- row:1 end -->
         <!-- row:2 start-->
-        <div class="row main-row dashboard">
+        <div class="row main-row dashboard dashboard-row2">
             <div class="col dashboard-col">
                 <div class="card">
                     <div class="card-body">
@@ -79,8 +79,8 @@
             <div class="col-3 dashboard-col">
                 <div class="card">
                     <div class="card-body">
-                        <div class="card-title mb-4"><span class="card-title-bar"></span><span>사용용도</span></div>
-                        <canvas class="w-80 h-80 m-auto" id="pieChart"></canvas>
+                        <div class="card-title"><span class="card-title-bar"></span><span>사용용도</span></div>
+                        <canvas  id="pieChart"></canvas>
                     </div>
                 </div>
             </div>
@@ -150,6 +150,7 @@
     <script type="text/javascript" th:src="@{/js/chart.js}"></script>
     <script th:inline="javascript">
         var opStatus = /*[[${opStatus != null ? opStatus : '{}'}]]*/ {};
+        var connStatus = /*[[${connStatus != null ? connStatus : '{}'}]]*/ {};
     </script>
 </div>
 </html>

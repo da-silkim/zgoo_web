@@ -93,42 +93,24 @@ document.addEventListener('DOMContentLoaded', function(){
     });
 
     // treemap chart
-    // B43F3F ED9455 686D76
-    var ctx =  document.getElementById("treeChart").getContext('2d');
-    var DATA = [
-        {
-            what: '대기',
-            value: 200,
-            color: '#327EC3'
-        },
-        {
-            what: '충전중',
-            value: 50,
-            color: '#2EC8A3'
-        },
-        {
-            what: '고장/점검',
-            value: 10,
-            color: '#C1315C'
-        },
-        {
-            what: '예약',
-            value: 20,
-            color: '#702EC3'
-        },
-        {
-            what: '통신장애',
-            value: 10,
-            color: '#A9A3A3'
-        },
+    const treemapData = [
+        { what: "사용가능", value: connStatus.availableCount, color: '#28a745'},
+        { what: "준비중", value: connStatus.preparingCount, color: '#ffc107'},
+        { what: "충전중", value: connStatus.chargingCount, color: '#007bff'},
+        { what: "충전오류", value: connStatus.suspendedEvCount, color: '#A9A3A3'},
+        { what: "충전기오류", value: connStatus.suspendedEvseCount, color: '#DBDBDB'},
+        { what: "종료중", value: connStatus.finishingCount, color: '#EC5228'},
+        { what: "예약", value: connStatus.reservedCount, color: '#702EC3'},
+        { what: "사용불가능", value: connStatus.unavailableCount, color: '#BF3131'},
+        { what: "고장", value: connStatus.faultedCount, color: '#dc3545'},
     ];
-    
-    let treemapChart =  new Chart(ctx, {
+    var ctx =  document.getElementById("treeChart").getContext('2d');
+    var treemapChart =  new Chart(ctx, {
         type: 'treemap',
         data: {
             datasets: [{
                 label: 'Charge',
-                tree: DATA,
+                tree: treemapData,
                 key: 'value',
                 borderWidth: 0,
                 borderRadius: 6,
@@ -149,9 +131,8 @@ document.addEventListener('DOMContentLoaded', function(){
                         return [ctx.raw.v, ctx.raw._data.what];
                     },
                     color: ['white', 'whiteSmoke'],
-                    font: [{size: 28, weight: 'bold'}, {size: 18}],
-                    // font: { size: 20 },
-                    position: 'center' // 라벨 위치 가운데로 설정
+                    font: [{size: 24, weight: 'bold'}, {size: 16}],
+                    position: 'center'
                 },
             }]
         },
@@ -200,10 +181,10 @@ document.addEventListener('DOMContentLoaded', function(){
             plugins: {
                 legend: {
                     position: 'right', // 범례 위치 설정
-                    // align: 'center', // 범례 정렬
+                    // align: 'left', // 범례 정렬
                     labels: {
                         font: {
-                            size: 16
+                            size: 14
                         }
                     }
                 },                        

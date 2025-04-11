@@ -139,4 +139,20 @@ public class ChargerDto {
         private LocalDateTime recentDt;
         private List<ConnectorStatusDto> connector;
     }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class ConnectorStatusCountDto {
+        private Long availableCount;
+        private Long preparingCount;
+        private Long chargingCount;
+        private Long suspendedEvCount;
+        private Long suspendedEvseCount;
+        private Long finishingCount;
+        private Long reservedCount;
+        private Long unavailableCount;
+        private Long faultedCount;
+    }
 }

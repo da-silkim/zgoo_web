@@ -1291,5 +1291,27 @@ table.table tbody tr.row-selected {
   height: 100% !important;
 }
 .dashboard-hfix {
-  height: 300px;
+  height: 300px !important;
+}
+
+.dashboard-row1 > div:nth-child(1) .card-body {
+  position: relative;
+  padding-top: 80px;
+}
+.dashboard-row1 > div:nth-child(1) .card-body > div:nth-child(1),
+.dashboard-row1 > div:nth-child(2) .card-body > div:nth-child(1),
+.dashboard-row2 > div:nth-child(2) .card-body > div:nth-child(1) {
+  position: absolute;
+  top: 16px;
+}
+.dashboard-row1 > div:nth-child(1) .card-body > div:nth-child(2) {
+  position: absolute;
+  top: 46px;
+  left: 28px;
+}
+
+.dashboard-row1 > div:nth-child(2) .card-body,
+.dashboard-row2 > div:nth-child(2) .card-body {
+  padding-top: 60px;
+  position: relative;
 }

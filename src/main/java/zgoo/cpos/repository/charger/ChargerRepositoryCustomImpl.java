@@ -277,4 +277,12 @@ public class ChargerRepositoryCustomImpl implements ChargerRepositoryCustom {
                 .orderBy(cpInfo.regDt.desc())
                 .fetch();
     }
+
+    @Override
+    public long countCharger() {
+        return queryFactory
+            .select(cpInfo.count())
+            .from(cpInfo)
+            .fetchOne();
+    }
 }

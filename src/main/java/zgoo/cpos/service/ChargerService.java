@@ -21,6 +21,7 @@ import zgoo.cpos.dto.cp.ChargerDto.ChargerDetailListDto;
 import zgoo.cpos.dto.cp.ChargerDto.ChargerListDto;
 import zgoo.cpos.dto.cp.ChargerDto.ChargerRegDto;
 import zgoo.cpos.dto.cp.ChargerDto.ChargerSearchDto;
+import zgoo.cpos.dto.cp.ChargerDto.ConnectorStatusCountDto;
 import zgoo.cpos.dto.cp.ChargerDto.ConnectorStatusDto;
 import zgoo.cpos.dto.cp.CpModelDto.CpModelListDto;
 import zgoo.cpos.mapper.CpMapper;
@@ -275,5 +276,29 @@ public class ChargerService {
 
         // 대용량 데이터 처리를 위한 스트림 처리 또는 배치 처리 고려
         return chargerRepository.findAllChargerListWithoutPagination(companyId, manufCd, searchOp, searchContent);
+    }
+
+    /* 
+     * 총 충전기
+     */
+    public long countCharger() {
+        try {
+            return chargerRepository.countCharger();
+        } catch (Exception e) {
+            log.error("[ChargerService >> countCharger] error:", e.getMessage(), e);
+            return 0;
+        }
+    }
+
+    /* 
+     * 충전기 상태
+     */
+    public ConnectorStatusCountDto getConnectorStatusCount() {
+        try {
+            return connectorStatusRepository.getConnectorStatusCount();
+        } catch (Exception e) {
+            log.error("[ChargerService >> getConnectorStatusCount] error:", e.getMessage(), e);
+            return null;
+        }
     }
 }

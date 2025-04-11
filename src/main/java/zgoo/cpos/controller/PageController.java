@@ -30,6 +30,7 @@ import zgoo.cpos.dto.company.CompanyDto.CompanyRegDto;
 import zgoo.cpos.dto.company.CompanyDto.CpPlanDto;
 import zgoo.cpos.dto.cp.ChargerDto.ChargerListDto;
 import zgoo.cpos.dto.cp.ChargerDto.ChargerRegDto;
+import zgoo.cpos.dto.cp.ChargerDto.ConnectorStatusCountDto;
 import zgoo.cpos.dto.cp.ChargerDto.ConnectorStatusDto;
 import zgoo.cpos.dto.cp.CpMaintainDto.CpMaintainListDto;
 import zgoo.cpos.dto.cp.CpModelDto;
@@ -121,6 +122,12 @@ public class PageController {
         // 필요한 data를 model에 추가 !!!
 
         try {
+            long cpCount = this.chargerService.countCharger();
+            model.addAttribute("cpCount", cpCount);
+
+            ConnectorStatusCountDto connStatus = this.chargerService.getConnectorStatusCount();
+            model.addAttribute("connStatus", connStatus);
+
             StationOpStatusDto opStatus = this.csService.getStationOpStatusCount();
             model.addAttribute("opStatus", opStatus);
 
