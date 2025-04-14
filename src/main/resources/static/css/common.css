@@ -32,6 +32,12 @@ footer {
 a {
   text-decoration: none !important;
 }
+.font-color-brown {
+  color: brown;
+}
+.font-color-blue {
+  color: blue;
+}
 
 /* Chrome, Safari, Edge, Opera */
 input::-webkit-outer-spin-button,
@@ -325,7 +331,7 @@ input.input-add-row-bb {
   padding: 5px;
 }
 .main-content .main-row .row {
-  height: 50%;
+  height: 33.33%;
 }
 
 .main-content .card .card-body .card-title {
@@ -363,27 +369,18 @@ input.input-add-row-bb {
 .main-content .main-row .card-body .error-status thead tr > th {
   background-color: #f5f7f8;
 }
-.main-content .main-row .card-body .sales-status {
-  padding: 10px 20px;
-  font-size: 20px;
-}
-.main-content .main-row .card-body .sales-status .col6-text {
-  font-size: 16px;
-  display: flex;
-  align-items: center;
-  padding-left: 30px;
-}
+.main-content .main-row .card-body .sales-status,
 .main-content .main-row .card-body .charge-status {
-  padding: 10px 20px;
   font-size: 20px;
+  height: 100%;
 }
-.main-content .main-row .card-body .charge-status .col6-text {
+.main-content .main-row .card-body .sales-status .status-text,
+.main-content .main-row .card-body .charge-status .status-text {
   font-size: 16px;
   display: flex;
   align-items: center;
   padding-left: 30px;
 }
-
 .main-notice-container {
   width: 100% !important;
   position: relative;
@@ -597,9 +594,10 @@ table.table tbody tr.row-selected {
     font-size: 16px !important;
     padding-top: 0 !important;
   }
-  .main-content .main-row .card-body .sales-status .col6-text,
-  .main-content .main-row .card-body .charge-status .col6-text {
+  .main-content .main-row .card-body .sales-status .status-text,
+  .main-content .main-row .card-body .charge-status .status-text {
     font-size: 14px !important;
+    padding-left: 0 !important;
   }
 }
 
@@ -1300,7 +1298,9 @@ table.table tbody tr.row-selected {
 }
 .dashboard-row1 > div:nth-child(1) .card-body > div:nth-child(1),
 .dashboard-row1 > div:nth-child(2) .card-body > div:nth-child(1),
-.dashboard-row2 > div:nth-child(2) .card-body > div:nth-child(1) {
+.dashboard-row2 > div:nth-child(2) .card-body > div:nth-child(1),
+.sales-container .card-body > div:nth-child(1),
+.charge-container .card-body > div:nth-child(1) {
   position: absolute;
   top: 16px;
 }
@@ -1311,7 +1311,21 @@ table.table tbody tr.row-selected {
 }
 
 .dashboard-row1 > div:nth-child(2) .card-body,
-.dashboard-row2 > div:nth-child(2) .card-body {
+.dashboard-row2 > div:nth-child(2) .card-body,
+.sales-container .card-body,
+.charge-container .card-body {
   padding-top: 60px;
   position: relative;
+}
+
+.sales-status > div,
+.charge-status > div {
+  text-align: center !important;
+  display: flex; align-items: center;
+}
+.dashboard-period {
+  position: absolute;
+  top: 20px;
+  right: 16px;
+  font-size: 13px;
 }

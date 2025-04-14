@@ -285,7 +285,7 @@ document.addEventListener('DOMContentLoaded', () => {
 $(document).ready(function () {
     $('.price-format').each(function () {
         var price = parseInt($(this).text(), 10);
-        $(this).text(price.toLocaleString('ko-KR'));
+        $(this).text(price.toLocaleString('ko-KR') + "원");
     });
 });
 

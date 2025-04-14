@@ -3,7 +3,7 @@
     <div class="responsive-content">
         <!-- row:1 start -->
         <div class="row main-row dashboard dashboard-row1">
-            <div class="col-5 dashboard-col">
+            <div class="col-5 dashboard-col p-0">
                 <div class="card">
                     <div class="card-body">
                         <div class="card-title"><span class="card-title-bar"></span><span>충전기 현황</span></div>
@@ -20,44 +20,72 @@
                     </div>
                 </div>
             </div>
-            <div class="col-4 dashboard-col">
-                <div class="row pb-1 h-50 m-0">
+            <div class="col-4 dashboard-col p-0">
+                <div class="row pb-1 h-50 m-0 sales-container">
                     <div class="card">
                         <div class="card-body">
                             <div class="card-title"><span class="card-title-bar"></span><span>매출 현황</span></div>
                             <div class="sales-status">
-                                <div class="row text-center mb-3">
-                                    <div class="col-2">급속</div>
-                                    <div class="col-3 text-right price-format p-0">1500000</div>
-                                    <div class="col-1">원</div>
-                                    <div class="col-6 col6-text ps-0" style="color:brown;">▲ 지난달 대비&nbsp;<span class="price-format">10000</span></div>
+                                <div class="row">
+                                    <div class="col-3">급속</div>
+                                    <div class="col-4 text-right price-format">1500000</div>
+                                    <div class="col-5 status-text font-color-brown">▲ 지난달 대비&nbsp;<span class="price-format">10000</span></div>
                                 </div>
-                                <div class="row text-center">
-                                    <div class="col-2">완속</div>
-                                    <div class="col-3 text-right price-format p-0">50000</div>
-                                    <div class="col-1">원</div>
-                                    <div class="col-6 col6-text ps-0" style="color: blue;">▼ 지난달 대비&nbsp;<span class="price-format">10000</span></div>
+                                <div class="row">
+                                    <div class="col-3">완속</div>
+                                    <div class="col-4 text-right price-format">50000</div>
+                                    <div class="col-5 status-text font-color-blue">▼ 지난달 대비&nbsp;<span class="price-format">10000</span></div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-3">디스펜서</div>
+                                    <div class="col-4 text-right price-format">50000</div>
+                                    <div class="col-5 status-text font-color-blue">▼ 지난달 대비&nbsp;<span class="price-format">10000</span></div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="row pt-1 h-50 m-0">
+                <div class="row pt-1 h-50 m-0 charge-container">
                     <div class="card h-100">
                         <div class="card-body">
                             <div class="card-title"><span class="card-title-bar"></span><span>충전 현황</span></div>
+                            <div class="dashboard-period">
+                                <i class="bi bi-clock-history me-1"></i>
+                                <span th:text="${chgStatus.period}"></span>
+                            </div>
                             <div class="charge-status">
-                                <div class="row text-center mb-3">
-                                    <div class="col-2">급속</div>
-                                    <div class="col-2 text-right price-format p-0">100</div>
-                                    <div class="col-2">kWh</div>
-                                    <div class="col-6 col6-text ps-0" style="color:brown;">▲ 지난달 대비 10 kWh</div>
+                                <div class="row">
+                                    <div class="col-3">급속</div>
+                                    <div class="col-4 text-right" th:text="|${#numbers.formatDecimal(chgStatus.fastChgAmount, 1, 'COMMA', 2, 'POINT')} kWh|"></div>
+                                    <div class="col-5 status-text">
+                                        <span th:if="${chgStatus.fastCheck == 1}" class="font-color-brown"
+                                            th:text="|▲ 지난달 대비 ${#numbers.formatDecimal(chgStatus.compareFast, 1, 'COMMA', 2, 'POINT')} kWh|"></span>
+                                        <span th:if="${chgStatus.fastCheck == -1}" class="font-color-blue"
+                                            th:text="|▼ 지난달 대비 ${#numbers.formatDecimal(chgStatus.compareFast, 1, 'COMMA', 2, 'POINT')} kWh|"></span>
+                                        <span th:if="${chgStatus.fastCheck == 0}" th:text="|-|"></span>
+                                    </div>
                                 </div>
-                                <div class="row text-center">
-                                    <div class="col-2">완속</div>
-                                    <div class="col-2 text-right price-format p-0">50</div>
-                                    <div class="col-2">kWh</div>
-                                    <div class="col-6 col6-text ps-0" style="color: blue;">▼ 지난달 대비 10 kWh</div>
+                                <div class="row">
+                                    <div class="col-3">완속</div>
+                                    <div class="col-4 text-right" th:text="|${#numbers.formatDecimal(chgStatus.lowChgAmount, 1, 'COMMA', 2, 'POINT')} kWh|"></div>
+                                    <div class="col-5 status-text">
+                                        <span th:if="${chgStatus.lowCheck == 1}" class="font-color-brown"
+                                            th:text="|▲ 지난달 대비 ${#numbers.formatDecimal(chgStatus.compareLow, 1, 'COMMA', 2, 'POINT')} kWh|"></span>
+                                        <span th:if="${chgStatus.lowCheck == -1}" class="font-color-blue"
+                                            th:text="|▼ 지난달 대비 ${#numbers.formatDecimal(chgStatus.compareLow, 1, 'COMMA', 2, 'POINT')} kWh|"></span>
+                                        <span th:if="${chgStatus.lowCheck == 0}" th:text="|-|"></span>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-3">디스펜서</div>
+                                    <div class="col-4 text-right" th:text="|${#numbers.formatDecimal(chgStatus.despnChgAmount, 1, 'COMMA', 2, 'POINT')} kWh|"></div>
+                                    <div class="col-5 status-text">
+                                        <span th:if="${chgStatus.despnCheck == 1}" class="font-color-brown"
+                                            th:text="|▲ 지난달 대비 ${#numbers.formatDecimal(chgStatus.compareDespn, 1, 'COMMA', 2, 'POINT')} kWh|"></span>
+                                        <span th:if="${chgStatus.despnCheck == -1}" class="font-color-blue"
+                                            th:text="|▼ 지난달 대비 ${#numbers.formatDecimal(chgStatus.compareDespn, 1, 'COMMA', 2, 'POINT')} kWh|"></span>
+                                        <span th:if="${chgStatus.despnCheck == 0}" th:text="|-|"></span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -68,7 +96,7 @@
         <!-- row:1 end -->
         <!-- row:2 start-->
         <div class="row main-row dashboard dashboard-row2">
-            <div class="col dashboard-col">
+            <div class="col dashboard-col ps-0">
                 <div class="card">
                     <div class="card-body">
                         <div class="card-title"><span class="card-title-bar"></span><span>충전기 설치 현황</span></div>
@@ -76,7 +104,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-3 dashboard-col">
+            <div class="col-3 dashboard-col p-0">
                 <div class="card">
                     <div class="card-body">
                         <div class="card-title"><span class="card-title-bar"></span><span>사용용도</span></div>
@@ -88,7 +116,7 @@
         <!-- row:2 end -->
         <!-- row:3 start -->
         <div class="row main-row dashboard-hfix">
-            <div class="col-7 dashboard-col">
+            <div class="col-7 dashboard-col ps-0">
                 <div class="card">
                     <div class="card-body">
                         <div class="card-title"><span class="card-title-bar"></span><span>고장/장애 이력</span>
@@ -114,7 +142,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-5 dashboard-col">
+            <div class="col-5 dashboard-col p-0">
                 <div class="card">
                     <div class="card-body main-notice-container">
                         <div>

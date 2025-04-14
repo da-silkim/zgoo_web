@@ -1,5 +1,6 @@
 package zgoo.cpos.repository.history;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -7,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 
 import zgoo.cpos.dto.history.ChargingHistDto;
 import zgoo.cpos.dto.statistics.TotalkwDto.TotalkwBaseDto;
+import zgoo.cpos.dto.statistics.TotalkwDto.TotalkwDashboardDto;
 import zgoo.cpos.dto.statistics.TotalkwDto.TotalkwLineChartBaseDto;
 import zgoo.cpos.dto.statistics.UsageDto.UsageBaseDto;
 import zgoo.cpos.dto.statistics.UsageDto.UsageLineChartBaseDto;
@@ -27,4 +29,6 @@ public interface ChargingHistRepositoryCustom {
     UsageBaseDto searchYearUsage(Long companyId, String searchOp, String searchContent, Integer year);
 
     List<UsageLineChartBaseDto> searchMonthlyUsage(Long companyId, String searchOp, String searchContent, Integer year, String cpType);
+
+    TotalkwDashboardDto findChargingHistByPeriod(LocalDateTime startDate, LocalDateTime endDate);
 }

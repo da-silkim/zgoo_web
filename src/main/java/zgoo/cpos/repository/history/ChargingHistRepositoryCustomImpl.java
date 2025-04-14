@@ -13,7 +13,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
-import com.graphbuilder.math.Expression;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Projections;
@@ -29,8 +28,8 @@ import zgoo.cpos.domain.cs.QCsInfo;
 import zgoo.cpos.domain.history.QChargingHist;
 import zgoo.cpos.domain.member.QMember;
 import zgoo.cpos.dto.history.ChargingHistDto;
-import zgoo.cpos.dto.statistics.TotalkwDto;
 import zgoo.cpos.dto.statistics.TotalkwDto.TotalkwBaseDto;
+import zgoo.cpos.dto.statistics.TotalkwDto.TotalkwDashboardDto;
 import zgoo.cpos.dto.statistics.TotalkwDto.TotalkwLineChartBaseDto;
 import zgoo.cpos.dto.statistics.UsageDto.UsageBaseDto;
 import zgoo.cpos.dto.statistics.UsageDto.UsageLineChartBaseDto;
@@ -336,13 +335,13 @@ public class ChargingHistRepositoryCustomImpl implements ChargingHistRepositoryC
         builder.and(hist.startTime.between(startOfYear, endOfYear));
 
         TotalkwBaseDto dto = queryFactory.select(Projections.fields(TotalkwBaseDto.class,
-                Expressions.stringTemplate("MAX(CASE WHEN {0} = 'SPEEDFAST' THEN {0} END)", model.cpType).as("speedLow"),
+                Expressions.stringTemplate("MAX(CASE WHEN {0} = 'SPEEDFAST' THEN {0} END)", model.cpType).as("speedFast"),
                 Expressions.numberTemplate(BigDecimal.class,
-                    "SUM(CASE WHEN {0} = 'SPEEDFAST' THEN {1} ELSE 0 END)", model.cpType, hist.chargeAmount).as("lowChgAmount"),
-                Expressions.stringTemplate("MAX(CASE WHEN {0} = 'SPEEDLOW' THEN {0} END)", model.cpType).as("speedFast"),
+                    "SUM(CASE WHEN {0} = 'SPEEDFAST' THEN {1} ELSE 0 END)", model.cpType, hist.chargeAmount).as("fastChgAmount"),
+                Expressions.stringTemplate("MAX(CASE WHEN {0} = 'SPEEDLOW' THEN {0} END)", model.cpType).as("speedLow"),
                 Expressions.numberTemplate(BigDecimal.class,
-                    "SUM(CASE WHEN {0} = 'SPEEDLOW' THEN {1} ELSE 0 END)", model.cpType, hist.chargeAmount).as("fastChgAmount"),
-                    Expressions.stringTemplate("MAX(CASE WHEN {0} = 'SPEEDDESPN' THEN {0} END)", model.cpType).as("speedDespn"),
+                    "SUM(CASE WHEN {0} = 'SPEEDLOW' THEN {1} ELSE 0 END)", model.cpType, hist.chargeAmount).as("lowChgAmount"),
+                Expressions.stringTemplate("MAX(CASE WHEN {0} = 'SPEEDDESPN' THEN {0} END)", model.cpType).as("speedDespn"),
                 Expressions.numberTemplate(BigDecimal.class,
                     "SUM(CASE WHEN {0} = 'SPEEDDESPN' THEN {1} ELSE 0 END)", model.cpType, hist.chargeAmount).as("despnChgAmount"),
                 Expressions.numberTemplate(BigDecimal.class,
@@ -505,5 +504,23 @@ public class ChargingHistRepositoryCustomImpl implements ChargingHistRepositoryC
         }
 
         return monthlyResults;
+    }
+
+    @Override
+    public TotalkwDashboardDto findChargingHistByPeriod(LocalDateTime startDate, LocalDateTime endDate) {
+        TotalkwDashboardDto dto = queryFactory.select(Projections.fields(TotalkwDashboardDto.class,
+        Expressions.numberTemplate(BigDecimal.class,
+        "SUM(CASE WHEN {0} = 'SPEEDLOW' THEN {1} ELSE 0 END)", model.cpType, hist.chargeAmount).as("lowChgAmount"),
+        Expressions.numberTemplate(BigDecimal.class,
+        "SUM(CASE WHEN {0} = 'SPEEDFAST' THEN {1} ELSE 0 END)", model.cpType, hist.chargeAmount).as("fastChgAmount"),
+        Expressions.numberTemplate(BigDecimal.class,
+        "SUM(CASE WHEN {0} = 'SPEEDDESPN' THEN {1} ELSE 0 END)", model.cpType, hist.chargeAmount).as("despnChgAmount")))
+        .from(hist)
+        .leftJoin(cpInfo).on(hist.chargerID.eq(cpInfo.id))
+        .leftJoin(model).on(cpInfo.modelCode.eq(model.modelCode))
+        .where(hist.startTime.between(startDate, endDate))
+        .fetchOne();
+
+        return dto;
     }
 }

@@ -1,5 +1,9 @@
 package zgoo.cpos.service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.List;
 
 import org.springframework.dao.DataAccessException;
@@ -12,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import zgoo.cpos.dto.history.ChargingHistDto;
+import zgoo.cpos.dto.statistics.TotalkwDto.TotalkwDashboardDto;
 import zgoo.cpos.repository.history.ChargingHistRepository;
 
 @Service
@@ -80,5 +85,68 @@ public class ChargingHistService {
 
         return chargingHistRepository.findAllChargingHistListWithoutPagination(companyId, chgStartTimeFrom,
                 chgStartTimeTo, searchOp, searchContent);
+    }
+
+    /* 
+     * 대시보드 - 충전현황
+     */
+    public TotalkwDashboardDto findChargingHistByPeriod() {
+        try {
+            LocalDate today = LocalDate.now();    // 오늘 날짜
+            LocalDate firstDayOfCurrentMonth = today.withDayOfMonth(1);                       // 당월의 첫 번째 날
+            YearMonth lastMonth = YearMonth.from(today).minusMonths(1);                 // 전월 YearMonth
+            LocalDate sameDayLastMonth = today.minusMonths(1).withDayOfMonth(today.getDayOfMonth()); // 전월의 같은 일자
+            LocalDate firstDayOfLastMonth = lastMonth.atDay(1);                               // 전월의 첫 번째 날
+            LocalDate lastDayOfLastMonth = lastMonth.atEndOfMonth();                                     // 전월의 마지막 날
+
+
+            LocalDate endDate = today.getDayOfMonth() > lastDayOfLastMonth.getDayOfMonth() ? lastDayOfLastMonth : sameDayLastMonth;
+
+
+            TotalkwDashboardDto lastMonthDto = chargingHistRepository.findChargingHistByPeriod(firstDayOfLastMonth.atStartOfDay(), 
+                endDate.atTime(23, 59, 59));
+            TotalkwDashboardDto currMonthDto = chargingHistRepository.findChargingHistByPeriod(firstDayOfCurrentMonth.atStartOfDay(), 
+                today.atTime(23, 59, 59));
+
+            currMonthDto.setFastCheck(compareAmountCheck(lastMonthDto.getFastChgAmount(), currMonthDto.getFastChgAmount(), "Fast"));
+            currMonthDto.setLowCheck(compareAmountCheck(lastMonthDto.getLowChgAmount(), currMonthDto.getLowChgAmount(), "Low"));
+            currMonthDto.setDespnCheck(compareAmountCheck(lastMonthDto.getDespnChgAmount(), currMonthDto.getDespnChgAmount(), "Despn"));
+            
+            currMonthDto.setCompareFast(compareAmount(lastMonthDto.getFastChgAmount(), currMonthDto.getFastChgAmount()));
+            currMonthDto.setCompareLow(compareAmount(lastMonthDto.getLowChgAmount(), currMonthDto.getLowChgAmount()));
+            currMonthDto.setCompareDespn(compareAmount(lastMonthDto.getDespnChgAmount(), currMonthDto.getDespnChgAmount()));
+
+            currMonthDto.setPeriod(firstDayOfCurrentMonth + " ~ " + today);
+
+            return currMonthDto;
+        } catch (Exception e) {
+            log.error("[findChargingHistByPeriod] error: {}", e.getMessage(), e);
+            return null;
+        }
+    }
+
+    private int compareAmountCheck(BigDecimal prev, BigDecimal curr, String label) {
+        int comparison = prev.compareTo(curr);
+        if (comparison > 0) {
+            log.info("전월의 {} 충전량이 당월보다 큽니다.", label);
+            return -1;
+        } else if (comparison < 0) {
+            log.info("당월의 {} 충전량이 전월보다 큽니다.", label);
+            return 1;
+        } else {
+            log.info("두 달의 {} 충전량이 같습니다.", label);
+            return 0;
+        }
+    }
+
+    private BigDecimal compareAmount(BigDecimal prev, BigDecimal curr) {
+        int comparison = prev.compareTo(curr);
+        if (comparison > 0) {
+            return prev.subtract(curr).setScale(2, RoundingMode.HALF_UP);
+        } else if (comparison < 0) {
+            return curr.subtract(prev).setScale(2, RoundingMode.HALF_UP);
+        } else {
+            return BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP);
+        }
     }
 }

@@ -6,7 +6,9 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 @Data
@@ -14,7 +16,7 @@ import lombok.experimental.SuperBuilder;
 public class TotalkwDto {
 
     @Data
-    @Builder
+    @SuperBuilder(toBuilder = true)
     @NoArgsConstructor
     @AllArgsConstructor
     public static class TotalkwBaseDto {
@@ -57,5 +59,21 @@ public class TotalkwDto {
     public static class TotalkwBarDto {
         private TotalkwBaseDto preYear;
         private TotalkwBaseDto curYear;
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @SuperBuilder(toBuilder = true)
+    @ToString(callSuper = true)
+    @EqualsAndHashCode(callSuper = true)
+    public static class TotalkwDashboardDto extends TotalkwBaseDto {
+        private Integer lowCheck;
+        private Integer fastCheck;
+        private Integer despnCheck;
+        private BigDecimal compareLow;
+        private BigDecimal compareFast;
+        private BigDecimal compareDespn;
+        private String period;
     }
 }

@@ -51,6 +51,7 @@ import zgoo.cpos.dto.menu.CompanyMenuAuthorityDto;
 import zgoo.cpos.dto.menu.MenuAuthorityDto.MenuAuthorityBaseDto;
 import zgoo.cpos.dto.menu.MenuDto;
 import zgoo.cpos.dto.statistics.TotalkwDto.TotalkwBarDto;
+import zgoo.cpos.dto.statistics.TotalkwDto.TotalkwDashboardDto;
 import zgoo.cpos.dto.statistics.TotalkwDto.TotalkwLineChartDto;
 import zgoo.cpos.dto.statistics.UsageDto.UsageBarDto;
 import zgoo.cpos.dto.statistics.UsageDto.UsageLineChartDto;
@@ -130,6 +131,9 @@ public class PageController {
 
             StationOpStatusDto opStatus = this.csService.getStationOpStatusCount();
             model.addAttribute("opStatus", opStatus);
+
+            TotalkwDashboardDto chgStatus = this.chargingHistService.findChargingHistByPeriod();
+            model.addAttribute("chgStatus", chgStatus);
 
             List<NoticeListDto> noticeList = this.noticeService.findLatestNoticeList();
             model.addAttribute("noticeList", noticeList);
