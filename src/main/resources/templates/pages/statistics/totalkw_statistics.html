@@ -83,8 +83,8 @@
                             <tbody>
                                 <tr>
                                     <th style="background-color: #f5f7f8;">전체 충전량(kWh)</th>
-                                    <td th:text="${totalkw.curYear.lowChgAmount}"></td>
                                     <td th:text="${totalkw.curYear.fastChgAmount}"></td>
+                                    <td th:text="${totalkw.curYear.lowChgAmount}"></td>
                                     <td th:text="${totalkw.curYear.despnChgAmount}"></td>
                                     <td th:text="${totalkw.curYear.totalkw}"></td>
                                 </tr>
@@ -172,8 +172,8 @@
 
         // bar Chart
         const barCharConfig = [
-            { label: '급속', data: [totalkw.preYear.lowChgAmount, totalkw.curYear.lowChgAmount], color: '#379C6D' },
-            { label: '완속', data: [totalkw.preYear.fastChgAmount, totalkw.curYear.fastChgAmount], color: '#E58A10' },
+            { label: '급속', data: [totalkw.preYear.fastChgAmount, totalkw.curYear.fastChgAmount], color: '#379C6D' },
+            { label: '완속', data: [totalkw.preYear.lowChgAmount, totalkw.curYear.lowChgAmount], color: '#E58A10' },
             { label: '디스펜서', data: [totalkw.preYear.despnChgAmount, totalkw.curYear.despnChgAmount], color: '#EFEFEF' }
         ];
 
