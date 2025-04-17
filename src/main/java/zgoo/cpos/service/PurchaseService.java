@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +22,7 @@ public class PurchaseService {
     private final CsRepository csRepository;
     private final PurchaseRepository purchaseRepository;
 
-    // 조회
+    // 매입 조회
     public Page<PurchaseListDto> findPurchaseInfoWithPagination(String searchOp, String searchContent,
             LocalDate startDate, LocalDate endDate, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
@@ -43,6 +44,17 @@ public class PurchaseService {
         } catch (Exception e) {
             log.error("[findPurchaseInfoWithPagination] error: {}", e.getMessage());
             return Page.empty(pageable);
+        }
+    }
+
+    // 매입 삭제
+    @Transactional
+    public void deletePurchaseInfo(Long id) {
+        try {
+            Long count = this.purchaseRepository.deletePurchaseOne(id);
+            log.info("=== delete purchase Info: {}", count);
+        } catch (Exception e) {
+            log.error("[deletePurchaseInfo] error: {}", e.getMessage());
         }
     }
 }

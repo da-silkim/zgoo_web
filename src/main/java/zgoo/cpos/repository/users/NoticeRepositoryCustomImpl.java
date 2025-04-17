@@ -61,9 +61,12 @@ public class NoticeRepositoryCustomImpl implements NoticeRepositoryCustom {
             .fetch();
 
         long totalCount = queryFactory
-            .selectFrom(notice)
-            .where(notice.delYn.eq("N"))
-            .fetchCount();
+            .select(notice.count())
+            .from(notice)
+            .where(notice.delYn.eq("N"),
+                    notice.startDate.loe(today),
+                    notice.endDate.goe(today))
+            .fetchOne();
 
         return new PageImpl<>(noticeList, pageable, totalCount);
     }
@@ -112,11 +115,12 @@ public class NoticeRepositoryCustomImpl implements NoticeRepositoryCustom {
             .fetch();
 
         long totalCount = queryFactory
-            .selectFrom(notice)
+            .select(notice.count())
+            .from(notice)
             .leftJoin(users).on(notice.user.userId.eq(users.userId))
             .leftJoin(company).on(users.company.id.eq(company.id))
             .where(builder)
-            .fetchCount();
+            .fetchOne();
 
         return new PageImpl<>(noticeList, pageable, totalCount);
     }

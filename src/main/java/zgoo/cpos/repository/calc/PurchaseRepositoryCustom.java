@@ -13,4 +13,6 @@ public interface PurchaseRepositoryCustom {
 
     Page<PurchaseListDto> searchPurchaseWithPagination(String searchOp, String searchContent, LocalDate startDate,
         LocalDate endDate, Pageable pageable);
+
+    Long deletePurchaseOne(Long id);
 }

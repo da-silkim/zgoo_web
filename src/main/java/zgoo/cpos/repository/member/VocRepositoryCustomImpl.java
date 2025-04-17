@@ -59,6 +59,7 @@ public class VocRepositoryCustomImpl implements VocRepositoryCustom {
         long totalCount = queryFactory
             .select(voc.count())
             .from(voc)
+            .where(voc.delYn.eq("N"))
             .fetchOne();
 
         return new PageImpl<>(vocList, pageable, totalCount);

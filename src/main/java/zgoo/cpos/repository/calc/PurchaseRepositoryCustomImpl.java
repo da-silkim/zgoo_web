@@ -57,6 +57,7 @@ public class PurchaseRepositoryCustomImpl implements PurchaseRepositoryCustom {
         long totalCount = queryFactory
             .select(purchase.count())
             .from(purchase)
+            .where(purchase.delYn.eq("N"))
             .fetchOne();
 
         return new PageImpl<>(purList, pageable, totalCount);
@@ -118,5 +119,14 @@ public class PurchaseRepositoryCustomImpl implements PurchaseRepositoryCustom {
             .fetchOne();
 
         return new PageImpl<>(purList, pageable, totalCount);
+    }
+
+    @Override
+    public Long deletePurchaseOne(Long id) {
+        return queryFactory
+            .update(purchase)
+            .set(purchase.delYn, "Y")
+            .where(purchase.id.eq(id))
+            .execute();
     }
 }

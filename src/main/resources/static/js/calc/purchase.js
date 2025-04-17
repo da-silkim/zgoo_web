@@ -12,4 +12,20 @@ $(document).ready(function() {
         id = selectRow.find('td').eq(0).attr('id');
         console.log("id: ", id);
     });
+
+    $('#deleteBtn').on('click', function() {
+        if (confirmSubmit("삭제")) {
+            $.ajax({
+                type: 'PATCH',
+                url: `/purchase/delete/${id}`,
+                success: function(response) {
+                    alert(response);
+                    window.location.reload();
+                },
+                error: function(error) {
+                    alert(error);
+                }
+            });
+        }
+    });
 });
