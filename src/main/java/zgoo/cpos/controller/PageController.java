@@ -28,10 +28,12 @@ import zgoo.cpos.dto.company.CompanyDto.BaseCompnayDto;
 import zgoo.cpos.dto.company.CompanyDto.CompanyListDto;
 import zgoo.cpos.dto.company.CompanyDto.CompanyRegDto;
 import zgoo.cpos.dto.company.CompanyDto.CpPlanDto;
+import zgoo.cpos.dto.cp.ChargerDto.ChargerCountBySidoDto;
 import zgoo.cpos.dto.cp.ChargerDto.ChargerListDto;
 import zgoo.cpos.dto.cp.ChargerDto.ChargerRegDto;
 import zgoo.cpos.dto.cp.ChargerDto.ConnectorStatusCountDto;
 import zgoo.cpos.dto.cp.ChargerDto.ConnectorStatusDto;
+import zgoo.cpos.dto.cp.ChargerDto.FacilityCountDto;
 import zgoo.cpos.dto.cp.CpMaintainDto.CpMaintainListDto;
 import zgoo.cpos.dto.cp.CpModelDto;
 import zgoo.cpos.dto.cp.CpModelDto.CpModelListDto;
@@ -120,7 +122,6 @@ public class PageController {
     @GetMapping("/dashboard")
     public String showdashboard(Model model) {
         log.info("Dashboard Home");
-        // 필요한 data를 model에 추가 !!!
 
         try {
             long cpCount = this.chargerService.countCharger();
@@ -135,11 +136,22 @@ public class PageController {
             TotalkwDashboardDto chgStatus = this.chargingHistService.findChargingHistByPeriod();
             model.addAttribute("chgStatus", chgStatus);
 
+            List<ChargerCountBySidoDto> chargerCountList = this.chargerService.countChargerBySidoAndType();
+            model.addAttribute("chargerCountList", chargerCountList);
+
+            List<FacilityCountDto> facilityList = this.chargerService.countFacilityBySidoAndType(null, null);
+            model.addAttribute("facilityList", facilityList);
+
             List<NoticeListDto> noticeList = this.noticeService.findLatestNoticeList();
             model.addAttribute("noticeList", noticeList);
         } catch (Exception e) {
             e.getStackTrace();
+            model.addAttribute("cpCount", null);
+            model.addAttribute("connStatus", null);
             model.addAttribute("opStatus", null);
+            model.addAttribute("chgStatus", null);
+            model.addAttribute("chargerCountList", Collections.emptyList());
+            model.addAttribute("facilityList", Collections.emptyList());
             model.addAttribute("noticeList", Collections.emptyList());
         }
 

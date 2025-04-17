@@ -1,4 +1,3 @@
-// charts
 document.addEventListener('DOMContentLoaded', function(){
     // doughnt chart
     var ctx =  document.getElementById("doughnutChart").getContext('2d');
@@ -33,19 +32,35 @@ document.addEventListener('DOMContentLoaded', function(){
     });
 
     // bar chart
+    var sido = [];
+    var speedFastCount = [];
+    var speedLowCount = [];
+    var speedDespnCount = [];
+
+    chargerCountList.forEach(item => {
+        sido.push(item.sido);
+        speedFastCount.push(item.speedFastCount);
+        speedLowCount.push(item.speedLowCount);
+        speedDespnCount.push(item.speedDespnCount);
+    });
+
     ctx =  document.getElementById("barChart").getContext('2d');
     var barChart = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: ["서울특별시", "경기도", "인천광역시", "충청남도", "대전광역시", "전라북도", "광주광역시", "강원도", "대구광역시", "제주도"],
+            labels: sido,
             datasets: [{
                 label: "급속",
-                data: [2500, 4000, 5100, 3400, 4003, 2510, 5841, 3540, 6612, 5312],
+                data: speedFastCount,
                 backgroundColor: ['#144693']
             },{
                 label: "완속",
-                data: [4500, 5400, 3400, 3511, 3210, 6540, 3455, 3533, 2104, 1202],
+                data: speedLowCount,
                 backgroundColor: ['#26C59E']
+            },{
+                label: "디스펜서",
+                data: speedDespnCount,
+                backgroundColor: ['#FFD36E']
             },]
         },
         options: {
@@ -54,9 +69,9 @@ document.addEventListener('DOMContentLoaded', function(){
             maxBarThickness: 50, // 막대의 최대 너비 설정
             plugins: {
                 legend: {
-                    position: 'right', // 범례 위치 설정
+                    position: 'top', // 범례 위치 설정
                     align: 'center',   // 범례 정렬
-                    maxWidth: 90,      // 범례의 최대 너비 설정
+                    maxWidth: 120,     // 범례의 최대 너비 설정
                     labels: {
                         font: {
                             size: 14   // 범례 폰트 크기 조정
@@ -75,9 +90,7 @@ document.addEventListener('DOMContentLoaded', function(){
                     },
                 },
                 y: {
-                    // beginAtZero: true,
                     min: 0,
-                    max: 10000,
                     stacked:true,
                     ticks: {
                         color: '#000',
@@ -89,8 +102,33 @@ document.addEventListener('DOMContentLoaded', function(){
                     },
                 },
             },
+            onClick: (e, elements) => {
+                if (elements.length > 0) {
+                    const element = elements[0];
+                    const datasetIndex = element.datasetIndex;
+                    const index = element.index;
+                    const dataset = barChart.data.datasets[datasetIndex];
+                    const label = barChart.data.labels[index];
+                    getFacilityList(label, dataset.label);
+                }
+            }
         },
     });
+
+    function getFacilityList(sido, type) {
+        $.ajax({
+            url: '/charger/get/facility',
+            method: 'GET',
+            data: {sido: sido, type: type},
+            success: function(response) {
+                document.getElementById('facilityText').innerHTML = `${sido} / ${type}`;
+                drawPieChart(response);
+            },
+            error: function(error) {
+                console.error(error);
+            }
+        });
+    }
 
     // treemap chart
     const treemapData = [
@@ -151,44 +189,60 @@ document.addEventListener('DOMContentLoaded', function(){
         }
     });
 
+    let pieChart = null;
+
     // pie chart
-    var ctx =  document.getElementById("pieChart").getContext('2d');
-    // const DATA_COUNT = 5;
-    // const NUMBER_CFG = {count: DATA_COUNT, min: 0, max: 100};
-    const Utils = {
-        PIE_CHART_COLORS: {
-            p1: 'rgb(54, 48, 98)',
-            p2: 'rgb(77, 76, 125)',
-            p3: 'rgb(130, 115, 151)',
-            p4: 'rgb(216, 185, 195)',
-            p5: 'rgb(93, 93, 93)',
-            p6: 'rgb(217. 217. 217)',
+    drawPieChart(facilityList);
+    function drawPieChart(facilityList) {
+        var facility = [];
+        var faData = [];
+
+        facilityList.forEach(item => {
+            facility.push(item.facility);
+            faData.push(item.count);
+        });
+    
+        var ctx =  document.getElementById("pieChart").getContext('2d');
+        const Utils = {
+            PIE_CHART_COLORS: {
+                p1: 'rgb(54, 48, 98)',
+                p2: 'rgb(77, 76, 125)',
+                p3: 'rgb(130, 115, 151)',
+                p4: 'rgb(216, 185, 195)',
+                p5: 'rgb(93, 93, 93)',
+                p6: 'rgb(217, 217, 217)',
+            }
+        };
+
+        if (pieChart !== null) {
+            pieChart.destroy();
         }
-    };
-    var pieChart =  new Chart(ctx, {
-        type: 'pie',
-        data: {
-            labels: ["시청", "공영주차장", "아파트", "고속도로휴게소", "마트"],
-            datasets: [{
-                data: [15, 35, 20, 20, 10],
-                backgroundColor: Object.values(Utils.PIE_CHART_COLORS),
-            }]
-        },
-        options: {
-            responsive: true, // 반응형 옵션 추가
-            maintainAspectRatio: false, // 비율 유지 비활성화
-            aspectRatio: 1, // 너비:높이 비율 설정 (정사각형)
-            plugins: {
-                legend: {
-                    position: 'right', // 범례 위치 설정
-                    // align: 'left', // 범례 정렬
-                    labels: {
-                        font: {
-                            size: 14
-                        }
-                    }
-                },                        
+
+        pieChart =  new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: facility,
+                datasets: [{
+                    data: faData,
+                    backgroundColor: Object.values(Utils.PIE_CHART_COLORS),
+                }]
             },
-        }
-    });
+            options: {
+                responsive: true, // 반응형 옵션 추가
+                maintainAspectRatio: false, // 비율 유지 비활성화
+                aspectRatio: 1, // 너비:높이 비율 설정 (정사각형)
+                plugins: {
+                    legend: {
+                        position: 'right', // 범례 위치 설정
+                        // align: 'left', // 범례 정렬
+                        labels: {
+                            font: {
+                                size: 14
+                            }
+                        }
+                    },                        
+                },
+            }
+        });
+    }
 });

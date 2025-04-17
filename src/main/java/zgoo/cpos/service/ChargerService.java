@@ -1,5 +1,6 @@
 package zgoo.cpos.service;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -17,12 +18,14 @@ import zgoo.cpos.domain.charger.CpInfo;
 import zgoo.cpos.domain.charger.CpModem;
 import zgoo.cpos.domain.company.CpPlanPolicy;
 import zgoo.cpos.domain.cs.CsInfo;
+import zgoo.cpos.dto.cp.ChargerDto.ChargerCountBySidoDto;
 import zgoo.cpos.dto.cp.ChargerDto.ChargerDetailListDto;
 import zgoo.cpos.dto.cp.ChargerDto.ChargerListDto;
 import zgoo.cpos.dto.cp.ChargerDto.ChargerRegDto;
 import zgoo.cpos.dto.cp.ChargerDto.ChargerSearchDto;
 import zgoo.cpos.dto.cp.ChargerDto.ConnectorStatusCountDto;
 import zgoo.cpos.dto.cp.ChargerDto.ConnectorStatusDto;
+import zgoo.cpos.dto.cp.ChargerDto.FacilityCountDto;
 import zgoo.cpos.dto.cp.CpModelDto.CpModelListDto;
 import zgoo.cpos.mapper.CpMapper;
 import zgoo.cpos.mapper.CpModemMapper;
@@ -299,6 +302,30 @@ public class ChargerService {
         } catch (Exception e) {
             log.error("[ChargerService >> getConnectorStatusCount] error:", e.getMessage(), e);
             return null;
+        }
+    }
+
+    /* 
+     * 충전기 설치 현황(대시보드)
+     */
+    public List<ChargerCountBySidoDto> countChargerBySidoAndType() {
+        try {
+            return chargerRepository.countChargerBySidoAndType();
+        } catch (Exception e) {
+            log.error("[ChargerService >> countChargerBySidoAndType] error:", e.getMessage(), e);
+            return new ArrayList<>();
+        }
+    }
+
+    /* 
+     * 사용용도(대시보드)
+     */
+    public List<FacilityCountDto> countFacilityBySidoAndType(String sido, String type) {
+        try {
+            return this.chargerRepository.countFacilityBySidoAndType(sido, type);
+        } catch (Exception e) {
+            log.error("[ChargerService >> countFacilityBySidoAndType] error:", e.getMessage(), e);
+            return new ArrayList<>();
         }
     }
 }

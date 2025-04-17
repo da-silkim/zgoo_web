@@ -40,6 +40,7 @@ import lombok.extern.slf4j.Slf4j;
 import zgoo.cpos.dto.cp.ChargerDto.ChargerDetailListDto;
 import zgoo.cpos.dto.cp.ChargerDto.ChargerListDto;
 import zgoo.cpos.dto.cp.ChargerDto.ChargerRegDto;
+import zgoo.cpos.dto.cp.ChargerDto.FacilityCountDto;
 import zgoo.cpos.service.ChargerService;
 
 @Controller
@@ -377,4 +378,18 @@ public class CpController {
         cell.setCellStyle(style);
     }
 
+    /* 
+     * 대시보드 - 사용용도
+     */
+    @GetMapping("/get/facility")
+    public ResponseEntity<List<FacilityCountDto>> countFacility(@RequestParam("sido") String sido, 
+            @RequestParam("type") String type) {
+        try {
+            List<FacilityCountDto> facilityList = chargerService.countFacilityBySidoAndType(sido, type);
+            return ResponseEntity.ok(facilityList);
+        } catch (Exception e) {
+            log.error("[countFacility] error: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 }

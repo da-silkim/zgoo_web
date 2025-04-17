@@ -155,4 +155,24 @@ public class ChargerDto {
         private Long unavailableCount;
         private Long faultedCount;
     }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class ChargerCountBySidoDto  {
+        private String sido;
+        private Long speedFastCount;
+        private Long speedLowCount;
+        private Long speedDespnCount;
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class FacilityCountDto {
+        private String facility;
+        private Long count;
+    }
 }

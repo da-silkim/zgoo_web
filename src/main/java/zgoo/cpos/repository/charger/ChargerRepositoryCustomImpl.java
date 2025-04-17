@@ -8,6 +8,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
@@ -24,8 +25,10 @@ import zgoo.cpos.domain.company.QCpPlanPolicy;
 import zgoo.cpos.domain.cp.QCpModel;
 import zgoo.cpos.domain.cs.QCsInfo;
 import zgoo.cpos.domain.history.QChargingHist;
+import zgoo.cpos.dto.cp.ChargerDto.ChargerCountBySidoDto;
 import zgoo.cpos.dto.cp.ChargerDto.ChargerListDto;
 import zgoo.cpos.dto.cp.ChargerDto.ChargerSearchDto;
+import zgoo.cpos.dto.cp.ChargerDto.FacilityCountDto;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -43,6 +46,7 @@ public class ChargerRepositoryCustomImpl implements ChargerRepositoryCustom {
     QCommonCode commonTypeName = new QCommonCode("commonTypeCode");
     QCommonCode manufCdName = new QCommonCode("manufCd");
     QCommonCode cpTypeName = new QCommonCode("cpType");
+    QCommonCode facilityTypeName = new QCommonCode("facilityType");
 
     @Override
     public Page<ChargerListDto> findAllChargerListPaging(Pageable pageable) {
@@ -284,5 +288,71 @@ public class ChargerRepositoryCustomImpl implements ChargerRepositoryCustom {
             .select(cpInfo.count())
             .from(cpInfo)
             .fetchOne();
+    }
+
+    @Override
+    public List<ChargerCountBySidoDto> countChargerBySidoAndType() {
+        return queryFactory
+            .select(Projections.fields(ChargerCountBySidoDto.class,
+                csInfo.sido.as("sido"),
+
+                // SPEEDFAST
+                ExpressionUtils.as(
+                    Expressions.numberTemplate(Long.class,
+                        "SUM(CASE WHEN {0} = {1} THEN 1 ELSE 0 END)",
+                        model.cpType,
+                        Expressions.constant("SPEEDFAST")
+                    ),
+                    "speedFastCount"
+                ),
+
+                // SPEEDLOW
+                ExpressionUtils.as(
+                    Expressions.numberTemplate(Long.class,
+                        "SUM(CASE WHEN {0} = {1} THEN 1 ELSE 0 END)",
+                        model.cpType,
+                        Expressions.constant("SPEEDLOW")
+                    ),
+                    "speedLowCount"
+                ),
+
+                // SPEEDDESPN
+                ExpressionUtils.as(
+                    Expressions.numberTemplate(Long.class,
+                        "SUM(CASE WHEN {0} = {1} THEN 1 ELSE 0 END)",
+                        model.cpType,
+                        Expressions.constant("SPEEDDESPN")
+                    ),
+                    "speedDespnCount"
+                )
+            ))
+            .from(cpInfo)
+            .leftJoin(model).on(cpInfo.modelCode.eq(model.modelCode))
+            .leftJoin(csInfo).on(cpInfo.stationId.eq(csInfo))
+            .where(csInfo.sido.isNotNull())
+            .groupBy(csInfo.sido)
+            .orderBy(csInfo.sido.asc())
+            .fetch();
+    }
+
+    @Override
+    public List<FacilityCountDto> countFacilityBySidoAndType(String sido, String type) {
+        BooleanBuilder builder = new BooleanBuilder();
+
+        if (sido != null && !sido.isEmpty() && type != null && !type.isEmpty()) {
+            builder.and(csInfo.sido.eq(sido)).and(cpTypeName.name.eq(type));
+        }
+
+        return queryFactory.select(Projections.fields(FacilityCountDto.class,
+        facilityTypeName.name.as("facility"),
+            cpInfo.count().as("count")))
+            .from(cpInfo)
+            .leftJoin(csInfo).on(csInfo.id.eq(cpInfo.stationId.id))
+            .leftJoin(model).on(model.modelCode.eq(cpInfo.modelCode))
+            .leftJoin(facilityTypeName).on(facilityTypeName.commonCode.eq(csInfo.facilityType))
+            .leftJoin(cpTypeName).on(cpTypeName.commonCode.eq(model.cpType))
+            .where(builder)
+            .groupBy(facilityTypeName.name)
+            .fetch();
     }
 }

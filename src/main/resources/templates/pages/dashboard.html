@@ -108,6 +108,10 @@
                 <div class="card">
                     <div class="card-body">
                         <div class="card-title"><span class="card-title-bar"></span><span>사용용도</span></div>
+                        <div class="dashboard-period">
+                            <i class="bi bi-ev-station me-1"></i>
+                            <span th:text="전체" id="facilityText"></span>
+                        </div>
                         <canvas  id="pieChart"></canvas>
                     </div>
                 </div>
@@ -179,6 +183,8 @@
     <script th:inline="javascript">
         var opStatus = /*[[${opStatus != null ? opStatus : '{}'}]]*/ {};
         var connStatus = /*[[${connStatus != null ? connStatus : '{}'}]]*/ {};
+        var chargerCountList = /*[[${chargerCountList != null ? chargerCountList : '{}'}]]*/ {};
+        var facilityList = /*[[${facilityList != null ? facilityList : '{}'}]]*/ {};
     </script>
 </div>
 </html>

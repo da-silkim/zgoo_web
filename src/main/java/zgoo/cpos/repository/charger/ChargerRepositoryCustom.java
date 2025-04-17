@@ -7,8 +7,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import zgoo.cpos.domain.charger.CpInfo;
+import zgoo.cpos.dto.cp.ChargerDto.ChargerCountBySidoDto;
 import zgoo.cpos.dto.cp.ChargerDto.ChargerListDto;
 import zgoo.cpos.dto.cp.ChargerDto.ChargerSearchDto;
+import zgoo.cpos.dto.cp.ChargerDto.FacilityCountDto;
 
 public interface ChargerRepositoryCustom {
     Page<ChargerListDto> findAllChargerListPaging(Pageable page);
@@ -28,4 +30,8 @@ public interface ChargerRepositoryCustom {
             String searchContent);
 
     long countCharger();
+
+    List<ChargerCountBySidoDto> countChargerBySidoAndType();
+
+    List<FacilityCountDto> countFacilityBySidoAndType(String sido, String type);
 }

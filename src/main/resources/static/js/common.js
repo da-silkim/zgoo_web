@@ -307,6 +307,7 @@ function postSearch() {
 
             const latitude = document.getElementById('latitude');
             const longitude = document.getElementById('longitude');
+            const sido = document.getElementById('sido');
 
             if (latitude && longitude) {
                 const geocoder = new kakao.maps.services.Geocoder();
@@ -314,11 +315,42 @@ function postSearch() {
                     if (status === kakao.maps.services.Status.OK) {
                         latitude.value = result[0].y;
                         longitude.value = result[0].x;
+
+                        if (sido) {
+                            sido.value = toAddress(longitude.value, latitude.value);
+                        }
                     }
                 })
             }
         }
     }).open();
+}
+
+function toAddress(lon, lat) {
+    if (!lat || !lon) {
+        console.warn('좌표 값이 없습니다. lat:', lat, ', lng:', lng);
+        return;
+    }
+
+    $.ajax({
+        url: `https://dapi.kakao.com/v2/local/geo/coord2regioncode.json?x=${lon}&y=${lat}&input_coord=WGS84`,
+        type: 'GET',
+        headers: {
+            'Authorization' : 'KakaoAK 4fae289535008a0dea1eb592bc662462'
+        },
+        success: function(result) {
+            console.log(result);
+            let totalCount = result.meta.total_count;
+            if (totalCount > 0) {
+                addr = result.documents[0].region_1depth_name;
+                document.getElementById('sido').value = addr;
+                console.log('addr: ', addr);
+            }
+        },
+        error: function(e) {
+            console.error(e);
+        }
+    });
 }
 
 // 날짜 포맷팅 함수(ex. 2024-10-29 12:13:00)

@@ -30,6 +30,7 @@ public class CsMapper {
                 .openStartTime(dto.getOpenStartTime())
                 .openEndTime(dto.getOpenEndTime())
                 .parkingFeeYn(dto.getParkingFeeYn())
+                .sido(dto.getSido())
                 .build();
         return cs;
     }

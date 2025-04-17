@@ -56,6 +56,7 @@ public class CsInfoDto {
         private String zipcode;
         private String addressDetail;
         private String parkingFeeYn;
+        private String sido;
 
         // 충전소 부지 정보
         private String institutionName;
