@@ -19,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import zgoo.cpos.dto.biz.BizInfoDto.BizInfoListDto;
 import zgoo.cpos.dto.biz.BizInfoDto.BizInfoRegDto;
+import zgoo.cpos.dto.calc.PurchaseDto.PurchaseListDto;
 import zgoo.cpos.dto.code.ChgErrorCodeDto;
 import zgoo.cpos.dto.code.ChgErrorCodeDto.ChgErrorCodeListDto;
 import zgoo.cpos.dto.code.CodeDto.CommCdBaseDto;
@@ -82,6 +83,7 @@ import zgoo.cpos.service.MemberService;
 import zgoo.cpos.service.MenuAuthorityService;
 import zgoo.cpos.service.MenuService;
 import zgoo.cpos.service.NoticeService;
+import zgoo.cpos.service.PurchaseService;
 import zgoo.cpos.service.StatisticsService;
 import zgoo.cpos.service.TariffService;
 import zgoo.cpos.service.UsersService;
@@ -115,6 +117,7 @@ public class PageController {
     private final ChgCommlogService chgCommlogService;
     private final StatisticsService statisticsService;
     private final ComService comService;
+    private final PurchaseService purchaseService;
 
     /*
      * 대시보드
@@ -1514,6 +1517,21 @@ public class PageController {
         log.info("=== Purchase Management Page ===");
 
         try {
+            model.addAttribute("selectedOpSearch", searchOp);
+            model.addAttribute("selectedContentSearch", searchContent);
+            model.addAttribute("selectedStartDate", startDate);
+            model.addAttribute("selectedEndDate", endDate);
+
+            Page<PurchaseListDto> purList = this.purchaseService.findPurchaseInfoWithPagination(searchOp, searchContent, 
+                startDate, endDate, page, size);
+
+            int totalPages = purList.getTotalPages() == 0 ? 1 : purList.getTotalPages();
+
+            model.addAttribute("purList", purList.getContent());
+            model.addAttribute("size", String.valueOf(size));
+            model.addAttribute("currentPage", page);
+            model.addAttribute("totalPages", totalPages);
+            model.addAttribute("totalCount", purList.getTotalElements());
 
             List<CommCdBaseDto> accList = codeService.findCommonCdNamesByGrpcd("ACCOUNTCD"); // 계정과목
             model.addAttribute("accList", accList);
@@ -1529,6 +1547,7 @@ public class PageController {
             model.addAttribute("menuAuthority", menuAuthority);
         } catch (Exception e) {
             e.getStackTrace();
+            model.addAttribute("purList", Collections.emptyList());
             model.addAttribute("accList", Collections.emptyList());
             model.addAttribute("purchaseList", Collections.emptyList());
             model.addAttribute("showListCnt", Collections.emptyList());

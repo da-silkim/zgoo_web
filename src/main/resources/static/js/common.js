@@ -281,13 +281,21 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-// 금액 단위 포맷 함수
+
 $(document).ready(function () {
-    $('.price-format').each(function () {
-        var price = parseInt($(this).text(), 10);
-        $(this).text(price.toLocaleString('ko-KR') + "원");
-    });
+    formatNumbers('.price-format', '원');
+    formatNumbers('.int-format');
 });
+
+// 금액 단위 포맷 함수
+function formatNumbers(selector, suffix = '') {
+    $(selector).each(function () {
+        const number = parseInt($(this).text().replace(/[^0-9]/g, ''), 10);
+        if (!isNaN(number)) {
+            $(this).text(number.toLocaleString('ko-KR') + suffix);
+        }
+    });
+}
 
 // 주소 검색 함수
 function postSearch() {
