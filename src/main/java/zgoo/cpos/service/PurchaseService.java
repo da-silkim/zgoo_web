@@ -1,6 +1,8 @@
 package zgoo.cpos.service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -55,6 +57,20 @@ public class PurchaseService {
             log.info("=== delete purchase Info: {}", count);
         } catch (Exception e) {
             log.error("[deletePurchaseInfo] error: {}", e.getMessage());
+        }
+    }
+
+    // 매입 조회(엑셀)
+    public List<PurchaseListDto> findAllPurchaseWithoutPagination(String searchOp, String searchContent,
+            LocalDate startDate, LocalDate endDate) {
+        log.info("=== Finding all station list: searchOp={}, searchContent={}, startDate={}, endDate={} ===", 
+            searchOp, searchContent, startDate, endDate);
+
+        try {
+            return this.purchaseRepository.findAllPurchaseWithoutPagination(searchOp, searchContent, startDate, endDate);
+        } catch (Exception e) {
+            log.error("[findAllPurchaseWithoutPagination] error: {}", e.getMessage());
+            return new ArrayList<>();
         }
     }
 }

@@ -1,6 +1,7 @@
 package zgoo.cpos.repository.calc;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,4 +16,7 @@ public interface PurchaseRepositoryCustom {
         LocalDate endDate, Pageable pageable);
 
     Long deletePurchaseOne(Long id);
+
+    List<PurchaseListDto> findAllPurchaseWithoutPagination(String searchOp, String searchContent,
+            LocalDate startDate, LocalDate endDate);
 }

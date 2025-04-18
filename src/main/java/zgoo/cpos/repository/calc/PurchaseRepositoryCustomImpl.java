@@ -129,4 +129,48 @@ public class PurchaseRepositoryCustomImpl implements PurchaseRepositoryCustom {
             .where(purchase.id.eq(id))
             .execute();
     }
+
+    @Override
+    public List<PurchaseListDto> findAllPurchaseWithoutPagination(String searchOp, String searchContent,
+            LocalDate startDate, LocalDate endDate) {
+        BooleanBuilder builder = new BooleanBuilder();
+        builder.and(purchase.delYn.eq("N"));
+
+        if (searchOp != null & (searchContent != null && !searchContent.isEmpty())) {
+            if (searchOp.equals("approvalNo")) {
+                builder.and(purchase.approvalNo.contains(searchContent));
+            } else if (searchOp.equals("bizName")) {
+                builder.and(purchase.bizName.contains(searchContent));
+            }
+        }
+
+        if (startDate != null) {
+            builder.and(purchase.purchaseDate.goe(startDate));
+        }
+
+        if (endDate != null) {
+            builder.and(purchase.purchaseDate.loe(endDate));
+        }
+
+        return queryFactory.select(Projections.fields(PurchaseListDto.class,
+            purchase.id.as("purchaseId"),
+            purchase.purchaseDate.as("purchaseDate"),
+            purchase.bizNum.as("bizNum"),
+            purchase.bizName.as("bizName"),
+            purchase.approvalNo.as("approvalNo"),
+            purchase.item.as("item"),
+            purchase.supplyPrice.as("supplyPrice"),
+            purchase.vat.as("vat"),
+            purchase.totalAmount.as("totalAmount"),
+            csInfo.stationName.as("stationName"),
+            accountCdName.name.as("accountCodeName"),
+            paymentName.name.as("paymentMethodName")))
+            .from(purchase)
+            .leftJoin(csInfo).on(purchase.station.eq(csInfo))
+            .leftJoin(accountCdName).on(purchase.accountCode.eq(accountCdName.commonCode))
+            .leftJoin(paymentName).on(purchase.paymentMethod.eq(paymentName.commonCode))
+            .orderBy(purchase.regDt.desc(), purchase.id.desc())
+            .where(builder)
+            .fetch();
+    }
 }

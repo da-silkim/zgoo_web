@@ -1,6 +1,7 @@
 package zgoo.cpos.controller;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -26,11 +27,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import zgoo.cpos.dto.calc.PurchaseDto.PurchaseListDto;
 import zgoo.cpos.dto.cs.CsInfoDto.CsInfoListDto;
 import zgoo.cpos.dto.member.MemberDto.MemberAuthDto;
 import zgoo.cpos.dto.member.MemberDto.MemberListDto;
 import zgoo.cpos.service.CsService;
 import zgoo.cpos.service.MemberService;
+import zgoo.cpos.service.PurchaseService;
 
 @Controller
 @RequiredArgsConstructor
@@ -40,6 +43,7 @@ public class ExcelDownloadController {
 
     private final MemberService memberService;
     private final CsService csService;
+    private final PurchaseService purchaseService;
 
     /*
      * member list excel download
@@ -112,6 +116,32 @@ public class ExcelDownloadController {
 
         Workbook workbook = createExcelFile(csList, "충전소리스트", headers, dataMapper);
         writeExcelToResponse(response, workbook, "station_list");
+    }
+
+    /* 
+     * purchase excel download
+     */
+    @GetMapping("/download/purchase")
+    public void downloadPurchase(
+            @RequestParam(value = "opSearch", required = false) String searchOp,
+            @RequestParam(value = "contentSearch", required = false) String searchContent,
+            @RequestParam(value = "startDate", required = false) LocalDate startDate,
+            @RequestParam(value = "endDate", required = false) LocalDate endDate,
+            HttpServletResponse response) {
+        log.info("=== purchase excel download info ===");
+
+        List<PurchaseListDto> purList = this.purchaseService.findAllPurchaseWithoutPagination(searchOp, searchContent, startDate, endDate);
+
+        String[] headers = { "충전소명", "거래처명", "계정과목", "공급가액", "부가세", "합계", "지불방법", "승인번호", "매입일자" };
+        Function<PurchaseListDto, Object[]> dataMapper = purchase -> new Object[]{
+            purchase.getStationName(), purchase.getBizName(), purchase.getAccountCodeName(),
+            purchase.getSupplyPrice(), purchase.getVat(), purchase.getTotalAmount(),
+            purchase.getPaymentMethodName(), purchase.getApprovalNo(),
+            purchase.getPurchaseDate() != null ? purchase.getPurchaseDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) : ""
+        };
+
+        Workbook workbook = createExcelFile(purList, "매입관리", headers, dataMapper);
+        writeExcelToResponse(response, workbook, "purchase");
     }
 
     private <T> Workbook createExcelFile(List<T> data, String sheetName, String[] headers, Function<T, Object[]> dataMapper) {
