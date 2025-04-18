@@ -845,25 +845,34 @@ table.table tbody tr.row-selected {
 }
 
 .biz-search-content,
-.mem-search-content {
+.mem-search-content,
+.station-search-content {
   min-height: 76vh;
 }
 .biz-search-content .modal-body,
-.mem-search-content .modal-body {
+.mem-search-content .modal-body,
+.station-search-content .modal-body {
   padding-bottom: 60px;
   position: relative;
 }
-.biz-search-content .modal-body > div:nth-child(2) {
+.biz-search-content .modal-body > div:nth-child(2),
+.station-search-content .modal-body > div:nth-child(2) {
   margin-top: 1rem !important;
   margin-bottom: 3rem !important;
   display: flex !important;
   align-items: center !important;
 }
-.biz-search-content .modal-body > div:nth-child(2) > input {
+.biz-search-content .modal-body > div:nth-child(2) > input,
+.station-search-content .modal-body > div:nth-child(2) > input {
   width: 500px;
 }
+.station-search-content .modal-body > div:nth-child(2) > select {
+  width: 130px !important;
+  margin-right: 10px;
+}
 .biz-search-content .modal-body span:nth-of-type(1),
-.mem-search-content .modal-body span:nth-of-type(1) {
+.mem-search-content .modal-body span:nth-of-type(1),
+.station-search-content .modal-body span:nth-of-type(1) {
   font-size: 18px;
   font-weight: 600;
 }
@@ -875,8 +884,7 @@ table.table tbody tr.row-selected {
 #memTable tbody tr td {
   vertical-align: middle;
 }
-#bizModalBtn,
-#memModalBtn {
+.close-modal-btn {
   position: absolute;
   bottom: 0;
   left: 50%;

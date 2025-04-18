@@ -198,7 +198,7 @@
                                         <input type="text" name="stationId" id="stationId" class="form-control"
                                                 autocomplete="off" required>
                                         <button type="button" class="btn btn-outline-grey flex-btn"
-                                                id="stationIdBtn">조회</button>
+                                                id="stationSearchBtn">조회</button>
                                     </div>
                                 </td>
                                 <th class="w-20">매입거래일자<b class="required-data">*</b></th>
@@ -265,6 +265,49 @@
         <!-- modal dialog end -->
     </div>
     <!-- Add Modal end -->
+
+    <!-- Station Search Modal start -->
+    <div class="modal fade" id="stationSearchModal" tabindex="-1" aria-labelledby="stationSearchModalLabel"
+        style="z-index: 1056;" data-bs-backdrop="static" data-bs-keyboard="false" role="dialog">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width: 60vw;">
+            <div class="modal-content overflow-y-auto scrollbar station-search-content">
+                <div class="modal-body">
+                    <div class="modal-title mb-2"><span class="modal-title-bar"></span><span>충전소 조회</span></div>
+                    <div id="stationSearchContainer">
+                        <select class="form-control" id="searchStation">
+                            <option th:value="stationName">충전소명</option>
+                            <option th:value="stationId">충전소ID</option>
+                        </select>
+                        <input type="text" name="stationOpSearch" id="stationOpSearch" class="form-control"
+                            placeholder="검색어를 입력하세요" th:value="null">
+                        <button type="button" class="btn btn-outline-grey ms-2" id="stationOpSearchBtn">
+                            <i class="bi bi-search"></i>검색</button>
+                    </div>
+                    <span>검색결과</span>
+                    <div class="w-100 table-responsive scroll-table-container">
+                        <table class="table table-bg table-hover text-center" id="stationTable">
+                            <thead>
+                                <tr>
+                                    <th scope="col" class="w-40">충전소명</th>
+                                    <th scope="col" class="w-40">충전소ID</th>
+                                    <th scope="col" class="w-20"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="stationSearchList">
+                                <tr>
+                                    <td colspan="3" class="vertical-align-middle">조회된 데이터가 없습니다.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <button type="button" class="btn btn-outline-grey close-modal-btn" id="stationModalBtn"
+                        data-bs-dismiss="modal">닫기</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Station Search Modal end -->
+
     <script type="text/javascript" th:src="@{/js/calc/purchase.js}"></script>
 </div>
 </html>
