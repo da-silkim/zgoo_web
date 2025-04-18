@@ -1,5 +1,6 @@
 package zgoo.cpos.dto.member;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -148,7 +149,7 @@ public class MemberDto {
         private LocalDate expireDate;
         private String useYn;
         private String parentIdTag;
-        private Double totalChargingPower;
+        private BigDecimal totalChargingPower;
         private String status;
         private Long totalChargingPrice;
 

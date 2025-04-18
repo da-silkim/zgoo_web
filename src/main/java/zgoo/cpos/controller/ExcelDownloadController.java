@@ -83,7 +83,7 @@ public class ExcelDownloadController {
 
         List<MemberAuthDto> memtagList = this.memberService.findAllMemberTagWithoutPagination(idTagSearch, nameSearch);
 
-        String[] headers = { "사업자", "회원명", "휴대전화", "회원카드번호", "부모IDTAG", "사용여부", "누적충전량", "누적충전금액", "상태" };
+        String[] headers = { "사업자", "회원명", "휴대전화", "회원카드번호", "부모IDTAG", "사용여부", "누적충전량(kWh)", "누적충전금액(원)", "상태" };
         Function<MemberAuthDto, Object[]> dataMapper = memtag -> new Object[] {
                 memtag.getCompanyName(), memtag.getName(), memtag.getPhoneNo(), memtag.getIdTag(),
                 memtag.getParentIdTag(), memtag.getUseYn(), memtag.getTotalChargingPower(),

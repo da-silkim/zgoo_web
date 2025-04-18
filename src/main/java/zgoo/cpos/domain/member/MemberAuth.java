@@ -1,5 +1,6 @@
 package zgoo.cpos.domain.member;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -39,12 +40,12 @@ public class MemberAuth {
     private String parentIdTag;
 
     @Column(name = "total_charging_power")
-    private Double totalChargingPower;
+    private BigDecimal totalChargingPower;
 
     @Column(name = "status")
     private String status;
 
-    @Column(name = "total_charging_price")
+    @Column(name = "total_charging_price", precision = 12, scale = 3)
     private Long totalChargingPrice;
 
     @Column(name = "reg_dt")

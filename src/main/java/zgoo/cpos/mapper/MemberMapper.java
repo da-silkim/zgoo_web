@@ -1,5 +1,6 @@
 package zgoo.cpos.mapper;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -121,7 +122,7 @@ public class MemberMapper {
                 .expireDate(LocalDate.parse("2099-12-31"))
                 .useYn("Y")
                 .parentIdTag("1001")
-                .totalChargingPower(0.0)
+                .totalChargingPower(BigDecimal.ZERO)
                 .status("Accepted")
                 .totalChargingPrice(0L)
                 .regDt(LocalDateTime.now())

@@ -73,8 +73,8 @@
                                     <th scope="col">회원카드번호</th>
                                     <th scope="col">유효기간</th>
                                     <th scope="col">사용여부</th>
-                                    <th scope="col">누적충전량</th>
-                                    <th scope="col">누적충전금액</th>
+                                    <th scope="col">누적충전량(kWh)</th>
+                                    <th scope="col">누적충전금액(원)</th>
                                     <th scope="col">상태</th>
                                 </tr>
                             </thead>
@@ -88,7 +88,7 @@
                                     <td th:text="${member.idTag}"></td>
                                     <td th:text="${member.expireDate}"></td>
                                     <td th:text="${member.useYn}"></td>
-                                    <td th:text="${member.totalChargingPower}"></td>
+                                    <td th:text="${#numbers.formatDecimal(member.totalChargingPower, 1, 'COMMA', 2, 'POINT')}"></td>
                                     <td th:text="${member.totalChargingPrice}"></td>
                                     <td th:text="${member.status}"></td>
                                 </tr>
@@ -184,12 +184,12 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th>누적충전량</th>
+                                    <th>누적충전량(kWh)</th>
                                     <td>
-                                        <input type="number" name="totalChargingPower" id="totalChargingPower" class="form-control"
+                                        <input type="text" name="totalChargingPower" id="totalChargingPower" class="form-control"
                                                 autocomplete="off" disabled>
                                     </td>
-                                    <th>누적충전금액</th>
+                                    <th>누적충전금액(원)</th>
                                     <td>
                                         <input type="number" name="totalChargingPrice" id="totalChargingPrice" class="form-control"
                                                 autocomplete="off" disabled>

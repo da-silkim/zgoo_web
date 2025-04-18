@@ -36,10 +36,14 @@ $(document).ready(function() {
                     $('#useNo').prop('checked', true);
                 }
 
-                const totalChargingPower = parseFloat(data.authInfo.totalChargingPower) || 0;
+                const totalChargingPower = parseFloat(data.authInfo.totalChargingPower) || 0.00;
+                const formattedPower = totalChargingPower.toLocaleString('en-US', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                });
+                $('#totalChargingPower').val(formattedPower);
+                
                 const totalChargingPrice = parseInt(data.authInfo.totalChargingPrice) || 0;
-
-                $('#totalChargingPower').val(totalChargingPower);
                 $('#totalChargingPrice').val(totalChargingPrice);
             },
             error: function(error) {

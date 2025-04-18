@@ -1,5 +1,6 @@
 package zgoo.cpos.repository.member;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -7,12 +8,15 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Projections;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import zgoo.cpos.domain.company.QCompany;
+import zgoo.cpos.domain.history.QChargingHist;
 import zgoo.cpos.domain.member.QMember;
 import zgoo.cpos.domain.member.QMemberAuth;
 import zgoo.cpos.dto.member.MemberDto.MemberAuthDto;
@@ -24,6 +28,7 @@ public class MemberAuthRepositoryCustomImpl implements MemberAuthRepositoryCusto
     QCompany company = QCompany.company;
     QMember member = QMember.member;
     QMemberAuth memberAuth = QMemberAuth.memberAuth;
+    QChargingHist hist = QChargingHist.chargingHist;
 
     @Override
     public Page<MemberAuthDto> findMemberAuthWithPagination(Pageable pageable) {
@@ -32,7 +37,13 @@ public class MemberAuthRepositoryCustomImpl implements MemberAuthRepositoryCusto
             memberAuth.expireDate.as("expireDate"),
             memberAuth.useYn.as("useYn"),
             memberAuth.parentIdTag.as("parentIdTag"),
-            memberAuth.totalChargingPower.as("totalChargingPower"),
+            ExpressionUtils.as(
+                JPAExpressions
+                    .select(hist.chargeAmount.sum().coalesce(BigDecimal.ZERO))
+                    .from(hist)
+                    .where(hist.idTag.eq(memberAuth.idTag)),
+                "totalChargingPower"
+            ),
             memberAuth.status.as("status"),
             memberAuth.totalChargingPrice.as("totalChargingPrice"),
             memberAuth.regDt.as("regDt"),
@@ -72,7 +83,13 @@ public class MemberAuthRepositoryCustomImpl implements MemberAuthRepositoryCusto
             memberAuth.expireDate.as("expireDate"),
             memberAuth.useYn.as("useYn"),
             memberAuth.parentIdTag.as("parentIdTag"),
-            memberAuth.totalChargingPower.as("totalChargingPower"),
+            ExpressionUtils.as(
+                JPAExpressions
+                    .select(hist.chargeAmount.sum().coalesce(BigDecimal.ZERO))
+                    .from(hist)
+                    .where(hist.idTag.eq(memberAuth.idTag)),
+                "totalChargingPower"
+            ),
             memberAuth.status.as("status"),
             memberAuth.totalChargingPrice.as("totalChargingPrice"),
             memberAuth.regDt.as("regDt"),
@@ -104,7 +121,13 @@ public class MemberAuthRepositoryCustomImpl implements MemberAuthRepositoryCusto
             memberAuth.expireDate.as("expireDate"),
             memberAuth.useYn.as("useYn"),
             memberAuth.parentIdTag.as("parentIdTag"),
-            memberAuth.totalChargingPower.as("totalChargingPower"),
+            ExpressionUtils.as(
+                JPAExpressions
+                    .select(hist.chargeAmount.sum().coalesce(BigDecimal.ZERO))
+                    .from(hist)
+                    .where(hist.idTag.eq(memberAuth.idTag)),
+                "totalChargingPower"
+            ),
             memberAuth.status.as("status"),
             memberAuth.totalChargingPrice.as("totalChargingPrice"),
             memberAuth.regDt.as("regDt"),
@@ -136,7 +159,13 @@ public class MemberAuthRepositoryCustomImpl implements MemberAuthRepositoryCusto
             memberAuth.expireDate.as("expireDate"),
             memberAuth.useYn.as("useYn"),
             memberAuth.parentIdTag.as("parentIdTag"),
-            memberAuth.totalChargingPower.as("totalChargingPower"),
+            ExpressionUtils.as(
+                JPAExpressions
+                    .select(hist.chargeAmount.sum().coalesce(BigDecimal.ZERO))
+                    .from(hist)
+                    .where(hist.idTag.eq(memberAuth.idTag)),
+                "totalChargingPower"
+            ),
             memberAuth.status.as("status"),
             memberAuth.totalChargingPrice.as("totalChargingPrice"),
             memberAuth.regDt.as("regDt"),
