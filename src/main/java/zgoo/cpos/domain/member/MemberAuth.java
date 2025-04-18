@@ -33,19 +33,19 @@ public class MemberAuth {
     @Column(name = "expire_date")
     private LocalDate expireDate;
 
-    @Column(name = "use_yn")
+    @Column(name = "use_yn", length = 1)
     private String useYn;
 
     @Column(name = "parent_id_tag")
     private String parentIdTag;
 
-    @Column(name = "total_charging_power")
+    @Column(name = "total_charging_power", precision = 12, scale = 3)
     private BigDecimal totalChargingPower;
 
     @Column(name = "status")
     private String status;
 
-    @Column(name = "total_charging_price", precision = 12, scale = 3)
+    @Column(name = "total_charging_price")
     private Long totalChargingPrice;
 
     @Column(name = "reg_dt")
