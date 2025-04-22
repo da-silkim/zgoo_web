@@ -127,7 +127,7 @@ public class MemberService {
                 log.info("[findAllByMemberIdDto] cardInfo success");
 
                 for (MemberCreditCardDto dto : cardInfo) {
-                    dto.setCardNum(AESUtil.decrypt(dto.getCardNum()));
+                    dto.setCardNum(maskCardNum(AESUtil.decrypt(dto.getCardNum())));
                 }
 
                 return this.memberRepository.findMemberDetailOne(memberId, cardInfo, carInfo, conditionInfo);
@@ -457,6 +457,12 @@ public class MemberService {
         if (dto.getTid() != null && !dto.getTid().isEmpty()) {
             dto.setTid(AESUtil.encrypt(dto.getTid()));
         }
+    }
+
+    // 카드번호 마스킹
+    private String maskCardNum(String cardNum) throws Exception  {
+        return cardNum.replaceAll("(\\d{4})(\\d{2})(\\d{6})(\\d{4})",
+                "$1-$2**-****-$4");
     }
 
     // 대표결제카드에 따른 결제카드정상여부 업데이트

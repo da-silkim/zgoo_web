@@ -341,23 +341,11 @@
                                     <th scope="col" class="w-45">차량모델</th>
                                 </tr>
                             </thead>
-                            <tbody id="carTableBody">
-                                <!-- <tr>
-                                    <td><input type="checkbox" class="single-checkbox"></td>
-                                    <td>
-                                        <select class="form-control connectorType" required>
-                                            <option th:each="data : ${bizTypeList}" th:value="${data.commonCode}"
-                                                    th:text="${data.commonCodeName}" ></option>
-                                        </select>
-                                    </td>
-                                    <td><input type="text" class="input-add-row carNum"></td>
-                                    <td><input type="text" class="input-add-row model"></td>
-                                </tr> -->
-                            </tbody>
+                            <tbody id="carTableBody"></tbody>
                         </table>
                         <!-- table:3 end -->
                         <!-- table:4 start -->
-                        <div id="cardInfoContainer" hidden>
+                        <!-- <div id="cardInfoContainer" hidden>
                             <div class="modal-title mb-2 position-relative">
                                 <span class="modal-title-bar"></span><span>결제 카드</span>
                                 <span class="table-row-control-container">
@@ -377,38 +365,9 @@
                                         <th scope="col" class="w-15">대표카드</th>
                                     </tr>
                                 </thead>
-                                <tbody id="cardTableBody">
-                                    <!-- <tr>
-                                        <td><input type="checkbox" class="single-checkbox"></td>
-                                        <td>
-                                            <select class="form-control connectorType" required>
-                                                <option th:each="data : ${creditCardList}" th:value="${data.commonCode}"
-                                                        th:text="${data.commonCodeName}" ></option>
-                                            </select>
-                                        </td>
-                                        <td>
-                                            <div class="card-num-container">
-                                                <input type="number" id="cardNum1" name="cardNum1" class="input-add-row-bb" oninput="maxLengthNum(this, 4)"
-                                                    autocomplete="off">
-                                                <span>-</span>
-                                                <input type="number" id="cardNum2" name="cardNum2" class="input-add-row-bb" oninput="maxLengthNum(this, 4)"
-                                                    autocomplete="off">
-                                                <span>-</span>
-                                                <input type="password" id="cardNum3" name="cardNum3" class="input-add-row-bb" oninput="maxLengthNum(this, 4)"
-                                                    autocomplete="off">
-                                                <span>-</span>
-                                                <input type="password" id="cardNum4" name="cardNum4" class="input-add-row-bb" oninput="maxLengthNum(this, 4)"
-                                                    autocomplete="off">
-                                            </div>
-                                        </td>
-                                        <td><input type="text" id="tid" name="tid" class="input-add-row tid" autocomplete="off"></td>
-                                        <td>
-                                            <input type="radio" name="representativeCard" class="mx-3 representativeCard">
-                                        </td>
-                                    </tr> -->
-                                </tbody>
+                                <tbody id="cardTableBody"></tbody>
                             </table>
-                        </div>
+                        </div> -->
                         <!-- table:4 end -->
                         <!-- table:5 start -->
                         <div class="modal-title mb-2"><span class="modal-title-bar"></span><span>약관정보</span></div>

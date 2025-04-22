@@ -132,17 +132,17 @@ $(document).ready(function() {
         var bizTypeValue = document.getElementById('bizType').value;
         var bizSearchBtn = document.getElementById('bizSearchBtn');
         var bizInfoContainer = document.getElementById('bizInfoContainer');
-        var cardInfoContainer = document.getElementById('cardInfoContainer');
+        // var cardInfoContainer = document.getElementById('cardInfoContainer');
     
         if (bizTypeValue === 'PB') {   // 개인
             bizNameInput.value = '';
             bizSearchBtn.disabled = true;
             bizInfoContainer.hidden = true;
-            cardInfoContainer.hidden = false;
+            // cardInfoContainer.hidden = false;
         } else if (bizTypeValue === 'CB') { // 법인
             bizSearchBtn.disabled = false;
             bizInfoContainer.hidden = false;
-            cardInfoContainer.hidden = true;
+            // cardInfoContainer.hidden = true;
         }
     }
 
@@ -197,7 +197,7 @@ $(document).ready(function() {
         $('#memberForm')[0].reset();
         handleBizYnChange();
         clearCarTable();
-        clearCardTable();
+        // clearCardTable();
 
         $('#companyId').prop('disabled', false);
         $('#bizType').prop('disabled', false);
@@ -244,38 +244,40 @@ $(document).ready(function() {
                     var bizIdInput = document.getElementById('bizId');
                     bizNameInput.value = data.bizInfo.bizName;
                     bizIdInput.value = data.bizInfo.bizId;
-                } else {
-                    const cardTableBody = document.querySelector("#cardTable tbody");
-                    cardTableBody.innerHTML = "";
-                    data.memberInfo.card.forEach(card => {
-                        const row = document.createElement("tr");
-                        row.classList.add("card-row");
-                        row.innerHTML = `<td><input type="checkbox" class="single-checkbox"></td>`;
-
-                        const selectElement = document.createElement('select');
-                        selectElement.classList.add('form-control', 'fnCode');
-                        creditCardList.forEach(function(data) {
-                            const option = document.createElement('option');
-                            option.value = data.commonCode;
-                            option.textContent = data.commonCodeName;
-                            if (card.fnCode === data.commonCode) {
-                                option.selected = true;
-                            }
-                            selectElement.appendChild(option);
-                        });
-                        const tdSelect = document.createElement('td');
-                        tdSelect.appendChild(selectElement);
-                        row.appendChild(tdSelect);
-
-                        row.innerHTML += `
-                        <td><input type="text" class="input-add-row text-center cardNum" value="${card.carNum ? card.carNum : ''}"/></td>
-                        <td><input type="text" class="input-add-row text-center tid" value="${card.tid ? card.tid : ''}"/></td>
-                        <td><input type="radio" class="mx-3 representativeCard" value="${card.representativeCard}" ${card.representativeCard == "Y" ? "checked" : ""}/></td>
-                        `;
-    
-                        cardTableBody.appendChild(row);
-                    });
                 }
+                // card table
+                // else {
+                //     const cardTableBody = document.querySelector("#cardTable tbody");
+                //     cardTableBody.innerHTML = "";
+                //     data.memberInfo.card.forEach(card => {
+                //         const row = document.createElement("tr");
+                //         row.classList.add("card-row");
+                //         row.innerHTML = `<td><input type="checkbox" class="single-checkbox"></td>`;
+
+                //         const selectElement = document.createElement('select');
+                //         selectElement.classList.add('form-control', 'fnCode');
+                //         creditCardList.forEach(function(data) {
+                //             const option = document.createElement('option');
+                //             option.value = data.commonCode;
+                //             option.textContent = data.commonCodeName;
+                //             if (card.fnCode === data.commonCode) {
+                //                 option.selected = true;
+                //             }
+                //             selectElement.appendChild(option);
+                //         });
+                //         const tdSelect = document.createElement('td');
+                //         tdSelect.appendChild(selectElement);
+                //         row.appendChild(tdSelect);
+
+                //         row.innerHTML += `
+                //         <td><input type="text" class="input-add-row text-center cardNum" value="${card.carNum ? card.carNum : ''}"/></td>
+                //         <td><input type="text" class="input-add-row text-center tid" value="${card.tid ? card.tid : ''}"/></td>
+                //         <td><input type="radio" class="mx-3 representativeCard" value="${card.representativeCard}" ${card.representativeCard == "Y" ? "checked" : ""}/></td>
+                //         `;
+    
+                //         cardTableBody.appendChild(row);
+                //     });
+                // }
 
                 $('#name').val(data.memberInfo.name || '');
                 $('#phoneNo').val(data.memberInfo.phoneNo || '');
@@ -379,9 +381,9 @@ $(document).ready(function() {
         event.preventDefault();
 
         const carInfoList = getCarList();
-        const cardInfoList = getCreditCardList();
+        // const cardInfoList = getCreditCardList();
 
-        if (!carInfoList || !cardInfoList) {
+        if (!carInfoList) {
             return;
         }
 
@@ -446,16 +448,17 @@ $(document).ready(function() {
         };
 
         // 개인
-        const PBDATA = {
-            card: cardInfoList
-        };
+        // const PBDATA = {
+        //     card: cardInfoList
+        // };
 
         if (bizTypeValue === 'CB') {
             Object.assign(DATA, CBDATA);
-        } else if (bizTypeValue === 'PB') {
-            Object.assign(DATA, PBDATA);
         }
-        console.log("법인ID: " + bizIdValue);
+        // else if (bizTypeValue === 'PB') {
+        //     Object.assign(DATA, PBDATA);
+        // }
+        // console.log("법인ID: " + bizIdValue);
         console.log(DATA);
 
         if (confirmSubmit(btnMsg)) {
