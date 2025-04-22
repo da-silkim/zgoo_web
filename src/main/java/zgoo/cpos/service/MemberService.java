@@ -142,9 +142,36 @@ public class MemberService {
         }
     }
 
-    // memLoginId 중복 검사
+    // memLoginId duplicate check
     public boolean isMemLoginIdDuplicate(String memLoginId) {
         return this.memberRepository.existsByMemLoginId(memLoginId);
+    }
+
+    // memberTag duplicate check
+    public Integer isMemberTagDuplicate(Long memberId, String idTag) {
+        Member member = this.memberRepository.findById(memberId)
+            .orElseThrow(() -> new IllegalArgumentException("member not found with id: " + memberId));
+
+        try {
+            // 1. null 또는 16자리가 아닌 경우
+            if (idTag == null || idTag.length() != 16) return -1;
+
+            // 2. 현재 회원카드번호와 업데이트할 카드번호가 일치한지 확인
+            if (idTag.equals(member.getIdTag())) {
+                return 0;
+            }
+
+            // 3. 이미 등록된 카드번호인지 확인
+            if (this.memberRepository.existsByIdTag(idTag)) {
+                return 2;
+            }
+
+            // 4. 사용 가능한 카드번호
+            return 1;
+        } catch (Exception e) {
+            log.error("[isMemberTagDuplicate] error: {}", e.getMessage());
+            return -1;
+        }
     }
 
     // 회원 저장

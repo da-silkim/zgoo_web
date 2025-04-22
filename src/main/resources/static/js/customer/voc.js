@@ -124,8 +124,8 @@ $(document).ready(function() {
                     alert(response);
                     window.location.reload();
                 },
-                error: function(error) {
-                    alert(error);
+                error: function(xhr, status, error) {
+                    alert(xhr.responseText);
                 }
             });
         }
@@ -194,8 +194,8 @@ $(document).ready(function() {
                     $('#name').val(response.memberInfo.name || '');
                     $('#phoneNo').val(response.memberInfo.phoneNo || '');
                 },
-                error: function(error) {
-                    alert(error);
+                error: function(xhr, status, error) {
+                    alert(JSON.parse(xhr.responseText).message);
                 }
             });
             var memSearchModal = bootstrap.Modal.getInstance(document.getElementById('memSearchModal'));

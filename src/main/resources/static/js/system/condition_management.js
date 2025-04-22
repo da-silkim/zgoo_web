@@ -40,8 +40,7 @@ $(document).ready(function() {
                     });
                 }
             },
-            error: function(error) {
-                alert(error);
+            error: function(xhr, status, error) {
             }
         });
     }
@@ -70,8 +69,8 @@ $(document).ready(function() {
                     alert(response);
                     window.location.reload();
                 },
-                error: function(error) {
-                    alert(error);
+                error: function(xhr, status, error) {
+                    alert(xhr.responseText);
                 }
             });
         }
@@ -88,8 +87,8 @@ $(document).ready(function() {
                     alert(response);
                     window.location.reload();
                 },
-                error: function(error) {
-                    alert(error);
+                error: function(xhr, status, error) {
+                    alert(xhr.responseText);
                 }
             });
         }
@@ -114,8 +113,8 @@ $(document).ready(function() {
                     alert(response);
                     window.location.reload();
                 },
-                error: function(error) {
-                    alert(error);
+                error: function(xhr, status, error) {
+                    alert(xhr.responseText);
                 }
             });
         }
@@ -160,7 +159,7 @@ $(document).ready(function() {
                     renderConditionHist();
                 },
                 error: function(xhr, status, error) {
-                    alert(error);
+                    alert(xhr.responseText);
                 }
             });
         }

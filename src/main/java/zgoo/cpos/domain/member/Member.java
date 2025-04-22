@@ -50,7 +50,7 @@ public class Member {
     @Column(name = "phone_no")
     private String phoneNo;
 
-    @Column(name = "id_tag", unique = true, nullable = false)
+    @Column(name = "id_tag", unique = true, nullable = false, length = 16)
     private String idTag;
 
     @Column(name = "email")
@@ -95,6 +95,7 @@ public class Member {
         this.name = dto.getName();
         this.bizType = dto.getBizType();
         this.phoneNo = dto.getPhoneNo();
+        this.idTag = dto.getIdTag();
         this.email = dto.getEmail();
         this.birth = dto.getBirth();
         this.zipCode = dto.getZipCode();

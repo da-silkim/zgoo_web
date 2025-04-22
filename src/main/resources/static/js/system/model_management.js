@@ -236,8 +236,8 @@ $(document).ready(function() {
                 success: function(response) {
                     window.location.reload();
                 },
-                error: function(error) {
-                    alert(error);
+                error: function(xhr, status, error) {
+                    alert(xhr.responseText);
                 }
             });
         }

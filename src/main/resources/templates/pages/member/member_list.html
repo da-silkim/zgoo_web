@@ -242,8 +242,12 @@
                                 <tr>
                                     <th>회원카드번호<b class="required-data">*</b></th>
                                     <td>
-                                        <input type="number" name="idTag" id="idTag" th:field="*{idTag}"
-                                            class="form-control" autocomplete="off" disabled required>
+                                        <div class="display-input-btn">
+                                            <input type="number" name="idTag" id="idTag" th:field="*{idTag}"
+                                                class="form-control" autocomplete="off" disabled required>
+                                            <button type="button" class="btn btn-outline-grey flex-btn ms-0"
+                                                id="duplicateMemTagBtn" disabled hidden>중복체크</button>
+                                        </div>
                                     </td>
                                     <th scope="row">회원상태<b class="required-data">*</b></th>
                                     <td>

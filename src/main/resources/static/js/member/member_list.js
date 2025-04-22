@@ -1,10 +1,11 @@
 $(document).ready(function() {
     let modalCon = false, selectRow, btnMsg = "등록";
-    let isDuplicateCheck = false, memLoginIdCheck = false;
+    let isDuplicateCheck = false, memLoginIdCheck = false, isTagDuplicateCheck = true;
     var memberId;
 
     var passwordContainer = document.getElementById('passwordContainer');
     var passwordEditBtn = document.getElementById('passwordEditBtn');
+    var duplicateMemTagBtn = document.getElementById('duplicateMemTagBtn');
 
     document.getElementById('bizSearchBtn').addEventListener('click', function () {
         var bizSearchModal = new bootstrap.Modal(document.getElementById('bizSearchModal'), {
@@ -67,8 +68,7 @@ $(document).ready(function() {
                     $('#cardYn').val(data.cardYn || '');
                     $('#tidYn').val(data.tidYn || '');
                 },
-                error: function(error) {
-                    alert(error);
+                error: function(xhr, status, error) {
                 }
             });
             var bizSearchModal = bootstrap.Modal.getInstance(document.getElementById('bizSearchModal'));
@@ -116,14 +116,19 @@ $(document).ready(function() {
                 }
                 alert(response.message);
             },
-            error: function(error) {
-                alert(error);
+            error: function(xhr, status, error) {
+                alert(JSON.parse(xhr.responseText).message);
             }
         });
     });
 
     document.getElementById('memLoginId').addEventListener('input', function() {
         isDuplicateCheck = false;
+    });
+
+    document.getElementById('idTag').addEventListener('input', function() {
+        $('#duplicateMemTagBtn').prop('disabled', false);
+        isTagDuplicateCheck = false;
     });
 
     document.getElementById('bizType').addEventListener('change', handleBizYnChange);
@@ -162,7 +167,7 @@ $(document).ready(function() {
         }
 
         $.ajax({
-            url: '/member/memLoginId',
+            url: '/member/memLoginId/dupcheck',
             type: 'GET',
             data: { memLoginId: memLoginId },
             success: function(isDuplicate) {
@@ -176,6 +181,31 @@ $(document).ready(function() {
             },
             error: function(error) {
                 console.error(error);
+            }
+        });
+    });
+
+    $('#duplicateMemTagBtn').on('click', function() {
+        var idTag = $('#idTag').val();
+        if (idTag.trim() === '') {
+            alert('회원카드번호를 입력해주세요.');
+            return;
+        }
+
+        $.ajax({
+            url: `/member/memTag/dupcheck/${memberId}`,
+            type: 'GET',
+            data: { idTag: idTag },
+            success: function(response) {
+                if (response.state) {
+                    isTagDuplicateCheck = true;
+                } else {
+                    isTagDuplicateCheck = false;
+                }
+                alert(response.message);
+            },
+            error: function(xhr, status, error) {
+                alert(JSON.parse(xhr.responseText).message);
             }
         });
     });
@@ -204,11 +234,14 @@ $(document).ready(function() {
         $('#bizSearchBtn').prop('disabled', false);
         $('#memLoginId').prop('disabled', false);
         $('#userState').val('MSTNORMAL');
+        $('#idTag').prop('disabled', true);
         $('#duplicateMemLoginIdBtn').prop('disabled', false);
+        $('#duplicateMemTagBtn').prop('disabled', true);
         $('#bizNameSearch').val('');
         document.getElementById('bizSearchList').innerHTML = '<tr><td colspan="3">조회된 데이터가 없습니다.</td></tr>';
         passwordContainer.hidden = false;
         passwordEditBtn.hidden = true;
+        duplicateMemTagBtn.hidden = true;
     });
 
     $('#editBtn').on('click', function(event) {
@@ -220,11 +253,14 @@ $(document).ready(function() {
         $('#companyId').prop('disabled', true);
         $('#bizType').prop('disabled', true);
         $('#memLoginId').prop('disabled', true);
-        $('#idTag').prop('disabled', true);
+        $('#idTag').prop('disabled', false);
         $('#duplicateMemLoginIdBtn').prop('disabled', true);
+        $('#duplicateMemTagBtn').prop('disabled', true);
         passwordContainer.hidden = true;
         passwordEditBtn.hidden = false;
-
+        duplicateMemTagBtn.hidden = false;
+        isTagDuplicateCheck = true;
+        
         $.ajax({
             type: 'GET',
             url: `/member/get/${memberId}`,
@@ -370,8 +406,8 @@ $(document).ready(function() {
                     alert(response);
                     window.location.reload();
                 },
-                error: function(error) {
-                    alert(error);
+                error: function(xhr, status, error) {
+                    alert(xhr.responseText);
                 }
             });
         }
@@ -421,6 +457,11 @@ $(document).ready(function() {
 
             if (email.trim() != '') {
                 if (!isEmail(email)) { return; }
+            }
+        } else {
+            if(!isTagDuplicateCheck) {
+                alert('회원카드번호 중복체크를 해주세요.');
+                return;
             }
         }
 
@@ -474,8 +515,8 @@ $(document).ready(function() {
                     alert(response);
                     window.location.reload();
                 },
-                error: function(error) {
-                    alert(error);
+                error: function(xhr, status, error) {
+                    alert(xhr.responseText);
                 }
             });
         }
@@ -630,8 +671,8 @@ $(document).ready(function() {
                 });
                 conditionModal.show();
             },
-            error: function(error) {
-                alert(error);
+            error: function(xhr, status, error) {
+                alert(JSON.parse(xhr.responseText).message);
             }
         });
     });

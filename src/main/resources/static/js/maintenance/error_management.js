@@ -34,7 +34,7 @@ $(document).ready(function() {
                 
             },
             error: function(xhr, status, error) {
-                alert(error.message);
+                alert(JSON.parse(xhr.responseText).message);
             }
         });
     });
@@ -132,8 +132,8 @@ $(document).ready(function() {
                     alert(response);
                     window.location.reload();
                 },
-                error: function(error) {
-                    alert(error);
+                error: function(xhr, status, error) {
+                    alert(xhr.responseText);
                 }
             });
         }
@@ -197,8 +197,8 @@ $(document).ready(function() {
                     $('#dataAddModal').modal('hide');
                     window.location.reload();
                 },
-                error: function(error) {
-                    alert(error);
+                error: function(xhr, status, error) {
+                    alert(xhr.responseText);
                 }
             });
         }

@@ -107,8 +107,8 @@ $(document).ready(function() {
                     alert(response);
                     window.location.replace('/system/user/list');
                 },
-                error: function(error) {
-                    alert(error);
+                error: function(xhr, status, error) {
+                    alert(xhr.responseText);
                 }
             });
         }
@@ -179,8 +179,8 @@ $(document).ready(function() {
                     alert(response);
                     window.location.replace('/system/user/list');
                 },
-                error: function(error) {
-                    alert(error);
+                error: function(xhr, status, error) {
+                    alert(xhr.responseText);
                 }
             });
         }        
@@ -281,8 +281,8 @@ $(document).ready(function() {
                 }
                 alert(response.message);
             },
-            error: function(error) {
-                alert(error);
+            error: function(xhr, status, error) {
+                alert(JSON.parse(xhr.responseText).message);
             }
         });
     });

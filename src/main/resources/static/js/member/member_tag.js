@@ -46,8 +46,8 @@ $(document).ready(function() {
                 const totalChargingPrice = parseInt(data.authInfo.totalChargingPrice) || 0;
                 $('#totalChargingPrice').val(totalChargingPrice);
             },
-            error: function(error) {
-                alert(error);
+            error: function(xhr, status, error) {
+                alert(JSON.parse(xhr.responseText).message);
             }
         });
     });
@@ -62,8 +62,8 @@ $(document).ready(function() {
                     alert(response);
                     window.location.reload();
                 },
-                error: function(error) {
-                    alert(error);
+                error: function(xhr, status, error) {
+                    alert(xhr.responseText);
                 }
             });
         }
@@ -90,8 +90,8 @@ $(document).ready(function() {
                     alert(response);
                     window.location.reload();
                 },
-                error: function(error) {
-                    alert(error);
+                error: function(xhr, status, error) {
+                    alert(xhr.responseText);
                 }
             });
         }

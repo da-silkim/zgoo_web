@@ -78,7 +78,7 @@ public class MemberController {
     }
 
     // 사용자ID 중복 검사
-    @GetMapping("/memLoginId")
+    @GetMapping("/memLoginId/dupcheck")
     public ResponseEntity<Boolean> checkMemLoginId(@RequestParam("memLoginId") String memLoginId) {
         log.info("=== duplicate check memLoginId ===");
 
@@ -88,6 +88,39 @@ public class MemberController {
         } catch (Exception e) {
             log.error("[checkMemLoginId] error : {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    // 회원카드번호 중복 검사
+    @GetMapping("/memTag/dupcheck/{memberId}")
+    public ResponseEntity<Map<String, Object>> checkMemberTag(@PathVariable("memberId") Long memberId,
+            @RequestParam("idTag") String idTag) {
+        log.info("=== duplicate check member Tag ===");
+
+        Map<String, Object> response = new HashMap<>();
+
+        try {
+            Integer result = this.memberService.isMemberTagDuplicate(memberId, idTag);
+
+            switch (result) {
+                case 0 -> response.put("message", "현재 본인 카드번호입니다.");
+                case 1 -> response.put("message", "사용 가능한 카드번호입니다.");
+                case 2 -> response.put("message", "이미 등록된 카드번호입니다. 관리자에게 문의 바랍니다.");
+                default -> response.put("message", "등록이 불가능한 카드번호입니다. 다시 확인해주세요.");
+            }
+
+            boolean state = false;
+
+            if (result == 0 || result == 1) {
+                state = true;
+            }
+
+            response.put("state", state);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            log.error("[checkMemTag] error : {}", e.getMessage());
+            response.put("message", "회원카드번호 중복 검사 중 오류가 발생했습니다.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
 
@@ -190,7 +223,7 @@ public class MemberController {
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             log.error("[updateMemberPassword] error: {}", e.getMessage());
-            response.put("message", "비밀번호 변경 중 오류 발생");
+            response.put("message", "비밀번호 변경 중 오류가 발생했습니다.");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
