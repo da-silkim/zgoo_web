@@ -43,4 +43,13 @@ public class ConditionDto {
         private LocalDateTime applyDt;
         private String applyDtString;
     }
+
+    @Data
+    @NoArgsConstructor
+    @SuperBuilder
+    @EqualsAndHashCode(callSuper = true)
+    @ToString(callSuper = true)
+    public static class ConditionList extends ConditionCodeBaseDto {
+        private String agreeVersion;
+    }
 }

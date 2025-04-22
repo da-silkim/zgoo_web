@@ -110,6 +110,7 @@ public class MemberDto {
         private String agreeYn;
         private String agreeYnCheck;
         private String section;
+        private String agreeVersion;
         private String conditionCodeName;
         private LocalDateTime agreeDt;
     }

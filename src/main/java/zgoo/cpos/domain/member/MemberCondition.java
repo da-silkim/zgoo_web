@@ -36,6 +36,9 @@ public class MemberCondition {
     @Column(name = "agree_yn")
     private String agreeYn;
 
+    @Column(name = "agree_version")
+    private String agreeVersion;
+
     @Column(name = "agree_dt")
     private LocalDateTime agreeDt;
 
@@ -49,6 +52,7 @@ public class MemberCondition {
 
     public void updateMemberConditionInfo(MemberConditionDto dto) {
         this.agreeYn = dto.getAgreeYn();
+        this.agreeVersion = dto.getAgreeVersion();
         this.agreeDt = LocalDateTime.now();
     }
 }

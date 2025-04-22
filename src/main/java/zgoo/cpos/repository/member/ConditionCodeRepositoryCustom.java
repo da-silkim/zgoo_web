@@ -3,8 +3,8 @@ package zgoo.cpos.repository.member;
 import java.util.List;
 
 import zgoo.cpos.domain.member.ConditionCode;
-import zgoo.cpos.dto.member.ConditionDto;
 import zgoo.cpos.dto.member.ConditionDto.ConditionCodeBaseDto;
+import zgoo.cpos.dto.member.ConditionDto.ConditionList;
 
 public interface ConditionCodeRepositoryCustom {
 
@@ -16,4 +16,6 @@ public interface ConditionCodeRepositoryCustom {
 
     // 약관 삭제
     void deleteByConditionCode(String conCode);
+
+    List<ConditionList> findAllConditionWithVersion();
 }

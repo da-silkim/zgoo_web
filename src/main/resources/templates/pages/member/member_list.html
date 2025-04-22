@@ -385,80 +385,22 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr class="condition-row">
-                                    <td class="condition-section">필수</td>
-                                    <td class="condition-code text-left" id="PI">개인정보 활용동의서
+                                <tr class="condition-row" th:each="con : ${conList}">
+                                    <td class="condition-section" th:text="${con.section}"></td>
+                                    <td class="condition-code text-left" th:id="${con.conditionCode}">
+                                        <span th:text="${con.conditionName}"></span>
                                         <span class="condition-detail-container">
-                                            <a href="#" class="condition-detail PI">내용보기</a>
+                                            <a href="#" th:class="'condition-detail ' + ${con.conditionCode}">내용보기</a>
                                         </span>
+                                        <input th:id="'ver' + ${con.conditionCode}" th:value="${con.agreeVersion}" hidden>
                                     </td>
                                     <td>
-                                        <input type="radio" name="privateCheck" id="privateY" class="mx-3" value="Y"
-                                            checked>
-                                        <label for="privateY">동의</label>
-                                        <input type="radio" name="privateCheck" id="privateN" class="mx-3" value="N">
-                                        <label for="privateN">미동의</label>
-                                    </td>
-                                </tr>
-                                <tr class="condition-row">
-                                    <td class="condition-section">필수</td>
-                                    <td class="condition-code text-left" id="MS">멤버십 서비스 이용약관
-                                        <span class="condition-detail-container">
-                                            <a href="#" class="condition-detail MS">내용보기</a>
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <input type="radio" name="memServiceCheck" id="memServiceY" class="mx-3"
-                                            value="Y" checked>
-                                        <label for="memServiceY">동의</label>
-                                        <input type="radio" name="memServiceCheck" id="memServiceN" class="mx-3"
-                                            value="N">
-                                        <label for="memServiceN">미동의</label>
-                                    </td>
-                                </tr>
-                                <tr class="condition-row">
-                                    <td class="condition-section">선택</td>
-                                    <td class="condition-code text-left" id="MK">마케팅 수신 동의
-                                        <span class="condition-detail-container">
-                                            <a href="#" class="condition-detail MK">내용보기</a>
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <input type="radio" name="marketingCheck" id="marketingY" class="mx-3" value="Y"
-                                            checked>
-                                        <label for="marketingY">동의</label>
-                                        <input type="radio" name="marketingCheck" id="marketingN" class="mx-3"
-                                            value="N">
-                                        <label for="marketingN">미동의</label>
-                                    </td>
-                                </tr>
-                                <tr class="condition-row">
-                                    <td class="condition-section">선택</td>
-                                    <td class="condition-code text-left" id="ES">이메일 수신 동의
-                                        <span class="condition-detail-container">
-                                            <a href="#" class="condition-detail ES">내용보기</a>
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <input type="radio" name="emailCheck" id="emailY" class="mx-3" value="Y"
-                                            checked>
-                                        <label for="emailY">동의</label>
-                                        <input type="radio" name="emailCheck" id="emailN" class="mx-3" value="N">
-                                        <label for="emailN">미동의</label>
-                                    </td>
-                                </tr>
-                                <tr class="condition-row">
-                                    <td class="condition-section">선택</td>
-                                    <td class="condition-code text-left" id="SS">SMS 수신 동의
-                                        <span class="condition-detail-container">
-                                            <a href="#" class="condition-detail SS">내용보기</a>
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <input type="radio" name="smsCheck" id="smsY" class="mx-3" value="Y" checked>
-                                        <label for="smsY">동의</label>
-                                        <input type="radio" name="smsCheck" id="smsN" class="mx-3" value="N">
-                                        <label for="smsN">미동의</label>
+                                        <input type="radio" th:name="${con.conditionCode + 'Check'}" th:id="${con.conditionCode + '-Y'}"
+                                            class="mx-3" value="Y" checked>
+                                        <label th:for="${con.conditionCode + '-Y'}">동의</label>
+                                        <input type="radio" th:name="${con.conditionCode + 'Check'}" th:id="${con.conditionCode + '-N'}"
+                                            class="mx-3" value="N">
+                                        <label th:for="${con.conditionCode + '-N'}">미동의</label>
                                     </td>
                                 </tr>
                             </tbody>
@@ -556,10 +498,10 @@
                     <div class="modal-title mb-2"><span class="modal-title-bar"></span><span id="conditionName"></span>
                     </div>
                     <div id="conditonText"></div>
-                    <div class="modal-footer justify-content-center border-top-none">
-                        <button type="button" class="btn btn-outline-grey" id="conditionModalBtn"
-                            data-bs-dismiss="modal">닫기</button>
-                    </div>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-outline-grey" id="conditionModalBtn"
+                        data-bs-dismiss="modal">닫기</button>
                 </div>
             </div>
         </div>

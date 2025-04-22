@@ -106,6 +106,7 @@ public class MemberMapper {
         MemberCondition condition = MemberCondition.builder()
                 .member(member)
                 .condition(conditionCode)
+                .agreeVersion(dto.getAgreeVersion())
                 .agreeYn(dto.getAgreeYn())
                 .agreeDt(LocalDateTime.now())
                 .build();

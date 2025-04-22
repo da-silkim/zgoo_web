@@ -260,7 +260,7 @@ $(document).ready(function() {
         passwordEditBtn.hidden = false;
         duplicateMemTagBtn.hidden = false;
         isTagDuplicateCheck = true;
-        
+
         $.ajax({
             type: 'GET',
             url: `/member/get/${memberId}`,
@@ -358,36 +358,10 @@ $(document).ready(function() {
                 });
 
                 data.memberInfo.condition.forEach(con => {
-                    if (con.conditionCode === 'PI') {
-                        if (con.agreeYn === 'Y') {
-                            $('#privateY').prop('checked', true);
-                        } else {
-                            $('#privateN').prop('checked', true);
-                        }
-                    } else if (con.conditionCode === 'MS') {
-                        if (con.agreeYn === 'Y') {
-                            $('#memServiceY').prop('checked', true);
-                        } else {
-                            $('#memServiceN').prop('checked', true);
-                        }
-                    } else if (con.conditionCode === 'MK') {
-                        if (con.agreeYn === 'Y') {
-                            $('#marketingY').prop('checked', true);
-                        } else {
-                            $('#marketingN').prop('checked', true);
-                        }
-                    } else if (con.conditionCode === 'ES') {
-                        if (con.agreeYn === 'Y') {
-                            $('#emailY').prop('checked', true);
-                        } else {
-                            $('#emailN').prop('checked', true);
-                        }
-                    } else if (con.conditionCode === 'SS') {
-                        if (con.agreeYn === 'Y') {
-                            $('#smsY').prop('checked', true);
-                        } else {
-                            $('#smsN').prop('checked', true);
-                        }
+                    if (con.agreeYn === 'Y') {
+                        $(`#${con.conditionCode}-Y`).prop('checked', true);
+                    } else {
+                        $(`#${con.conditionCode}-N`).prop('checked', true);
                     }
                 });
             }
@@ -608,14 +582,15 @@ $(document).ready(function() {
         const conditionInfoList = [];
 
         conditionRows.forEach(row => {
-            // const section = row.querySelector(".condition-section").innerText;
             const conditionCode = row.querySelector(".condition-code").id;
             const agreeYn = row.querySelector('input[type="radio"]:checked').value;
+            const version = row.querySelector(`#ver${conditionCode}`)?.value;
+            console.log("version: ", version);
 
             conditionInfoList.push({
                 conditionCode: conditionCode,
                 agreeYn: agreeYn,
-                // section: section
+                agreeVersion: version
             });
         });
 

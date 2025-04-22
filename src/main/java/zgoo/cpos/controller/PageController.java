@@ -45,6 +45,7 @@ import zgoo.cpos.dto.cs.CsInfoDto.StationOpStatusDto;
 import zgoo.cpos.dto.history.ChargingHistDto;
 import zgoo.cpos.dto.history.ChgCommlogDto;
 import zgoo.cpos.dto.member.ConditionDto.ConditionCodeBaseDto;
+import zgoo.cpos.dto.member.ConditionDto.ConditionList;
 import zgoo.cpos.dto.member.MemberDto;
 import zgoo.cpos.dto.member.MemberDto.MemberAuthDto;
 import zgoo.cpos.dto.member.MemberDto.MemberListDto;
@@ -213,6 +214,8 @@ public class PageController {
 
             List<CompanyListDto> companyList = this.companyService.findCompanyListAll(); // 사업자 list
             model.addAttribute("companyList", companyList);
+            List<ConditionList> conList = this.conditionService.findAllConditionWithVersion();
+            model.addAttribute("conList", conList);
             List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT"); // 그리드 row 수
             model.addAttribute("showListCnt", showListCnt);
             List<CommCdBaseDto> memStatList = codeService.findCommonCdNamesByGrpcd("MEMSTATCD"); // 회원상태코드

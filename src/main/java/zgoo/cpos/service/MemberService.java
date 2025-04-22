@@ -420,8 +420,6 @@ public class MemberService {
 
                 if (matchedOne != null) {
                     matchedOne.updateMemberConditionInfo(conditionDto);
-                } else {
-                    log.error("An error occurred while updating the terms and conditions");
                 }
             }
         } catch (Exception e) {

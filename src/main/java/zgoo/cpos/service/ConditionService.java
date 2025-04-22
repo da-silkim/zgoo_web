@@ -6,6 +6,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -17,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import zgoo.cpos.domain.member.ConditionCode;
 import zgoo.cpos.domain.member.ConditionVersionHist;
 import zgoo.cpos.dto.member.ConditionDto.ConditionCodeBaseDto;
+import zgoo.cpos.dto.member.ConditionDto.ConditionList;
 import zgoo.cpos.dto.member.ConditionDto.ConditionVersionHistBaseDto;
 import zgoo.cpos.mapper.ConditionMapper;
 import zgoo.cpos.repository.member.ConditionCodeRepository;
@@ -187,5 +189,15 @@ public class ConditionService {
             throw new IllegalArgumentException(conditionCode + "코드에 해당하는 파일 정보를 찾을 수 없습니다.");
         }
         return condition.getConditionName();
+    }
+
+    // 적용중인 약관 조회
+    public List<ConditionList> findAllConditionWithVersion() {
+        try {
+            return this.conditionCodeRepository.findAllConditionWithVersion();
+        } catch (Exception e) {
+            log.error("[findAllConditionWithVersion] error: {}", e.getMessage());
+            return new ArrayList<>();
+        }
     }
 }
