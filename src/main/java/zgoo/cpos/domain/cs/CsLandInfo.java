@@ -55,6 +55,9 @@ public class CsLandInfo {
     @Column(name = "land_use_fee")
     private Integer landUseFee;
 
+    @Column(name = "settlement_date")
+    private String settlementDate;
+
 
     public void updateCsLandInfo(CsInfoRegDto dto) {
         this.institutionName = dto.getInstitutionName();
@@ -66,5 +69,6 @@ public class CsLandInfo {
         this.endDate = dto.getEndDate();
         this.landUseType = dto.getLandUseType();
         this.landUseFee = dto.getLandUseFee();
+        this.settlementDate = dto.getSettlementDate();
     }
 }

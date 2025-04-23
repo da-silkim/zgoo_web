@@ -51,22 +51,24 @@ public class CsInfoDto {
         private String stationType;
         private String facilityType;
         private String asNum;
-        private Double latitude;
-        private Double longitude;
         private String zipcode;
         private String addressDetail;
         private String parkingFeeYn;
         private String sido;
+        private Double latitude;
+        private Double longitude;
+        private Integer safetyManagementFee;
 
         // 충전소 부지 정보
         private String institutionName;
         private String landType;
         private String staffName;
         private String staffPhone;
+        private String landUseType;
+        private String settlementDate;
         private LocalDate contractDate;
         private LocalDate startDate;
         private LocalDate endDate;
-        private String landUseType;
         private Integer landUseFee;
 
         // 충전소 한전계약 정보
@@ -99,6 +101,7 @@ public class CsInfoDto {
         private String contractDateString;
         private String rcvCapacityString;
         private String parkingFeeString;
+        private String safetyFeeString;
     }
 
     @Data

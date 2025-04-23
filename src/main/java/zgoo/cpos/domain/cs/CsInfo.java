@@ -73,6 +73,9 @@ public class CsInfo {
     @Column(name = "sido")
     private String sido;
 
+    @Column(name = "safety_management_fee")
+    private Integer safetyManagementFee;
+
     @JoinColumn(name = "company_id")
     @ManyToOne(fetch = FetchType.LAZY)
     private Company company;
@@ -100,5 +103,6 @@ public class CsInfo {
         this.openEndTime = dto.getOpenEndTime();
         this.parkingFeeYn = dto.getParkingFeeYn();
         this.sido = dto.getSido();
+        this.safetyManagementFee = dto.getSafetyManagementFee();
     }
 }

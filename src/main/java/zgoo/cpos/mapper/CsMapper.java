@@ -31,6 +31,7 @@ public class CsMapper {
                 .openEndTime(dto.getOpenEndTime())
                 .parkingFeeYn(dto.getParkingFeeYn())
                 .sido(dto.getSido())
+                .safetyManagementFee(dto.getSafetyManagementFee())
                 .build();
         return cs;
     }
@@ -49,6 +50,7 @@ public class CsMapper {
                 .endDate(dto.getEndDate())
                 .landUseType(dto.getLandUseType())
                 .landUseFee(dto.getLandUseFee())
+                .settlementDate(dto.getSettlementDate())
                 .build();
         return land;
     }

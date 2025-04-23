@@ -146,6 +146,13 @@
                                         <span th:if="${csInfo.landUseType == 'RATE'}" th:text="${csInfo.landUseFee + '%'}"></span>
                                     </td>
                                 </tr>
+                                <tr>
+                                    <th class="w-20">정산일</th>
+                                    <td class="w-30">
+                                        <span th:text="${csInfo.settlementDate}"></span>
+                                    </td>
+                                    <td colspan="2"></td>
+                                </tr>
                             </tbody>
                         </table>
                         <!-- table:3 end -->
@@ -186,6 +193,20 @@
                             </tbody>
                         </table>
                         <!-- table:4 end -->
+                        <!-- table:5 start -->
+                        <div class="card-title mb-2"><span class="card-title-bar"></span><span>안전점검관리비 정보</span></div>
+                        <table class="table table-bg-v table-fixed w-100 text-center align-middle">
+                            <tbody>
+                                <tr class="table-border-top">
+                                    <th class="w-20">안전점검관리비(원)<b class="required-data">*</b></th>
+                                    <td class="w-30">
+                                        <span th:text="${csInfo.safetyFeeString}" class="price-format"></span>
+                                    </td>
+                                    <td colspan="2"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <!-- table:5 end -->
                         <button type="button" class="list-btn" onclick="goToList('/station/list',
                             ['companyIdSearch', 'opSearch', 'contentSearch'])"> 목록 </button>
                     </div>

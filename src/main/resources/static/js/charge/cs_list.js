@@ -122,6 +122,9 @@ $(document).ready(function() {
                 $('#rcvCapacityMethod').val(data.rcvCapacityMethod || '');
                 $('#rcvCapacity').val(data.rcvCapacity || '');
                 $('#voltageType').val(data.voltageType || '');
+                $('#sido').val(data.sido || '');
+                $('#settlementDate').val(data.settlementDate || '');
+                $('#safetyManagementFee').val(data.safetyManagementFee || '');
             }
         });
     });
@@ -185,7 +188,10 @@ $(document).ready(function() {
                 contPower: $('#contPower').val(),
                 rcvCapacityMethod: $('#rcvCapacityMethod').val(),
                 rcvCapacity: $('#rcvCapacity').val(),
-                voltageType: $('#voltageType').val()
+                voltageType: $('#voltageType').val(),
+                sido: $('#sido').val(),
+                settlementDate: $('#settlementDate').val(),
+                safetyManagementFee: $('#safetyManagementFee').val()
             }
 
             const URL = modalCon ? `/station/list/update` : `/station/list/new`;

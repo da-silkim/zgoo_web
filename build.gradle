@@ -75,10 +75,10 @@ dependencies {
 	// 내장 톰캣을 providedRuntime으로 변경 (외부 톰캣 사용 시)
     providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
 
-	compileOnly 'org.projectlombok:lombok'
+	compileOnly 'org.projectlombok:lombok:1.18.38'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	runtimeOnly 'com.mysql:mysql-connector-j'
-	annotationProcessor 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok:1.18.38'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.kafka:spring-kafka-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
