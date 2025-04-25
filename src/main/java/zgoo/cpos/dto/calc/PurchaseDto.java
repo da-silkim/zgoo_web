@@ -69,4 +69,14 @@ public class PurchaseDto {
         // 토지사용료
         private String landUseType;
     }
+
+    @Data
+    @NoArgsConstructor
+    @SuperBuilder
+    @EqualsAndHashCode(callSuper = true)
+    @ToString(callSuper = true)
+    public static class PurchaseDetailDto extends PurchaseRegDto {
+        private String accountCodeName;
+        private String paymentMethodName;
+    }
 }

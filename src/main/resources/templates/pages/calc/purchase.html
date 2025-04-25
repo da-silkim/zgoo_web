@@ -98,7 +98,12 @@
                                 <tr th:each="pur : ${purList}">
                                     <td th:id="${pur.purchaseId}"><input type="checkbox" /></td>
                                     <td>
-                                        <a>
+                                        <a th:href="@{/purchase/detail/{id}(id=${pur.purchaseId}, page=${currentPage}, size=${size},
+                                            opSearch=${selectedOpSearch != null ? selectedOpSearch : ''}, 
+                                            contentSearch=${selectedContentSearch != null ? selectedContentSearch : ''}, 
+                                            startDate=${selectedStartDate != null ? selectedStartDate : ''},
+                                            endDate=${selectedEndDate != null ? selectedEndDate : ''})}"
+                                            class="no-underline">
                                             <i class="bi bi-files detail-files"></i>
                                         </a>
                                     </td>
@@ -251,17 +256,6 @@
                                         <input type="number" name="vat" id="vat" class="form-control" autocomplete="off" value="0" required>
                                     </td>
                                 </tr>
-                                <!-- <tr id="elecContainer" hidden>
-                                    <th class="w-20">부담금<b class="required-data">*</b></th>
-                                    <td class="w-30">
-                                        <input type="number" name="charge" id="charge" class="form-control" autocomplete="off">
-                                    </td>
-                                    <th class="w-20">한전파일 업로드<b class="required-data">*</b></th>
-                                    <td class="w-30">
-                                        <input type="file" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                                            name="excelFile" id="excelFile" class="form-control" onchange="excelRead(event)">
-                                    </td>
-                                </tr>   -->
                                 <tr id="elecContainer" hidden>
                                     <th class="w-20">부담금<b class="required-data">*</b></th>
                                     <td class="w-30">

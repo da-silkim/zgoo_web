@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import zgoo.cpos.domain.calc.PurchaseInfo;
 import zgoo.cpos.domain.cs.CsInfo;
 import zgoo.cpos.dto.calc.PurchaseDto.PurchaseAccountDto;
+import zgoo.cpos.dto.calc.PurchaseDto.PurchaseDetailDto;
 import zgoo.cpos.dto.calc.PurchaseDto.PurchaseListDto;
 import zgoo.cpos.dto.calc.PurchaseDto.PurchaseRegDto;
 import zgoo.cpos.mapper.PurchaseMapper;
@@ -67,7 +68,7 @@ public class PurchaseService {
     // 계정과목 정보 조회
     public PurchaseAccountDto searchPurchaseAccount(String accountCode, String stationId) {
         try {
-            
+
             PurchaseAccountDto result = switch (accountCode) {
                 case "LANDFEE" -> {
                     PurchaseAccountDto landResult = this.purchaseRepository.searchAccountLand(stationId);
@@ -95,6 +96,16 @@ public class PurchaseService {
                     .vat(0)
                     .totalAmount(0)
                     .build();
+        }
+    }
+
+    // 매입 상세 조회
+    public PurchaseDetailDto findPurchaseDetailOne(Long id) {
+        try {
+            return this.purchaseRepository.findPurchaseDetailOne(id);
+        } catch (Exception e) {
+            log.error("[findPurchaseDetailOne] error : {}", e.getMessage());
+            return null;
         }
     }
 

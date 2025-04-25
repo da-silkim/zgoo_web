@@ -19,6 +19,7 @@ import zgoo.cpos.domain.code.QCommonCode;
 import zgoo.cpos.domain.cs.QCsInfo;
 import zgoo.cpos.domain.cs.QCsLandInfo;
 import zgoo.cpos.dto.calc.PurchaseDto.PurchaseAccountDto;
+import zgoo.cpos.dto.calc.PurchaseDto.PurchaseDetailDto;
 import zgoo.cpos.dto.calc.PurchaseDto.PurchaseListDto;
 import zgoo.cpos.dto.calc.PurchaseDto.PurchaseRegDto;
 
@@ -234,4 +235,29 @@ public class PurchaseRepositoryCustomImpl implements PurchaseRepositoryCustom {
                 .fetchOne();
     }
 
+    @Override
+    public PurchaseDetailDto findPurchaseDetailOne(Long id) {
+        return queryFactory.select(Projections.fields(PurchaseDetailDto.class,
+            purchase.accountCode.as("accountCode"),
+            Expressions.stringTemplate("IF({0} IS NULL OR {0} = '', '정보없음', {0})", purchase.item).as("item"),
+            purchase.bizName.as("bizName"),
+            purchase.bizNum.as("bizNum"),
+            purchase.station.id.as("stationId"),
+            purchase.purchaseDate.as("purchaseDate"),
+            purchase.paymentMethod.as("paymentMethod"),
+            Expressions.stringTemplate("IF({0} IS NULL OR {0} = '', '정보없음', {0})", purchase.approvalNo).as("approvalNo"),
+            purchase.unitPrice.as("unitPrice"),
+            purchase.amount.as("amount"),
+            purchase.supplyPrice.as("supplyPrice"),
+            purchase.vat.as("vat"),
+            Expressions.numberTemplate(Integer.class, "COALESCE({0}, 0)", purchase.charge).as("charge"),
+            purchase.totalAmount.as("totalAmount"),
+            accountCdName.name.as("accountCodeName"),
+            paymentName.name.as("paymentMethodName")))
+            .from(purchase)
+            .leftJoin(accountCdName).on(purchase.accountCode.eq(accountCdName.commonCode))
+            .leftJoin(paymentName).on(purchase.paymentMethod.eq(paymentName.commonCode))
+            .where(purchase.id.eq(id))
+            .fetchOne();
+    }
 }

@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import zgoo.cpos.dto.calc.PurchaseDto.PurchaseAccountDto;
+import zgoo.cpos.dto.calc.PurchaseDto.PurchaseDetailDto;
 import zgoo.cpos.dto.calc.PurchaseDto.PurchaseListDto;
 import zgoo.cpos.dto.calc.PurchaseDto.PurchaseRegDto;
 
@@ -32,4 +33,7 @@ public interface PurchaseRepositoryCustom {
     // 계정과목 정보 조회
     PurchaseAccountDto searchAccountLand(String stationId);
     PurchaseAccountDto searchAccountSafety(String stationId);
+
+    // 매입 상세 조회
+    PurchaseDetailDto findPurchaseDetailOne(Long id);
 }

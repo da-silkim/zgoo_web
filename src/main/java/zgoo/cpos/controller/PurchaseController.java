@@ -1,6 +1,7 @@
 package zgoo.cpos.controller;
 
 import java.security.Principal;
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -9,6 +10,7 @@ import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,6 +23,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import zgoo.cpos.dto.calc.PurchaseDto.PurchaseAccountDto;
+import zgoo.cpos.dto.calc.PurchaseDto.PurchaseDetailDto;
 import zgoo.cpos.dto.calc.PurchaseDto.PurchaseRegDto;
 import zgoo.cpos.dto.cs.CsInfoDto.StationSearchDto;
 import zgoo.cpos.service.ComService;
@@ -98,6 +101,34 @@ public class PurchaseController {
             response.put("message", "서버 오류가 발생했습니다. 다시 시도해 주세요.");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
+    }
+
+    // 매입 상세 조회
+    @GetMapping("/detail/{id}")
+    public String detailPurchase(Model model, @PathVariable("id") Long id,
+            @RequestParam(value = "opSearch", required = false) String searchOp,
+            @RequestParam(value = "contentSearch", required = false) String searchContent,
+            @RequestParam(value = "startDate", required = false) LocalDate startDate,
+            @RequestParam(value = "endDate", required = false) LocalDate endDate,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size) {
+        log.info("=== Detail Purchase Management Page ===");
+
+        model.addAttribute("selectedOpSearch", searchOp);
+        model.addAttribute("selectedContentSearch", searchContent);
+        model.addAttribute("selectedStartDate", startDate);
+        model.addAttribute("selectedEndDate", endDate);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("size", size);
+
+        try {
+            PurchaseDetailDto purchase = this.purchaseService.findPurchaseDetailOne(id);
+            model.addAttribute("purchase", purchase);          
+        } catch (Exception e) {
+            log.error("[detailPurchase] error: {}", e.getMessage());
+        }
+
+        return "pages/calc/purchase_detail";
     }
 
     // 매입 등록
