@@ -187,6 +187,14 @@ public class CsRepositoryCustomImpl implements CsRepositoryCustom {
     }
 
     @Override
+    public CsInfo findStationOne(String stationId) {
+        return queryFactory
+            .selectFrom(csInfo)
+            .where(csInfo.id.eq(stationId))
+            .fetchOne();
+    }
+
+    @Override
     public CsInfoDetailDto findCsInfoDetailOne(String stationId) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
 
@@ -304,6 +312,28 @@ public class CsRepositoryCustomImpl implements CsRepositoryCustom {
             .from(csInfo)
             .where(csInfo.stationName.contains(keyword))
             .fetch();
+        return csList;
+    }
+
+    @Override
+    public List<StationSearchDto> searchStationByOption(String searchOp, String searchContent) {
+        BooleanBuilder builder = new BooleanBuilder();
+
+        if (searchOp != null && (searchContent != null && !searchContent.isEmpty())) {
+            if (searchOp.equals("stationId")) {
+                builder.and(csInfo.id.contains(searchContent));
+            } else if (searchOp.equals("stationName")) {
+                builder.and(csInfo.stationName.contains(searchContent));
+            }
+        }
+
+        List<StationSearchDto> csList = queryFactory.select(Projections.fields(StationSearchDto.class,
+            csInfo.id.as("stationId"),
+            csInfo.stationName.as("stationName")))
+            .from(csInfo)
+            .where(builder)
+            .fetch();
+
         return csList;
     }
 

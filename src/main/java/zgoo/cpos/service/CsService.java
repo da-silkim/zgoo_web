@@ -275,4 +275,13 @@ public class CsService {
             return null;
         }
     }
+    
+    public List<StationSearchDto> searchStationByOption(String searchOp, String searchContent) {
+        try {
+            return this.csRepository.searchStationByOption(searchOp, searchContent);
+        } catch (Exception e) {
+            log.error("[searchStationByOption] error: {}", e.getMessage());
+            return new ArrayList<>();
+        }
+    }
 }

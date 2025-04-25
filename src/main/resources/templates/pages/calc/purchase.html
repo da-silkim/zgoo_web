@@ -57,6 +57,8 @@
                             th:if="${menuAuthority.authority == 'SU' or menuAuthority.excelYn == 'Y'}">
                             <i class="bi bi-file-earmark-spreadsheet"></i>엑셀다운로드</button>
                         <div class="btn-mod display-inline-block" th:if="${menuAuthority.authority == 'SU' or menuAuthority.modYn == 'Y'}">
+                            <button class="btn btn-elec" id="elecBtn" data-bs-toggle="modal" data-bs-target="#elecModal">
+                                <i class="bi bi bi-file-earmark-arrow-up"></i>한전파일 업로드</button>
                             <button class="btn btn-data-add" id="addBtn" data-bs-toggle="modal" data-bs-target="#dataAddModal">
                                 <i class="bi bi-plus-square"></i>등록</button>
                             <button class="btn btn-data-edit" id="editBtn" data-bs-toggle="modal" data-bs-target="#dataAddModal" hidden>
@@ -85,6 +87,7 @@
                                     <th scope="col">계정과목</th>
                                     <th scope="col">공급가액</th>
                                     <th scope="col">부가세</th>
+                                    <th scope="col">부담금</th>
                                     <th scope="col">합계</th>
                                     <th scope="col">지불방법</th>
                                     <th scope="col">승인번호</th>
@@ -104,6 +107,7 @@
                                     <td th:text="${pur.accountCodeName}"></td>
                                     <td th:text="${pur.supplyPrice}" class="int-format"></td>
                                     <td th:text="${pur.vat}" class="int-format"></td>
+                                    <td th:text="${pur.charge}" class="int-format"></td>
                                     <td th:text="${pur.totalAmount}" class="int-format"></td>
                                     <td th:text="${pur.paymentMethodName}"></td>
                                     <td th:text="${pur.approvalNo}"></td>
@@ -161,97 +165,125 @@
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width: 60vw; height: 90vh;">
             <div class="modal-content mh-100 overflow-y-auto scrollbar">
                 <form id="purchaseForm">
-                <!-- modal body start -->
-                <div class="modal-body">
-                    <!-- 모달 내용 -->
-                    <div class="modal-title mb-2"><span class="modal-title-bar"></span><span>매입정보</span></div>
-                    <!-- table:1 start -->
-                    <table class="table table-bg-v table-fixed w-100 text-center align-middle">
-                        <tbody>
-                            <tr class="table-border-top">
-                                <th class="w-20">계정과목<b class="required-data">*</b></th>
-                                <td class="w-30">
-                                    <select id="accountCode" class="form-control" required>
-                                        <option th:each="data : ${accList}" th:value="${data.commonCode}"
-                                                th:text="${data.commonCodeName}"></option>
-                                    </select>
-                                </td>
-                                <th class="w-20">품목명</th>
-                                <td class="w-30">
-                                    <input type="text" name="item" id="item" class="form-control" autocomplete="off">
-                                </td>
-                            </tr>
-                            <tr>
-                                <th class="w-20">거래처명<b class="required-data">*</b></th>
-                                <td class="w-30">
-                                    <input type="text" name="bizName" id="bizName" class="form-control" autocomplete="off" required>
-                                </td>
-                                <th class="w-20">사업자등록번호<b class="required-data">*</b></th>
-                                <td class="w-30">
-                                    <input type="text" name="bizNum" id="bizNum" class="form-control" autocomplete="off" required>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th class="w-20">충전소ID<b class="required-data">*</b></th>
-                                <td class="w-30">
-                                    <div class="display-input-btn">
-                                        <input type="text" name="stationId" id="stationId" class="form-control"
+                    <!-- modal body start -->
+                    <div class="modal-body position-relative">
+                        <!-- 모달 내용 -->
+                        <div class="modal-title mb-2">
+                            <span class="modal-title-bar"></span><span>매입정보</span>
+                            <span class="table-row-control-container me-4">
+                                <button type="button" class="btn btn-outline-grey" id="loadBtn" hidden>불러오기</button>
+                            </span>
+                        </div>
+                        <!-- table:1 start -->
+                        <table class="table table-bg-v table-fixed w-100 text-center align-middle">
+                            <tbody>
+                                <tr class="table-border-top">
+                                    <th class="w-20">계정과목<b class="required-data">*</b></th>
+                                    <td class="w-30">
+                                        <select id="accountCode" class="form-control" required>
+                                            <option th:each="data : ${accList}" th:value="${data.commonCode}"
+                                                    th:text="${data.commonCodeName}"></option>
+                                        </select>
+                                    </td>
+                                    <th class="w-20">품목명</th>
+                                    <td class="w-30">
+                                        <input type="text" name="item" id="item" class="form-control" autocomplete="off">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="w-20">거래처명<b class="required-data">*</b></th>
+                                    <td class="w-30">
+                                        <input type="text" name="bizName" id="bizName" class="form-control" autocomplete="off" required>
+                                    </td>
+                                    <th class="w-20">사업자등록번호<b class="required-data">*</b></th>
+                                    <td class="w-30">
+                                        <input type="text" name="bizNum" id="bizNum" class="form-control" oninput="addHyphenBizNo(this)" autocomplete="off" required>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="w-20">충전소ID<b class="required-data">*</b></th>
+                                    <td class="w-30">
+                                        <div class="display-input-btn">
+                                            <input type="text" name="stationId" id="stationId" class="form-control"
+                                                    autocomplete="off" disabled required>
+                                            <button type="button" class="btn btn-outline-grey flex-btn m-0"
+                                                    id="stationSearchBtn">조회</button>
+                                        </div>
+                                    </td>
+                                    <th class="w-20">매입거래일자<b class="required-data">*</b></th>
+                                    <td class="w-30">
+                                        <input type="date" min="1930-01-01" max="2199-12-31" name="purchaseDate" id="purchaseDate"
+                                            class="form-control" required>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="w-20">대금거래방법<b class="required-data">*</b></th>
+                                    <td class="w-30">
+                                        <select id="paymentMethod" class="form-control" required>
+                                            <option th:each="data : ${purchaseList}" th:value="${data.commonCode}"
+                                                    th:text="${data.commonCodeName}"></option>
+                                        </select>
+                                    </td>
+                                    <th class="w-20">승인번호</th>
+                                    <td class="w-30">
+                                        <input type="text" name="approvalNo" id="approvalNo" class="form-control" autocomplete="off">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="w-20">단가<b class="required-data">*</b></th>
+                                    <td class="w-30">
+                                        <input type="number" name="unitPrice" id="unitPrice" class="form-control" value="0"
+                                            autocomplete="off" required>
+                                    </td>
+                                    <th class="w-20">수량<b class="required-data">*</b></th>
+                                    <td class="w-30">
+                                        <input type="number" name="amount" id="amount" class="form-control" autocomplete="off" value="1" required>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="w-20">공급가액<b class="required-data">*</b></th>
+                                    <td class="w-30">
+                                        <input type="number" name="supplyPrice" id="supplyPrice" class="form-control" value="0"
                                                 autocomplete="off" required>
-                                        <button type="button" class="btn btn-outline-grey flex-btn"
-                                                id="stationSearchBtn">조회</button>
-                                    </div>
-                                </td>
-                                <th class="w-20">매입거래일자<b class="required-data">*</b></th>
-                                <td class="w-30">
-                                    <input type="date" min="1930-01-01" max="2199-12-31" name="purchaseDate" id="purchaseDate"
-                                    class="form-control" required>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th class="w-20">대금거래방법<b class="required-data">*</b></th>
-                                <td class="w-30">
-                                    <select id="paymentMethod" class="form-control" required>
-                                        <option th:each="data : ${purchaseList}" th:value="${data.commonCode}"
-                                                th:text="${data.commonCodeName}"></option>
-                                    </select>
-                                </td>
-                                <th class="w-20">승인번호</th>
-                                <td class="w-30">
-                                    <input type="text" name="approvalNo" id="approvalNo" class="form-control" autocomplete="off" required>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th class="w-20">단가<b class="required-data">*</b></th>
-                                <td class="w-30">
-                                    <input type="number" name="unitPrice" id="unitPrice" class="form-control"
-                                            autocomplete="off" required>
-                                </td>
-                                <th class="w-20">수량<b class="required-data">*</b></th>
-                                <td class="w-30">
-                                    <input type="number" name="amount" id="amount" class="form-control" autocomplete="off" required>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th class="w-20">공급가액<b class="required-data">*</b></th>
-                                <td class="w-30">
-                                    <input type="number" name="supplyPrice" id="supplyPrice" class="form-control"
-                                            autocomplete="off" required>
-                                </td>
-                                <th class="w-20">부가세<b class="required-data">*</b></th>
-                                <td class="w-30">
-                                    <input type="number" name="vat" id="vat" class="form-control" autocomplete="off" required>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th class="w-20">합계액<b class="required-data">*</b></th>
-                                <td class="w-30">
-                                    <input type="number" name="totalAmount" id="totalAmount" class="form-control" autocomplete="off" disabled required>
-                                </td>
-                                <td colspan="2"></td>
-                            </tr>    
-                        </tbody>
-                    </table>
-                    <!-- table:1 end -->
+                                    </td>
+                                    <th class="w-20">부가세<b class="required-data">*</b></th>
+                                    <td class="w-30">
+                                        <input type="number" name="vat" id="vat" class="form-control" autocomplete="off" value="0" required>
+                                    </td>
+                                </tr>
+                                <!-- <tr id="elecContainer" hidden>
+                                    <th class="w-20">부담금<b class="required-data">*</b></th>
+                                    <td class="w-30">
+                                        <input type="number" name="charge" id="charge" class="form-control" autocomplete="off">
+                                    </td>
+                                    <th class="w-20">한전파일 업로드<b class="required-data">*</b></th>
+                                    <td class="w-30">
+                                        <input type="file" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                                            name="excelFile" id="excelFile" class="form-control" onchange="excelRead(event)">
+                                    </td>
+                                </tr>   -->
+                                <tr id="elecContainer" hidden>
+                                    <th class="w-20">부담금<b class="required-data">*</b></th>
+                                    <td class="w-30">
+                                        <input type="number" name="charge" id="charge" class="form-control" autocomplete="off" value="0" required>
+                                    </td>
+                                    <th class="w-20">합계액<b class="required-data">*</b></th>
+                                    <td class="w-30">
+                                        <input type="number" name="totalAmountSub" id="totalAmountSub" class="form-control"
+                                            autocomplete="off" value="0" disabled required>
+                                    </td>
+                                </tr>  
+                                <tr id="totalContainer">
+                                    <th class="w-20">합계액<b class="required-data">*</b></th>
+                                    <td class="w-30">
+                                        <input type="number" name="totalAmount" id="totalAmount" class="form-control"
+                                            autocomplete="off" value="0" disabled required>
+                                    </td>
+                                    <td colspan="2"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <!-- table:1 end -->
                     </div>
                     <!-- modal body end -->
                     <div class="modal-footer justify-content-center border-top-none">
@@ -279,7 +311,7 @@
                             <option th:value="stationId">충전소ID</option>
                         </select>
                         <input type="text" name="stationOpSearch" id="stationOpSearch" class="form-control"
-                            placeholder="검색어를 입력하세요" th:value="null">
+                            placeholder="검색어를 입력하세요" autocomplete="off" th:value="null">
                         <button type="button" class="btn btn-outline-grey ms-2" id="stationOpSearchBtn">
                             <i class="bi bi-search"></i>검색</button>
                     </div>
@@ -293,9 +325,9 @@
                                     <th scope="col" class="w-20"></th>
                                 </tr>
                             </thead>
-                            <tbody id="stationSearchList">
+                            <tbody id="stationSearchList" class="vertical-align-middle">
                                 <tr>
-                                    <td colspan="3" class="vertical-align-middle">조회된 데이터가 없습니다.</td>
+                                    <td colspan="3">조회된 데이터가 없습니다.</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -308,6 +340,64 @@
     </div>
     <!-- Station Search Modal end -->
 
+    <!-- File Upload Modal start -->
+    <div class="modal fade" id="elecModal" tabindex="-1" aria-labelledby="elecModalLabel"
+        style="z-index: 1056;" data-bs-backdrop="static" data-bs-keyboard="false" role="dialog">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width: 60vw;">
+            <div class="modal-content overflow-y-auto scrollbar station-search-content">
+                <div class="modal-body">
+                    <div class="modal-title mb-2"><span class="modal-title-bar"></span><span>충전소 조회</span></div>
+                    <div id="stationSearchContainer">
+                        <select class="form-control" id="searchStation">
+                            <option th:value="stationName">충전소명</option>
+                            <option th:value="stationId">충전소ID</option>
+                        </select>
+                        <input type="text" name="stationOpSearch" id="stationOpSearch" class="form-control"
+                            placeholder="검색어를 입력하세요" autocomplete="off" th:value="null">
+                        <button type="button" class="btn btn-outline-grey ms-2" id="stationOpSearchBtn">
+                            <i class="bi bi-search"></i>검색</button>
+                    </div>
+                    <span>검색결과</span>
+                    <div class="w-100 table-responsive scroll-table-container">
+                        <table class="table table-bg table-hover text-center" id="stationTable">
+                            <thead>
+                                <tr>
+                                    <th scope="col" class="w-40">충전소명</th>
+                                    <th scope="col" class="w-40">충전소ID</th>
+                                    <th scope="col" class="w-20"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="stationSearchList" class="vertical-align-middle">
+                                <tr>
+                                    <td colspan="3">조회된 데이터가 없습니다.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <button type="button" class="btn btn-outline-grey close-modal-btn" id="stationModalBtn"
+                        data-bs-dismiss="modal">닫기</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- File Upload Modal end -->
+
     <script type="text/javascript" th:src="@{/js/calc/purchase.js}"></script>
+    <script type="text/javascript">
+        function excelRead(event) {
+            let input = event.target;
+            let reader = new FileReader();
+            reader.onload = function () {
+                let data = reader.result;
+                let workBook = XLSX.read(data, { type: 'binary' });
+                workBook.SheetNames.forEach(function (sheetName) {
+                    console.log('SheetName: ' + sheetName);
+                    let rows = XLSX.utils.sheet_to_json(workBook.Sheets[sheetName]);
+                    console.log(JSON.stringify(rows));
+                })
+            };
+            reader.readAsBinaryString(input.files[0]);
+        }
+    </script>
 </div>
 </html>
