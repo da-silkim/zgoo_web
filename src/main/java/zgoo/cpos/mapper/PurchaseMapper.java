@@ -25,6 +25,7 @@ public class PurchaseMapper {
                 .amount(dto.getAmount())
                 .supplyPrice(dto.getSupplyPrice())
                 .vat(dto.getVat())
+                .charge(dto.getCharge())
                 .totalAmount(dto.getTotalAmount())
                 .delYn("N")
                 .regUserId(regUserId)

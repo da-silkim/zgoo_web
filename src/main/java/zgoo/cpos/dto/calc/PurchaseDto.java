@@ -3,6 +3,7 @@ package zgoo.cpos.dto.calc;
 import java.time.LocalDate;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -26,6 +27,7 @@ public class PurchaseDto {
         private String paymentMethod;
         private Integer supplyPrice;
         private Integer vat;
+        private Integer charge;
         private Integer totalAmount;
         private LocalDate purchaseDate;
     }
@@ -52,5 +54,19 @@ public class PurchaseDto {
         private String item;
         private Integer unitPrice;
         private Integer amount;
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class PurchaseAccountDto {
+        private Integer unitPrice;
+        private Integer supplyPrice;
+        private Integer vat;
+        private Integer totalAmount;
+        
+        // 토지사용료
+        private String landUseType;
     }
 }

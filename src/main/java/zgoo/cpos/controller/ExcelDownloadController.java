@@ -132,10 +132,10 @@ public class ExcelDownloadController {
 
         List<PurchaseListDto> purList = this.purchaseService.findAllPurchaseWithoutPagination(searchOp, searchContent, startDate, endDate);
 
-        String[] headers = { "충전소명", "거래처명", "계정과목", "공급가액", "부가세", "합계", "지불방법", "승인번호", "매입일자" };
+        String[] headers = { "충전소명", "거래처명", "계정과목", "공급가액", "부가세", "부담금", "합계", "지불방법", "승인번호", "매입일자" };
         Function<PurchaseListDto, Object[]> dataMapper = purchase -> new Object[]{
             purchase.getStationName(), purchase.getBizName(), purchase.getAccountCodeName(),
-            purchase.getSupplyPrice(), purchase.getVat(), purchase.getTotalAmount(),
+            purchase.getSupplyPrice(), purchase.getVat(), purchase.getCharge(), purchase.getTotalAmount(),
             purchase.getPaymentMethodName(), purchase.getApprovalNo(),
             purchase.getPurchaseDate() != null ? purchase.getPurchaseDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) : ""
         };

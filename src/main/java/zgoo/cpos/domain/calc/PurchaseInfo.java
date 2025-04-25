@@ -66,6 +66,9 @@ public class PurchaseInfo {
     @Column(name = "vat")
     private Integer vat;
 
+    @Column(name = "charge")
+    private Integer charge;
+
     @Column(name = "total_amount")
     private Integer totalAmount;
 
@@ -88,8 +91,7 @@ public class PurchaseInfo {
     @ManyToOne(fetch = FetchType.LAZY)
     private CsInfo station;
 
-    public void updatePurchase(PurchaseRegDto dto, CsInfo station, String modUserId) {
-        this.station = station;
+    public void updatePurchase(PurchaseRegDto dto, String modUserId) {
         this.approvalNo = dto.getApprovalNo();
         this.purchaseDate = dto.getPurchaseDate();
         this.accountCode = dto.getAccountCode();
@@ -101,6 +103,7 @@ public class PurchaseInfo {
         this.amount = dto.getAmount();
         this.supplyPrice = dto.getSupplyPrice();
         this.vat = dto.getVat();
+        this.charge = dto.getCharge();
         this.totalAmount = dto.getTotalAmount();
         this.modUserId = modUserId;
         this.modDt = LocalDateTime.now();
