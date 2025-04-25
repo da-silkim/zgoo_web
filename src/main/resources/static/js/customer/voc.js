@@ -39,35 +39,8 @@ $(document).ready(function() {
         });
     });
 
-    $('#resetBtn').on('click', function() {
-        window.location.replace('/voc');
-    });
-
-    $('#searchBtn').on('click', function() {
-        const selectedSize = document.getElementById('size').value;
-        const form = document.getElementById('searchForm');
-
-        const hiddenSizeInput = document.createElement('input');
-        hiddenSizeInput.type = 'hidden';
-        hiddenSizeInput.name = 'size';
-        hiddenSizeInput.value = selectedSize;
-        hiddenSizeInput.id = 'hiddenSizeInput';
-
-        form.appendChild(hiddenSizeInput);
-        form.submit();
-    });
-
     $('#size').on('change', function() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const selectedSize = document.getElementById("size").value;
-        const selectedType = urlParams.get('typeSearch') || '';
-        const selectedReplyStat = urlParams.get('replyStatSearch') || '';
-        const selectedName = urlParams.get('nameSearch') || '';
-
-        window.location.href = "/voc?page=0&size=" + selectedSize +
-                               "&typeSearch=" + selectedType +
-                               "&replyStatSearch=" + selectedReplyStat +
-                               "&nameSearch=" + selectedName;
+        updatePageSize(this, "/voc", ["typeSearch", "replyStatSearch", "nameSearch"]);
     });
 
     $('#addBtn').on('click', function(event) {

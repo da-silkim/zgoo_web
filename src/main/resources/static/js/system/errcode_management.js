@@ -1,35 +1,8 @@
 $(document).ready(function() {
     let modalCon = false, selectRow, btnMsg = "등록", errcdId;
 
-    $('#resetBtn').on('click', function() {
-        window.location.replace('/system/errcode/list');
-    });
-
-    $('#searchBtn').on('click', function() {
-        const selectedSize = document.getElementById('size').value;
-        const form = document.getElementById('searchForm');
-
-        const hiddenSizeInput = document.createElement('input');
-        hiddenSizeInput.type = 'hidden';
-        hiddenSizeInput.name = 'size';
-        hiddenSizeInput.value = selectedSize;
-        hiddenSizeInput.id = 'hiddenSizeInput';
-
-        form.appendChild(hiddenSizeInput);
-        form.submit();
-    });
-
     $('#size').on('change', function() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const selectedSize = document.getElementById("size").value;
-        const selectedManfCd = urlParams.get('manfCdSearch') || '';
-        const selectedOpSearch = urlParams.get('opSearch') || '';
-        const selectedContentSearch = urlParams.get('contentSearch') || '';
-
-        window.location.href = "/system/errcode/list?page=0&size=" + selectedSize +
-                               "&manfCdSearch=" + (selectedManfCd) +
-                               "&opSearch=" + (selectedOpSearch) +
-                               "&contentSearch=" + (selectedContentSearch);
+        updatePageSize(this, "/system/errcode/list", ["manfCdSearch", "opSearch", "contentSearch"]);                 
     });
 
     $('#pageList').on('click', 'tr', function() {

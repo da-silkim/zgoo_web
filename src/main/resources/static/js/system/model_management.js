@@ -2,35 +2,8 @@ $(document).ready(function() {
     let modalCon = false, selectRow, btnMsg = "등록";
     var modelId;
 
-    $('#resetBtn').on('click', function() {
-        window.location.replace('/system/model/list');
-    });
-
-    $('#searchBtn').on('click', function() {
-        const selectedSize = document.getElementById('size').value;
-        const form = document.getElementById('searchForm');
-
-        const hiddenSizeInput = document.createElement('input');
-        hiddenSizeInput.type = 'hidden';
-        hiddenSizeInput.name = 'size';
-        hiddenSizeInput.value = selectedSize;
-        hiddenSizeInput.id = 'hiddenSizeInput';
-
-        form.appendChild(hiddenSizeInput);
-        form.submit();
-    });
-
     $('#size').on('change', function() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const selectedSize = document.getElementById("size").value;
-        const selectedCompanyId = urlParams.get('companyIdSearch') || '';
-        const selectedManfCd = urlParams.get('manfCdSearch') || '';
-        const selectedChgSpeedCd = urlParams.get('chgSpeedCdSearch') || '';
-
-        window.location.href = "/system/model/list?page=0&size=" + selectedSize +
-                               "&companyIdSearch=" + (selectedCompanyId) +
-                               "&manfCdSearch=" + (selectedManfCd) +
-                               "&chgSpeedCdSearch=" + (selectedChgSpeedCd);
+        updatePageSize(this, "/system/model/list", ["companyIdSearch", "manfCdSearch", "chgSpeedCdSearch"]);
     });
 
     $('#pageList').on('click', 'tr', function() {

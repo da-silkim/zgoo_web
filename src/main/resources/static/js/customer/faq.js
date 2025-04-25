@@ -2,33 +2,8 @@ $(document).ready(function() {
     let modalCon = false, selectRow, btnMsg = "등록";
     var faqId;
 
-    $('#resetBtn').on('click', function() {
-        window.location.replace('/faq');
-    });
-
-    $('#searchBtn').on('click', function() {
-        const selectedSize = document.getElementById('size').value;
-        const form = document.getElementById('searchForm');
-
-        const hiddenSizeInput = document.createElement('input');
-        hiddenSizeInput.type = 'hidden';
-        hiddenSizeInput.name = 'size';
-        hiddenSizeInput.value = selectedSize;
-        hiddenSizeInput.id = 'hiddenSizeInput';
-
-        form.appendChild(hiddenSizeInput);
-        form.submit();
-    });
-
     $('#size').on('change', function() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const selectedPage = urlParams.get('page') || 0;
-        const selectedSize = document.getElementById("size").value;
-        const selectedSection = urlParams.get('sectionSearch') || '';
-
-        window.location.href = "/faq?page=" + selectedPage +
-                            "&size=" + selectedSize +
-                            "&sectionSearch=" + selectedSection;
+        updatePageSize(this, "/faq", ["sectionSearch"]);
     });
 
     $('#pageList').on('click', 'tr', function() {

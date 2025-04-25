@@ -7,39 +7,8 @@ $(document).ready(function() {
     var passwordContainer = document.getElementById('passwordContainer');
     var passwordEditBtn = document.getElementById('passwordEditBtn');
 
-    // 초기화
-    $('#resetBtn').on('click', function() {
-        window.location.replace('/system/user/list');
-    });
-
-    // 검색
-    $('#searchBtn').on('click', function() {
-        const selectedSize = document.getElementById('size').value;
-        const form = document.getElementById('searchForm');
-
-        const hiddenSizeInput = document.createElement('input');
-        hiddenSizeInput.type = 'hidden';
-        hiddenSizeInput.name = 'size';
-        hiddenSizeInput.value = selectedSize;
-        hiddenSizeInput.id = 'hiddenSizeInput';
-
-        form.appendChild(hiddenSizeInput);
-        form.submit();
-    });
-
-    // pagination
     $('#size').on('change', function() {
-        // 현재 URL에서 쿼리 파라미터 추출
-        const urlParams = new URLSearchParams(window.location.search);
-        const selectedSize = document.getElementById("size").value;
-        const selectedCompanyId = urlParams.get('companyIdSearch') || '';
-        const selectedCompanyType = urlParams.get('companyTypeSearch') || '';
-        const selectedName = urlParams.get('nameSearch') || '';
-
-        window.location.href = "/system/user/list?page=0&size=" + selectedSize +
-                               "&companyIdSearch=" + (selectedCompanyId) +
-                               "&companyTypeSearch=" + encodeURIComponent(selectedCompanyType) +
-                               "&nameSearch=" + encodeURIComponent(selectedName);
+        updatePageSize(this, "/system/user/list", ["companyIdSearch", "companyTypeSearch", "nameSearch"]);
     });
 
     // 행 선택

@@ -359,7 +359,7 @@ VALUES
 ('ACCOUNTCD', 'COMFEE', '통신비', NULL, NULL, NULL, NULL, 'zgoodev', NOW(), NULL, NULL),
 ('ACCOUNTCD', 'LANDFEE', '토지사용료', NULL, NULL, NULL, NULL, 'zgoodev', NOW(), NULL, NULL),
 ('ACCOUNTCD', 'SMFEE', '안전점검관리비', NULL, NULL, NULL, NULL, 'zgoodev', NOW(), NULL, NULL),
-('ACCOUNTCD', 'TALKFEE', '알림톡사용료', NULL, NULL, NULL, NULL, 'zgoodev', NOW(), NULL, NULL),
+('ACCOUNTCD', 'REPFEE', '수리비', NULL, NULL, NULL, NULL, 'zgoodev', NOW(), NULL, NULL),
 ('ACCOUNTCD', 'SYSFEE', '시스템사용료', NULL, NULL, NULL, NULL, 'zgoodev', NOW(), NULL, NULL),
 ('ACCOUNTCD', 'EFEE', '기타', NULL, NULL, NULL, NULL, 'zgoodev', NOW(), NULL, NULL),
 ('PURCHASEMTH', 'PM01', '신용(체크)카드', NULL, NULL, NULL, NULL, 'zgoodev', NOW(), NULL, NULL),

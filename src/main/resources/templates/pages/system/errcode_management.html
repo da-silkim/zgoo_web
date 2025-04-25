@@ -11,13 +11,14 @@
                 <div class="card-body">
                     <div class="card-title"><span class="card-title-bar"></span><span>검색조건</span></div>
                     <!-- form start -->
-                    <form id="searchForm" class="position-relative">
+                    <form id="searchForm" class="position-relative" th:action="@{/system/errcode/list}" method="get">
                         <!-- row:1 start -->
                         <div class="row mb-3 row-cols-2 row-cols-lg-3 g-2">
                             <div class="col d-flex align-items-center">
                                 <label for="manfCdSearch" class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">제조사</label>
                                 <select id="manfCdSearch" name="manfCdSearch" class="mx-3 form-control">
-                                    <option th:value="null">선택</option>
+                                    <option th:value="null" th:text="선택"></option>
+                                    <option value="DFT" th:selected="${'DEF' == selectedManfCd}">없음(공통)</option>
                                     <option th:each="data : ${manfCd}" th:value="${data.commonCode}"
                                                 th:text="${data.commonCodeName}"
                                                 th:selected="${data.commonCode == selectedManfCd}"></option>
@@ -35,9 +36,9 @@
                             </div>
                         </div>
                         <div class="search-btn">
-                            <button type="button" class="btn btn-outline-grey me-2" id="searchBtn">
+                            <button type="button" class="btn btn-outline-grey me-2" id="searchBtn" onclick="searchOption()">
                                 <i class="bi bi-search me-2"></i>검색</button>
-                            <button type="button" class="btn btn-outline-grey me-2" id="resetBtn">
+                            <button type="button" class="btn btn-outline-grey me-2" id="resetBtn" onclick="replacePage('/system/errcode/list')">
                                 <i class="bi bi-arrow-repeat me-2"></i>초기화</button>
                         </div>
                         <!-- row:1 end -->

@@ -2,31 +2,8 @@ $(document).ready(function() {
     let modalCon = false;
     let btnMsg = "등록", selectRow, selectRowSec;
 
-    $('#resetBtn').on('click', function() {
-        window.location.replace('/system/menu/list');
-    });
-
-    $('#searchBtn').on('click', function() {
-        const selectedSize = document.getElementById('size').value;
-        const form = document.getElementById('searchForm');
-
-        const hiddenSizeInput = document.createElement('input');
-        hiddenSizeInput.type = 'hidden';
-        hiddenSizeInput.name = 'size';
-        hiddenSizeInput.value = selectedSize;
-        hiddenSizeInput.id = 'hiddenSizeInput';
-
-        form.appendChild(hiddenSizeInput);
-        form.submit();
-    });
-
     $('#size').on('change', function() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const selectedSize = document.getElementById("size").value;
-        const selectedCompanyName = urlParams.get('companyNameSearch') || '';
-
-        window.location.href = "/system/menu/list?page=0&size=" + selectedSize +
-                               "&companyNameSearch=" + selectedCompanyName;
+        updatePageSize(this, "/system/menu/list", ["companyNameSearch"]);
     });
 
     $('#pageList').on('click', 'tr', function() {

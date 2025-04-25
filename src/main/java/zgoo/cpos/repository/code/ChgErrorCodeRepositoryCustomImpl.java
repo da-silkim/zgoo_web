@@ -53,8 +53,9 @@ public class ChgErrorCodeRepositoryCustomImpl implements ChgErrorCodeRepositoryC
     public Page<ChgErrorCodeListDto> searchErrorCodeWithPagination(String manuf, String searchOp, String searchContent,
             Pageable pageable) {
         BooleanBuilder builder = new BooleanBuilder();
-
-        if (manuf != null) {
+        log.info("manuf: {}, searchOp: {}, searchContent:{}", manuf, searchOp, searchContent);
+        
+        if (manuf != null && !manuf.isEmpty()) {
             builder.and(errorCode.menufCode.eq(manuf));
         }
 

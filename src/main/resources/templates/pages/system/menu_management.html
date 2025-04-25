@@ -61,12 +61,12 @@
                 <div class="card-body">
                     <div class="card-title title-btn-area">
                         <span class="card-title-bar"></span><span>사업장별 메뉴 접근 권한</span>
-                        <form  id="searchForm" class="d-flex align-items-center search-container">
+                        <form id="searchForm" class="d-flex align-items-center search-container" th:action="@{/system/menu/list}" method="get">
                                 <input type="text" name="companyNameSearch" id="companyNameSearch" class="form-control" placeholder="사업자명을 입력하세요"
                                         th:value="${selectedCompanyName}">
-                                <button type="submit" class="btn btn-outline-grey" id="companyNameSearchBtn">
+                                <button type="submit" class="btn btn-outline-grey" id="companyNameSearchBtn" onclick="searchOption()">
                                     <i class="bi bi-search"></i>검색</button>
-                                <button type="button" class="btn btn-outline-grey" id="resetBtn">
+                                <button type="button" class="btn btn-outline-grey" id="resetBtn" onclick="replacePage('/system/menu/list')">
                                     <i class="bi bi-arrow-repeat me-2"></i>초기화</button>
                         </form>
                     </div>
