@@ -15,25 +15,46 @@
                         <!-- row:1 start -->
                         <div class="row mb-3 row-cols-2 row-cols-lg-3 g-2">
                             <div class="col d-flex align-items-center">
-                                <label for="opSearch" class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">검색조건</label>
+                                <label for="companyIdSearch"
+                                    class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">사업자</label>
+                                <select id="companyIdSearch" class="mx-3 form-control" name="companyIdSearch">
+                                    <option value="" th:text="'(없음)'" th:selected="${selectedCompanyId == null}">
+                                    </option>
+                                    <option th:each="company : ${companyList}" th:value="${company.companyId}"
+                                        th:text="${company.companyName}"
+                                        th:selected="${company.companyId == selectedCompanyId}"></option>
+                                </select>
+                            </div>
+                            <div class="col d-flex align-items-center">
+                                <label for="opSearch"
+                                    class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">검색조건</label>
                                 <select id="opSearch" name="opSearch" class="ms-3 form-control w-40">
-                                    <option th:value="null" th:selected="${selectedOpSearch == null}">선택</option>
-                                    <option th:value="'company'" th:text="사업자" th:selected="${selectedOpSearch == 'company'}"></option>
-                                    <option th:value="'stationName'" th:text="충전소명" th:selected="${selectedOpSearch == 'stationName'}"></option>
-                                    <option th:value="'chargerId'" th:text="충전기ID" th:selected="${selectedOpSearch == 'chargerId'}"></option>
+                                    <option value="" th:selected="${selectedOpSearch == null}">선택</option>
+                                    <option value="approvalNumber" th:text="승인번호"
+                                        th:selected="${selectedOpSearch == 'approvalNumber'}"></option>
+                                    <option value="stationName" th:text="충전소명"
+                                        th:selected="${selectedOpSearch == 'stationName'}"></option>
+                                    <option value="chargerId" th:text="충전기ID"
+                                        th:selected="${selectedOpSearch == 'chargerId'}"></option>
                                 </select>
                                 <input type="text" name="contentSearch" id="contentSearch" class="mx-2 form-control"
                                     th:value="${selectedContentSearch}" autocomplete="off">
                             </div>
                             <div class="col d-flex align-items-center">
-                                <span class="flex-shrink-0 col-form-label font-weight-bold mr-3p text-right w-25">결제기간</span>
-                                <input type="date" min="1970-01-01" max="2199-12-31" th:value="${selectedStartDate}" name="startDateSearch"
-                                        id="startDateSearch" class="mx-3 form-control">
+                                <span
+                                    class="flex-shrink-0 col-form-label font-weight-bold mr-3p text-right w-25">결제기간</span>
+                                <input type="month" min="1970-01" max="2199-12" th:value="${selectedStartMonth}"
+                                    name="startMonthSearch" id="startMonthSearch" class="mx-3 form-control">
                                 <span class="flex-shrink-0 col-form-label font-weight-bold">~</span>
-                                <input type="date" min="1970-01-01" max="2199-12-31" th:value="${selectedEndDate}" name="endDateSearch"
-                                        id="endDateSearch" class="mx-3 form-control">
+                                <input type="month" min="1970-01" max="2199-12" th:value="${selectedEndMonth}"
+                                    name="endMonthSearch" id="endMonthSearch" class="mx-3 form-control">
                             </div>
                         </div>
+
+                        <!-- size 선택 상자 추가 (숨겨진 필드로 유지) -->
+                        <input type="hidden" id="size" name="size"
+                            th:value="${selectedSize != null ? selectedSize : 10}">
+
                         <div class="search-btn">
                             <button type="button" class="btn btn-outline-grey me-2" id="searchBtn">
                                 <i class="bi bi-search me-2"></i>검색</button>
@@ -52,80 +73,175 @@
                 <!-- card body:3 start -->
                 <div class="card-body">
                     <div class="card-title"><span class="card-title-bar"></span><span>충전결제정보</span></div>
+                    <!-- 합산 금액 표시 영역 추가 -->
+                    <div class="w-100 mb-3">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card bg-light">
+                                    <div class="card-body">
+                                        <h5 class="card-title">관제 결제 데이터 합계</h5>
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <p class="mb-1">승인금액 합계:</p>
+                                                <h4 class="text-primary"
+                                                    th:text="${#numbers.formatInteger(summary.totalChgPrice, 0, 'COMMA') + '원'}">
+                                                    0원</h4>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <p class="mb-1">취소금액 합계:</p>
+                                                <h4 class="text-danger"
+                                                    th:text="${#numbers.formatInteger(summary.totalCancelCost, 0, 'COMMA') + '원'}">
+                                                    0원</h4>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <p class="mb-1">결제금액 합계:</p>
+                                                <h4 class="text-success"
+                                                    th:text="${#numbers.formatInteger(summary.totalRealCost, 0, 'COMMA') + '원'}">
+                                                    0원</h4>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card bg-light">
+                                    <div class="card-body">
+                                        <h5 class="card-title">PG 거래 데이터 합계</h5>
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <p class="mb-1">승인금액 합계:</p>
+                                                <h4 class="text-primary"
+                                                    th:text="${summary.totalPgAppAmount != null ? #numbers.formatDecimal(summary.totalPgAppAmount, 0, 'COMMA', 0, 'POINT') + '원' : '0원'}">
+                                                    0원</h4>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <p class="mb-1">취소금액 합계:</p>
+                                                <h4 class="text-danger"
+                                                    th:text="${summary.totalPgCancelAmount != null ? #numbers.formatDecimal(summary.totalPgCancelAmount, 0, 'COMMA', 0, 'POINT') + '원' : '0원'}">
+                                                    0원</h4>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <p class="mb-1">결제금액 합계:</p>
+                                                <h4 class="text-success"
+                                                    th:text="${summary.totalPgPaymentAmount != null ? #numbers.formatDecimal(summary.totalPgPaymentAmount, 0, 'COMMA', 0, 'POINT') + '원' : '0원'}">
+                                                    0원</h4>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="mt-3 btn-page-area">
                         <button class="btn btn-excel" id="excelBtn" onclick="excelDownload()"
                             th:if="${menuAuthority.authority == 'SU' or menuAuthority.excelYn == 'Y'}">
                             <i class="bi bi-file-earmark-spreadsheet"></i>엑셀다운로드</button>
                         <span>
                             <span id="pageInfo">
-                                <!-- <span th:text="'Page ' + (${currentPage + 1}) + ' of ' + ${totalPages} + ' [총 ' + ${totalCount} + '건]'"></span> -->
+                                <span
+                                    th:text="'Page ' + (${currentPage + 1}) + ' of ' + ${totalPages} + ' [총 ' + ${totalCount} + '건]'"></span>
                             </span>
                             <select class="mx-3 page-select" id="size" name="size">
                                 <option th:each="data : ${showListCnt}" th:value="${data.commonCode}"
-                                        th:text="${data.commonCodeName}" th:selected="${data.commonCode == size}"></option>
+                                    th:text="${data.commonCodeName}" th:selected="${data.commonCode == size}"></option>
                             </select>
                         </span>
                     </div>
+
                     <div class="w-100 table-responsive position-relative">
-                        <table class="table text-center mt-3 table-bg table-hover" style="overflow-x: auto; min-width: 2500px;">
+                        <table class="table text-center mt-3 table-bg table-hover"
+                            style="overflow-x: auto; min-width: 2500px;">
                             <thead>
                                 <tr class="table-border-top">
                                     <th scope="col" colspan="8" class="th-border-r">관제 결제 데이터</th>
-                                    <th scope="col" colspan="7">PG 정산 데이터</th>
+                                    <th scope="col" colspan="7">PG 거래 데이터</th>
                                 </tr>
                                 <tr>
                                     <th scope="col">결제시간</th>
                                     <th scope="col" class="th-border-lr">사업자</th>
                                     <th scope="col" class="th-border-lr">충전소명</th>
                                     <th scope="col" class="th-border-lr">충전기ID</th>
-                                    <th scope="col" class="th-border-lr">충전량</th>
-                                    <th scope="col" class="th-border-lr">최초결제금액</th>
-                                    <th scope="col" class="th-border-lr">취소금액</th>
-                                    <th scope="col" class="th-border-lr">결제금액</th>
-                                    <th scope="col" class="th-border-lr">승인일시</th>
+                                    <th scope="col" class="th-border-lr">충전량(kWh)</th>
+                                    <th scope="col" class="th-border-lr">승인금액(원)</th>
+                                    <th scope="col" class="th-border-lr">취소금액(원)</th>
+                                    <th scope="col" class="th-border-lr">결제금액(원)</th>
                                     <th scope="col" class="th-border-lr">승인번호</th>
+                                    <th scope="col" class="th-border-lr">승인일시</th>
                                     <th scope="col" class="th-border-lr">지불수단</th>
-                                    <th scope="col" class="th-border-lr">정산금액</th>
-                                    <th scope="col" class="th-border-lr">정산부분취소</th>
-                                    <th scope="col" class="th-border-lr">결제금액</th>
+                                    <th scope="col" class="th-border-lr">승인금액(원)</th>
+                                    <th scope="col" class="th-border-lr">취소금액(원)</th>
+                                    <th scope="col" class="th-border-lr">결제금액(원)</th>
                                     <th scope="col">카드번호</th>
                                 </tr>
                             </thead>
                             <tbody id="pageList">
+                                <tr th:each="data : ${chgPaymentList}">
+                                    <td th:text="${data.paymentTime}"></td>
+                                    <td th:text="${data.companyName}"></td>
+                                    <td th:text="${data.stationName}"></td>
+                                    <td th:text="${data.chargerId}"></td>
+                                    <td th:text="${#numbers.formatDecimal(data.chgAmount, 1, 2)}"></td>
+                                    <td th:text="${#numbers.formatInteger(data.chgPrice, 0, 'COMMA')}"></td>
+                                    <td
+                                        th:text="${data.cancelCost != null && data.cancelCost > 0 ? #numbers.formatInteger(data.cancelCost, 0, 'COMMA') : '0'}">
+                                    </td>
+                                    <td th:text="${#numbers.formatInteger(data.realCost, 0, 'COMMA')}"></td>
+                                    <td th:text="${data.pgAppNum}"></td>
+                                    <td th:text="${data.pgAppTime}"></td>
+                                    <td th:text="${data.pgPayType}"></td>
+                                    <td
+                                        th:text="${data.pgAppAmount != null ? #numbers.formatInteger(data.pgAppAmount, 0, 'COMMA') : ''}">
+                                    </td>
+                                    <td
+                                        th:text="${data.pgCancelAmount != null ? #numbers.formatInteger(data.pgCancelAmount, 0, 'COMMA') : ''}">
+                                    </td>
+                                    <td
+                                        th:text="${data.pgPaymentAmount != null ? #numbers.formatInteger(data.pgPaymentAmount, 0, 'COMMA') : ''}">
+                                    </td>
+                                    <td th:text="${data.cardNumber}"></td>
+                                </tr>
+                                <tr th:if="${chgPaymentList.size() == 0}">
+                                    <td colspan="15" class="text-center">정보가 없습니다.</td>
+                                </tr>
                             </tbody>
-                        </table>                                
+                        </table>
                     </div>
                     <!-- paging navigation start -->
-                    <!-- <div th:if="${cpList.size() > 0}">
+                    <div th:if="${chgPaymentList.size() > 0}">
                         <ul class="pagination justify-content-center">
                             <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled' : ''">
-                                <a class="page-link" th:href="@{/calc/chgpayment(page=0, size=${size}, opSearch=${selectedOpSearch},
-                                contentSearch=${selectedContentSearch}, startDate=${selectedStartDate}, endDate=${selectedEndDate})}">
-                                <i class="bi bi-chevron-double-left"></i></a>
+                                <a class="page-link"
+                                    th:href="@{/calc/chgpayment(page=0, size=${size}, companyIdSearch=${selectedCompanyId}, opSearch=${selectedOpSearch},
+                                contentSearch=${selectedContentSearch}, startMonthSearch=${selectedStartMonth}, endMonthSearch=${selectedEndMonth})}">
+                                    <i class="bi bi-chevron-double-left"></i></a>
                             </li>
                             <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled' : ''">
-                                <a class="page-link" th:href="@{/calc/chgpayment(page=${currentPage-1}, size=${size}, opSearch=${selectedOpSearch},
-                                contentSearch=${selectedContentSearch}, startDate=${selectedStartDate}, endDate=${selectedEndDate})}">
-                                <i class="bi bi-chevron-left"></i></a>
+                                <a class="page-link"
+                                    th:href="@{/calc/chgpayment(page=${currentPage-1}, size=${size}, companyIdSearch=${selectedCompanyId}, opSearch=${selectedOpSearch},
+                                contentSearch=${selectedContentSearch}, startMonthSearch=${selectedStartMonth}, endMonthSearch=${selectedEndMonth})}">
+                                    <i class="bi bi-chevron-left"></i></a>
                             </li>
                             <li class="page-item" th:each="i : ${#numbers.sequence(currentPage - 2, currentPage + 2)}"
                                 th:if="${i >= 0 && i < totalPages}">
-                                <a class="page-link" th:href="@{/calc/chgpayment(page=${i}, size=${size}, opSearch=${selectedOpSearch},
-                                contentSearch=${selectedContentSearch}, startDate=${selectedStartDate}, endDate=${selectedEndDate})}"
-                                th:text="${i+1}" th:classappend="${i == currentPage} ? 'active' : ''"></a>
+                                <a class="page-link"
+                                    th:href="@{/calc/chgpayment(page=${i}, size=${size}, companyIdSearch=${selectedCompanyId}, opSearch=${selectedOpSearch},
+                                contentSearch=${selectedContentSearch}, startMonthSearch=${selectedStartMonth}, endMonthSearch=${selectedEndMonth})}"
+                                    th:text="${i+1}" th:classappend="${i == currentPage} ? 'active' : ''"></a>
                             </li>
                             <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled' : ''">
-                                <a class="page-link" th:href="@{/calc/chgpayment(page=${currentPage+1}, size=${size}, opSearch=${selectedOpSearch},
-                                contentSearch=${selectedContentSearch}, startDate=${selectedStartDate}, endDate=${selectedEndDate})}">
-                                <i class="bi bi-chevron-right"></i></a>
+                                <a class="page-link"
+                                    th:href="@{/calc/chgpayment(page=${currentPage+1}, size=${size}, companyIdSearch=${selectedCompanyId}, opSearch=${selectedOpSearch},
+                                contentSearch=${selectedContentSearch}, startMonthSearch=${selectedStartMonth}, endMonthSearch=${selectedEndMonth})}">
+                                    <i class="bi bi-chevron-right"></i></a>
                             </li>
                             <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled' : ''">
-                                <a class="page-link" th:href="@{/calc/chgpayment(page=${totalPages - 1}, size=${size}, opSearch=${selectedOpSearch},
-                                contentSearch=${selectedContentSearch}, startDate=${selectedStartDate}, endDate=${selectedEndDate})}">
-                                <i class="bi bi-chevron-double-right"></i></a>
+                                <a class="page-link"
+                                    th:href="@{/calc/chgpayment(page=${totalPages - 1}, size=${size}, companyIdSearch=${selectedCompanyId}, opSearch=${selectedOpSearch},
+                                contentSearch=${selectedContentSearch}, startMonthSearch=${selectedStartMonth}, endMonthSearch=${selectedEndMonth})}">
+                                    <i class="bi bi-chevron-double-right"></i></a>
                             </li>
                         </ul>
-                    </div> -->
+                    </div>
                     <!-- paging navigation end -->
                 </div>
                 <!-- card body:3 end -->
@@ -135,6 +251,8 @@
         <!-- card body:1 end -->
     </div>
     <!-- card:1 end -->
-    <!-- <script type="text/javascript" th:src="@{/js/maintenance/error_management.js}"></script> -->
+    <script type="text/javascript" th:src="@{/js/calc/chgpayment.js}"></script>
+    <script type="text/javascript" th:src="@{/js/calc/chgpayment_exceldown.js}"></script>
 </div>
+
 </html>

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-    <!-- 로컬 환경과 운영 환경에 따라 다른 로그 경로 설정 -->
-    <springProfile name="prod">
+    <!-- 개발 환경(dev)과 운영 환경(prod)에 동일한 로그 경로 설정 -->
+    <springProfile name="dev,prod">
         <property name="LOG_DIR" value="/app/cpos/logs" />
     </springProfile>
-    <springProfile name="!prod">
+    <springProfile name="!dev,!prod">
         <property name="LOG_DIR" value="./logs" />
     </springProfile>
     
@@ -31,7 +31,47 @@
         </layout>
     </appender>
 
-    <logger name="org.springframework" level="info" additivity="false"> <!-- warn -->
+    <!-- 스프링 시큐리티 로그 레벨 명시적 설정 -->
+    <logger name="org.springframework.security" level="WARN" additivity="false">
+        <appender-ref ref="STDOUT" />
+        <appender-ref ref="ROLLING" />
+    </logger>
+    
+    <!-- 스프링 웹 로그 레벨 명시적 설정 -->
+    <logger name="org.springframework.web" level="WARN" additivity="false">
+        <appender-ref ref="STDOUT" />
+        <appender-ref ref="ROLLING" />
+    </logger>
+    
+    <!-- 스프링 ORM 로그 레벨 명시적 설정 -->
+    <logger name="org.springframework.orm" level="WARN" additivity="false">
+        <appender-ref ref="STDOUT" />
+        <appender-ref ref="ROLLING" />
+    </logger>
+    
+    <!-- 스프링 코어 로그 레벨 명시적 설정 -->
+    <logger name="org.springframework.core" level="WARN" additivity="false">
+        <appender-ref ref="STDOUT" />
+        <appender-ref ref="ROLLING" />
+    </logger>
+
+    <logger name="org.springframework" level="WARN" additivity="false">
+        <appender-ref ref="STDOUT" />
+        <appender-ref ref="ROLLING" />
+    </logger>
+
+    <logger name="org.hibernate" level="WARN" additivity="false">
+        <appender-ref ref="STDOUT" />
+        <appender-ref ref="ROLLING" />
+    </logger>
+
+    <logger name="org.springframework.kafka" level="WARN" additivity="false">
+        <appender-ref ref="STDOUT" />
+        <appender-ref ref="ROLLING" />
+    </logger>
+
+    <logger name="org.apache.kafka" level="WARN" additivity="false">
+        <appender-ref ref="STDOUT" />
         <appender-ref ref="ROLLING" />
     </logger>
 
@@ -40,22 +80,35 @@
         <appender-ref ref="ROLLING" />
     </logger>
 
-    <logger name="jdbc.sqltiming" level="info" additivity="false">
+    <logger name="jdbc.sqltiming" level="INFO" additivity="false">
         <appender-ref ref="STDOUT" />
         <appender-ref ref="ROLLING" />
     </logger>
 
-    <logger name="jdbc.resultsettable" level="error" additivity="false">
+    <logger name="jdbc.resultsettable" level="ERROR" additivity="false">
         <appender-ref ref="ROLLING" />
     </logger>
 
-    <logger name="com.bluenetworks.cpos" level="info" additivity="false">
+    <!-- 애플리케이션 로그 설정 -->
+    <logger name="zgoo.cpos" level="INFO" additivity="false">
         <appender-ref ref="STDOUT" />
         <appender-ref ref="ROLLING" />
     </logger>
 
-    <root name="jdbc.sqlonly" level="info" additivity="false">
+    <logger name="jdbc.sqlonly" level="INFO" additivity="false">
+        <appender-ref ref="STDOUT" />
+        <appender-ref ref="ROLLING" />
+    </logger>
+    
+    <!-- 루트 로거 설정 (모든 로그의 기본 레벨) -->
+    <root level="WARN">
         <appender-ref ref="STDOUT" />
         <appender-ref ref="ROLLING" />
     </root>
+
+    <!-- p6spy SQL 로깅 -->
+    <logger name="p6spy" level="INFO" additivity="false">
+        <appender-ref ref="STDOUT" />
+        <appender-ref ref="ROLLING" />
+    </logger>
 </configuration>

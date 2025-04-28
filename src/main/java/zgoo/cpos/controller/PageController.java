@@ -48,6 +48,8 @@ import zgoo.cpos.dto.member.VocDto.VocListDto;
 import zgoo.cpos.dto.menu.CompanyMenuAuthorityDto;
 import zgoo.cpos.dto.menu.MenuAuthorityDto.MenuAuthorityBaseDto;
 import zgoo.cpos.dto.menu.MenuDto;
+import zgoo.cpos.dto.payment.ChgPaymentInfoDto;
+import zgoo.cpos.dto.payment.ChgPaymentSummaryDto;
 import zgoo.cpos.dto.statistics.TotalkwDto.TotalkwBarDto;
 import zgoo.cpos.dto.statistics.TotalkwDto.TotalkwLineChartDto;
 import zgoo.cpos.dto.statistics.UsageDto.UsageBarDto;
@@ -62,6 +64,7 @@ import zgoo.cpos.dto.users.UsersDto;
 import zgoo.cpos.service.BizService;
 import zgoo.cpos.service.ChargerService;
 import zgoo.cpos.service.ChargingHistService;
+import zgoo.cpos.service.ChargingPaymentInfoService;
 import zgoo.cpos.service.ChgCommlogService;
 import zgoo.cpos.service.ChgErrorCodeService;
 import zgoo.cpos.service.CodeService;
@@ -110,6 +113,7 @@ public class PageController {
     private final ChgCommlogService chgCommlogService;
     private final StatisticsService statisticsService;
     private final ComService comService;
+    private final ChargingPaymentInfoService chargingPaymentService;
 
     /*
      * 대시보드
@@ -1236,33 +1240,33 @@ public class PageController {
             @RequestParam(value = "companyIdSearch", required = false) Long companyId,
             @RequestParam(value = "opSearch", required = false) String searchOp,
             @RequestParam(value = "contentSearch", required = false) String searchContent,
-            @RequestParam(value = "chgStartTimeFrom", required = false) String chgStartTimeFrom,
-            @RequestParam(value = "chgStartTimeTo", required = false) String chgStartTimeTo,
+            @RequestParam(value = "chgStartTimeFrom", required = false) String searchFrom,
+            @RequestParam(value = "chgStartTimeTo", required = false) String searchTo,
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "10") int size,
             Model model, Principal principal) {
         log.info("=== Charging History Page ===");
-        log.info("== companyId: {}, chgStartTimeFrom: {}, chgStartTimeTo: {}, opSearch: {}, contentSearch: {}",
-                companyId, chgStartTimeFrom, chgStartTimeTo, searchOp, searchContent);
+        log.info("== companyId: {}, searchFrom: {}, searchTo: {}, opSearch: {}, contentSearch: {}",
+                companyId, searchFrom, searchTo, searchOp, searchContent);
         log.info("== page: {}, size: {}", page, size);
 
         // 검색 조건 저장
         model.addAttribute("selectedCompanyId", companyId);
         model.addAttribute("selectedOpSearch", searchOp);
         model.addAttribute("selectedContentSearch", searchContent);
-        model.addAttribute("selectedTimeFrom", chgStartTimeFrom);
-        model.addAttribute("selectedTimeTo", chgStartTimeTo);
+        model.addAttribute("selectedTimeFrom", searchFrom);
+        model.addAttribute("selectedTimeTo", searchTo);
 
         Page<ChargingHistDto> chargingHistList;
         try {
-            if (companyId == null && searchOp == null && searchContent == null && chgStartTimeFrom == null
-                    && chgStartTimeTo == null) {
+            if (companyId == null && searchOp == null && searchContent == null && searchFrom == null
+                    && searchTo == null) {
                 log.info("=== >> Start find all charging history");
                 chargingHistList = this.chargingHistService.findAllChargingHist(page, size);
             } else {
                 log.info("=== >> Start find charging history with search condition");
-                chargingHistList = this.chargingHistService.findChargingHist(companyId, chgStartTimeFrom,
-                        chgStartTimeTo, searchOp, searchContent, page, size);
+                chargingHistList = this.chargingHistService.findChargingHist(companyId, searchFrom, searchTo,
+                        searchOp, searchContent, page, size);
             }
 
             // page 처리
@@ -1445,16 +1449,60 @@ public class PageController {
      */
     @GetMapping("/calc/chgpayment")
     public String showchgpayment(
+            @RequestParam(value = "companyIdSearch", required = false) Long companyId,
             @RequestParam(value = "opSearch", required = false) String searchOp,
             @RequestParam(value = "contentSearch", required = false) String searchContent,
-            @RequestParam(value = "startDate", required = false) LocalDate startDate,
-            @RequestParam(value = "endDate", required = false) LocalDate endDate,
+            @RequestParam(value = "startMonthSearch", required = false) String searchFrom,
+            @RequestParam(value = "endMonthSearch", required = false) String searchTo,
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "10") int size,
             Model model, Principal principal) {
         log.info("=== Charging Payment Information Page ===");
 
         try {
+            // 검색 조건이 모두 null인 경우 현재 년월을 기본값으로 설정
+            if (searchOp == null && searchContent == null && searchFrom == null && searchTo == null
+                    && companyId == null) {
+                LocalDate now = LocalDate.now();
+                String currentYearMonth = now.format(DateTimeFormatter.ofPattern("yyyyMM"));
+                searchFrom = currentYearMonth;
+                searchTo = currentYearMonth;
+                log.info("=== >> 검색 조건이 없어 현재 년월({})로 설정합니다.", currentYearMonth);
+            }
+
+            // 모델에 검색 조건 추가
+            model.addAttribute("selectedOpSearch", searchOp);
+            model.addAttribute("selectedContentSearch", searchContent);
+            model.addAttribute("selectedStartMonth", searchFrom);
+            model.addAttribute("selectedEndMonth", searchTo);
+            model.addAttribute("selectedCompanyId", companyId);
+
+            log.info("=== >> 충전 결제 정보 조회: opSearch={}, contentSearch={}, startMonth={}, endMonth={}, companyId={}",
+                    searchOp, searchContent, searchFrom, searchTo, companyId);
+
+            // 충전 결제 정보 조회 (페이징)
+            Page<ChgPaymentInfoDto> chgPaymentList = this.chargingPaymentService.findChgPaymentInfo(
+                    searchFrom, searchTo, searchOp, searchContent, companyId, page, size);
+
+            // 전체 데이터에 대한 합계 계산 (집계 쿼리 사용)
+            ChgPaymentSummaryDto summary = this.chargingPaymentService.calculatePaymentSummary(
+                    searchFrom, searchTo, searchOp, searchContent, companyId);
+
+            // 모델에 합계 정보 추가
+            model.addAttribute("summary", summary);
+
+            // 페이지 처리
+            int totalPages = chgPaymentList.getTotalPages() == 0 ? 1 : chgPaymentList.getTotalPages();
+            model.addAttribute("chgPaymentList", chgPaymentList.getContent());
+            model.addAttribute("size", String.valueOf(size));
+            model.addAttribute("currentPage", page);
+            model.addAttribute("totalPages", totalPages);
+            model.addAttribute("totalCount", chgPaymentList.getTotalElements());
+            log.info("=== >> 충전 결제 정보 조회 결과: 총 페이지={}, 총 데이터={}", totalPages, chgPaymentList.getTotalElements());
+
+            // 검색옵션
+            List<CompanyListDto> companyList = this.companyService.findCompanyListAll();
+            model.addAttribute("companyList", companyList);
 
             List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT"); // 그리드 row 수
             model.addAttribute("showListCnt", showListCnt);
@@ -1463,9 +1511,11 @@ public class PageController {
                     "L0100");
             model.addAttribute("menuAuthority", menuAuthority);
         } catch (Exception e) {
-            e.getStackTrace();
+            log.error("충전 결제 정보 조회 중 오류 발생", e);
+            e.printStackTrace();
             model.addAttribute("showListCnt", Collections.emptyList());
             model.addAttribute("menuAuthority", Collections.emptyList());
+            model.addAttribute("companyList", Collections.emptyList());
         }
 
         return "pages/calc/chgpayment";
@@ -1539,7 +1589,8 @@ public class PageController {
             @RequestParam(value = "yearSearch", required = false) Integer year,
             Model model, Principal principal) {
         log.info("=== Usage Statistics Page ===");
-        log.info("companyId: {}, opSearch: {}, contentSearch: {}, yearSearch: {}", companyId, searchOp, searchContent, year);
+        log.info("companyId: {}, opSearch: {}, contentSearch: {}, yearSearch: {}", companyId, searchOp, searchContent,
+                year);
 
         try {
             model.addAttribute("selectedCompanyId", companyId);
@@ -1551,7 +1602,8 @@ public class PageController {
             model.addAttribute("usage", usage);
             log.info("usage >> {}", usage.toString());
 
-            UsageLineChartDto lineChart = this.statisticsService.searchMonthlyUsage(companyId, searchOp, searchContent, year);
+            UsageLineChartDto lineChart = this.statisticsService.searchMonthlyUsage(companyId, searchOp, searchContent,
+                    year);
             model.addAttribute("lineChart", lineChart);
             log.info("lineChart >> {}", lineChart.toString());
 
@@ -1580,19 +1632,22 @@ public class PageController {
             @RequestParam(value = "yearSearch", required = false) Integer year,
             Model model, Principal principal) {
         log.info("=== Charge Statistics Page ===");
-        log.info("companyId: {}, opSearch: {}, contentSearch: {}, yearSearch: {}", companyId, searchOp, searchContent, year);
+        log.info("companyId: {}, opSearch: {}, contentSearch: {}, yearSearch: {}", companyId, searchOp, searchContent,
+                year);
 
         try {
             model.addAttribute("selectedCompanyId", companyId);
             model.addAttribute("selectedOpSearch", searchOp);
             model.addAttribute("selectedContentSearch", searchContent);
             model.addAttribute("selectedYear", year);
-            
-            TotalkwBarDto totalkw = this.statisticsService.searchYearChargeAmount(companyId, searchOp, searchContent, year);
+
+            TotalkwBarDto totalkw = this.statisticsService.searchYearChargeAmount(companyId, searchOp, searchContent,
+                    year);
             model.addAttribute("totalkw", totalkw);
             log.info("totalkw >> {}", totalkw.toString());
 
-            TotalkwLineChartDto lineChart = this.statisticsService.searchMonthlyChargeAmount(companyId, searchOp, searchContent, year);
+            TotalkwLineChartDto lineChart = this.statisticsService.searchMonthlyChargeAmount(companyId, searchOp,
+                    searchContent, year);
             model.addAttribute("lineChart", lineChart);
             log.info("lineChart >> {}", lineChart.toString());
 

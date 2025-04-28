@@ -82,7 +82,7 @@
                                 <thead>
                                     <tr class="table-border-top">
                                         <th scope="col">충전기ID</th>
-                                        <th scope="col">커넥터ID</th>
+                                        <!-- <th scope="col">커넥터ID</th> -->
                                         <th scope="col">메시지</th>
                                         <th scope="col">수신내용</th>
                                         <th scope="col">수신일시</th>
@@ -94,13 +94,15 @@
                                 <tbody id="pageList">
                                     <tr th:each="data : ${chgCommlogList}">
                                         <td th:text="${data.chargerId}"></td>
-                                        <td th:text="${data.connectorId}"></td>
+                                        <!-- <td th:text="${data.connectorId}"></td> -->
                                         <td th:text="${data.action}"></td>
-                                        <td th:text="${data.recvPayload}"></td>
+                                        <td class="content-truncate" th:data-content="${data.recvPayload}"
+                                            th:text="${data.recvPayload}" onclick="showFullContent(this)"></td>
                                         <td
                                             th:text="${data.recvTime != null ? #dates.format(data.recvTime, 'yyyy-MM-dd HH:mm:ss.SSSSSS') : ''}">
                                         </td>
-                                        <td th:text="${data.sendPayload}"></td>
+                                        <td class="content-truncate" th:data-content="${data.sendPayload}"
+                                            th:text="${data.sendPayload}" onclick="showFullContent(this)"></td>
                                         <td
                                             th:text="${data.sendTime != null ? #dates.format(data.sendTime, 'yyyy-MM-dd HH:mm:ss.SSSSSS') : ''}">
                                         </td>
@@ -158,6 +160,21 @@
         <!-- card body:1 end -->
     </div>
     <!-- card:1 end -->
+    <!-- payload 모달 영역 -->
+    <!-- payload 모달 영역 -->
+    <div class="modal fade" id="contentModal" tabindex="-1" aria-labelledby="contentModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="contentModalLabel">상세 내용</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <pre id="modalContent" style="white-space: pre-wrap; word-break: break-all;"></pre>
+                </div>
+            </div>
+        </div>
+    </div>
     <script type="text/javascript" th:src="@{/js/history/comm_history.js}"></script>
 </div>
 

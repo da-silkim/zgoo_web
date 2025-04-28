@@ -119,13 +119,14 @@
                                         <th scope="col">충전종료일시</th>
                                         <th scope="col">충전시간</th>
                                         <th scope="col">종료사유</th>
-                                        <th scope="col">SOC</th>
-                                        <th scope="col">충전량</th>
-                                        <th scope="col">충전금액</th>
-                                        <th scope="col">적용단가</th>
-                                        <th scope="col">최초결제금액</th>
-                                        <th scope="col">취소금액</th>
-                                        <th scope="col">실결제금액</th>
+                                        <th scope="col">SOC(%)</th>
+                                        <th scope="col">충전량(kWh)</th>
+                                        <th scope="col">충전금액(원)</th>
+                                        <th scope="col">적용단가(원)</th>
+                                        <th scope="col">최초결제금액(원)</th>
+                                        <th scope="col">부분취소금액(원)</th>
+                                        <th scope="col">실결제금액(원)</th>
+                                        <th scope="col">승인번호</th>
                                         <th scope="col">결제여부</th>
                                     </tr>
                                 </thead>
@@ -143,15 +144,28 @@
                                         <td th:text="${#temporals.format(data.chgStartTime,'yyyy-MM-dd HH:mm:ss')}">
                                         </td>
                                         <td th:text="${#temporals.format(data.chgEndTime,'yyyy-MM-dd HH:mm:ss')}"></td>
-                                        <td th:text="${data.chgTime}"></td>
+                                        <td
+                                            th:text="${data.chgTime != null ? (#numbers.formatInteger(data.chgTime / 3600, 2) + ':' + #numbers.formatInteger((data.chgTime % 3600) / 60, 2) + ':' + #numbers.formatInteger(data.chgTime % 60, 2)) : ''}">
+                                        </td>
                                         <td th:text="${data.chgEndReason}"></td>
                                         <td th:text="${data.soc}"></td>
-                                        <td th:text="${data.chgAmount}"></td>
-                                        <td th:text="${data.chgPrice}"></td>
+                                        <td
+                                            th:text="${data.chgAmount != null ? #numbers.formatDecimal(data.chgAmount, 1, 2) : '0.0'}">
+                                        </td>
+                                        <td
+                                            th:text="${data.chgPrice != null ? #numbers.formatInteger(data.chgPrice, 0, 'COMMA') : '0'}">
+                                        </td>
                                         <td th:text="${data.unitCost}"></td>
-                                        <td th:text="${data.prepayCost}"></td>
-                                        <td th:text="${data.cancelCost}"></td>
-                                        <td th:text="${data.realCost}"></td>
+                                        <td
+                                            th:text="${data.prepayCost != null ? #numbers.formatInteger(data.prepayCost, 0, 'COMMA') : '0'}">
+                                        </td>
+                                        <td
+                                            th:text="${data.cancelCost != null ? #numbers.formatInteger(data.cancelCost, 0, 'COMMA') : '0'}">
+                                        </td>
+                                        <td
+                                            th:text="${data.realCost != null ? #numbers.formatInteger(data.realCost, 0, 'COMMA') : '0'}">
+                                        </td>
+                                        <td th:text="${data.approvalNum}"></td>
                                         <td th:text="${data.paymentYn}"></td>
                                     </tr>
                                     <tr th:if="${chargingHistList.size() == 0}">

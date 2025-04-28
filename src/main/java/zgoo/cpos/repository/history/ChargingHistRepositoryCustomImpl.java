@@ -13,7 +13,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
-import com.graphbuilder.math.Expression;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Projections;
@@ -29,7 +28,6 @@ import zgoo.cpos.domain.cs.QCsInfo;
 import zgoo.cpos.domain.history.QChargingHist;
 import zgoo.cpos.domain.member.QMember;
 import zgoo.cpos.dto.history.ChargingHistDto;
-import zgoo.cpos.dto.statistics.TotalkwDto;
 import zgoo.cpos.dto.statistics.TotalkwDto.TotalkwBaseDto;
 import zgoo.cpos.dto.statistics.TotalkwDto.TotalkwLineChartBaseDto;
 import zgoo.cpos.dto.statistics.UsageDto.UsageBaseDto;
@@ -71,6 +69,7 @@ public class ChargingHistRepositoryCustomImpl implements ChargingHistRepositoryC
                 hist.preAmount.as("prepayCost"),
                 hist.cancelAmount.as("cancelCost"),
                 hist.realAmount.as("realCost"),
+                hist.approvalNum.as("approvalNum"),
                 hist.paymentYn.as("paymentYn")))
                 .from(hist)
                 .leftJoin(cpInfo).on(hist.chargerID.eq(cpInfo.id))
@@ -184,6 +183,7 @@ public class ChargingHistRepositoryCustomImpl implements ChargingHistRepositoryC
                 hist.preAmount.as("prepayCost"),
                 hist.cancelAmount.as("cancelCost"),
                 hist.realAmount.as("realCost"),
+                hist.approvalNum.as("approvalNum"),
                 hist.paymentYn.as("paymentYn")))
                 .from(hist)
                 .leftJoin(cpInfo).on(hist.chargerID.eq(cpInfo.id))
@@ -298,6 +298,7 @@ public class ChargingHistRepositoryCustomImpl implements ChargingHistRepositoryC
                 hist.preAmount.as("prepayCost"),
                 hist.cancelAmount.as("cancelCost"),
                 hist.realAmount.as("realCost"),
+                hist.approvalNum.as("approvalNum"),
                 hist.paymentYn.as("paymentYn")))
                 .from(hist)
                 .leftJoin(cpInfo).on(hist.chargerID.eq(cpInfo.id))
@@ -336,18 +337,24 @@ public class ChargingHistRepositoryCustomImpl implements ChargingHistRepositoryC
         builder.and(hist.startTime.between(startOfYear, endOfYear));
 
         TotalkwBaseDto dto = queryFactory.select(Projections.fields(TotalkwBaseDto.class,
-                Expressions.stringTemplate("MAX(CASE WHEN {0} = 'SPEEDFAST' THEN {0} END)", model.cpType).as("speedLow"),
+                Expressions.stringTemplate("MAX(CASE WHEN {0} = 'SPEEDFAST' THEN {0} END)", model.cpType)
+                        .as("speedLow"),
                 Expressions.numberTemplate(BigDecimal.class,
-                    "SUM(CASE WHEN {0} = 'SPEEDFAST' THEN {1} ELSE 0 END)", model.cpType, hist.chargeAmount).as("lowChgAmount"),
-                Expressions.stringTemplate("MAX(CASE WHEN {0} = 'SPEEDLOW' THEN {0} END)", model.cpType).as("speedFast"),
+                        "SUM(CASE WHEN {0} = 'SPEEDFAST' THEN {1} ELSE 0 END)", model.cpType, hist.chargeAmount)
+                        .as("lowChgAmount"),
+                Expressions.stringTemplate("MAX(CASE WHEN {0} = 'SPEEDLOW' THEN {0} END)", model.cpType)
+                        .as("speedFast"),
                 Expressions.numberTemplate(BigDecimal.class,
-                    "SUM(CASE WHEN {0} = 'SPEEDLOW' THEN {1} ELSE 0 END)", model.cpType, hist.chargeAmount).as("fastChgAmount"),
-                    Expressions.stringTemplate("MAX(CASE WHEN {0} = 'SPEEDDESPN' THEN {0} END)", model.cpType).as("speedDespn"),
+                        "SUM(CASE WHEN {0} = 'SPEEDLOW' THEN {1} ELSE 0 END)", model.cpType, hist.chargeAmount)
+                        .as("fastChgAmount"),
+                Expressions.stringTemplate("MAX(CASE WHEN {0} = 'SPEEDDESPN' THEN {0} END)", model.cpType)
+                        .as("speedDespn"),
                 Expressions.numberTemplate(BigDecimal.class,
-                    "SUM(CASE WHEN {0} = 'SPEEDDESPN' THEN {1} ELSE 0 END)", model.cpType, hist.chargeAmount).as("despnChgAmount"),
+                        "SUM(CASE WHEN {0} = 'SPEEDDESPN' THEN {1} ELSE 0 END)", model.cpType, hist.chargeAmount)
+                        .as("despnChgAmount"),
                 Expressions.numberTemplate(BigDecimal.class,
-                    "SUM((CASE WHEN {0} = 'SPEEDFAST' THEN {1} ELSE 0 END) + (CASE WHEN {0} = 'SPEEDLOW' THEN {1} ELSE 0 END) + (CASE WHEN {0} = 'SPEEDDESPN' THEN {1} ELSE 0 END))", 
-                    model.cpType, hist.chargeAmount).as("totalkw")))
+                        "SUM((CASE WHEN {0} = 'SPEEDFAST' THEN {1} ELSE 0 END) + (CASE WHEN {0} = 'SPEEDLOW' THEN {1} ELSE 0 END) + (CASE WHEN {0} = 'SPEEDDESPN' THEN {1} ELSE 0 END))",
+                        model.cpType, hist.chargeAmount).as("totalkw")))
                 .from(hist)
                 .leftJoin(cpInfo).on(hist.chargerID.eq(cpInfo.id))
                 .leftJoin(csInfo).on(csInfo.eq(cpInfo.stationId))
@@ -360,7 +367,8 @@ public class ChargingHistRepositoryCustomImpl implements ChargingHistRepositoryC
     }
 
     @Override
-    public List<TotalkwLineChartBaseDto> searchMonthlyChargeAmount(Long companyId, String searchOp, String searchContent, Integer year, String cpType) {
+    public List<TotalkwLineChartBaseDto> searchMonthlyChargeAmount(Long companyId, String searchOp,
+            String searchContent, Integer year, String cpType) {
         BooleanBuilder builder = new BooleanBuilder();
 
         if (companyId != null) {
@@ -383,26 +391,25 @@ public class ChargingHistRepositoryCustomImpl implements ChargingHistRepositoryC
         builder.and(Expressions.numberTemplate(Integer.class, "YEAR({0})", hist.startTime).eq(year));
 
         List<TotalkwLineChartBaseDto> monthlyResults = IntStream.rangeClosed(1, 12)
-            .mapToObj(month -> TotalkwLineChartBaseDto.builder()
-                .month(month)
-                .year(year)
-                .totalkw(BigDecimal.ZERO)
-                .build())
-            .collect(Collectors.toList());
+                .mapToObj(month -> TotalkwLineChartBaseDto.builder()
+                        .month(month)
+                        .year(year)
+                        .totalkw(BigDecimal.ZERO)
+                        .build())
+                .collect(Collectors.toList());
 
         // 월별 충전량 조회
         List<Tuple> results = queryFactory
-        .select(
-            Expressions.numberTemplate(Integer.class, "MONTH({0})", hist.startTime).as("month"),
-            hist.chargeAmount.sum()
-        )
-        .from(hist)
-        .leftJoin(cpInfo).on(hist.chargerID.eq(cpInfo.id))
-        .leftJoin(csInfo).on(csInfo.eq(cpInfo.stationId))
-        .leftJoin(model).on(cpInfo.modelCode.eq(model.modelCode))
-        .where(builder)
-        .groupBy(Expressions.numberTemplate(Integer.class, "MONTH({0})", hist.startTime))
-        .fetch();
+                .select(
+                        Expressions.numberTemplate(Integer.class, "MONTH({0})", hist.startTime).as("month"),
+                        hist.chargeAmount.sum())
+                .from(hist)
+                .leftJoin(cpInfo).on(hist.chargerID.eq(cpInfo.id))
+                .leftJoin(csInfo).on(csInfo.eq(cpInfo.stationId))
+                .leftJoin(model).on(cpInfo.modelCode.eq(model.modelCode))
+                .where(builder)
+                .groupBy(Expressions.numberTemplate(Integer.class, "MONTH({0})", hist.startTime))
+                .fetch();
 
         for (Tuple tuple : results) {
             Integer month = tuple.get(0, Integer.class);
@@ -438,16 +445,19 @@ public class ChargingHistRepositoryCustomImpl implements ChargingHistRepositoryC
         builder.and(hist.startTime.between(startOfYear, endOfYear));
 
         UsageBaseDto dto = queryFactory.select(Projections.fields(UsageBaseDto.class,
-            Expressions.numberTemplate(Long.class, "COUNT(CASE WHEN {0} = 'SPEEDFAST' THEN 1 END)", model.cpType).as("fastCount"),
-            Expressions.numberTemplate(Long.class, "COUNT(CASE WHEN {0} = 'SPEEDLOW' THEN 1 END)", model.cpType).as("lowCount"),
-            Expressions.numberTemplate(Long.class, "COUNT(CASE WHEN {0} = 'SPEEDDESPN' THEN 1 END)", model.cpType).as("despnCount"),
-            Expressions.numberTemplate(Long.class, "COUNT(*)").as("totalUsage")))
-            .from(hist)
-            .leftJoin(cpInfo).on(hist.chargerID.eq(cpInfo.id))
-            .leftJoin(csInfo).on(csInfo.eq(cpInfo.stationId))
-            .leftJoin(model).on(cpInfo.modelCode.eq(model.modelCode))
-            .where(builder)
-            .fetchOne();
+                Expressions.numberTemplate(Long.class, "COUNT(CASE WHEN {0} = 'SPEEDFAST' THEN 1 END)", model.cpType)
+                        .as("fastCount"),
+                Expressions.numberTemplate(Long.class, "COUNT(CASE WHEN {0} = 'SPEEDLOW' THEN 1 END)", model.cpType)
+                        .as("lowCount"),
+                Expressions.numberTemplate(Long.class, "COUNT(CASE WHEN {0} = 'SPEEDDESPN' THEN 1 END)", model.cpType)
+                        .as("despnCount"),
+                Expressions.numberTemplate(Long.class, "COUNT(*)").as("totalUsage")))
+                .from(hist)
+                .leftJoin(cpInfo).on(hist.chargerID.eq(cpInfo.id))
+                .leftJoin(csInfo).on(csInfo.eq(cpInfo.stationId))
+                .leftJoin(model).on(cpInfo.modelCode.eq(model.modelCode))
+                .where(builder)
+                .fetchOne();
         dto.setYear(year);
 
         return dto;
@@ -478,25 +488,24 @@ public class ChargingHistRepositoryCustomImpl implements ChargingHistRepositoryC
         builder.and(Expressions.numberTemplate(Integer.class, "YEAR({0})", hist.startTime).eq(year));
 
         List<UsageLineChartBaseDto> monthlyResults = IntStream.rangeClosed(1, 12)
-            .mapToObj(month -> UsageLineChartBaseDto.builder()
-                .month(month)
-                .year(year)
-                .totalUsage(0L)
-                .build())
-            .collect(Collectors.toList());
+                .mapToObj(month -> UsageLineChartBaseDto.builder()
+                        .month(month)
+                        .year(year)
+                        .totalUsage(0L)
+                        .build())
+                .collect(Collectors.toList());
 
         List<Tuple> results = queryFactory
-            .select(
-                Expressions.numberTemplate(Integer.class, "MONTH({0})", hist.startTime).as("month"),
-                hist.id.count()
-            )
-            .from(hist)
-            .leftJoin(cpInfo).on(hist.chargerID.eq(cpInfo.id))
-            .leftJoin(csInfo).on(csInfo.eq(cpInfo.stationId))
-            .leftJoin(model).on(cpInfo.modelCode.eq(model.modelCode))
-            .where(builder)
-            .groupBy(Expressions.numberTemplate(Integer.class, "MONTH({0})", hist.startTime))
-            .fetch();
+                .select(
+                        Expressions.numberTemplate(Integer.class, "MONTH({0})", hist.startTime).as("month"),
+                        hist.id.count())
+                .from(hist)
+                .leftJoin(cpInfo).on(hist.chargerID.eq(cpInfo.id))
+                .leftJoin(csInfo).on(csInfo.eq(cpInfo.stationId))
+                .leftJoin(model).on(cpInfo.modelCode.eq(model.modelCode))
+                .where(builder)
+                .groupBy(Expressions.numberTemplate(Integer.class, "MONTH({0})", hist.startTime))
+                .fetch();
 
         for (Tuple tuple : results) {
             Integer month = tuple.get(0, Integer.class);
