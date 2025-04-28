@@ -71,7 +71,6 @@ import zgoo.cpos.dto.users.UsersDto;
 import zgoo.cpos.service.BizService;
 import zgoo.cpos.service.ChargerService;
 import zgoo.cpos.service.ChargingHistService;
-import zgoo.cpos.service.ChargingPaymentInfoService;
 import zgoo.cpos.service.ChgCommlogService;
 import zgoo.cpos.service.ChgErrorCodeService;
 import zgoo.cpos.service.CodeService;
@@ -87,7 +86,6 @@ import zgoo.cpos.service.MemberService;
 import zgoo.cpos.service.MenuAuthorityService;
 import zgoo.cpos.service.MenuService;
 import zgoo.cpos.service.NoticeService;
-import zgoo.cpos.service.PurchaseService;
 import zgoo.cpos.service.StatisticsService;
 import zgoo.cpos.service.TariffService;
 import zgoo.cpos.service.UsersService;
@@ -121,8 +119,6 @@ public class PageController {
     private final ChgCommlogService chgCommlogService;
     private final StatisticsService statisticsService;
     private final ComService comService;
-    private final PurchaseService purchaseService;
-    private final ChargingPaymentInfoService chargingPaymentService;
 
     /*
      * 대시보드

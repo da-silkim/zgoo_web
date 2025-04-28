@@ -688,7 +688,7 @@ table.table tbody tr.row-selected {
 .connector-container {
   position: absolute;
   right: 16px;
-  padding: .5rem !important;
+  padding: 0.5rem !important;
   display: flex !important;
   justify-content: flex-start !important;
   align-items: center !important;
@@ -706,7 +706,8 @@ table.table tbody tr.row-selected {
 .btn-page-area > div:nth-child(1) {
   display: inline-block !important;
 }
-.page-container, .cp-page-container {
+.page-container,
+.cp-page-container {
   float: right;
   height: 38px;
   display: flex;
@@ -1284,28 +1285,12 @@ table.table tbody tr.row-selected {
   color: #dc3545;
 }
 .fa-plug.disconnected {
-  color: #505050;
-}
-.fa-plug.finishing {
-  color: #6f03fd;
-}
-.fa-plug.reserved {
-  color: #c4e605;
-}
-
-
-
-.content-truncate {
-  max-width: 300px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  cursor: pointer;
+  color: #6c757d;
 }
 
 /* 모달 내 콘텐츠 스타일 */
 #modalContent {
-  white-space: pre-wrap; 
+  white-space: pre-wrap;
   word-break: break-all;
   max-height: 500px;
   overflow-y: auto;
@@ -1362,7 +1347,8 @@ table.table tbody tr.row-selected {
 .sales-status > div,
 .charge-status > div {
   text-align: center !important;
-  display: flex; align-items: center;
+  display: flex;
+  align-items: center;
 }
 .dashboard-period {
   position: absolute;

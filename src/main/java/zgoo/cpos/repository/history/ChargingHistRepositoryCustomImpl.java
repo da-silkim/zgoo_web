@@ -339,14 +339,15 @@ public class ChargingHistRepositoryCustomImpl implements ChargingHistRepositoryC
 
         TotalkwBaseDto dto = queryFactory.select(Projections.fields(TotalkwBaseDto.class,
                 Expressions.stringTemplate("MAX(CASE WHEN {0} = 'SPEEDFAST' THEN {0} END)", model.cpType)
-                        .as("speedFast"),
+                        .as("speedLow"),
                 Expressions.numberTemplate(BigDecimal.class,
                         "SUM(CASE WHEN {0} = 'SPEEDFAST' THEN {1} ELSE 0 END)", model.cpType, hist.chargeAmount)
-                        .as("fastChgAmount"),
-                Expressions.stringTemplate("MAX(CASE WHEN {0} = 'SPEEDLOW' THEN {0} END)", model.cpType).as("speedLow"),
+                        .as("lowChgAmount"),
+                Expressions.stringTemplate("MAX(CASE WHEN {0} = 'SPEEDLOW' THEN {0} END)", model.cpType)
+                        .as("speedFast"),
                 Expressions.numberTemplate(BigDecimal.class,
                         "SUM(CASE WHEN {0} = 'SPEEDLOW' THEN {1} ELSE 0 END)", model.cpType, hist.chargeAmount)
-                        .as("lowChgAmount"),
+                        .as("fastChgAmount"),
                 Expressions.stringTemplate("MAX(CASE WHEN {0} = 'SPEEDDESPN' THEN {0} END)", model.cpType)
                         .as("speedDespn"),
                 Expressions.numberTemplate(BigDecimal.class,
