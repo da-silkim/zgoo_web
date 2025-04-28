@@ -72,19 +72,24 @@
             <div class="card card-shadow mt-4">
                 <!-- card body:3 start -->
                 <div class="card-body btn-page-container">
-                    <div
-                        class="connector-container connector-legend bg-light rounded">
+                    <div class="connector-container connector-legend bg-light rounded">
                         <span class="me-3 d-flex align-items-center">
                             <i class="fa-solid fa-plug available me-1 fa-lg"></i> <strong>사용가능</strong>
-                        </span>
-                        <span class="me-3 d-flex align-items-center">
-                            <i class="fa-solid fa-plug charging me-1 fa-lg"></i> <strong>충전중</strong>
                         </span>
                         <span class="me-3 d-flex align-items-center">
                             <i class="fa-solid fa-plug preparing me-1 fa-lg"></i> <strong>준비중</strong>
                         </span>
                         <span class="me-3 d-flex align-items-center">
+                            <i class="fa-solid fa-plug charging me-1 fa-lg"></i> <strong>충전중</strong>
+                        </span>
+                        <span class="me-3 d-flex align-items-center">
+                            <i class="fa-solid fa-plug finishing me-1 fa-lg"></i> <strong>충전완료</strong>
+                        </span>
+                        <span class="me-3 d-flex align-items-center">
                             <i class="fa-solid fa-plug faulted me-1 fa-lg"></i> <strong>고장</strong>
+                        </span>
+                        <span class="me-3 d-flex align-items-center">
+                            <i class="fa-solid fa-plug reserved me-1 fa-lg"></i> <strong>예약</strong>
                         </span>
                         <span class="me-3 d-flex align-items-center">
                             <i class="fa-solid fa-plug disconnected me-1 fa-lg"></i> <strong>연결끊김</strong>
@@ -115,7 +120,7 @@
                         </select>
                     </div>
 
-                    <div class="w-100 table-responsive"> 
+                    <div class="w-100 table-responsive">
                         <table class="table text-center mt-3 table-bg table-hover">
                             <thead>
                                 <tr class="table-border-top">
@@ -522,31 +527,48 @@
             function updateConnectorStatus(statusData) {
                 const chargerId = statusData.chargerId;
                 const connectorId = statusData.connectorId;
-                const displayStatus = statusData.connectionYn === 'N' ? 'Disconnected' : statusData.status;
+                const displayStatus = statusData.connectionYn === 'N' ? 'disconnected' : statusData.status.toLowerCase();
 
-                // 해당 커넥터 아이콘 찾기
-                const connectorIcon = document.querySelector(`.connector-status i[data-connector-id="${connectorId}"][data-charger-id="${chargerId}"]`);
+                // connectorId가 0인 경우 모든 커넥터 업데이트
+                if (connectorId === 0) {
+                    // 해당 충전기의 모든 커넥터 아이콘 찾기
+                    const connectorIcons = document.querySelectorAll(`.connector-status i[data-charger-id="${chargerId}"]`);
 
-                if (connectorIcon) {
-                    // 기존 클래스 제거
-                    connectorIcon.classList.remove('available', 'preparing', 'charging', 'suspendedev',
-                        'suspendedevse', 'finishing', 'reserved', 'unavailable', 'faulted', 'disconnected');
-
-                    // 새 상태에 따른 클래스 추가
-                    connectorIcon.classList.add(displayStatus.toLowerCase());
-
-                    // 툴크 업데이트
-                    connectorIcon.setAttribute('title', displayStatus);
-
-                    // 콘솔에 상태 변경 로깅
-                    console.log(`충전기 ${chargerId}, 커넥터 ${connectorId} 상태 변경: ${displayStatus}`);
+                    if (connectorIcons.length > 0) {
+                        connectorIcons.forEach(icon => {
+                            updateConnectorIcon(icon, displayStatus);
+                        });
+                        console.log(`충전기 ${chargerId}의 모든 커넥터 상태 변경: ${displayStatus}`);
+                    } else {
+                        console.warn(`충전기 ${chargerId}의 커넥터를 찾을 수 없습니다.`);
+                    }
                 } else {
-                    console.warn(`충전기 ${chargerId}, 커넥터 ${connectorId}를 찾을 수 없습니다.`);
+                    // 특정 커넥터만 업데이트
+                    const connectorIcon = document.querySelector(`.connector-status i[data-connector-id="${connectorId}"][data-charger-id="${chargerId}"]`);
+
+                    if (connectorIcon) {
+                        updateConnectorIcon(connectorIcon, displayStatus);
+                        console.log(`충전기 ${chargerId}, 커넥터 ${connectorId} 상태 변경: ${displayStatus}`);
+                    } else {
+                        console.warn(`충전기 ${chargerId}, 커넥터 ${connectorId}를 찾을 수 없습니다.`);
+                    }
                 }
+            }
+
+            // 커넥터 아이콘 업데이트 헬퍼 함수
+            function updateConnectorIcon(iconElement, status) {
+                // 기존 클래스 제거
+                iconElement.classList.remove('available', 'preparing', 'charging', 'suspendedev',
+                    'suspendedevse', 'finishing', 'reserved', 'unavailable', 'faulted', 'disconnected');
+
+                // 새 상태에 따른 클래스 추가
+                iconElement.classList.add(status);
+
+                // 툴팁 업데이트
+                iconElement.setAttribute('title', status.charAt(0).toUpperCase() + status.slice(1));
             }
         });
     </script>
-
 </div>
 
 </html>

@@ -35,6 +35,7 @@ public class ChargingHistDto {
     private Integer prepayCost;
     private Integer cancelCost;
     private Integer realCost;
+    private String approvalNum; // 승인번호
     private UseYn paymentYn;
 
     // to entity

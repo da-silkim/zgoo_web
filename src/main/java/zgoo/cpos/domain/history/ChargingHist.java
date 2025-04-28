@@ -10,6 +10,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -20,7 +21,12 @@ import zgoo.cpos.type.Reason;
 import zgoo.cpos.type.UseYn;
 
 @Entity
-@Table(name = "CHARGING_HIST")
+@Table(name = "CHARGING_HIST", indexes = {
+        @Index(name = "idx_charging_hist_charger_id", columnList = "charger_id"),
+        @Index(name = "idx_charging_hist_start_time", columnList = "start_time"),
+        @Index(name = "idx_charging_hist_id_tag", columnList = "id_tag"),
+        @Index(name = "idx_charging_hist_approval_num", columnList = "approval_num")
+})
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
@@ -82,6 +88,9 @@ public class ChargingHist {
 
     @Column(name = "real_amount")
     private Integer realAmount;
+
+    @Column(name = "approval_num")
+    private String approvalNum;
 
     @Column(name = "payment_yn", columnDefinition = "CHAR(1)")
     @Enumerated(EnumType.STRING)

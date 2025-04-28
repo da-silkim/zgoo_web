@@ -1272,19 +1272,52 @@ table.table tbody tr.row-selected {
 }
 
 .fa-plug.available {
-  color: #28a745;
+  color: #346906;
 }
 .fa-plug.charging {
-  color: #007bff;
+  color: #39afe2;
 }
 .fa-plug.preparing {
-  color: #ffc107;
+  color: #f0a503;
 }
 .fa-plug.faulted {
   color: #dc3545;
 }
 .fa-plug.disconnected {
-  color: #6c757d;
+  color: #505050;
+}
+.fa-plug.finishing {
+  color: #6f03fd;
+}
+.fa-plug.reserved {
+  color: #c4e605;
+}
+
+
+
+.content-truncate {
+  max-width: 300px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+
+/* 모달 내 콘텐츠 스타일 */
+#modalContent {
+  white-space: pre-wrap; 
+  word-break: break-all;
+  max-height: 500px;
+  overflow-y: auto;
+  font-size: 14px;
+  background-color: #f8f9fa;
+  padding: 15px;
+  border-radius: 5px;
+}
+
+/* 클릭 가능한 셀 스타일 */
+.content-truncate:hover {
+  background-color: #f0f0f0;
 }
 
 /*

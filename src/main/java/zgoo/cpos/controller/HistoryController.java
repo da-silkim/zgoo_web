@@ -93,8 +93,8 @@ public class HistoryController {
             // 헤더 행 생성
             Row headerRow = sheet.createRow(0);
             String[] headers = { "사업자", "충전소명", "충전소ID", "충전기ID", "커넥터ID", "충전기구분", "회원명", "회원카드번호", "회원구분",
-                    "충전시작일시", "충전종료일시", "충전시간", "종료사유", "SOC", "충전량(kWh)", "충전금액", "적용단가", "최초결제금액", "취소금액", "실결제금액",
-                    "결제여부" };
+                    "충전시작일시", "충전종료일시", "충전시간", "종료사유", "SOC", "충전량(kWh)", "충전금액", "적용단가", "최초결제금액", "부분취소금액", "실결제금액",
+                    "승인번호", "결제여부" };
 
             for (int i = 0; i < headers.length; i++) {
                 Cell cell = headerRow.createCell(i);
@@ -133,7 +133,8 @@ public class HistoryController {
                 createCell(row, 17, chargingHist.getPrepayCost().toString(), dataStyle);
                 createCell(row, 18, chargingHist.getCancelCost().toString(), dataStyle);
                 createCell(row, 19, chargingHist.getRealCost().toString(), dataStyle);
-                createCell(row, 20, chargingHist.getPaymentYn().toString(), dataStyle);
+                createCell(row, 20, chargingHist.getApprovalNum(), dataStyle);
+                createCell(row, 21, chargingHist.getPaymentYn().toString(), dataStyle);
             }
 
             // 파일 다운로드 설정
