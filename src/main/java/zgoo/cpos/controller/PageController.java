@@ -71,6 +71,7 @@ import zgoo.cpos.dto.users.UsersDto;
 import zgoo.cpos.service.BizService;
 import zgoo.cpos.service.ChargerService;
 import zgoo.cpos.service.ChargingHistService;
+import zgoo.cpos.service.ChargingPaymentInfoService;
 import zgoo.cpos.service.ChgCommlogService;
 import zgoo.cpos.service.ChgErrorCodeService;
 import zgoo.cpos.service.CodeService;
@@ -86,6 +87,7 @@ import zgoo.cpos.service.MemberService;
 import zgoo.cpos.service.MenuAuthorityService;
 import zgoo.cpos.service.MenuService;
 import zgoo.cpos.service.NoticeService;
+import zgoo.cpos.service.PurchaseService;
 import zgoo.cpos.service.StatisticsService;
 import zgoo.cpos.service.TariffService;
 import zgoo.cpos.service.UsersService;
@@ -119,6 +121,8 @@ public class PageController {
     private final ChgCommlogService chgCommlogService;
     private final StatisticsService statisticsService;
     private final ComService comService;
+    private final ChargingPaymentInfoService chargingPaymentInfoService;
+    private final PurchaseService purchaseService;
 
     /*
      * 대시보드
@@ -1511,11 +1515,11 @@ public class PageController {
                     searchOp, searchContent, searchFrom, searchTo, companyId);
 
             // 충전 결제 정보 조회 (페이징)
-            Page<ChgPaymentInfoDto> chgPaymentList = this.chargingPaymentService.findChgPaymentInfo(
+            Page<ChgPaymentInfoDto> chgPaymentList = this.chargingPaymentInfoService.findChgPaymentInfo(
                     searchFrom, searchTo, searchOp, searchContent, companyId, page, size);
 
             // 전체 데이터에 대한 합계 계산 (집계 쿼리 사용)
-            ChgPaymentSummaryDto summary = this.chargingPaymentService.calculatePaymentSummary(
+            ChgPaymentSummaryDto summary = this.chargingPaymentInfoService.calculatePaymentSummary(
                     searchFrom, searchTo, searchOp, searchContent, companyId);
 
             // 모델에 합계 정보 추가
