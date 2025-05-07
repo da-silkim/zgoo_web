@@ -13,25 +13,26 @@ import zgoo.cpos.dto.cp.ChargerDto.ChargerSearchDto;
 import zgoo.cpos.dto.cp.ChargerDto.FacilityCountDto;
 
 public interface ChargerRepositoryCustom {
-    Page<ChargerListDto> findAllChargerListPaging(Pageable page);
+    Page<ChargerListDto> findAllChargerListPaging(Pageable page, String levelPath, boolean isSuperAdmin);
 
-    Page<ChargerListDto> findChargerListPaging(Long companyId, String manufCd, String searchOp, String searchContent,
-            Pageable pageable);
+    Page<ChargerListDto> findChargerListPaging(Long companyId, String manufCd, String searchOp,
+            String searchContent,
+            Pageable pageable, String levelPath, boolean isSuperAdmin);
 
     Optional<CpInfo> findCpByStationId(String stationId);
 
     CpInfo findCpInfoByChargerId(String chargerId);
 
-    List<ChargerSearchDto> findChargerListByStationId(String stationId);
+    List<ChargerSearchDto> findChargerListByStationId(String stationId, String levelPath, boolean isSuperAdmin);
 
     long countByStationId(String stationId);
 
     List<ChargerListDto> findAllChargerListWithoutPagination(Long companyId, String manufCd, String searchOp,
-            String searchContent);
+            String searchContent, String levelPath, boolean isSuperAdmin);
 
-    long countCharger();
+    long countCharger(String levelPath, boolean isSuperAdmin);
 
-    List<ChargerCountBySidoDto> countChargerBySidoAndType();
+    List<ChargerCountBySidoDto> countChargerBySidoAndType(String levelPath, boolean isSuperAdmin);
 
-    List<FacilityCountDto> countFacilityBySidoAndType(String sido, String type);
+    List<FacilityCountDto> countFacilityBySidoAndType(String sido, String type, String levelPath, boolean isSuperAdmin);
 }

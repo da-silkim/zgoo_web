@@ -87,45 +87,99 @@ public class ChargingHistService {
                 chgStartTimeTo, searchOp, searchContent);
     }
 
-    /* 
+    /*
      * 대시보드 - 충전현황
      */
     public TotalkwDashboardDto findChargingHistByPeriod() {
         try {
-            LocalDate today = LocalDate.now();    // 오늘 날짜
-            LocalDate firstDayOfCurrentMonth = today.withDayOfMonth(1);                       // 당월의 첫 번째 날
-            YearMonth lastMonth = YearMonth.from(today).minusMonths(1);                 // 전월 YearMonth
-            LocalDate sameDayLastMonth = today.minusMonths(1).withDayOfMonth(today.getDayOfMonth()); // 전월의 같은 일자
-            LocalDate firstDayOfLastMonth = lastMonth.atDay(1);                               // 전월의 첫 번째 날
-            LocalDate lastDayOfLastMonth = lastMonth.atEndOfMonth();                                     // 전월의 마지막 날
+            LocalDate today = LocalDate.now(); // 오늘 날짜
+            LocalDate firstDayOfCurrentMonth = today.withDayOfMonth(1); // 당월의 첫 번째 날
+            YearMonth lastMonth = YearMonth.from(today).minusMonths(1); // 전월 YearMonth
+            LocalDate sameDayLastMonth = today.minusMonths(1)
+                    .withDayOfMonth(Math.min(today.getDayOfMonth(), lastMonth.lengthOfMonth())); // 전월의 같은 일자
+            LocalDate firstDayOfLastMonth = lastMonth.atDay(1); // 전월의 첫 번째 날
+            LocalDate lastDayOfLastMonth = lastMonth.atEndOfMonth(); // 전월의 마지막 날
 
+            LocalDate endDate = today.getDayOfMonth() > lastDayOfLastMonth.getDayOfMonth() ? lastDayOfLastMonth
+                    : sameDayLastMonth;
 
-            LocalDate endDate = today.getDayOfMonth() > lastDayOfLastMonth.getDayOfMonth() ? lastDayOfLastMonth : sameDayLastMonth;
+            TotalkwDashboardDto lastMonthDto = chargingHistRepository.findChargingHistByPeriod(
+                    firstDayOfLastMonth.atStartOfDay(),
+                    endDate.atTime(23, 59, 59));
+            TotalkwDashboardDto currMonthDto = chargingHistRepository.findChargingHistByPeriod(
+                    firstDayOfCurrentMonth.atStartOfDay(),
+                    today.atTime(23, 59, 59));
 
+            // 데이터가 없는 경우 기본값 설정
+            if (lastMonthDto == null) {
+                lastMonthDto = createEmptyTotalkwDashboardDto();
+            }
 
-            TotalkwDashboardDto lastMonthDto = chargingHistRepository.findChargingHistByPeriod(firstDayOfLastMonth.atStartOfDay(), 
-                endDate.atTime(23, 59, 59));
-            TotalkwDashboardDto currMonthDto = chargingHistRepository.findChargingHistByPeriod(firstDayOfCurrentMonth.atStartOfDay(), 
-                today.atTime(23, 59, 59));
+            if (currMonthDto == null) {
+                currMonthDto = createEmptyTotalkwDashboardDto();
+                currMonthDto.setPeriod(firstDayOfCurrentMonth + " ~ " + today);
+                return currMonthDto;
+            }
 
-            currMonthDto.setFastCheck(compareAmountCheck(lastMonthDto.getFastChgAmount(), currMonthDto.getFastChgAmount(), "Fast"));
-            currMonthDto.setLowCheck(compareAmountCheck(lastMonthDto.getLowChgAmount(), currMonthDto.getLowChgAmount(), "Low"));
-            currMonthDto.setDespnCheck(compareAmountCheck(lastMonthDto.getDespnChgAmount(), currMonthDto.getDespnChgAmount(), "Despn"));
-            
-            currMonthDto.setCompareFast(compareAmount(lastMonthDto.getFastChgAmount(), currMonthDto.getFastChgAmount()));
-            currMonthDto.setCompareLow(compareAmount(lastMonthDto.getLowChgAmount(), currMonthDto.getLowChgAmount()));
-            currMonthDto.setCompareDespn(compareAmount(lastMonthDto.getDespnChgAmount(), currMonthDto.getDespnChgAmount()));
+            // null 체크 추가
+            BigDecimal lastFast = lastMonthDto.getFastChgAmount() != null ? lastMonthDto.getFastChgAmount()
+                    : BigDecimal.ZERO;
+            BigDecimal lastLow = lastMonthDto.getLowChgAmount() != null ? lastMonthDto.getLowChgAmount()
+                    : BigDecimal.ZERO;
+            BigDecimal lastDespn = lastMonthDto.getDespnChgAmount() != null ? lastMonthDto.getDespnChgAmount()
+                    : BigDecimal.ZERO;
+
+            BigDecimal currFast = currMonthDto.getFastChgAmount() != null ? currMonthDto.getFastChgAmount()
+                    : BigDecimal.ZERO;
+            BigDecimal currLow = currMonthDto.getLowChgAmount() != null ? currMonthDto.getLowChgAmount()
+                    : BigDecimal.ZERO;
+            BigDecimal currDespn = currMonthDto.getDespnChgAmount() != null ? currMonthDto.getDespnChgAmount()
+                    : BigDecimal.ZERO;
+
+            currMonthDto.setFastCheck(compareAmountCheck(lastFast, currFast, "Fast"));
+            currMonthDto.setLowCheck(compareAmountCheck(lastLow, currLow, "Low"));
+            currMonthDto.setDespnCheck(compareAmountCheck(lastDespn, currDespn, "Despn"));
+
+            currMonthDto.setCompareFast(compareAmount(lastFast, currFast));
+            currMonthDto.setCompareLow(compareAmount(lastLow, currLow));
+            currMonthDto.setCompareDespn(compareAmount(lastDespn, currDespn));
 
             currMonthDto.setPeriod(firstDayOfCurrentMonth + " ~ " + today);
 
             return currMonthDto;
         } catch (Exception e) {
             log.error("[findChargingHistByPeriod] error: {}", e.getMessage(), e);
-            return null;
+            // 오류 발생 시 기본 객체 반환
+            TotalkwDashboardDto defaultDto = createEmptyTotalkwDashboardDto();
+            defaultDto.setPeriod(LocalDate.now().withDayOfMonth(1) + " ~ " + LocalDate.now());
+            return defaultDto;
         }
     }
 
+    /**
+     * 빈 TotalkwDashboardDto 객체 생성
+     */
+    private TotalkwDashboardDto createEmptyTotalkwDashboardDto() {
+        TotalkwDashboardDto dto = new TotalkwDashboardDto();
+        dto.setFastChgAmount(BigDecimal.ZERO);
+        dto.setLowChgAmount(BigDecimal.ZERO);
+        dto.setDespnChgAmount(BigDecimal.ZERO);
+        dto.setFastCheck(0);
+        dto.setLowCheck(0);
+        dto.setDespnCheck(0);
+        dto.setCompareFast(BigDecimal.ZERO);
+        dto.setCompareLow(BigDecimal.ZERO);
+        dto.setCompareDespn(BigDecimal.ZERO);
+        return dto;
+    }
+
     private int compareAmountCheck(BigDecimal prev, BigDecimal curr, String label) {
+        // null 체크 추가
+        if (prev == null)
+            prev = BigDecimal.ZERO;
+        if (curr == null)
+            curr = BigDecimal.ZERO;
+
         int comparison = prev.compareTo(curr);
         if (comparison > 0) {
             log.info("전월의 {} 충전량이 당월보다 큽니다.", label);
@@ -140,6 +194,12 @@ public class ChargingHistService {
     }
 
     private BigDecimal compareAmount(BigDecimal prev, BigDecimal curr) {
+        // null 체크 추가
+        if (prev == null)
+            prev = BigDecimal.ZERO;
+        if (curr == null)
+            curr = BigDecimal.ZERO;
+
         int comparison = prev.compareTo(curr);
         if (comparison > 0) {
             return prev.subtract(curr).setScale(2, RoundingMode.HALF_UP);

@@ -21,6 +21,7 @@ import zgoo.cpos.domain.charger.QCpInfo;
 import zgoo.cpos.domain.charger.QCpModem;
 import zgoo.cpos.domain.code.QCommonCode;
 import zgoo.cpos.domain.company.QCompany;
+import zgoo.cpos.domain.company.QCompanyRelationInfo;
 import zgoo.cpos.domain.company.QCpPlanPolicy;
 import zgoo.cpos.domain.cp.QCpModel;
 import zgoo.cpos.domain.cs.QCsInfo;
@@ -29,6 +30,7 @@ import zgoo.cpos.dto.cp.ChargerDto.ChargerCountBySidoDto;
 import zgoo.cpos.dto.cp.ChargerDto.ChargerListDto;
 import zgoo.cpos.dto.cp.ChargerDto.ChargerSearchDto;
 import zgoo.cpos.dto.cp.ChargerDto.FacilityCountDto;
+import zgoo.cpos.util.QueryUtils;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -36,6 +38,7 @@ public class ChargerRepositoryCustomImpl implements ChargerRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
     QCompany company = QCompany.company;
+    QCompanyRelationInfo relation = QCompanyRelationInfo.companyRelationInfo;
     QCsInfo csInfo = QCsInfo.csInfo;
     QCpInfo cpInfo = QCpInfo.cpInfo;
     QCpModel model = QCpModel.cpModel;
@@ -49,7 +52,14 @@ public class ChargerRepositoryCustomImpl implements ChargerRepositoryCustom {
     QCommonCode facilityTypeName = new QCommonCode("facilityType");
 
     @Override
-    public Page<ChargerListDto> findAllChargerListPaging(Pageable pageable) {
+    public Page<ChargerListDto> findAllChargerListPaging(Pageable pageable, String levelPath, boolean isSuperAdmin) {
+
+        BooleanBuilder builder = new BooleanBuilder();
+
+        if (!isSuperAdmin && levelPath != null && !levelPath.isEmpty()) {
+            builder.and(QueryUtils.hasCompanyLevelAccess(relation, levelPath));
+        }
+
         List<ChargerListDto> chargerList = queryFactory.select(Projections.fields(ChargerListDto.class,
                 company.companyName.as("companyName"),
                 csInfo.stationName.as("stationName"),
@@ -63,10 +73,12 @@ public class ChargerRepositoryCustomImpl implements ChargerRepositoryCustom {
                 .from(cpInfo)
                 .leftJoin(csInfo).on(cpInfo.stationId.eq(csInfo))
                 .leftJoin(company).on(csInfo.company.eq(company))
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
                 .leftJoin(commonTypeName).on(cpInfo.commonType.eq(commonTypeName.commonCode))
                 .leftJoin(model).on(cpInfo.modelCode.eq(model.modelCode))
                 .leftJoin(cpplan).on(cpInfo.planInfo.id.eq(cpplan.id))
                 .leftJoin(manufCdName).on(model.manufCd.eq(manufCdName.commonCode))
+                .where(builder)
                 .orderBy(cpInfo.regDt.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -75,6 +87,10 @@ public class ChargerRepositoryCustomImpl implements ChargerRepositoryCustom {
         long totalCount = queryFactory
                 .select(cpInfo.count())
                 .from(cpInfo)
+                .leftJoin(csInfo).on(cpInfo.stationId.eq(csInfo))
+                .leftJoin(company).on(csInfo.company.eq(company))
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
+                .where(builder)
                 .fetchOne();
 
         return new PageImpl<>(chargerList, pageable, totalCount);
@@ -82,7 +98,7 @@ public class ChargerRepositoryCustomImpl implements ChargerRepositoryCustom {
 
     @Override
     public Page<ChargerListDto> findChargerListPaging(Long companyId, String manufCd, String searchOp,
-            String searchContent, Pageable pageable) {
+            String searchContent, Pageable pageable, String levelPath, boolean isSuperAdmin) {
 
         BooleanBuilder builder = new BooleanBuilder();
 
@@ -116,6 +132,10 @@ public class ChargerRepositoryCustomImpl implements ChargerRepositoryCustom {
             }
         }
 
+        if (!isSuperAdmin && levelPath != null && !levelPath.isEmpty()) {
+            builder.and(QueryUtils.hasCompanyLevelAccess(relation, levelPath));
+        }
+
         // 동적 쿼리를 사용하여 조회
         List<ChargerListDto> chargerList = queryFactory.select(Projections.fields(ChargerListDto.class,
                 company.companyName.as("companyName"),
@@ -130,6 +150,7 @@ public class ChargerRepositoryCustomImpl implements ChargerRepositoryCustom {
                 .from(cpInfo)
                 .join(csInfo).on(cpInfo.stationId.eq(csInfo))
                 .join(company).on(csInfo.company.eq(company))
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
                 .leftJoin(commonTypeName).on(cpInfo.commonType.eq(commonTypeName.commonCode))
                 .leftJoin(model).on(cpInfo.modelCode.eq(model.modelCode))
                 .leftJoin(cpplan).on(cpInfo.planInfo.eq(cpplan))
@@ -146,6 +167,7 @@ public class ChargerRepositoryCustomImpl implements ChargerRepositoryCustom {
                 .from(cpInfo)
                 .join(csInfo).on(cpInfo.stationId.eq(csInfo))
                 .join(company).on(csInfo.company.eq(company))
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
                 .leftJoin(model).on(cpInfo.modelCode.eq(model.modelCode)) // manufCd 조건을 위해 model 조인 추가
                 .where(builder)
                 .fetchOne();
@@ -166,7 +188,17 @@ public class ChargerRepositoryCustomImpl implements ChargerRepositoryCustom {
     }
 
     @Override
-    public List<ChargerSearchDto> findChargerListByStationId(String stationId) {
+    public List<ChargerSearchDto> findChargerListByStationId(String stationId, String levelPath, boolean isSuperAdmin) {
+        BooleanBuilder builder = new BooleanBuilder();
+
+        if (stationId != null && !stationId.isEmpty()) {
+            builder.and(cpInfo.stationId.id.eq(stationId));
+        }
+
+        if (!isSuperAdmin && levelPath != null && !levelPath.isEmpty()) {
+            builder.and(QueryUtils.hasCompanyLevelAccess(relation, levelPath));
+        }
+
         List<ChargerSearchDto> chargerList = queryFactory.select(Projections.fields(ChargerSearchDto.class,
                 cpInfo.id.as("chargerId"),
                 Expressions.stringTemplate("IF({0} IS NULL OR {0} = '', '-', {0})", cpInfo.chargerName)
@@ -182,15 +214,13 @@ public class ChargerRepositoryCustomImpl implements ChargerRepositoryCustom {
                 .leftJoin(manufCdName).on(model.manufCd.eq(manufCdName.commonCode))
                 .leftJoin(cpTypeName).on(model.cpType.eq(cpTypeName.commonCode))
                 .leftJoin(hist).on(
-                    hist.chargerID.eq(cpInfo.id)
-                        .and(hist.startTime.eq(
-                            JPAExpressions
-                                .select(histSub.startTime.max())
-                                .from(histSub)
-                                .where(histSub.chargerID.eq(cpInfo.id))
-                        ))
-                )
-                .where(cpInfo.stationId.id.eq(stationId))
+                        hist.chargerID.eq(cpInfo.id)
+                                .and(hist.startTime.eq(
+                                        JPAExpressions
+                                                .select(histSub.startTime.max())
+                                                .from(histSub)
+                                                .where(histSub.chargerID.eq(cpInfo.id)))))
+                .where(builder)
                 .fetch();
         return chargerList;
     }
@@ -222,7 +252,7 @@ public class ChargerRepositoryCustomImpl implements ChargerRepositoryCustom {
 
     @Override
     public List<ChargerListDto> findAllChargerListWithoutPagination(Long companyId, String manufCd, String searchOp,
-            String searchContent) {
+            String searchContent, String levelPath, boolean isSuperAdmin) {
         log.info(
                 "=== Repository(findAllChargerListWithoutPagination): Finding all charger list >> companyId:{}, manufCd:{}, searchOp:{}, searchContent:{} ===",
                 companyId, manufCd, searchOp, searchContent);
@@ -258,6 +288,10 @@ public class ChargerRepositoryCustomImpl implements ChargerRepositoryCustom {
             }
         }
 
+        if (!isSuperAdmin && levelPath != null && !levelPath.isEmpty()) {
+            builder.and(QueryUtils.hasCompanyLevelAccess(relation, levelPath));
+        }
+
         // 대용량 데이터 처리를 위한 최적화된 쿼리
         // 필요한 필드만 선택하여 메모리 사용량 최소화
         return queryFactory.select(Projections.fields(ChargerListDto.class,
@@ -273,6 +307,7 @@ public class ChargerRepositoryCustomImpl implements ChargerRepositoryCustom {
                 .from(cpInfo)
                 .join(csInfo).on(cpInfo.stationId.eq(csInfo))
                 .join(company).on(csInfo.company.eq(company))
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
                 .leftJoin(commonTypeName).on(cpInfo.commonType.eq(commonTypeName.commonCode))
                 .leftJoin(model).on(cpInfo.modelCode.eq(model.modelCode))
                 .leftJoin(cpplan).on(cpInfo.planInfo.eq(cpplan))
@@ -283,76 +318,96 @@ public class ChargerRepositoryCustomImpl implements ChargerRepositoryCustom {
     }
 
     @Override
-    public long countCharger() {
-        return queryFactory
-            .select(cpInfo.count())
-            .from(cpInfo)
-            .fetchOne();
-    }
-
-    @Override
-    public List<ChargerCountBySidoDto> countChargerBySidoAndType() {
-        return queryFactory
-            .select(Projections.fields(ChargerCountBySidoDto.class,
-                csInfo.sido.as("sido"),
-
-                // SPEEDFAST
-                ExpressionUtils.as(
-                    Expressions.numberTemplate(Long.class,
-                        "SUM(CASE WHEN {0} = {1} THEN 1 ELSE 0 END)",
-                        model.cpType,
-                        Expressions.constant("SPEEDFAST")
-                    ),
-                    "speedFastCount"
-                ),
-
-                // SPEEDLOW
-                ExpressionUtils.as(
-                    Expressions.numberTemplate(Long.class,
-                        "SUM(CASE WHEN {0} = {1} THEN 1 ELSE 0 END)",
-                        model.cpType,
-                        Expressions.constant("SPEEDLOW")
-                    ),
-                    "speedLowCount"
-                ),
-
-                // SPEEDDESPN
-                ExpressionUtils.as(
-                    Expressions.numberTemplate(Long.class,
-                        "SUM(CASE WHEN {0} = {1} THEN 1 ELSE 0 END)",
-                        model.cpType,
-                        Expressions.constant("SPEEDDESPN")
-                    ),
-                    "speedDespnCount"
-                )
-            ))
-            .from(cpInfo)
-            .leftJoin(model).on(cpInfo.modelCode.eq(model.modelCode))
-            .leftJoin(csInfo).on(cpInfo.stationId.eq(csInfo))
-            .where(csInfo.sido.isNotNull())
-            .groupBy(csInfo.sido)
-            .orderBy(csInfo.sido.asc())
-            .fetch();
-    }
-
-    @Override
-    public List<FacilityCountDto> countFacilityBySidoAndType(String sido, String type) {
+    public long countCharger(String levelPath, boolean isSuperAdmin) {
         BooleanBuilder builder = new BooleanBuilder();
+
+        if (!isSuperAdmin && levelPath != null && !levelPath.isEmpty()) {
+            builder.and(QueryUtils.hasCompanyLevelAccess(relation, levelPath));
+        }
+
+        return queryFactory
+                .select(cpInfo.count())
+                .from(cpInfo)
+                .join(csInfo).on(cpInfo.stationId.eq(csInfo))
+                .join(company).on(csInfo.company.eq(company))
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
+                .where(builder)
+                .fetchOne();
+    }
+
+    @Override
+    public List<ChargerCountBySidoDto> countChargerBySidoAndType(String levelPath, boolean isSuperAdmin) {
+        BooleanBuilder builder = new BooleanBuilder();
+
+        builder.and(csInfo.sido.isNotNull());
+
+        if (!isSuperAdmin && levelPath != null && !levelPath.isEmpty()) {
+            builder.and(QueryUtils.hasCompanyLevelAccess(relation, levelPath));
+        }
+
+        return queryFactory
+                .select(Projections.fields(ChargerCountBySidoDto.class,
+                        csInfo.sido.as("sido"),
+
+                        // SPEEDFAST
+                        ExpressionUtils.as(
+                                Expressions.numberTemplate(Long.class,
+                                        "SUM(CASE WHEN {0} = {1} THEN 1 ELSE 0 END)",
+                                        model.cpType,
+                                        Expressions.constant("SPEEDFAST")),
+                                "speedFastCount"),
+
+                        // SPEEDLOW
+                        ExpressionUtils.as(
+                                Expressions.numberTemplate(Long.class,
+                                        "SUM(CASE WHEN {0} = {1} THEN 1 ELSE 0 END)",
+                                        model.cpType,
+                                        Expressions.constant("SPEEDLOW")),
+                                "speedLowCount"),
+
+                        // SPEEDDESPN
+                        ExpressionUtils.as(
+                                Expressions.numberTemplate(Long.class,
+                                        "SUM(CASE WHEN {0} = {1} THEN 1 ELSE 0 END)",
+                                        model.cpType,
+                                        Expressions.constant("SPEEDDESPN")),
+                                "speedDespnCount")))
+                .from(cpInfo)
+                .leftJoin(model).on(cpInfo.modelCode.eq(model.modelCode))
+                .leftJoin(csInfo).on(cpInfo.stationId.eq(csInfo))
+                .leftJoin(company).on(csInfo.company.eq(company))
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
+                .where(builder)
+                .groupBy(csInfo.sido)
+                .orderBy(csInfo.sido.asc())
+                .fetch();
+    }
+
+    @Override
+    public List<FacilityCountDto> countFacilityBySidoAndType(String sido, String type, String levelPath,
+            boolean isSuperAdmin) {
+        BooleanBuilder builder = new BooleanBuilder();
+
+        if (!isSuperAdmin && levelPath != null && !levelPath.isEmpty()) {
+            builder.and(QueryUtils.hasCompanyLevelAccess(relation, levelPath));
+        }
 
         if (sido != null && !sido.isEmpty() && type != null && !type.isEmpty()) {
             builder.and(csInfo.sido.eq(sido)).and(cpTypeName.name.eq(type));
         }
 
         return queryFactory.select(Projections.fields(FacilityCountDto.class,
-        facilityTypeName.name.as("facility"),
-            cpInfo.count().as("count")))
-            .from(cpInfo)
-            .leftJoin(csInfo).on(csInfo.id.eq(cpInfo.stationId.id))
-            .leftJoin(model).on(model.modelCode.eq(cpInfo.modelCode))
-            .leftJoin(facilityTypeName).on(facilityTypeName.commonCode.eq(csInfo.facilityType))
-            .leftJoin(cpTypeName).on(cpTypeName.commonCode.eq(model.cpType))
-            .where(builder)
-            .groupBy(facilityTypeName.name)
-            .fetch();
+                facilityTypeName.name.as("facility"),
+                cpInfo.count().as("count")))
+                .from(cpInfo)
+                .leftJoin(csInfo).on(csInfo.id.eq(cpInfo.stationId.id))
+                .leftJoin(model).on(model.modelCode.eq(cpInfo.modelCode))
+                .leftJoin(facilityTypeName).on(facilityTypeName.commonCode.eq(csInfo.facilityType))
+                .leftJoin(cpTypeName).on(cpTypeName.commonCode.eq(model.cpType))
+                .leftJoin(company).on(csInfo.company.eq(company))
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
+                .where(builder)
+                .groupBy(facilityTypeName.name)
+                .fetch();
     }
 }

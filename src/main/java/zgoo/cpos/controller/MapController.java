@@ -1,5 +1,6 @@
 package zgoo.cpos.controller;
 
+import java.security.Principal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,18 +51,19 @@ public class MapController {
 
     // 충전소, 충전기 상세 조회
     @GetMapping("/search/detail/{stationId}")
-    public ResponseEntity<Map<String, Object>> searchDetailStation(@PathVariable("stationId") String stationId) {
+    public ResponseEntity<Map<String, Object>> searchDetailStation(@PathVariable("stationId") String stationId,
+            Principal principal) {
         log.info("=== search station detail info ===");
 
         Map<String, Object> response = new HashMap<>();
-        
+
         try {
             // 충전소 정보
             CsInfoDetailDto csInfo = this.csService.findCsInfoDetailOne(stationId);
             response.put("csInfo", csInfo);
 
             // 충전기 정보
-            List<ChargerSearchDto> cpList = this.chargerService.searchChargerList(stationId);
+            List<ChargerSearchDto> cpList = this.chargerService.searchChargerList(stationId, principal.getName());
 
             if (cpList != null && !cpList.isEmpty()) {
                 response.put("cpList", cpList);
@@ -78,7 +80,8 @@ public class MapController {
 
     // 사용자 위치 기반, 주변 충전소 조회
     @GetMapping("/nearby")
-    public ResponseEntity<Map<String, Object>> getNearbyStations(@RequestParam("latitude") double latitude, @RequestParam("longitude") double longitude) {
+    public ResponseEntity<Map<String, Object>> getNearbyStations(@RequestParam("latitude") double latitude,
+            @RequestParam("longitude") double longitude) {
         log.info("=== find nearby charging stations ===");
 
         Map<String, Object> response = new HashMap<>();

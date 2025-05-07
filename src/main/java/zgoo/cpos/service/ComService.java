@@ -14,6 +14,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,9 +32,9 @@ public class ComService {
     private final MenuAuthorityRepository menuAuthorityRepository;
     private final UsersRepository usersRepository;
 
-    /* 
+    /*
      * super admin check
-     *   if) SU: true
+     * if) SU: true
      * else) false
      */
     public boolean checkSuperAdmin(String loginUserId) {
@@ -52,9 +53,9 @@ public class ComService {
         return true;
     }
 
-    /* 
+    /*
      * super admin & admin check
-     *   if) SU, AD: true
+     * if) SU, AD: true
      * else) false
      */
     public boolean checkAdmin(String loginUserId) {
@@ -73,9 +74,35 @@ public class ComService {
         return false;
     }
 
-    /* 
+    @Transactional(readOnly = true)
+    public Long getLoginUserCompanyId(String loginUserId) {
+        try {
+            Users loginUser = this.usersRepository.findUserOne(loginUserId);
+
+            log.info("=== getLoginUserCompanyId: {}", loginUser.getCompany().getId());
+            return loginUser.getCompany().getId();
+        } catch (Exception e) {
+            log.error("[getLoginUserCompanyId] error: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    @Transactional(readOnly = true)
+    public Long getLoginUserCompanyId(String loginUserId) {
+        try {
+            Users loginUser = this.usersRepository.findUserOne(loginUserId);
+
+            log.info("=== getLoginUserCompanyId: {}", loginUser.getCompany().getId());
+            return loginUser.getCompany().getId();
+        } catch (Exception e) {
+            log.error("[getLoginUserCompanyId] error: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    /*
      * mod_yn check
-     *   if) SU: true
+     * if) SU: true
      * else) AD, NO, AS: modify authority check
      */
     public boolean checkModYn(String loginUserId, String menuCode) {
@@ -90,8 +117,9 @@ public class ComService {
                 log.info("[checkModYn] Super Admin");
                 return true;
             } else {
-                MenuAuthorityBaseDto dto = this.menuAuthorityRepository.findUserMenuAuthority(loginUser.getCompany().getId(),
-                    authorityName, menuCode);
+                MenuAuthorityBaseDto dto = this.menuAuthorityRepository.findUserMenuAuthority(
+                        loginUser.getCompany().getId(),
+                        authorityName, menuCode);
                 String modYn = dto.getModYn();
 
                 log.info("[checkModYn] authority >> {}", authorityName);
@@ -102,9 +130,9 @@ public class ComService {
         return false;
     }
 
-    /* 
+    /*
      * excel_yn check
-     *   if) SU: true
+     * if) SU: true
      * else) AD, NO, AS: excel authority check
      */
     public boolean checkExcelYn(String loginUserId, String menuCode) {
@@ -119,8 +147,9 @@ public class ComService {
                 log.info("[checkExcelYn] Super Admin");
                 return true;
             } else {
-                MenuAuthorityBaseDto dto = this.menuAuthorityRepository.findUserMenuAuthority(loginUser.getCompany().getId(),
-                    authorityName, menuCode);
+                MenuAuthorityBaseDto dto = this.menuAuthorityRepository.findUserMenuAuthority(
+                        loginUser.getCompany().getId(),
+                        authorityName, menuCode);
                 String excelYn = dto.getExcelYn();
 
                 log.info("[checkExcelYn] authority >> {}", authorityName);
@@ -131,7 +160,7 @@ public class ComService {
         return false;
     }
 
-    /* 
+    /*
      * login User mod_yn authority check
      * return type: ResponseEntity<String>
      */
@@ -149,13 +178,14 @@ public class ComService {
         return null;
     }
 
-    /* 
-     * login User mod_yn authority check
-     * return type: ResponseEntity<Map<String, String>>
+    /*
+     * 로그인 사용자 권한 체크
+     * checkUserPermissions 함수와 기능동일
+     * 컨트롤러 별 다른 리턴타입에 대응
      */
     public ResponseEntity<Map<String, String>> checkUserPermissionsMsg(Principal principal, String menuCode) {
         Map<String, String> response = new HashMap<>();
-        
+
         String loginUserId = principal.getName();
         if (loginUserId == null || loginUserId.isEmpty()) {
             response.put("message", "사용자 정보를 찾을 수 없습니다.");
@@ -171,7 +201,7 @@ public class ComService {
         return null;
     }
 
-    /* 
+    /*
      * super admin check
      */
     public ResponseEntity<String> checkSuperAdminPermissions(Principal principal) {
@@ -188,7 +218,7 @@ public class ComService {
         return null;
     }
 
-    /* 
+    /*
      * admin check
      */
     public ResponseEntity<String> checkAdminPermissions(Principal principal) {
@@ -205,13 +235,13 @@ public class ComService {
         return null;
     }
 
-    /* 
+    /*
      * super admin check
      * return type: ResponseEntity<Map<String, String>>
      */
     public ResponseEntity<Map<String, String>> checkSuperAdminPermissionsMsg(Principal principal) {
         Map<String, String> response = new HashMap<>();
-        
+
         String loginUserId = principal.getName();
         if (loginUserId == null || loginUserId.isEmpty()) {
             response.put("message", "사용자 정보를 찾을 수 없습니다.");
@@ -227,7 +257,7 @@ public class ComService {
         return null;
     }
 
-    /* 
+    /*
      * login User excel_yn authority check
      */
     public boolean checkExcelPermissions(Principal principal, String menuCode) {
@@ -253,11 +283,10 @@ public class ComService {
 
         for (int year = currentYear; year >= 2024; year--) {
             yearOptions.add(
-                YearOptionDto.builder()
-                    .text(year + "년")
-                    .value(year)
-                    .build()
-            );
+                    YearOptionDto.builder()
+                            .text(year + "년")
+                            .value(year)
+                            .build());
         }
 
         return yearOptions;

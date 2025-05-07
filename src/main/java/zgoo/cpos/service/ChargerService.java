@@ -33,6 +33,7 @@ import zgoo.cpos.repository.charger.ChargerRepository;
 import zgoo.cpos.repository.charger.ConnectorStatusRepository;
 import zgoo.cpos.repository.charger.CpModemRepository;
 import zgoo.cpos.repository.code.CommonCodeRepository;
+import zgoo.cpos.repository.company.CompanyRepository;
 import zgoo.cpos.repository.company.CpPlanPolicyRepository;
 import zgoo.cpos.repository.cpmodel.CpModelRepository;
 import zgoo.cpos.repository.cs.CsRepository;
@@ -49,6 +50,8 @@ public class ChargerService {
     private final ConnectorStatusRepository connectorStatusRepository;
     private final CpModelRepository cpModelRepository;
     private final CommonCodeRepository commonCodeRepository;
+    private final ComService comService;
+    private final CompanyRepository companyRepository;
 
     /*
      * 저장 > 충전기 정보 저장
@@ -107,12 +110,20 @@ public class ChargerService {
     /*
      * 조회 > 충전기 전체 조회
      */
-    public Page<ChargerListDto> searchCpListPageAll(int page, int size) {
+    public Page<ChargerListDto> searchCpListPageAll(int page, int size, String userId) {
         log.info("=== Start search ChargerList All");
 
         Pageable pageable = PageRequest.of(page, size);
+        boolean isSuperAdmin = comService.checkSuperAdmin(userId);
+        Long loginUserCompanyId = comService.getLoginUserCompanyId(userId);
+        String levelPath = companyRepository.findLevelPathByCompanyId(loginUserCompanyId);
+        log.info("== levelPath : {}", levelPath);
+        if (levelPath == null) {
+            // 관계정보가 없을경우 빈 리스트 전달
+            return Page.empty(pageable);
+        }
         try {
-            Page<ChargerListDto> cpList = chargerRepository.findAllChargerListPaging(pageable);
+            Page<ChargerListDto> cpList = chargerRepository.findAllChargerListPaging(pageable, levelPath, isSuperAdmin);
             return cpList;
         } catch (DataAccessException dae) {
             log.error("Database error occurred while fetching cpList with pagination: {}", dae.getMessage(), dae);
@@ -128,16 +139,25 @@ public class ChargerService {
      * 조회 > 충전기 조회 with 검색조건
      */
     public Page<ChargerListDto> searchCpListPage(Long reqCompanyId, String reqManfCd, String reqOpSearch,
-            String reqSearchContent, int page, int size) {
+            String reqSearchContent, int page, int size, String userId) {
 
         Pageable pageable = PageRequest.of(page, size);
+
+        boolean isSuperAdmin = comService.checkSuperAdmin(userId);
+        Long loginUserCompanyId = comService.getLoginUserCompanyId(userId);
+        String levelPath = companyRepository.findLevelPathByCompanyId(loginUserCompanyId);
+        log.info("== levelPath : {}", levelPath);
+        if (levelPath == null) {
+            // 관계정보가 없을경우 빈 리스트 전달
+            return Page.empty(pageable);
+        }
 
         log.info("=== Start search ChargerList with conditions >> companyId:{}, manufcd:{}, condition:{}, content:{}",
                 reqCompanyId, reqManfCd, reqOpSearch, reqSearchContent);
 
         try {
             Page<ChargerListDto> cpList = chargerRepository.findChargerListPaging(reqCompanyId, reqManfCd, reqOpSearch,
-                    reqSearchContent, pageable);
+                    reqSearchContent, pageable, levelPath, isSuperAdmin);
             return cpList;
         } catch (DataAccessException dae) {
             log.error("Database error occurred while fetching cpList with pagination: {}", dae.getMessage(), dae);
@@ -165,11 +185,15 @@ public class ChargerService {
     /*
      * 충전기 커넥터 상태 조회
      */
-    public List<ConnectorStatusDto> searchConStatListAll() {
+    public List<ConnectorStatusDto> searchConStatListByChargerIds(List<String> chargerIds) {
+        if (chargerIds == null || chargerIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+
         try {
-            return connectorStatusRepository.findAllConnectorStatusList();
+            return connectorStatusRepository.findConnectorStatusByChargerIds(chargerIds);
         } catch (Exception e) {
-            log.error("Error while fetching connector_status list:{}", e.getMessage(), e);
+            log.error("Error occurred while fetching connector status by charger IDs: {}", e.getMessage(), e);
             return Collections.emptyList();
         }
     }
@@ -177,9 +201,13 @@ public class ChargerService {
     /*
      * stationId로 충전기 전체 조회
      */
-    public List<ChargerSearchDto> searchChargerList(String stationId) {
+    public List<ChargerSearchDto> searchChargerList(String stationId, String userId) {
         try {
-            List<ChargerSearchDto> chargerList = chargerRepository.findChargerListByStationId(stationId);
+            boolean isSuperAdmin = comService.checkSuperAdmin(userId);
+            Long loginUserCompanyId = comService.getLoginUserCompanyId(userId);
+            String levelPath = companyRepository.findLevelPathByCompanyId(loginUserCompanyId);
+            List<ChargerSearchDto> chargerList = chargerRepository.findChargerListByStationId(stationId, levelPath,
+                    isSuperAdmin);
 
             for (ChargerSearchDto dto : chargerList) {
                 String chargerId = dto.getChargerId();
@@ -273,56 +301,102 @@ public class ChargerService {
      */
     @Transactional(readOnly = true)
     public List<ChargerListDto> findAllChargerListWithoutPagination(Long companyId, String manufCd,
-            String searchOp, String searchContent) {
+            String searchOp, String searchContent, String userId) {
         log.info("=== Finding all charger list: companyId={}, manufCd={}, searchOp={}, searchContent={} ===",
                 companyId, manufCd, searchOp, searchContent);
 
-        // 대용량 데이터 처리를 위한 스트림 처리 또는 배치 처리 고려
-        return chargerRepository.findAllChargerListWithoutPagination(companyId, manufCd, searchOp, searchContent);
+        boolean isSuperAdmin = comService.checkSuperAdmin(userId);
+        Long loginUserCompanyId = comService.getLoginUserCompanyId(userId);
+        String levelPath = companyRepository.findLevelPathByCompanyId(loginUserCompanyId);
+        log.info("== levelPath : {}", levelPath);
+        if (levelPath == null) {
+            // 관계정보가 없을경우 빈 리스트 전달
+            return Collections.emptyList();
+        }
+
+        try {
+            return chargerRepository.findAllChargerListWithoutPagination(companyId, manufCd, searchOp, searchContent,
+                    levelPath, isSuperAdmin);
+        } catch (Exception e) {
+            log.error("Error occurred while fetching all charger list without pagination: {}", e.getMessage(), e);
+            return Collections.emptyList();
+        }
     }
 
-    /* 
+    /*
      * 총 충전기
      */
-    public long countCharger() {
+    public long countCharger(String userId) {
         try {
-            return chargerRepository.countCharger();
+            boolean isSuperAdmin = comService.checkSuperAdmin(userId);
+            Long loginUserCompanyId = comService.getLoginUserCompanyId(userId);
+            String levelPath = companyRepository.findLevelPathByCompanyId(loginUserCompanyId);
+            log.info("== levelPath : {}", levelPath);
+            if (levelPath == null) {
+                // 관계정보가 없을경우 빈 리스트 전달
+                return 0;
+            }
+            return chargerRepository.countCharger(levelPath, isSuperAdmin);
         } catch (Exception e) {
             log.error("[ChargerService >> countCharger] error:", e.getMessage(), e);
             return 0;
         }
     }
 
-    /* 
+    /*
      * 충전기 상태
      */
-    public ConnectorStatusCountDto getConnectorStatusCount() {
+    public ConnectorStatusCountDto getConnectorStatusCount(String userId) {
         try {
-            return connectorStatusRepository.getConnectorStatusCount();
+            boolean isSuperAdmin = comService.checkSuperAdmin(userId);
+            Long loginUserCompanyId = comService.getLoginUserCompanyId(userId);
+            String levelPath = companyRepository.findLevelPathByCompanyId(loginUserCompanyId);
+            log.info("== levelPath : {}", levelPath);
+            if (levelPath == null) {
+                // 관계정보가 없을경우 빈 리스트 전달
+                return null;
+            }
+            return connectorStatusRepository.getConnectorStatusCount(levelPath, isSuperAdmin);
         } catch (Exception e) {
             log.error("[ChargerService >> getConnectorStatusCount] error:", e.getMessage(), e);
             return null;
         }
     }
 
-    /* 
+    /*
      * 충전기 설치 현황(대시보드)
      */
-    public List<ChargerCountBySidoDto> countChargerBySidoAndType() {
+    public List<ChargerCountBySidoDto> countChargerBySidoAndType(String userId) {
         try {
-            return chargerRepository.countChargerBySidoAndType();
+            boolean isSuperAdmin = comService.checkSuperAdmin(userId);
+            Long loginUserCompanyId = comService.getLoginUserCompanyId(userId);
+            String levelPath = companyRepository.findLevelPathByCompanyId(loginUserCompanyId);
+            log.info("== levelPath : {}", levelPath);
+            if (levelPath == null) {
+                // 관계정보가 없을경우 빈 리스트 전달
+                return new ArrayList<>();
+            }
+            return chargerRepository.countChargerBySidoAndType(levelPath, isSuperAdmin);
         } catch (Exception e) {
             log.error("[ChargerService >> countChargerBySidoAndType] error:", e.getMessage(), e);
             return new ArrayList<>();
         }
     }
 
-    /* 
+    /*
      * 사용용도(대시보드)
      */
-    public List<FacilityCountDto> countFacilityBySidoAndType(String sido, String type) {
+    public List<FacilityCountDto> countFacilityBySidoAndType(String sido, String type, String userId) {
         try {
-            return this.chargerRepository.countFacilityBySidoAndType(sido, type);
+            boolean isSuperAdmin = comService.checkSuperAdmin(userId);
+            Long loginUserCompanyId = comService.getLoginUserCompanyId(userId);
+            String levelPath = companyRepository.findLevelPathByCompanyId(loginUserCompanyId);
+            log.info("== levelPath : {}", levelPath);
+            if (levelPath == null) {
+                // 관계정보가 없을경우 빈 리스트 전달
+                return new ArrayList<>();
+            }
+            return chargerRepository.countFacilityBySidoAndType(sido, type, levelPath, isSuperAdmin);
         } catch (Exception e) {
             log.error("[ChargerService >> countFacilityBySidoAndType] error:", e.getMessage(), e);
             return new ArrayList<>();

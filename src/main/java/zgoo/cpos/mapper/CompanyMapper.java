@@ -92,11 +92,10 @@ public class CompanyMapper {
      * relation(dto >> entity)
      */
     public static CompanyRelationInfo toEntityRelation(CompanyRegDto dto) {
-        CompanyRelationInfo companyRelationInfo = CompanyRelationInfo.builder()
-                .parentCompanyName(dto.getParentCompanyName())
+        return CompanyRelationInfo.builder()
+                .parentCompany(null)
+                .levelPath(dto.getLevelPath())
                 .build();
-
-        return companyRelationInfo;
     }
     /*
      * relation(entity >> dto)

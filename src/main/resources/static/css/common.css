@@ -1351,3 +1351,27 @@ table.table tbody tr.row-selected {
   right: 16px;
   font-size: 13px;
 }
+
+/* 통신이력 테이블 컬럼 너비 고정 */
+.table-responsive table th,
+.table-responsive table td {
+  white-space: nowrap;
+}
+
+.table-responsive table th:nth-child(3),
+.table-responsive table td:nth-child(3) {
+  max-width: 300px;
+  width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.table-responsive table th:nth-child(5),
+.table-responsive table td:nth-child(5) {
+  max-width: 300px;
+  width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
