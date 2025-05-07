@@ -87,7 +87,6 @@
                                     <th scope="col">계정과목</th>
                                     <th scope="col">공급가액</th>
                                     <th scope="col">부가세</th>
-                                    <th scope="col">부담금</th>
                                     <th scope="col">합계</th>
                                     <th scope="col">지불방법</th>
                                     <th scope="col">승인번호</th>
@@ -112,14 +111,13 @@
                                     <td th:text="${pur.accountCodeName}"></td>
                                     <td th:text="${pur.supplyPrice}" class="int-format"></td>
                                     <td th:text="${pur.vat}" class="int-format"></td>
-                                    <td th:text="${pur.charge}" class="int-format"></td>
                                     <td th:text="${pur.totalAmount}" class="int-format"></td>
                                     <td th:text="${pur.paymentMethodName}"></td>
                                     <td th:text="${pur.approvalNo}"></td>
                                     <td th:text="${pur.purchaseDate}"></td>
                                 </tr>
                                 <tr th:if="${purList.size() == 0}">
-                                    <td colspan="11">조회된 데이터가 없습니다.</td>
+                                    <td colspan="10">조회된 데이터가 없습니다.</td>
                                 </tr>
                             </tbody>
                         </table>                                
@@ -256,24 +254,47 @@
                                         <input type="number" name="vat" id="vat" class="form-control" autocomplete="off" value="0" required>
                                     </td>
                                 </tr>
-                                <tr id="elecContainer" hidden>
+                                <tr id="elecContainer" class="elec-content" hidden>
                                     <th class="w-20">부담금<b class="required-data">*</b></th>
                                     <td class="w-30">
                                         <input type="number" name="charge" id="charge" class="form-control" autocomplete="off" value="0" required>
                                     </td>
-                                    <th class="w-20">합계액<b class="required-data">*</b></th>
+                                    <th class="w-20">가산금<b class="required-data">*</b></th>
                                     <td class="w-30">
-                                        <input type="number" name="totalAmountSub" id="totalAmountSub" class="form-control"
-                                            autocomplete="off" value="0" disabled required>
+                                        <input type="number" name="surcharge" id="surcharge" class="form-control" autocomplete="off" value="0" required>
                                     </td>
-                                </tr>  
+                                </tr>
+                                <tr id="elecContainerSec" hidden>
+                                    <th class="w-20">절사액<b class="required-data">*</b></th>
+                                    <td class="w-30">
+                                        <input type="number" name="cutoffAmount" id="cutoffAmount" class="form-control"
+                                            autocomplete="off" value="0" required>
+                                    </td>
+                                    <th class="w-20">미납금액<b class="required-data">*</b></th>
+                                    <td class="w-30">
+                                        <input type="number" name="unpaidAmount" id="unpaidAmount" class="form-control"
+                                            autocomplete="off" value="0" required>
+                                    </td>
+                                </tr>
                                 <tr id="totalContainer">
                                     <th class="w-20">합계액<b class="required-data">*</b></th>
                                     <td class="w-30">
                                         <input type="number" name="totalAmount" id="totalAmount" class="form-control"
-                                            autocomplete="off" value="0" disabled required>
+                                            autocomplete="off" value="0" required>
                                     </td>
                                     <td colspan="2"></td>
+                                </tr>
+                                <tr id="totalContainerSec" hidden>
+                                    <th class="w-20">합계액<b class="required-data">*</b></th>
+                                    <td class="w-30">
+                                        <input type="number" name="totalAmountSub" id="totalAmountSub" class="form-control"
+                                            autocomplete="off" value="0" required>
+                                    </td>
+                                    <th class="w-20">사용량(kWh)<b class="required-data">*</b></th>
+                                    <td class="w-30">
+                                        <input type="number" name="power" id="power" class="form-control"
+                                            autocomplete="off" value="0" required>
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
@@ -296,7 +317,7 @@
     <div class="modal fade" id="stationSearchModal" tabindex="-1" aria-labelledby="stationSearchModalLabel"
         style="z-index: 1056;" data-bs-backdrop="static" data-bs-keyboard="false" role="dialog">
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width: 60vw;">
-            <div class="modal-content overflow-y-auto scrollbar station-search-content">
+            <div class="modal-content overflow-y-auto scrollbar station-search-content min-76vh">
                 <div class="modal-body">
                     <div class="modal-title mb-2"><span class="modal-title-bar"></span><span>충전소 조회</span></div>
                     <div id="stationSearchContainer">
@@ -309,7 +330,7 @@
                         <button type="button" class="btn btn-outline-grey ms-2" id="stationOpSearchBtn">
                             <i class="bi bi-search"></i>검색</button>
                     </div>
-                    <span>검색결과</span>
+                    <span class="font-sw-m">검색결과</span>
                     <div class="w-100 table-responsive scroll-table-container">
                         <table class="table table-bg table-hover text-center" id="stationTable">
                             <thead>
@@ -338,38 +359,38 @@
     <div class="modal fade" id="elecModal" tabindex="-1" aria-labelledby="elecModalLabel"
         style="z-index: 1056;" data-bs-backdrop="static" data-bs-keyboard="false" role="dialog">
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width: 60vw;">
-            <div class="modal-content overflow-y-auto scrollbar station-search-content">
-                <div class="modal-body">
-                    <div class="modal-title mb-2"><span class="modal-title-bar"></span><span>충전소 조회</span></div>
-                    <div id="stationSearchContainer">
-                        <select class="form-control" id="searchStation">
-                            <option th:value="stationName">충전소명</option>
-                            <option th:value="stationId">충전소ID</option>
-                        </select>
-                        <input type="text" name="stationOpSearch" id="stationOpSearch" class="form-control"
-                            placeholder="검색어를 입력하세요" autocomplete="off" th:value="null">
-                        <button type="button" class="btn btn-outline-grey ms-2" id="stationOpSearchBtn">
-                            <i class="bi bi-search"></i>검색</button>
-                    </div>
-                    <span>검색결과</span>
-                    <div class="w-100 table-responsive scroll-table-container">
-                        <table class="table table-bg table-hover text-center" id="stationTable">
-                            <thead>
-                                <tr>
-                                    <th scope="col" class="w-40">충전소명</th>
-                                    <th scope="col" class="w-40">충전소ID</th>
-                                    <th scope="col" class="w-20"></th>
-                                </tr>
-                            </thead>
-                            <tbody id="stationSearchList" class="vertical-align-middle">
-                                <tr>
-                                    <td colspan="3">조회된 데이터가 없습니다.</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <button type="button" class="btn btn-outline-grey close-modal-btn" id="stationModalBtn"
-                        data-bs-dismiss="modal">닫기</button>
+            <div class="modal-content overflow-y-auto scrollbar elec-file-content min-76vh">
+                <div class="modal-body" style="padding-bottom: 4rem !important;">
+                    <form id="elecForm">
+                        <div class="modal-title mb-2"><span class="modal-title-bar"></span><span>한전전기요금</span></div>
+                        <input type="file" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                                name="excelFile" id="excelFile" class="form-control w-50 mt-2" onchange="excelRead(event)">
+                        <div class="mt-3" style="display: flex; justify-content: space-between; align-items: end; margin-bottom: 0.4rem !important;">
+                            <span class="font-sw-m">업로드 데이터</span>
+                            <button type="button" class="btn btn-outline-grey" id="elecSaveBtn" disabled></i>저장</button>
+                        </div>
+                        <div class="w-100 table-responsive scroll-table-container">
+                            <table class="table table-bg table-hover text-center" id="elecTable" style="min-width: 1260px;">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">고객번호</th>
+                                        <th scope="col">사용량(KWH)</th>
+                                        <th scope="col">공급가액</th>
+                                        <th scope="col">부가세</th>
+                                        <th scope="col">부담금</th>
+                                        <th scope="col">가산금</th>
+                                        <th scope="col">절사액</th>
+                                        <th scope="col">미납금액</th>
+                                        <th scope="col">청구요금</th>
+                                        <th scope="col">납부방법</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="elecList" class="vertical-align-middle"></tbody>
+                            </table>
+                        </div>
+                        <button type="button" class="btn btn-outline-grey close-modal-btn" id="elecModalBtn"
+                            data-bs-dismiss="modal">닫기</button>
+                    </form>
                 </div>
             </div>
         </div>
@@ -378,19 +399,110 @@
 
     <script type="text/javascript" th:src="@{/js/calc/purchase.js}"></script>
     <script type="text/javascript">
+        const $elecSaveBtn = $('#elecSaveBtn');
+
         function excelRead(event) {
             let input = event.target;
             let reader = new FileReader();
             reader.onload = function () {
                 let data = reader.result;
-                let workBook = XLSX.read(data, { type: 'binary' });
-                workBook.SheetNames.forEach(function (sheetName) {
-                    console.log('SheetName: ' + sheetName);
-                    let rows = XLSX.utils.sheet_to_json(workBook.Sheets[sheetName]);
-                    console.log(JSON.stringify(rows));
-                })
+                let workbook = XLSX.read(data, { type: 'binary' });
+
+                workbook.SheetNames.forEach(function (sheetName) {
+                    // console.log('SheetName: ' + sheetName);
+
+                    // 배열 형태로 읽기 (header: 1 옵션)
+                    let rows = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], { header: 1 });
+                    // console.log('Raw rows:', rows);
+
+                    // 빈 배열 제거
+                    rows = rows.filter(row => row.some(cell => cell !== undefined && cell !== ""));
+
+                    if (rows.length < 2) {
+                        console.error('데이터가 없습니다.');
+                        return;
+                    }
+
+                    // 첫 번째 줄을 헤더로 사용
+                    const headers = rows[0];
+                    const dataRows = rows.slice(1);
+
+                    // 데이터 재구성 (헤더 키: 값 매칭)
+                    const jsonData = dataRows.map(row => {
+                        let obj = {};
+                        headers.forEach((header, index) => {
+                            obj[header] = row[index] ?? "";
+                        });
+                        return obj;
+                    });
+
+                    // console.log('Parsed JSON:', JSON.stringify(jsonData));
+
+                    displayData(jsonData);
+                });
             };
-            reader.readAsBinaryString(input.files[0]);
+            reader.readAsArrayBuffer(input.files[0]);
+        }
+
+        function displayData(data) {
+            const tbody = document.getElementById('elecList');
+            tbody.innerHTML = "";
+
+            const requiredFields = [
+                "고객번호", "사용량(KWH)", "공급가액", "부가세", "부담금", 
+                "가산금", "절사액", "미납금액", "청구요금", "납부방법"
+            ];
+
+            const allDataEmpty = data.every(row =>
+                requiredFields.every(field => !row[field])
+            );
+
+            const actualHeaders = Object.keys(data[0] || {});
+            const headerMismatch = requiredFields.some(header => !actualHeaders.includes(header));
+
+            if (allDataEmpty || headerMismatch) {
+                alert("파일 형식이 일치하지 않습니다.");
+                $elecSaveBtn.prop('disabled', true);
+
+                const tr = document.createElement('tr');
+                const td = document.createElement('td');
+                td.colSpan = 10;
+                td.textContent = "업로드된 데이터가 없습니다.";
+                tr.appendChild(td);
+                tbody.appendChild(tr);
+                
+                return;
+            }
+
+            data.forEach(row => {
+                const kepCustNo = row["고객번호"] ?? "";
+                const power = row["사용량(KWH)"] ?? "";
+                const supplyPrice = row["공급가액"] ?? "";
+                const vat = row["부가세"] ?? "";
+                const charge = row["부담금"] ?? "";
+                const surcharge = row["가산금"] ?? "";
+                const cutoffAmount = row["절사액"] ?? "";
+                const unpaidAmount = row["미납금액"] ?? "";
+                const totalAmount = row["청구요금"] ?? "";
+                const paymentMethod = row["납부방법"] ?? "";
+
+                if (!kepCustNo && !power && !supplyPrice && !vat && !charge && !surcharge &&
+                    !cutoffAmount && !unpaidAmount && !totalAmount && !paymentMethod) {
+                    return;
+                }
+
+                const tr = document.createElement('tr');
+                [kepCustNo, power, supplyPrice, vat, charge, surcharge, cutoffAmount, unpaidAmount,
+                    totalAmount, paymentMethod].forEach(cellData => {
+                    const td = document.createElement('td');
+                    td.textContent = cellData;
+                    tr.appendChild(td);
+                });
+
+                tbody.appendChild(tr);
+            });
+            
+            $elecSaveBtn.prop('disabled', false);
         }
     </script>
 </div>

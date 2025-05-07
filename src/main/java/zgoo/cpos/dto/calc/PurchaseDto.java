@@ -1,6 +1,7 @@
 package zgoo.cpos.dto.calc;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -28,7 +29,11 @@ public class PurchaseDto {
         private Integer supplyPrice;
         private Integer vat;
         private Integer charge;
+        private Integer surcharge;
+        private Integer cutoffAmount;
+        private Integer unpaidAmount;
         private Integer totalAmount;
+        private Integer power;
         private LocalDate purchaseDate;
     }
 
@@ -54,6 +59,7 @@ public class PurchaseDto {
         private String item;
         private Integer unitPrice;
         private Integer amount;
+        private String kepcoCustNo;
     }
 
     @Data
@@ -78,5 +84,13 @@ public class PurchaseDto {
     public static class PurchaseDetailDto extends PurchaseRegDto {
         private String accountCodeName;
         private String paymentMethodName;
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class PurchaseElecDto {
+        private List<PurchaseRegDto> electricity;
     }
 }

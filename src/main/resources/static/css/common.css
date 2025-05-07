@@ -844,10 +844,7 @@ table.table tbody tr.row-selected {
   filter: blur(1px);
   transition: filter 0.3s;
 }
-
-.biz-search-content,
-.mem-search-content,
-.station-search-content {
+.min-76vh {
   min-height: 76vh;
 }
 .biz-search-content .modal-body,
@@ -871,9 +868,7 @@ table.table tbody tr.row-selected {
   width: 130px !important;
   margin-right: 10px;
 }
-.biz-search-content .modal-body span:nth-of-type(1),
-.mem-search-content .modal-body span:nth-of-type(1),
-.station-search-content .modal-body span:nth-of-type(1) {
+.font-sw-m {
   font-size: 18px;
   font-weight: 600;
 }

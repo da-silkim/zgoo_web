@@ -1,5 +1,6 @@
 package zgoo.cpos.mapper;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import zgoo.cpos.domain.calc.PurchaseInfo;
@@ -26,7 +27,41 @@ public class PurchaseMapper {
                 .supplyPrice(dto.getSupplyPrice())
                 .vat(dto.getVat())
                 .charge(dto.getCharge())
+                .surcharge(dto.getSurcharge())
+                .cutoffAmount(dto.getCutoffAmount())
+                .unpaidAmount(dto.getUnpaidAmount())
                 .totalAmount(dto.getTotalAmount())
+                .power(dto.getPower())
+                .delYn("N")
+                .regUserId(regUserId)
+                .regDt(LocalDateTime.now())
+                .build();
+        return purchase;
+    }
+
+    /* 
+     * dto >> entity(electricity)
+     */
+    public static PurchaseInfo toEntityElec(PurchaseRegDto dto, CsInfo station, String regUserId) {
+        PurchaseInfo purchase = PurchaseInfo.builder()
+                .station(station)
+                .approvalNo(null)
+                .purchaseDate(LocalDate.now())
+                .accountCode("ELCFEE")
+                .bizNum("120-82-00052")
+                .bizName("한국전력공사")
+                .item(null)
+                .paymentMethod(dto.getPaymentMethod())
+                .unitPrice(dto.getSupplyPrice())
+                .amount(1)
+                .supplyPrice(dto.getSupplyPrice())
+                .vat(dto.getVat())
+                .charge(dto.getCharge())
+                .surcharge(dto.getSurcharge())
+                .cutoffAmount(dto.getCutoffAmount())
+                .unpaidAmount(dto.getUnpaidAmount())
+                .totalAmount(dto.getTotalAmount())
+                .power(dto.getPower())
                 .delYn("N")
                 .regUserId(regUserId)
                 .regDt(LocalDateTime.now())

@@ -16,6 +16,7 @@ import zgoo.cpos.domain.calc.PurchaseInfo;
 import zgoo.cpos.domain.cs.CsInfo;
 import zgoo.cpos.dto.calc.PurchaseDto.PurchaseAccountDto;
 import zgoo.cpos.dto.calc.PurchaseDto.PurchaseDetailDto;
+import zgoo.cpos.dto.calc.PurchaseDto.PurchaseElecDto;
 import zgoo.cpos.dto.calc.PurchaseDto.PurchaseListDto;
 import zgoo.cpos.dto.calc.PurchaseDto.PurchaseRegDto;
 import zgoo.cpos.mapper.PurchaseMapper;
@@ -119,6 +120,38 @@ public class PurchaseService {
         } catch (Exception e) {
             log.error("[savePurchase] error: {}", e.getMessage());
         }
+    }
+
+    // 한전 등록
+    @Transactional
+    public int savePurchaseElec(PurchaseElecDto dtos, String regUserId) {
+        List<PurchaseRegDto> regDtos = dtos.getElectricity();
+        int count = 0;
+
+        try {
+            for (PurchaseRegDto dto : regDtos) {
+                CsInfo station = this.csRepository.findStationByKepcoCustNo(dto.getKepcoCustNo());
+
+                if (station == null) {
+                    log.warn("충전소에 등록되지 않은 고객번호입니다. kepcoCustNo: {}", dto.getKepcoCustNo());
+                    continue;
+                }
+
+                if ("자동이체".equals(dto.getPaymentMethod())) {
+                    dto.setPaymentMethod("PM05");
+                } else {
+                    dto.setPaymentMethod("PM07");  // 직접입금
+                }
+                
+                PurchaseInfo purchase = PurchaseMapper.toEntityElec(dto, station, regUserId);
+                this.purchaseRepository.save(purchase);
+                count++;
+            }
+        } catch (Exception e) {
+            log.error("[savePurchaseElec] error: {}", e.getMessage());
+        }
+
+        return count;
     }
 
     // 매입 수정

@@ -3,13 +3,21 @@ $(document).ready(function() {
     let selectRow, btnMsg = "등록";
     var id, accountCode;
     const elecContainer = document.getElementById('elecContainer');
+    const elecContainerSec = document.getElementById('elecContainerSec');
     const totalContainer = document.getElementById('totalContainer');
+    const totalContainerSec = document.getElementById('totalContainerSec');
     const supplyPrice = document.getElementById('supplyPrice');
     const loadBtn = document.getElementById('loadBtn');
     const vat = document.getElementById('vat');
     const totalAmount = document.getElementById('totalAmount');
     const totalAmountSub = document.getElementById('totalAmountSub');
     const charge = document.getElementById('charge');
+    const surcharge = document.getElementById('surcharge');
+    const cutoffAmount = document.getElementById('cutoffAmount');
+    const unpaidAmount = document.getElementById('unpaidAmount');
+    const power = document.getElementById('power');
+    const setValue = (element, value) => element.value = value;
+    const setHidden = (element, hidden) => element.hidden = hidden;
 
     $('#size').on('change', function() {
         updatePageSize(this, "/calc/purchase", ["opSearch", "contentSearch", "startDate", "endDate"]);
@@ -22,7 +30,9 @@ $(document).ready(function() {
             case 'ELCFEE':
                 loadBtn.hidden = true;
                 elecContainer.hidden = false;
+                elecContainerSec.hidden = false;
                 totalContainer.hidden = true;
+                totalContainerSec.hidden = false;
                 elecCon = true;
                 console.log("전기료");
                 break;
@@ -30,13 +40,17 @@ $(document).ready(function() {
             case 'SMFEE':
                 loadBtn.hidden = false;
                 elecContainer.hidden = true;
+                elecContainerSec.hidden = true;
                 totalContainer.hidden = false;
+                totalContainerSec.hidden = true;
                 elecCon = false;
                 break;
             default:
                 loadBtn.hidden = true;
                 elecContainer.hidden = true;
+                elecContainerSec.hidden = true;
                 totalContainer.hidden = false;
+                totalContainerSec.hidden = true;
                 elecCon = false;
                 break;
         }
@@ -45,8 +59,77 @@ $(document).ready(function() {
     $('#pageList').on('click', 'tr', function() {
         selectRow = $(this);
         id = selectRow.find('td').eq(0).attr('id');
-        console.log("id: ", id);
     });
+
+    $('#elecBtn').on('click', function(event) {
+        event.preventDefault();
+        $('#elecForm')[0].reset();
+        $('#elecSaveBtn').prop('disabled', true);
+        document.getElementById('elecList').innerHTML = '<tr><td colspan="10">업로드된 데이터가 없습니다.</td></tr>';
+    });
+
+    $('#elecSaveBtn').on('click', function(event) {
+        event.preventDefault();
+        if (confirmSubmit("저장")) {
+            const DATA = {
+                electricity: getElecList()
+            };
+
+            $.ajax({
+                url: `/purchase/new/elec`,
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(DATA),
+                success: function(response) {
+                    alert(response);
+                    window.location.reload();
+                },
+                error: function(xhr, status, error) {
+                    alert(xhr.responseText);
+                }
+            });
+        }
+    });
+
+    function getElecList() {
+        const elecInfoList = [];
+        const tbody = document.getElementById('elecList');
+        const rows = tbody.querySelectorAll('tr');
+
+        rows.forEach(tr => {
+            const tds = tr.querySelectorAll('td');
+            const kepcoCustNo = tds[0]?.textContent.trim() || "";
+            const powerInfo = tds[1]?.textContent.trim() || "";
+            const supplyPriceInfo = tds[2]?.textContent.trim() || "";
+            const vatInfo = tds[3]?.textContent.trim() || "";
+            const chargeInfo = tds[4]?.textContent.trim() || "";
+            const surchargeInfo = tds[5]?.textContent.trim() || "";
+            const cutoffInfo = tds[6]?.textContent.trim() || "";
+            const unpaidInfo = tds[7]?.textContent.trim() || "";
+            const totalInfo = tds[8]?.textContent.trim() || "";
+            const paymentInfo = tds[9]?.textContent.trim() || "";
+
+            if (!kepcoCustNo && !powerInfo && !supplyPriceInfo && !vatInfo && !chargeInfo &&
+                !surchargeInfo && !cutoffInfo && !unpaidInfo && !totalInfo && !paymentInfo) {
+                return;
+            }
+
+            elecInfoList.push({
+                kepcoCustNo: kepcoCustNo,
+                power: powerInfo,
+                supplyPrice: supplyPriceInfo,
+                vat: vatInfo,
+                charge: chargeInfo,
+                surcharge: surchargeInfo,
+                cutoffAmount: cutoffInfo,
+                unpaidAmount: unpaidInfo,
+                totalAmount: totalInfo,
+                paymentMethod: paymentInfo
+            });
+        });
+        // console.log(elecInfoList);
+        return elecInfoList;
+    }
 
     $('#addBtn').on('click', function(event) {
         event.preventDefault();
@@ -59,7 +142,9 @@ $(document).ready(function() {
         $('#stationOpSearch').val('');
         loadBtn.hidden = true;
         elecContainer.hidden = true;
+        elecContainerSec.hidden = true;
         totalContainer.hidden = false;
+        totalContainerSec.hidden = true;
         document.getElementById('stationSearchList').innerHTML = '<tr><td colspan="3">조회된 데이터가 없습니다.</td></tr>';
     });
 
@@ -83,21 +168,19 @@ $(document).ready(function() {
             success: function(data) {
                 $('#accountCode').val(data.accountCode);
 
-                if (data.accountCode === 'ELCFEE') {
-                    elecContainer.hidden = false;
-                    totalContainer.hidden = true;
-                    totalAmount.value = 0;
-                    totalAmountSub.value = data.totalAmount;
-                    charge.value = data.charge;
-                    elecCon = true;
-                } else {
-                    elecContainer.hidden = true;
-                    totalContainer.hidden = false;
-                    totalAmount.value = data.totalAmount;
-                    totalAmountSub.value = 0;
-                    charge.value = 0;
-                    elecCon = false;
-                }
+                const isElec = data.accountCode === 'ELCFEE';
+                setHidden(elecContainer, !isElec);
+                setHidden(elecContainerSec, !isElec);
+                setHidden(totalContainer, isElec);
+                setHidden(totalContainerSec, !isElec);
+                setValue(totalAmount, isElec ? 0 : data.totalAmount);
+                setValue(totalAmountSub, isElec ? data.totalAmount : 0);
+                setValue(charge, isElec ? data.charge : 0);
+                setValue(surcharge, isElec ? data.surcharge : 0);
+                setValue(cutoffAmount, isElec ? data.cutoffAmount : 0);
+                setValue(unpaidAmount, isElec ? data.unpaidAmount : 0);
+                setValue(power, isElec ? data.power : 0);
+                elecCon = isElec;
 
                 $('#item').val(data.item);
                 $('#bizName').val(data.bizName);
@@ -170,6 +253,10 @@ $(document).ready(function() {
             supplyPrice: $('#supplyPrice').val(),
             vat: $('#vat').val(),
             charge: elecCon ? charge.value : null,
+            surcharge: elecCon ? surcharge.value : null,
+            cutoffAmount: elecCon ? cutoffAmount.value : null,
+            unpaidAmount: elecCon ? unpaidAmount.value : null,
+            power: elecCon ? power.value : null,
             totalAmount: elecCon ? totalAmountSub.value : totalAmount.value
         };
 
@@ -243,12 +330,10 @@ $(document).ready(function() {
     });
 
     function updateTotalAmount() {
+        if (elecCon) return;
         const supply = parseInt(supplyPrice.value, 10) || 0;
         const vatVal = parseInt(vat.value, 10) || 0;
-        const chargeVal = parseInt(charge.value, 10) || 0;
-
         totalAmount.value = supply + vatVal || 0;
-        totalAmountSub.value = supply + vatVal + chargeVal || 0;
     }
 
     supplyPrice.addEventListener('input', function() {
@@ -257,7 +342,6 @@ $(document).ready(function() {
     });
 
     vat.addEventListener('input', updateTotalAmount);
-    charge.addEventListener('input', updateTotalAmount);
 
     $('#loadBtn').on('click', function() {
         if ($('#stationId').val().trim() === '') {

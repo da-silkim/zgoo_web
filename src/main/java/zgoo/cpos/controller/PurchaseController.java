@@ -24,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import zgoo.cpos.dto.calc.PurchaseDto.PurchaseAccountDto;
 import zgoo.cpos.dto.calc.PurchaseDto.PurchaseDetailDto;
+import zgoo.cpos.dto.calc.PurchaseDto.PurchaseElecDto;
 import zgoo.cpos.dto.calc.PurchaseDto.PurchaseRegDto;
 import zgoo.cpos.dto.cs.CsInfoDto.StationSearchDto;
 import zgoo.cpos.service.ComService;
@@ -149,6 +150,34 @@ public class PurchaseController {
             log.error("[createPurchase] error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                                     .body("매입 정보 등록 중 오류가 발생했습니다.");
+        }
+    }
+
+    // 한전 등록
+    @PostMapping("/new/elec")
+    public ResponseEntity<String> createPurchaseElec(@Valid @RequestBody PurchaseElecDto dto, Principal principal) {
+        log.info("=== create putchase electricity info ===");
+
+        try {
+            ResponseEntity<String> permissionCheck = this.comService.checkUserPermissions(principal,
+                    MenuConstants.CALC_PURCHASE);
+            if (permissionCheck != null) {
+                return permissionCheck;
+            }
+
+            log.info("dot >> {}", dto.toString());
+            int success = this.purchaseService.savePurchaseElec(dto, principal.getName());
+            int total = dto.getElectricity() != null ? dto.getElectricity().size() : 0;
+
+            if (success == total) {
+                return ResponseEntity.ok("모든 정보가 정상적으로 등록되었습니다.");
+            }
+
+            return ResponseEntity.ok(String.format("총 %d건 중 %d건이 저장되었습니다.", total, success));
+        } catch (Exception e) {
+            log.error("[createPurchaseElec] error: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                    .body("한전전기요금 정보 등록 중 오류가 발생했습니다.");
         }
     }
 

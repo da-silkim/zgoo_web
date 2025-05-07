@@ -4,7 +4,7 @@
     <div class="card responsive-content">
         <!-- card body:1 start -->
         <div class="card-body">
-            <div class="content-title"><i class="fa-solid fa-wrench font-ico me-2"></i>유지보수 > 매입관리</div>
+            <div class="content-title"><i class="fa-solid fa-receipt me-2"></i>정산 > 매입관리</div>
             <!-- card:2 start -->
             <div class="card card-shadow">
                 <!-- card body:2 start -->
@@ -79,9 +79,29 @@
                                     <td>
                                         <span th:text="${purchase.charge}" class="price-format"></span>
                                     </td>
+                                    <th>가산금<b class="required-data">*</b></th>
+                                    <td>
+                                        <span th:text="${purchase.surcharge}" class="price-format"></span>
+                                    </td>
+                                </tr>
+                                <tr th:if="${purchase.accountCode == 'ELCFEE'}">
+                                    <th>절사액<b class="required-data">*</b></th>
+                                    <td>
+                                        <span th:text="${purchase.cutoffAmount}" class="price-format"></span>
+                                    </td>
+                                    <th>미납급액<b class="required-data">*</b></th>
+                                    <td>
+                                        <span th:text="${purchase.unpaidAmount}" class="price-format"></span>
+                                    </td>
+                                </tr>
+                                <tr th:if="${purchase.accountCode == 'ELCFEE'}">
                                     <th>합계액<b class="required-data">*</b></th>
                                     <td>
                                         <span th:text="${purchase.totalAmount}" class="price-format"></span>
+                                    </td>
+                                    <th>사용량(kWh)<b class="required-data">*</b></th>
+                                    <td>
+                                        <span th:text="${purchase.power}" class="int-format"></span>
                                     </td>
                                 </tr>
                                 <tr th:unless="${purchase.accountCode == 'ELCFEE'}">
