@@ -521,6 +521,17 @@ public class ChargingHistRepositoryCustomImpl implements ChargingHistRepositoryC
         .where(hist.startTime.between(startDate, endDate))
         .fetchOne();
 
+        if (dto == null) {
+            dto = new TotalkwDashboardDto();
+            dto.setFastChgAmount(BigDecimal.ZERO);
+            dto.setLowChgAmount(BigDecimal.ZERO);
+            dto.setDespnChgAmount(BigDecimal.ZERO);
+        } else {
+            if (dto.getFastChgAmount() == null) dto.setFastChgAmount(BigDecimal.ZERO);
+            if (dto.getLowChgAmount() == null) dto.setLowChgAmount(BigDecimal.ZERO);
+            if (dto.getDespnChgAmount() == null) dto.setDespnChgAmount(BigDecimal.ZERO);
+        }
+        
         return dto;
     }
 }
