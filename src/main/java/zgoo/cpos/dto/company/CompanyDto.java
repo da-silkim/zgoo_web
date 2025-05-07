@@ -63,7 +63,9 @@ public class CompanyDto {
         private String companyCode; // 사업자코드
 
         // 사업자 관계정보
+        private Long parentCompanyId;
         private String parentCompanyName;
+        private String levelPath;
 
         // 담당자 정보
         private String staffName; // 담당자명

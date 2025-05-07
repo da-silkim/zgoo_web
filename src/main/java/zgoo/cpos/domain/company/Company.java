@@ -18,6 +18,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import zgoo.cpos.dto.company.CompanyDto.CompanyRegDto;
 
 @Entity
@@ -25,6 +26,7 @@ import zgoo.cpos.dto.company.CompanyDto.CompanyRegDto;
         @UniqueConstraint(columnNames = "company_name")
 })
 @Getter
+@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder(toBuilder = true)
@@ -95,7 +97,7 @@ public class Company {
     @Column(name = "logo_url")
     private String logoUrl;
 
-    @Column(name = "company_code", length = 2, unique = true)
+    @Column(name = "company_code", length = 4, unique = true)
     private String companyCode;
 
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -133,4 +135,24 @@ public class Company {
         this.companyCode = dto.getCompanyCode();
     }
 
+    // 회사 관계 정보 초기화 메서드
+    public void initializeRelationInfo(Company parentCompany) {
+        if (this.companyRelationInfo == null) {
+            CompanyRelationInfo relationInfo = CompanyRelationInfo.builder()
+                    .company(this)
+                    .parentCompany(parentCompany)
+                    .build();
+
+            this.companyRelationInfo = relationInfo;
+            relationInfo.setCompany(this);
+
+            // 레벨 경로 설정
+            if (parentCompany != null) {
+                String parentPath = parentCompany.getCompanyRelationInfo().getLevelPath();
+                relationInfo.updateRelationInfo(null, parentCompany);
+            } else {
+                relationInfo.updateRelationInfo(null, null);
+            }
+        }
+    }
 }

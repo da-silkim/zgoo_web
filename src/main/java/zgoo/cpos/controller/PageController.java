@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
@@ -128,14 +129,14 @@ public class PageController {
      * 대시보드
      */
     @GetMapping("/dashboard")
-    public String showdashboard(Model model) {
+    public String showdashboard(Model model, Principal principal) {
         log.info("Dashboard Home");
 
         try {
-            long cpCount = this.chargerService.countCharger();
+            long cpCount = this.chargerService.countCharger(principal.getName());
             model.addAttribute("cpCount", cpCount);
 
-            ConnectorStatusCountDto connStatus = this.chargerService.getConnectorStatusCount();
+            ConnectorStatusCountDto connStatus = this.chargerService.getConnectorStatusCount(principal.getName());
             model.addAttribute("connStatus", connStatus);
 
             StationOpStatusDto opStatus = this.csService.getStationOpStatusCount();
@@ -144,10 +145,12 @@ public class PageController {
             TotalkwDashboardDto chgStatus = this.chargingHistService.findChargingHistByPeriod();
             model.addAttribute("chgStatus", chgStatus);
 
-            List<ChargerCountBySidoDto> chargerCountList = this.chargerService.countChargerBySidoAndType();
+            List<ChargerCountBySidoDto> chargerCountList = this.chargerService
+                    .countChargerBySidoAndType(principal.getName());
             model.addAttribute("chargerCountList", chargerCountList);
 
-            List<FacilityCountDto> facilityList = this.chargerService.countFacilityBySidoAndType(null, null);
+            List<FacilityCountDto> facilityList = this.chargerService.countFacilityBySidoAndType(null, null,
+                    principal.getName());
             model.addAttribute("facilityList", facilityList);
 
             List<NoticeListDto> noticeList = this.noticeService.findLatestNoticeList();
@@ -216,7 +219,7 @@ public class PageController {
             model.addAttribute("totalPages", totalPages); // 총 페이지 수
             model.addAttribute("totalCount", memberList.getTotalElements()); // 총 데이터
 
-            List<CompanyListDto> companyList = this.companyService.findCompanyListAll(); // 사업자 list
+            List<CompanyListDto> companyList = this.companyService.findCompanyListAll(principal.getName()); // 사업자 list
             model.addAttribute("companyList", companyList);
             List<ConditionList> conList = this.conditionService.findAllConditionWithVersion();
             model.addAttribute("conList", conList);
@@ -285,7 +288,7 @@ public class PageController {
             model.addAttribute("totalPages", totalPages); // 총 페이지 수
             model.addAttribute("totalCount", memberAuthList.getTotalElements()); // 총 데이터
 
-            List<CompanyListDto> companyList = this.companyService.findCompanyListAll(); // 사업자 list
+            List<CompanyListDto> companyList = this.companyService.findCompanyListAll(principal.getName()); // 사업자 list
             model.addAttribute("companyList", companyList);
             List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT"); // 그리드 row 수
             model.addAttribute("showListCnt", showListCnt);
@@ -335,7 +338,7 @@ public class PageController {
             model.addAttribute("totalCount", csList.getTotalElements()); // 총 데이터
 
             // 사업자 list(select option)
-            List<CompanyListDto> companyList = this.companyService.findCompanyListAll();
+            List<CompanyListDto> companyList = this.companyService.findCompanyListAll(principal.getName());
             model.addAttribute("companyList", companyList);
             List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT"); // 그리드 row 수
             model.addAttribute("showListCnt", showListCnt);
@@ -406,14 +409,16 @@ public class PageController {
 
             // charger list 조회
             // 검색조건 check
-            if (reqCompanyId == null && reqManfCd == null && reqOpSearch == null) {
+            if (reqCompanyId == null && (reqManfCd == null || reqManfCd.isEmpty())
+                    && (reqOpSearch == null || reqOpSearch.isEmpty())
+                    && (reqSearchContent == null || reqSearchContent.isEmpty())) {
                 log.info("Search all charger list >>");
-                chargerList = chargerService.searchCpListPageAll(page, size);
+                chargerList = chargerService.searchCpListPageAll(page, size, principal.getName());
             } else {
                 log.info("Search charger list by options:companyid:{},manfcode:{},op:{},content:{} >>",
                         reqCompanyId, reqManfCd, reqOpSearch, reqSearchContent);
                 chargerList = chargerService.searchCpListPage(reqCompanyId, reqManfCd, reqOpSearch, reqSearchContent,
-                        page, size);
+                        page, size, principal.getName());
             }
 
             // page 처리
@@ -426,9 +431,17 @@ public class PageController {
             log.info("===ChargerList_PageInfo >> totalPages:{}, totalCount:{}", totalPages,
                     chargerList.getTotalElements());
 
-            // 충전기 커넥터 상태 리스트 조회 - 예외 처리 강화
+            // 충전기 커넥터 상태 리스트 조회 - 현재 페이지의 충전기 ID만 추출하여 조회
             try {
-                List<ConnectorStatusDto> connStatList = chargerService.searchConStatListAll();
+                // 현재 페이지의 충전기 ID 목록 추출
+                List<String> currentPageChargerIds = chargerList.getContent().stream()
+                        .map(ChargerListDto::getChargerId)
+                        .filter(Objects::nonNull)
+                        .collect(Collectors.toList());
+
+                // 현재 페이지의 충전기 ID에 대한 커넥터 상태만 조회
+                List<ConnectorStatusDto> connStatList = chargerService
+                        .searchConStatListByChargerIds(currentPageChargerIds);
 
                 // 안전하게 Map 생성 - 예외가 발생해도 빈 Map 반환
                 Map<String, List<Map<String, String>>> connStatusMap = new HashMap<>();
@@ -472,7 +485,7 @@ public class PageController {
 
             // 검색 select options 조회
             // 1.사업자 리스트
-            List<BaseCompnayDto> companyList = companyService.searchAllCompanyForSelectOpt();
+            List<BaseCompnayDto> companyList = companyService.searchAllCompanyForSelectOpt(principal.getName());
             model.addAttribute("companyList", companyList);
             // 2.grid row count
             List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT");
@@ -569,7 +582,7 @@ public class PageController {
 
             // 검색 select options 조회
             // 1.사업자 리스트
-            List<BaseCompnayDto> companyList = companyService.searchAllCompanyForSelectOpt();
+            List<BaseCompnayDto> companyList = companyService.searchAllCompanyForSelectOpt(principal.getName());
             model.addAttribute("companyList", companyList);
             // 2.grid row count
             List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT");
@@ -623,7 +636,7 @@ public class PageController {
             model.addAttribute("totalPages", totalPages); // 총 페이지 수
             model.addAttribute("totalCount", modelList.getTotalElements()); // 총 데이터
 
-            List<CompanyListDto> companyList = this.companyService.findCompanyListAll(); // 사업자 list
+            List<CompanyListDto> companyList = this.companyService.findCompanyListAll(principal.getName()); // 사업자 list
             model.addAttribute("companyList", companyList);
             List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT"); // 그리드 row 수
             model.addAttribute("showListCnt", showListCnt);
@@ -713,7 +726,7 @@ public class PageController {
             log.info("=== user DB search result >>>");
 
             // 사업자 list
-            List<CompanyListDto> companyList = this.companyService.findCompanyListAll();
+            List<CompanyListDto> companyList = this.companyService.findCompanyListAll(principal.getName());
             model.addAttribute("companyList", companyList);
 
             // 사용자 list
@@ -783,7 +796,7 @@ public class PageController {
 
         try {
             // 사업자 list
-            List<CompanyListDto> companyList = this.companyService.findCompanyListAll();
+            List<CompanyListDto> companyList = this.companyService.findCompanyListAll(principal.getName());
             model.addAttribute("companyList", companyList);
 
             Page<NoticeDto.NoticeListDto> noticeList = this.noticeService.findNoticeWithPagintaion(companyId,
@@ -847,7 +860,7 @@ public class PageController {
             model.addAttribute("menuList", menuList);
 
             // 사업자 list(select option)
-            List<CompanyListDto> companyList = this.companyService.findCompanyListAll();
+            List<CompanyListDto> companyList = this.companyService.findCompanyListAll(principal.getName());
             model.addAttribute("companyList", companyList);
 
             // 사업장별 메뉴 접근 권한 list
@@ -917,7 +930,7 @@ public class PageController {
             // log.info("사업자 권한 확인 >> {}", companyAuthorityList.toString());
             // model.addAttribute("companyAuthorityList", companyAuthorityList);
 
-            List<CompanyListDto> companyList = this.companyService.findCompanyListAll(); // 사업자 list
+            List<CompanyListDto> companyList = this.companyService.findCompanyListAll(principal.getName()); // 사업자 list
             model.addAttribute("companyList", companyList);
 
             List<CommCdBaseDto> authorityList = codeService.commonCodeMenuAuthority("MENUACCLV"); // 메뉴권한
@@ -1034,7 +1047,7 @@ public class PageController {
 
             // select options 조회
             // 사업자 리스트
-            List<BaseCompnayDto> companyList = companyService.searchAllCompanyForSelectOpt();
+            List<BaseCompnayDto> companyList = companyService.searchAllCompanyForSelectOpt(principal.getName());
             log.info("== selectOption >> companyList : {}", companyList.toString());
             model.addAttribute("companyList", companyList);
             // 요금제 리스트(cpPlanPolicy)
@@ -1118,7 +1131,7 @@ public class PageController {
             model.addAttribute("totalPages", totalPages); // 총 페이지 수
             model.addAttribute("totalCount", cpList.getTotalElements()); // 총 데이터
 
-            List<CompanyListDto> companyList = this.companyService.findCompanyListAll();
+            List<CompanyListDto> companyList = this.companyService.findCompanyListAll(principal.getName());
             model.addAttribute("companyList", companyList);
 
             List<CommCdBaseDto> frList = codeService.findCommonCdNamesByGrpcd("FRCODE"); // 장애접수유형코드
@@ -1318,7 +1331,7 @@ public class PageController {
             }
 
             // select option - 검색조건
-            List<CompanyListDto> companyList = this.companyService.findCompanyListAll();
+            List<CompanyListDto> companyList = this.companyService.findCompanyListAll(principal.getName());
             model.addAttribute("companyList", companyList);
 
             List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT"); // 그리드 row 수
@@ -1366,7 +1379,7 @@ public class PageController {
             model.addAttribute("selectedCancelStart", cancelStart);
             model.addAttribute("selectedCancelEnd", cancelEnd);
 
-            List<CompanyListDto> companyList = this.companyService.findCompanyListAll();
+            List<CompanyListDto> companyList = this.companyService.findCompanyListAll(principal.getName());
             model.addAttribute("companyList", companyList);
 
             List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT"); // 그리드 row 수
@@ -1535,7 +1548,7 @@ public class PageController {
             log.info("=== >> 충전 결제 정보 조회 결과: 총 페이지={}, 총 데이터={}", totalPages, chgPaymentList.getTotalElements());
 
             // 검색옵션
-            List<CompanyListDto> companyList = this.companyService.findCompanyListAll();
+            List<CompanyListDto> companyList = this.companyService.findCompanyListAll(principal.getName());
             model.addAttribute("companyList", companyList);
 
             List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT"); // 그리드 row 수
@@ -1618,7 +1631,7 @@ public class PageController {
         log.info("=== Purchase and Sales Statistics Page ===");
 
         try {
-            List<CompanyListDto> companyList = this.companyService.findCompanyListAll();
+            List<CompanyListDto> companyList = this.companyService.findCompanyListAll(principal.getName());
             model.addAttribute("companyList", companyList);
         } catch (Exception e) {
             e.getStackTrace();
@@ -1657,7 +1670,7 @@ public class PageController {
             model.addAttribute("lineChart", lineChart);
             log.info("lineChart >> {}", lineChart.toString());
 
-            List<CompanyListDto> companyList = this.companyService.findCompanyListAll();
+            List<CompanyListDto> companyList = this.companyService.findCompanyListAll(principal.getName());
             model.addAttribute("companyList", companyList);
 
             List<YearOptionDto> yearOption = this.comService.generateYearOptions();
@@ -1701,7 +1714,7 @@ public class PageController {
             model.addAttribute("lineChart", lineChart);
             log.info("lineChart >> {}", lineChart.toString());
 
-            List<CompanyListDto> companyList = this.companyService.findCompanyListAll();
+            List<CompanyListDto> companyList = this.companyService.findCompanyListAll(principal.getName());
             model.addAttribute("companyList", companyList);
 
             List<YearOptionDto> yearOption = this.comService.generateYearOptions();
@@ -1758,6 +1771,8 @@ public class PageController {
 
         Page<CompanyListDto> companyList;
 
+        String longinId = principal.getName();
+
         try {
             log.info("=== Compnay DB search result >>>");
 
@@ -1767,13 +1782,13 @@ public class PageController {
                 companyList = companyService.searchCompanyById(companyId, page, size);
             } else if (companyType != null && !companyType.isEmpty()) {
                 log.info("Searching by companyType: {}", companyType);
-                companyList = companyService.searchCompanyByType(companyType, page, size);
+                companyList = companyService.searchCompanyByType(longinId, companyType, page, size);
             } else if (companyLv != null && !companyLv.isEmpty()) {
                 log.info("Searching by CompanyLevel", companyLv);
-                companyList = companyService.searchCompanyByLevel(companyLv, page, size);
+                companyList = companyService.searchCompanyByLevel(longinId, companyLv, page, size);
             } else {
                 log.info("Fetching all companies >> ");
-                companyList = companyService.searchCompanyAll(page, size);
+                companyList = companyService.searchCompanyAll(longinId, page, size);
             }
 
             log.info("=== companyListDto : {}", companyList.toString());
@@ -1789,7 +1804,7 @@ public class PageController {
             // select options 조회
 
             // 전체 사업자 리스트
-            List<BaseCompnayDto> allCompanyList = companyService.searchAllCompanyForSelectOpt();
+            List<BaseCompnayDto> allCompanyList = companyService.searchAllCompanyForSelectOpt(longinId);
             model.addAttribute("allCompanyList", allCompanyList);
 
             List<CommCdBaseDto> lvList = codeService.findCommonCdNamesByGrpcd("COLV"); // 사업자레벨
@@ -1905,7 +1920,7 @@ public class PageController {
         log.info("=== Firmware Version Page ===");
 
         try {
-            List<CompanyListDto> companyList = this.companyService.findCompanyListAll();
+            List<CompanyListDto> companyList = this.companyService.findCompanyListAll(principal.getName());
             model.addAttribute("companyList", companyList);
 
             List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT"); // 그리드 row 수
@@ -1938,7 +1953,7 @@ public class PageController {
         try {
             model.addAttribute("selectedCompanyId", companyId);
 
-            List<CompanyListDto> companyList = this.companyService.findCompanyListAll();
+            List<CompanyListDto> companyList = this.companyService.findCompanyListAll(principal.getName());
             model.addAttribute("companyList", companyList);
 
             List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT"); // 그리드 row 수

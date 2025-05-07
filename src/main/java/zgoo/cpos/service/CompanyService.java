@@ -1,15 +1,12 @@
 package zgoo.cpos.service;
 
-import java.util.HashSet;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
-import java.util.function.BiFunction;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -45,34 +42,80 @@ public class CompanyService {
     private final CompanyRoamingRepository companyRoamingRepository;
     private final CompanyContractRepository companyContractRepository;
     private final CompanyPgRepository companyPgRepository;
+    private final ComService comService;
 
     /*
      * 조회(사업자리스트 - CompanyDto.CompanyListDto)
      */
-    public Page<CompanyDto.CompanyListDto> searchCompanyAll(int page, int size) {
+    @Transactional(readOnly = true)
+    public Page<CompanyDto.CompanyListDto> searchCompanyAll(String userId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<CompanyListDto> companylist = companyRepository.findCompanyListAllCustom(pageable);
 
-        return companylist;
+        boolean isSuperAdmin = comService.checkSuperAdmin(userId);
+        Long loginUserCompanyId = comService.getLoginUserCompanyId(userId);
+        String levelPath = companyRepository.findLevelPathByCompanyId(loginUserCompanyId);
+        log.info("== levelPath : {}", levelPath);
+        if (levelPath == null) {
+            // 관계정보가 없을경우 빈 리스트 전달
+            return new PageImpl<>(new ArrayList<>(), pageable, 0);
+        }
+        return companyRepository.findCompanyListPaging(pageable, levelPath, isSuperAdmin);
     }
 
     public Page<CompanyListDto> searchCompanyById(Long companyId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        return companyRepository.findCompanyListById(companyId, pageable);
+        return companyRepository.findCompanyListByIdPaging(companyId, pageable);
     }
 
-    public Page<CompanyListDto> searchCompanyByType(String companyType, int page, int size) {
+    @Transactional(readOnly = true)
+    public Page<CompanyListDto> searchCompanyByType(String userId, String companyType, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        return companyRepository.findCompanyListByType(companyType, pageable);
+
+        boolean isSuperAdmin = comService.checkSuperAdmin(userId);
+        Long loginUserCompanyId = comService.getLoginUserCompanyId(userId);
+        String levelPath = companyRepository.findLevelPathByCompanyId(loginUserCompanyId);
+        log.info("== levelPath : {}", levelPath);
+        if (levelPath == null) {
+            // 관계정보가 없을경우 빈 리스트 전달
+            return new PageImpl<>(new ArrayList<>(), pageable, 0);
+        }
+
+        return companyRepository.findCompanyListByTypePaging(companyType, levelPath, pageable, isSuperAdmin);
+
     }
 
-    public Page<CompanyListDto> searchCompanyByLevel(String companyLevel, int page, int size) {
+    @Transactional(readOnly = true)
+    public Page<CompanyListDto> searchCompanyByLevel(String userId, String companyLevel, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        return companyRepository.findCompanyListByLv(companyLevel, pageable);
+
+        boolean isSuperAdmin = comService.checkSuperAdmin(userId);
+        Long loginUserCompanyId = comService.getLoginUserCompanyId(userId);
+        String levelPath = companyRepository.findLevelPathByCompanyId(loginUserCompanyId);
+        log.info("== levelPath : {}", levelPath);
+        if (levelPath == null) {
+            // 관계정보가 없을경우 빈 리스트 전달
+            return new PageImpl<>(new ArrayList<>(), pageable, 0);
+        }
+
+        return companyRepository.findCompanyListByLvPaging(companyLevel, levelPath, pageable, isSuperAdmin);
+
     }
 
-    public List<BaseCompnayDto> searchAllCompanyForSelectOpt() {
-        return companyRepository.findAllCompanyForSelectOpt();
+    @Transactional(readOnly = true)
+    public List<BaseCompnayDto> searchAllCompanyForSelectOpt(String userId) {
+
+        boolean isSuperAdmin = comService.checkSuperAdmin(userId);
+
+        Long loginUserCompanyId = comService.getLoginUserCompanyId(userId);
+
+        String levelPath = companyRepository.findLevelPathByCompanyId(loginUserCompanyId);
+        log.info("== levelPath : {}", levelPath);
+        if (levelPath == null) {
+            return new ArrayList<>();
+        }
+
+        return companyRepository.findCompanyListForSelectOptBc(levelPath, isSuperAdmin);
+
     }
 
     // 조회 - 사업자ID(업데이트 항목 조회시 사용)
@@ -100,9 +143,17 @@ public class CompanyService {
                     .address(entity.getAddress())
                     .addressDetail(entity.getAddressDetail())
                     .consignmentPayment(entity.getConsignmentPayment())
+                    .parentCompanyId(Optional.ofNullable(entity.getCompanyRelationInfo())
+                            .map(r -> r.getParentCompany())
+                            .map(Company::getId)
+                            .orElse(null))
                     .parentCompanyName(Optional.ofNullable(entity.getCompanyRelationInfo())
-                            .map(CompanyRelationInfo::getParentCompanyName)
-                            .orElse(null)) // Lazy 로딩 해결 및 null 처리
+                            .map(r -> r.getParentCompany())
+                            .map(Company::getCompanyName)
+                            .orElse(null))
+                    .levelPath(Optional.ofNullable(entity.getCompanyRelationInfo())
+                            .map(CompanyRelationInfo::getLevelPath)
+                            .orElse(null))
                     .staffName(entity.getStaffName())
                     .staffTel(entity.getStaffTel())
                     .staffPhone(entity.getStaffPhone())
@@ -147,37 +198,110 @@ public class CompanyService {
     /**
      * 저장
      */
-    // 업체 정보 저장
+    @Transactional
     public Company saveCompany(CompanyDto.CompanyRegDto dto) {
         log.info("== company dto : {}", dto.toString());
 
-        // bizType 값 검증 및 로깅
-        if (dto.getBizType() == null || dto.getBizType().isEmpty()) {
-            log.error("bizType is null or empty!");
-            // 기본값 설정 또는 예외 처리
-            dto.setBizType("CB"); // 기본값 설정
-        }
+        // BizType 값 확인
         log.info("bizType value: '{}'", dto.getBizType());
 
-        // dto >> entity(relation)
-        CompanyRelationInfo companyRelationInfo = CompanyMapper.toEntityRelation(dto);
+        // 1. 회사 기본 정보 생성
+        Company company = Company.builder()
+                .companyName(dto.getCompanyName())
+                .companyLv(dto.getCompanyLv())
+                .companyType(dto.getCompanyType())
+                .bizNum(dto.getBizNum())
+                .ceoName(dto.getCeoName())
+                .headPhone(dto.getHeadPhone())
+                .bizKind(dto.getBizKind())
+                .bizType(dto.getBizType())
+                .zipcode(dto.getZipcode())
+                .address(dto.getAddress())
+                .addressDetail(dto.getAddressDetail())
+                .consignmentPayment(dto.getConsignmentPayment())
+                .logoUrl(dto.getLogoUrl())
+                .companyCode(dto.getCompanyCode())
+                .staffName(dto.getStaffName())
+                .staffEmail(dto.getStaffEmail())
+                .staffTel(dto.getStaffTel())
+                .staffPhone(dto.getStaffPhone())
+                .createdAt(LocalDateTime.now())
+                .build();
 
-        // dto >> entity(pg)
-        CompanyPG companyPG = CompanyMapper.toEntityPg(dto);
+        // 2. 계약 정보 생성 및 저장
+        CompanyContract contract = CompanyContract.builder()
+                .contractStatus(dto.getContractStatus())
+                .contractedAt(LocalDateTime.now())
+                .contractStart(dto.getContractStart())
+                .contractEnd(dto.getContractEnd())
+                .asCompany(dto.getAsCompany())
+                .asNum(dto.getAsNum())
+                .build();
+        contract = companyContractRepository.save(contract);
+        company.setCompanyContract(contract);
 
-        // dto >> entity(contract)
-        CompanyContract companyContract = CompanyMapper.toEntityContract(dto);
+        // 3. PG 정보 생성 및 저장
+        CompanyPG pg = CompanyPG.builder()
+                .mid(dto.getMid())
+                .merchantKey(dto.getMerchantKey())
+                .sspMallId(dto.getSspMallId())
+                .regDt(LocalDateTime.now())
+                .build();
+        pg = companyPgRepository.save(pg);
+        company.setCompanyPG(pg);
 
-        // dto >> entity(company)
-        Company company = CompanyMapper.toEntityCompany(dto, companyRelationInfo, companyPG, companyContract);
+        // 4. 관계 정보 생성 및 저장
+        CompanyRelationInfo relationInfo = new CompanyRelationInfo();
 
-        Company saved = companyRepository.save(company);
+        // 부모 회사 설정
+        Company parentCompany = null;
+        if (dto.getParentCompanyId() != null) {
+            parentCompany = companyRepository.findById(dto.getParentCompanyId()).orElse(null);
+        } else if (dto.getParentCompanyName() != null && !dto.getParentCompanyName().isEmpty()) {
+            // 부모 회사 이름으로 조회
+            parentCompany = companyRepository.findByCompanyName(dto.getParentCompanyName()).orElse(null);
+        }
 
-        saveCompanyRoamingInfo(saved, dto.getRomaing());
+        relationInfo.setParentCompany(parentCompany);
+        relationInfo = companyRelationInfoRepository.save(relationInfo);
+        company.setCompanyRelationInfo(relationInfo);
 
-        log.info(">>> Company saved : {}", saved.toString());
+        // 회사 저장 (ID 확보)
+        company = companyRepository.save(company);
 
-        return saved;
+        // levelPath 설정 (회사 ID가 필요하므로 회사 저장 후 설정)
+        if (parentCompany != null && parentCompany.getCompanyRelationInfo() != null) {
+            String parentPath = parentCompany.getCompanyRelationInfo().getLevelPath();
+            if (parentPath != null && !parentPath.isEmpty()) {
+                relationInfo.setLevelPath(parentPath + "." + company.getId());
+            } else {
+                relationInfo.setLevelPath(parentCompany.getId() + "." + company.getId());
+            }
+        } else {
+            relationInfo.setLevelPath(company.getId().toString());
+        }
+
+        // 관계 정보 다시 저장 (levelPath 업데이트)
+        relationInfo = companyRelationInfoRepository.save(relationInfo);
+
+        // 5. 로밍 정보 생성 및 저장
+        if (dto.getRomaing() != null && !dto.getRomaing().isEmpty()) {
+            for (CompanyRoamingtDto roamingDto : dto.getRomaing()) {
+                CompanyRoaming roaming = CompanyRoaming.builder()
+                        .institutionCode(roamingDto.getInstitutionCode())
+                        .institutionKey(roamingDto.getInstitutionKey())
+                        .institutionEmail(roamingDto.getInstitutionEmail())
+                        .company(company)
+                        .build();
+                companyRoamingRepository.save(roaming);
+            }
+        }
+
+        // 최종 회사 정보 저장
+        company = companyRepository.save(company);
+        log.info(">>> Company saved : {}", company);
+
+        return company;
     }
 
     // 업체 로밍정보 저장
@@ -198,116 +322,126 @@ public class CompanyService {
      */
     @Transactional
     public void updateCompanyAll(CompanyRegDto dto) {
-        // 한 번의 조회로 회사 정보 가져오기
+        log.info("== updateCompanyAll: {}", dto.getCompanyId());
+
+        // 회사 정보 조회
         Company company = companyRepository.findById(dto.getCompanyId())
-                .orElseThrow(() -> new IllegalArgumentException("Company not found with id: " + dto.getCompanyId()));
+                .orElseThrow(() -> new IllegalArgumentException("회사 정보가 없습니다."));
 
-        try {
-            // 기본 정보 업데이트
-            company.updateCompanyBasicInfo(dto);
+        // 1. 기본 회사 정보 업데이트
+        updateBasicInfo(dto, company);
 
-            // 관계 정보 업데이트
-            updateEntityInfo(company, dto,
-                    company.getCompanyRelationInfo(),
-                    CompanyMapper::toEntityRelation,
-                    (c, r) -> c.toBuilder().companyRelationInfo(r).build(),
-                    "relation");
-
-            // 계약 정보 업데이트
-            updateEntityInfo(company, dto,
-                    company.getCompanyContract(),
-                    CompanyMapper::toEntityContract,
-                    (c, contract) -> c.toBuilder().companyContract(contract).build(),
-                    "contract");
-
-            // PG 정보 업데이트
-            updateEntityInfo(company, dto,
-                    company.getCompanyPG(),
-                    CompanyMapper::toEntityPg,
-                    (c, pg) -> c.toBuilder().companyPG(pg).build(),
-                    "PG");
-
-            // 로밍 정보 업데이트
-            updateRoamingInfo(dto, company);
-
-        } catch (Exception e) {
-            log.error("Company update failed", e);
-            throw e;
+        // 2. 관계 정보 업데이트
+        CompanyRelationInfo relationInfo = null;
+        if (company.getCompanyRelationInfo() != null) {
+            relationInfo = company.getCompanyRelationInfo();
+        } else {
+            relationInfo = new CompanyRelationInfo();
         }
-    }
 
-    /**
-     * 엔티티 정보 업데이트를 위한 일반화된 메서드
-     */
-    private <T> void updateEntityInfo(Company company, CompanyRegDto dto,
-            T entityInfo,
-            Function<CompanyRegDto, T> toEntityMapper,
-            BiFunction<Company, T, Company> companyUpdater,
-            String infoType) {
-        try {
-            if (entityInfo == null) {
-                log.info("== companyId:{} has no {} info", company.getId(), infoType);
-                // 새 정보 생성
-                T newEntity = toEntityMapper.apply(dto);
-                Company updatedCompany = companyUpdater.apply(company, newEntity);
-                companyRepository.save(updatedCompany);
+        // 부모 회사 설정
+        Company parentCompany = null;
+        if (dto.getParentCompanyId() != null) {
+            parentCompany = companyRepository.findById(dto.getParentCompanyId()).orElse(null);
+        } else if (dto.getParentCompanyName() != null && !dto.getParentCompanyName().isEmpty()) {
+            // 부모 회사 이름으로 조회
+            parentCompany = companyRepository.findByCompanyName(dto.getParentCompanyName()).orElse(null);
+        }
+
+        relationInfo.setParentCompany(parentCompany);
+
+        // levelPath 설정
+        if (parentCompany != null && parentCompany.getCompanyRelationInfo() != null) {
+            String parentPath = parentCompany.getCompanyRelationInfo().getLevelPath();
+            if (parentPath != null && !parentPath.isEmpty()) {
+                relationInfo.setLevelPath(parentPath + "." + company.getId());
             } else {
-                // 기존 정보가 있는 경우 업데이트 로직
-                // 이 부분은 각 엔티티 타입에 따라 다르므로 별도 처리 필요
-                if (entityInfo instanceof CompanyRelationInfo) {
-                    ((CompanyRelationInfo) entityInfo).updateRelationInfo(dto);
-                } else if (entityInfo instanceof CompanyContract) {
-                    ((CompanyContract) entityInfo).updateContractInfo(dto);
-                } else if (entityInfo instanceof CompanyPG) {
-                    ((CompanyPG) entityInfo).updatePgInfo(dto);
-                }
+                relationInfo.setLevelPath(parentCompany.getId() + "." + company.getId());
+            }
+        } else {
+            relationInfo.setLevelPath(company.getId().toString());
+        }
+
+        // 관계 정보 저장
+        relationInfo = companyRelationInfoRepository.save(relationInfo);
+        company.setCompanyRelationInfo(relationInfo);
+
+        // 3. 계약 정보 업데이트
+        try {
+            if (company.getCompanyContract() == null) {
+                log.info("== companyId:{} has no contract info", company.getId());
+                CompanyContract contract = new CompanyContract();
+                contract.updateContractInfo(dto);
+                contract = companyContractRepository.save(contract);
+                company.setCompanyContract(contract);
+            } else {
+                company.getCompanyContract().updateContractInfo(dto);
             }
         } catch (Exception e) {
-            log.error("Update {} info error", infoType, e);
+            log.error("Update contract info error", e);
         }
-    }
 
-    /**
-     * 로밍 정보 업데이트를 위한 단순화된 메서드
-     */
-    private void updateRoamingInfo(CompanyRegDto dto, Company company) {
+        // 4. PG 정보 업데이트
         try {
-            if (dto.getRomaing() != null && !dto.getRomaing().isEmpty()) {
-                List<CompanyRoaming> existingRoamings = companyRoamingRepository.findAllByCompanyId(company.getId());
-                Map<String, CompanyRoaming> existingRoamingMap = existingRoamings.stream()
-                        .collect(Collectors.toMap(CompanyRoaming::getInstitutionCode, r -> r));
-
-                // 새로운 로밍 정보 처리
-                Set<String> processedCodes = new HashSet<>();
-                for (CompanyRoamingtDto roamingDto : dto.getRomaing()) {
-                    String code = roamingDto.getInstitutionCode();
-                    processedCodes.add(code);
-
-                    if (existingRoamingMap.containsKey(code)) {
-                        // 기존 정보 업데이트
-                        existingRoamingMap.get(code).updateRoamingInfo(roamingDto);
-                    } else {
-                        // 새 정보 추가
-                        companyRoamingRepository.save(CompanyRoaming.builder()
-                                .institutionCode(code)
-                                .institutionKey(roamingDto.getInstitutionKey())
-                                .institutionEmail(roamingDto.getInstitutionEmail())
-                                .company(company)
-                                .build());
-                    }
-                }
-
-                // 삭제할 로밍 정보 처리
-                existingRoamings.stream()
-                        .filter(r -> !processedCodes.contains(r.getInstitutionCode()))
-                        .forEach(companyRoamingRepository::delete);
+            if (company.getCompanyPG() == null) {
+                log.info("== companyId:{} has no PG info", company.getId());
+                CompanyPG pg = new CompanyPG();
+                pg.updatePgInfo(dto);
+                pg.setRegDt(LocalDateTime.now());
+                pg = companyPgRepository.save(pg);
+                company.setCompanyPG(pg);
             } else {
-                // 모든 로밍 정보 삭제
-                companyRoamingRepository.deleteAllByCompanyId(company.getId());
+                company.getCompanyPG().updatePgInfo(dto);
+            }
+        } catch (Exception e) {
+            log.error("Update PG info error", e);
+        }
+
+        // 5. 로밍 정보 업데이트
+        try {
+            companyRoamingRepository.deleteAllByCompanyId(company.getId());
+            if (dto.getRomaing() != null && !dto.getRomaing().isEmpty()) {
+                for (CompanyRoamingtDto roamingDto : dto.getRomaing()) {
+                    CompanyRoaming roaming = CompanyRoaming.builder()
+                            .institutionCode(roamingDto.getInstitutionCode())
+                            .institutionKey(roamingDto.getInstitutionKey())
+                            .institutionEmail(roamingDto.getInstitutionEmail())
+                            .company(company)
+                            .build();
+                    companyRoamingRepository.save(roaming);
+                }
             }
         } catch (Exception e) {
             log.error("Update roaming info error", e);
         }
+
+        // 최종 회사 정보 저장
+        companyRepository.save(company);
+    }
+
+    /**
+     * 회사 기본 정보 업데이트
+     */
+    private void updateBasicInfo(CompanyRegDto dto, Company company) {
+        company.setCompanyName(dto.getCompanyName());
+        company.setCompanyLv(dto.getCompanyLv());
+        company.setCompanyType(dto.getCompanyType());
+        company.setBizNum(dto.getBizNum());
+        company.setCeoName(dto.getCeoName());
+        company.setHeadPhone(dto.getHeadPhone());
+        company.setBizKind(dto.getBizKind());
+        company.setBizType(dto.getBizType());
+        company.setZipcode(dto.getZipcode());
+        company.setAddress(dto.getAddress());
+        company.setAddressDetail(dto.getAddressDetail());
+        company.setConsignmentPayment(dto.getConsignmentPayment());
+        company.setLogoUrl(dto.getLogoUrl());
+        company.setCompanyCode(dto.getCompanyCode());
+        company.setStaffName(dto.getStaffName());
+        company.setStaffEmail(dto.getStaffEmail());
+        company.setStaffTel(dto.getStaffTel());
+        company.setStaffPhone(dto.getStaffPhone());
+        company.setUpdatedAt(LocalDateTime.now());
     }
 
     /*
@@ -334,9 +468,20 @@ public class CompanyService {
     }
 
     // List 형태로 company 전체 조회
-    public List<CompanyListDto> findCompanyListAll() {
+    @Transactional(readOnly = true)
+    public List<CompanyListDto> findCompanyListAll(String userId) {
         try {
-            return companyRepository.findCompanyListAll();
+            boolean isSuperAdmin = comService.checkSuperAdmin(userId);
+
+            Long loginUserCompanyId = comService.getLoginUserCompanyId(userId);
+
+            String levelPath = companyRepository.findLevelPathByCompanyId(loginUserCompanyId);
+            log.info("== levelPath : {}", levelPath);
+            if (levelPath == null) {
+                return new ArrayList<>();
+            }
+
+            return companyRepository.findCompanyListForSelectOptCl(levelPath, isSuperAdmin);
         } catch (Exception e) {
             log.error("[findCompanyListAll] error: {}", e.getMessage());
             return null;

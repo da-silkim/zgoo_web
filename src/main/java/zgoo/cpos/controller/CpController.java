@@ -1,6 +1,7 @@
 package zgoo.cpos.controller;
 
 import java.io.IOException;
+import java.security.Principal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -42,6 +43,8 @@ import zgoo.cpos.dto.cp.ChargerDto.ChargerListDto;
 import zgoo.cpos.dto.cp.ChargerDto.ChargerRegDto;
 import zgoo.cpos.dto.cp.ChargerDto.FacilityCountDto;
 import zgoo.cpos.service.ChargerService;
+import zgoo.cpos.service.ComService;
+import zgoo.cpos.util.MenuConstants;
 
 @Controller
 @RequiredArgsConstructor
@@ -49,13 +52,14 @@ import zgoo.cpos.service.ChargerService;
 @RequestMapping("/charger")
 public class CpController {
     private final ChargerService chargerService;
+    private final ComService comService;
 
     /*
      * 충전기 등록
      */
     @PostMapping("/new")
     public ResponseEntity<Map<String, String>> createCpInfo(@Valid @RequestBody ChargerRegDto reqdto,
-            BindingResult bindingResult) {
+            BindingResult bindingResult, Principal principal) {
         log.info("=== create Charger info >> {}", reqdto.toString());
 
         Map<String, String> response = new HashMap<>();
@@ -72,6 +76,14 @@ public class CpController {
         }
 
         try {
+
+            // html코드에서 악의적으로 '등록'버튼 권한체크 영억을 지우고 등록시도시 추가 권한체크 진행
+            ResponseEntity<Map<String, String>> permissionCheck = this.comService.checkUserPermissionsMsg(principal,
+                    MenuConstants.CHARGER_LIST);
+            if (permissionCheck != null) {
+                return permissionCheck;
+            }
+
             String result = chargerService.createCpInfo(reqdto);
             if (result == null) {
                 response.put("message", "충전기 등록에 실패했습니다.");
@@ -92,12 +104,19 @@ public class CpController {
      * 충전기ID get
      */
     @GetMapping("/get/create/cpid")
-    public ResponseEntity<Map<String, String>> createCpId(@RequestParam("stationId") String stationId) {
+    public ResponseEntity<Map<String, String>> createCpId(@RequestParam("stationId") String stationId,
+            Principal principal) {
         log.info("=== Get new CPID ===");
 
         Map<String, String> respnose = new HashMap<>();
 
         try {
+            ResponseEntity<Map<String, String>> permissionCheck = this.comService.checkUserPermissionsMsg(principal,
+                    MenuConstants.CHARGER_LIST);
+            if (permissionCheck != null) {
+                return permissionCheck;
+            }
+
             String createdCpId = chargerService.createCpId(stationId);
             if (createdCpId.equals("")) {
                 respnose.put("message", "충전기ID 생성에 실패하였습니다.");
@@ -200,7 +219,7 @@ public class CpController {
      */
     @PatchMapping("/update")
     public ResponseEntity<Map<String, String>> updateCpInfo(@Valid @RequestBody ChargerRegDto reqdto,
-            BindingResult bindingResult) {
+            BindingResult bindingResult, Principal principal) {
         log.info("=== update Charger info >> {}", reqdto.toString());
 
         Map<String, String> response = new HashMap<>();
@@ -217,6 +236,12 @@ public class CpController {
         }
 
         try {
+            ResponseEntity<Map<String, String>> permissionCheck = this.comService.checkUserPermissionsMsg(principal,
+                    MenuConstants.CHARGER_LIST);
+            if (permissionCheck != null) {
+                return permissionCheck;
+            }
+
             boolean result = chargerService.updateCpInfo(reqdto);
             if (!result) {
                 response.put("message", "충전기 정보 수정에 실패했습니다.");
@@ -236,12 +261,19 @@ public class CpController {
      * 충전기 정보 삭제
      */
     @DeleteMapping("/delete/{chargerId}")
-    public ResponseEntity<Map<String, String>> deleteCpInfo(@PathVariable("chargerId") String chargerId) {
+    public ResponseEntity<Map<String, String>> deleteCpInfo(@PathVariable("chargerId") String chargerId,
+            Principal principal) {
         log.info("=== delete Charger info >> {}", chargerId);
 
         Map<String, String> response = new HashMap<>();
 
         try {
+            ResponseEntity<Map<String, String>> permissionCheck = this.comService.checkUserPermissionsMsg(principal,
+                    MenuConstants.CHARGER_LIST);
+            if (permissionCheck != null) {
+                return permissionCheck;
+            }
+
             boolean result = chargerService.deleteCpInfo(chargerId);
             if (!result) {
                 response.put("message", "충전기 정보 삭제에 실패했습니다.");
@@ -265,7 +297,7 @@ public class CpController {
             @RequestParam(required = false, value = "manfCodeSearch") String manfCodeSearch,
             @RequestParam(required = false, value = "opSearch") String opSearch,
             @RequestParam(required = false, value = "contentSearch") String contentSearch,
-            HttpServletResponse response) {
+            HttpServletResponse response, Principal principal) {
 
         log.info("=== Excel download request: companyId={}, manufCd={}, searchOp={}, searchContent={} ===",
                 companyIdSearch, manfCodeSearch, opSearch, contentSearch);
@@ -273,7 +305,7 @@ public class CpController {
         try {
             // 조건에 따른 전체 충전기 조회
             List<ChargerListDto> chargerList = chargerService.findAllChargerListWithoutPagination(companyIdSearch,
-                    manfCodeSearch, opSearch, contentSearch);
+                    manfCodeSearch, opSearch, contentSearch, principal.getName());
 
             log.info("=== Total records found: {} ===", chargerList.size());
 
@@ -378,14 +410,15 @@ public class CpController {
         cell.setCellStyle(style);
     }
 
-    /* 
+    /*
      * 대시보드 - 사용용도
      */
     @GetMapping("/get/facility")
-    public ResponseEntity<List<FacilityCountDto>> countFacility(@RequestParam("sido") String sido, 
-            @RequestParam("type") String type) {
+    public ResponseEntity<List<FacilityCountDto>> countFacility(@RequestParam("sido") String sido,
+            @RequestParam("type") String type, Principal principal) {
         try {
-            List<FacilityCountDto> facilityList = chargerService.countFacilityBySidoAndType(sido, type);
+            List<FacilityCountDto> facilityList = chargerService.countFacilityBySidoAndType(sido, type,
+                    principal.getName());
             return ResponseEntity.ok(facilityList);
         } catch (Exception e) {
             log.error("[countFacility] error: {}", e.getMessage(), e);

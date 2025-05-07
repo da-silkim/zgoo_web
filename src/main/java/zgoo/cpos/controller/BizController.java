@@ -1,5 +1,6 @@
 package zgoo.cpos.controller;
 
+import java.security.Principal;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -24,7 +25,9 @@ import zgoo.cpos.dto.biz.BizInfoDto.BizInfoRegDto;
 import zgoo.cpos.dto.payment.BillkeyIssueRequestDto;
 import zgoo.cpos.dto.payment.BillkeyIssueResponseDto;
 import zgoo.cpos.service.BizService;
+import zgoo.cpos.service.ComService;
 import zgoo.cpos.service.PaymentService;
+import zgoo.cpos.util.MenuConstants;
 
 @Controller
 @RequiredArgsConstructor
@@ -34,6 +37,7 @@ public class BizController {
 
     private final BizService bizService;
     private final PaymentService paymentService;
+    private final ComService comService;
 
     // 법인 단건 조회
     @GetMapping("/get/{bizId}")
@@ -95,10 +99,16 @@ public class BizController {
 
     // 법인 정보 등록
     @PostMapping("/new")
-    public ResponseEntity<String> createBiz(@Valid @RequestBody BizInfoRegDto dto) {
+    public ResponseEntity<String> createBiz(@Valid @RequestBody BizInfoRegDto dto, Principal principal) {
         log.info("=== create biz request info : {}", dto);
 
         try {
+            ResponseEntity<String> permissionCheck = this.comService.checkUserPermissions(principal,
+                    MenuConstants.CORP);
+            if (permissionCheck != null) {
+                return permissionCheck;
+            }
+
             this.bizService.saveBiz(dto);
             return ResponseEntity.ok("법인 정보가 정상적으로 등록되었습니다.");
         } catch (Exception e) {
@@ -110,10 +120,17 @@ public class BizController {
 
     // 법인 정보 수정
     @PatchMapping("/update/{bizId}")
-    public ResponseEntity<String> updateBiz(@PathVariable("bizId") Long bizId, @RequestBody BizInfoRegDto dto) {
+    public ResponseEntity<String> updateBiz(@PathVariable("bizId") Long bizId, @RequestBody BizInfoRegDto dto,
+            Principal principal) {
         log.info("=== update biz info :{}", dto);
 
         try {
+            ResponseEntity<String> permissionCheck = this.comService.checkUserPermissions(principal,
+                    MenuConstants.CORP);
+            if (permissionCheck != null) {
+                return permissionCheck;
+            }
+
             this.bizService.updateBizInfo(bizId, dto);
             log.info("=== biz info update complete ===");
             return ResponseEntity.ok("법인 정보가 정상적으로 수정되었습니다.");
@@ -126,7 +143,7 @@ public class BizController {
 
     // 법인 정보 삭제
     @DeleteMapping("/delete/{bizId}")
-    public ResponseEntity<String> deleteBiz(@PathVariable("bizId") Long bizId) {
+    public ResponseEntity<String> deleteBiz(@PathVariable("bizId") Long bizId, Principal principal) {
         log.info("=== delete biz info ===");
 
         if (bizId == null) {
@@ -136,6 +153,12 @@ public class BizController {
         }
 
         try {
+            ResponseEntity<String> permissionCheck = this.comService.checkUserPermissions(principal,
+                    MenuConstants.CORP);
+            if (permissionCheck != null) {
+                return permissionCheck;
+            }
+
             this.bizService.deleteBiz(bizId);
             return ResponseEntity.ok("법인 정보가 정상적으로 삭제되었습니다.");
         } catch (Exception e) {
@@ -147,10 +170,21 @@ public class BizController {
 
     // 법인카드 빌키 발급 요청
     @PostMapping("/billkey")
-    public ResponseEntity<BillkeyIssueResponseDto> issueBillkey(@RequestBody BillkeyIssueRequestDto requestDto) {
+    public ResponseEntity<BillkeyIssueResponseDto> issueBillkey(@RequestBody BillkeyIssueRequestDto requestDto,
+            Principal principal) {
         log.info("Billkey Issue Request dto:{}", requestDto);
 
         try {
+            ResponseEntity<String> permissionCheck = this.comService.checkUserPermissions(principal,
+                    MenuConstants.CORP);
+            if (permissionCheck != null) {
+                // 권한 체크 실패 시 적절한 BillkeyIssueResponseDto 객체를 생성하여 반환
+                BillkeyIssueResponseDto errorResponse = new BillkeyIssueResponseDto();
+                errorResponse.setResultCode("PERMISSION_DENIED");
+                errorResponse.setResultMsg(permissionCheck.getBody());
+                return ResponseEntity.status(permissionCheck.getStatusCode()).body(errorResponse);
+            }
+
             // 빌키 발급 요청 로직
             BillkeyIssueResponseDto responseDto = this.paymentService.issueBillkey(requestDto);
             log.info("Billkey Issue Response Result:{}", responseDto.getResultCode());

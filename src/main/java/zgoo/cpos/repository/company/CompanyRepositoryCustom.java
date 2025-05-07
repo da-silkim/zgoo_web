@@ -1,6 +1,7 @@
 package zgoo.cpos.repository.company;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,26 +13,37 @@ import zgoo.cpos.dto.company.CompanyDto.CompanyListDto;
 
 public interface CompanyRepositoryCustom {
 
+    // Paging ===================================================
     // 업체조회
-    // List<CompanyDto.CompanyListDto> findCompanyListAllCustom();
-    Page<CompanyListDto> findCompanyListAllCustom(Pageable pageable);
+    Page<CompanyListDto> findCompanyListPaging(Pageable pageable, String levelPath, boolean isSuperAdmin);
 
     // 업체조회 - 검색창(조건 : 사업자id )
-    Page<CompanyDto.CompanyListDto> findCompanyListById(Long id, Pageable pageable);
+    Page<CompanyDto.CompanyListDto> findCompanyListByIdPaging(Long id, Pageable pageable);
 
     // 업체조회 - 검색창(조건 : 사업자유형 )
-    Page<CompanyDto.CompanyListDto> findCompanyListByType(String type, Pageable pageable);
+    Page<CompanyDto.CompanyListDto> findCompanyListByTypePaging(String type, String levelPath, Pageable pageable,
+            boolean isSuperAdmin);
 
     // 업체조회 - 검색창(조건 : 사업자레벨 )
-    Page<CompanyDto.CompanyListDto> findCompanyListByLv(String level, Pageable pageable);
+    Page<CompanyDto.CompanyListDto> findCompanyListByLvPaging(String level, String levelPath, Pageable pageable,
+            boolean isSuperAdmin);
 
-    // 모든 사업자 조회
-    List<CompanyListDto> findCompanyListAll();
+    // Not paging ================================================
+    // 검색옵션 사업자 조회 (return type : CompanyListDto)
+    List<CompanyListDto> findCompanyListForSelectOptCl(String levelPath, boolean isSuperAdmin);
+
+    // 검색옵션 사업자 조회 (return type : BaseCompnayDto)
+    List<BaseCompnayDto> findCompanyListForSelectOptBc(String levelPath, boolean isSuperAdmin);
 
     // 사업자 단건 조회
     Company findCompanyOne(Long id);
 
-    // select option 조회 (사업자)
-    List<BaseCompnayDto> findAllCompanyForSelectOpt();
+    Optional<Company> findByCompanyName(String companyName);
+
+    List<Company> findByLevelPathStartingWith(String levelPathPrefix);
+
+    String findLevelPathByCompanyId(Long companyId);
+
+    String findCompanyLvById(Long companyId);
 
 }

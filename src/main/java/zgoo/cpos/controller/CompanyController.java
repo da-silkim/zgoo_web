@@ -1,5 +1,6 @@
 package zgoo.cpos.controller;
 
+import java.security.Principal;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,7 +23,9 @@ import lombok.extern.slf4j.Slf4j;
 import zgoo.cpos.domain.company.Company;
 import zgoo.cpos.dto.company.CompanyDto;
 import zgoo.cpos.dto.company.CompanyDto.CompanyRegDto;
+import zgoo.cpos.service.ComService;
 import zgoo.cpos.service.CompanyService;
+import zgoo.cpos.util.MenuConstants;
 
 @Controller
 @RequiredArgsConstructor
@@ -30,6 +33,7 @@ import zgoo.cpos.service.CompanyService;
 @RequestMapping("/biz_management")
 public class CompanyController {
     private final CompanyService companyService;
+    private final ComService comService;
 
     @GetMapping("/biz/search/{companyId}")
     public ResponseEntity<CompanyRegDto> searchForUpdate(@PathVariable("companyId") String companyId) {
@@ -40,7 +44,7 @@ public class CompanyController {
             if (findOne == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
             } else {
-                log.info("=== search(update) Result >> :{}", findOne.toString());
+                log.info("=== search(for update) Result >> :{}", findOne.toString());
             }
 
             return ResponseEntity.ok(findOne);
@@ -55,7 +59,7 @@ public class CompanyController {
      */
     @PostMapping(value = "/biz/new")
     public ResponseEntity<Map<String, String>> createCompany(@Valid @RequestBody CompanyDto.CompanyRegDto dto,
-            BindingResult result) {
+            BindingResult result, Principal principal) {
         log.info("==== create Request Company(dto):{}", dto.toString());
         Map<String, String> response = new HashMap<>();
 
@@ -70,6 +74,11 @@ public class CompanyController {
         }
 
         try {
+            ResponseEntity<Map<String, String>> permissionCheck = this.comService.checkUserPermissionsMsg(principal,
+                    MenuConstants.BIZ);
+            if (permissionCheck != null) {
+                return permissionCheck;
+            }
 
             // 저장
             Company saved = companyService.saveCompany(dto);
@@ -91,10 +100,16 @@ public class CompanyController {
      * 사업자 정보 수정
      */
     @PatchMapping("/biz/update")
-    public ResponseEntity<String> updateCompany(@RequestBody CompanyRegDto dto) {
+    public ResponseEntity<String> updateCompany(@RequestBody CompanyRegDto dto, Principal principal) {
         log.info("==== update Request Company(dto):{}", dto.toString());
 
         try {
+            ResponseEntity<String> permissionCheck = this.comService.checkUserPermissions(principal,
+                    MenuConstants.BIZ);
+            if (permissionCheck != null) {
+                return permissionCheck;
+            }
+
             companyService.updateCompanyAll(dto);
             log.info("=== update complete!!");
             return ResponseEntity.ok("업체정보 수정 성공");
@@ -108,10 +123,16 @@ public class CompanyController {
      * 사업자 삭제
      */
     @DeleteMapping("/biz/delete/{companyId}")
-    public ResponseEntity<String> deleteCompany(@PathVariable("companyId") String companyId) {
+    public ResponseEntity<String> deleteCompany(@PathVariable("companyId") String companyId, Principal principal) {
         log.info("==== delete group code(list) ======");
 
         try {
+            ResponseEntity<String> permissionCheck = this.comService.checkUserPermissions(principal,
+                    MenuConstants.BIZ);
+            if (permissionCheck != null) {
+                return permissionCheck;
+            }
+
             companyService.deleteCompany(Long.parseLong(companyId));
             return ResponseEntity.ok("Delete Success!");
         } catch (EntityNotFoundException e) {
@@ -120,4 +141,33 @@ public class CompanyController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error while delete Company Info..");
         }
     }
+
+    // /**
+    // * 회사 계층 구조 조회
+    // */
+    // @GetMapping("/biz/hierarchy/{companyId}")
+    // public ResponseEntity<?> getCompanyHierarchy(@PathVariable("companyId") Long
+    // companyId, Principal principal) {
+    // log.info("=== get company hierarchy >> companyId:{}", companyId);
+
+    // try {
+    // ResponseEntity<String> permissionCheck =
+    // this.comService.checkUserPermissions(principal,
+    // MenuConstants.BIZ);
+    // if (permissionCheck != null) {
+    // return permissionCheck;
+    // }
+
+    // Map<String, Object> hierarchy =
+    // companyService.getCompanyHierarchy(companyId);
+    // return ResponseEntity.ok(hierarchy);
+    // } catch (EntityNotFoundException e) {
+    // return ResponseEntity.status(HttpStatus.NOT_FOUND).body("회사를 찾을 수 없습니다: " +
+    // e.getMessage());
+    // } catch (Exception e) {
+    // log.error("[Controller - getCompanyHierarchy] : {}", e.getMessage(), e);
+    // return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 오류가
+    // 발생했습니다");
+    // }
+    // }
 }

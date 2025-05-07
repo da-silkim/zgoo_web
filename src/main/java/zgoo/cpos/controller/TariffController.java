@@ -1,5 +1,6 @@
 package zgoo.cpos.controller;
 
+import java.security.Principal;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -24,8 +25,10 @@ import lombok.extern.slf4j.Slf4j;
 import zgoo.cpos.dto.company.CompanyDto.CpPlanDto;
 import zgoo.cpos.dto.tariff.TariffDto.TariffInfoDto;
 import zgoo.cpos.dto.tariff.TariffDto.TariffRegDto;
+import zgoo.cpos.service.ComService;
 import zgoo.cpos.service.TariffService;
 import zgoo.cpos.util.DateUtils;
+import zgoo.cpos.util.MenuConstants;
 
 @Controller
 @RequiredArgsConstructor
@@ -34,6 +37,7 @@ import zgoo.cpos.util.DateUtils;
 public class TariffController {
 
     private final TariffService tariffService;
+    private final ComService comService;
 
     // 요금정보 조회
     @GetMapping("/tariffinfo/get/{tariffId}")
@@ -75,7 +79,7 @@ public class TariffController {
     // 요금제 등록
     @PostMapping("/new")
     public ResponseEntity<Map<String, String>> createPlan(@Valid @RequestBody TariffRegDto requestDto,
-            BindingResult result) {
+            BindingResult result, Principal principal) {
         log.info("==== create Request Charger Plan(dto):{}", requestDto.toString());
         Map<String, String> response = new HashMap<>();
 
@@ -92,6 +96,11 @@ public class TariffController {
         }
 
         try {
+            ResponseEntity<Map<String, String>> permissionCheck = this.comService.checkUserPermissionsMsg(principal,
+                    MenuConstants.TARIFF);
+            if (permissionCheck != null) {
+                return permissionCheck;
+            }
 
             // 요금제 저장(cpPlanPolicy)
             CpPlanDto planDto = CpPlanDto.builder()
@@ -120,10 +129,16 @@ public class TariffController {
 
     // 요금제 수정
     @PatchMapping("/update")
-    public ResponseEntity<String> updatePlan(@RequestBody TariffRegDto requestDto) {
+    public ResponseEntity<String> updatePlan(@RequestBody TariffRegDto requestDto, Principal principal) {
         log.info("==== update Request Charger Plan(dto):{}", requestDto.toString());
 
         try {
+            ResponseEntity<String> permissionCheck = this.comService.checkUserPermissions(principal,
+                    MenuConstants.TARIFF);
+            if (permissionCheck != null) {
+                return permissionCheck;
+            }
+
             tariffService.updateTariffPolicy(requestDto);
 
             return ResponseEntity.ok("요금제 수정 성공");
@@ -135,10 +150,16 @@ public class TariffController {
 
     // 요금제 삭제
     @DeleteMapping("/delete/{tariffId}")
-    public ResponseEntity<String> deletePlan(@PathVariable("tariffId") Long tariffId) {
+    public ResponseEntity<String> deletePlan(@PathVariable("tariffId") Long tariffId, Principal principal) {
         log.info("==== delete selected tariffId : {}", tariffId);
 
         try {
+            ResponseEntity<String> permissionCheck = this.comService.checkUserPermissions(principal,
+                    MenuConstants.TARIFF);
+            if (permissionCheck != null) {
+                return permissionCheck;
+            }
+
             tariffService.deletePlan(tariffId);
             return ResponseEntity.ok("Delete Success!");
         } catch (EntityNotFoundException e) {

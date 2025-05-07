@@ -17,16 +17,16 @@ spring:
     open-in-view: false
     show-sql: false
     hibernate:
-      ddl-auto: update
+      ddl-auto: update  # 애플리케이션 시작 시 스키마 새로 생성
     properties:
       hibernate:
         format_sql: true
-        show_sql: false
-    defer-datasource-initialization: false  # hibernate 초기화 후 SQL 스크립트 실행
+        show_sql: true
+    defer-datasource-initialization: false
   
   sql:
     init:
-      mode: never
+      mode: never  # SQL 초기화 스크립트 항상 실행
       platform: mariadb
       continue-on-error: true
       encoding: UTF-8
