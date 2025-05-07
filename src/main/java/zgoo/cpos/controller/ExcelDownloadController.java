@@ -1,6 +1,7 @@
 package zgoo.cpos.controller;
 
 import java.io.IOException;
+import java.security.Principal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -31,9 +32,11 @@ import zgoo.cpos.dto.calc.PurchaseDto.PurchaseListDto;
 import zgoo.cpos.dto.cs.CsInfoDto.CsInfoListDto;
 import zgoo.cpos.dto.member.MemberDto.MemberAuthDto;
 import zgoo.cpos.dto.member.MemberDto.MemberListDto;
+import zgoo.cpos.service.ComService;
 import zgoo.cpos.service.CsService;
 import zgoo.cpos.service.MemberService;
 import zgoo.cpos.service.PurchaseService;
+import zgoo.cpos.util.MenuConstants;
 
 @Controller
 @RequiredArgsConstructor
@@ -44,6 +47,7 @@ public class ExcelDownloadController {
     private final MemberService memberService;
     private final CsService csService;
     private final PurchaseService purchaseService;
+    private final ComService comService;
 
     /*
      * member list excel download
@@ -53,8 +57,16 @@ public class ExcelDownloadController {
             @RequestParam(required = false, value = "companyIdSearch") Long companyIdSearch,
             @RequestParam(required = false, value = "idTagSearch") String idTagSearch,
             @RequestParam(required = false, value = "nameSearch") String nameSearch,
-            HttpServletResponse response) {
+            HttpServletResponse response, Principal principal) throws IOException {
         log.info("=== member list excel download info ===");
+
+        boolean isExcel = this.comService.checkExcelPermissions(principal, MenuConstants.MEMBER_LIST);
+        if (!isExcel) {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN); // 403
+            response.setContentType("application/json;charset=UTF-8");
+            response.getWriter().write("{\"error\":\"An abnormal access has occurred.\"}");
+            return;
+        }
 
         List<MemberListDto> memberList = this.memberService.findAllMemberListWithoutPagination(companyIdSearch,
                 idTagSearch, nameSearch);
@@ -78,8 +90,16 @@ public class ExcelDownloadController {
     public void downloadMemberTag(
             @RequestParam(required = false, value = "idTagSearch") String idTagSearch,
             @RequestParam(required = false, value = "nameSearch") String nameSearch,
-            HttpServletResponse response) {
+            HttpServletResponse response, Principal principal) throws IOException {
         log.info("=== member tag excel download info ===");
+
+        boolean isExcel = this.comService.checkExcelPermissions(principal, MenuConstants.MEMBER_TAG);
+        if (!isExcel) {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN); // 403
+            response.setContentType("application/json;charset=UTF-8");
+            response.getWriter().write("{\"error\":\"An abnormal access has occurred.\"}");
+            return;
+        }
 
         List<MemberAuthDto> memtagList = this.memberService.findAllMemberTagWithoutPagination(idTagSearch, nameSearch);
 
@@ -102,8 +122,16 @@ public class ExcelDownloadController {
             @RequestParam(required = false, value = "companyIdSearch") Long companyIdSearch,
             @RequestParam(required = false, value = "opSearch") String opSearch,
             @RequestParam(required = false, value = "contentSearch") String contentSearch,
-            HttpServletResponse response) {
+            HttpServletResponse response, Principal principal) throws IOException {
         log.info("=== station list excel download info ===");
+
+        boolean isExcel = this.comService.checkExcelPermissions(principal, MenuConstants.STATION_LIST);
+        if (!isExcel) {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN); // 403
+            response.setContentType("application/json;charset=UTF-8");
+            response.getWriter().write("{\"error\":\"An abnormal access has occurred.\"}");
+            return;
+        }
 
         List<CsInfoListDto> csList = this.csService.findAllStationWithoutPagination(companyIdSearch, opSearch, contentSearch);
 
@@ -127,15 +155,24 @@ public class ExcelDownloadController {
             @RequestParam(value = "contentSearch", required = false) String searchContent,
             @RequestParam(value = "startDate", required = false) LocalDate startDate,
             @RequestParam(value = "endDate", required = false) LocalDate endDate,
-            HttpServletResponse response) {
+            HttpServletResponse response, Principal principal) throws IOException  {
         log.info("=== purchase excel download info ===");
+
+        boolean isExcel = this.comService.checkExcelPermissions(principal, MenuConstants.CALC_PURCHASE);
+        if (!isExcel) {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN); // 403
+            response.setContentType("application/json;charset=UTF-8");
+            response.getWriter().write("{\"error\":\"An abnormal access has occurred.\"}");
+            return;
+        }
 
         List<PurchaseListDto> purList = this.purchaseService.findAllPurchaseWithoutPagination(searchOp, searchContent, startDate, endDate);
 
-        String[] headers = { "충전소명", "거래처명", "계정과목", "공급가액", "부가세", "부담금", "합계", "지불방법", "승인번호", "매입일자" };
+        String[] headers = { "충전소명", "거래처명", "계정과목", "공급가액", "부가세", "부담금", "가산금", "절사액", "미납금액", "합계", "지불방법", "승인번호", "매입일자" };
         Function<PurchaseListDto, Object[]> dataMapper = purchase -> new Object[]{
             purchase.getStationName(), purchase.getBizName(), purchase.getAccountCodeName(),
-            purchase.getSupplyPrice(), purchase.getVat(), purchase.getCharge(), purchase.getTotalAmount(),
+            purchase.getSupplyPrice(), purchase.getVat(), purchase.getCharge(), purchase.getSurcharge(),
+            purchase.getCutoffAmount(),purchase.getUnpaidAmount(), purchase.getTotalAmount(),
             purchase.getPaymentMethodName(), purchase.getApprovalNo(),
             purchase.getPurchaseDate() != null ? purchase.getPurchaseDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) : ""
         };

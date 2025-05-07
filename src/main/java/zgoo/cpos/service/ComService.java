@@ -31,7 +31,11 @@ public class ComService {
     private final MenuAuthorityRepository menuAuthorityRepository;
     private final UsersRepository usersRepository;
 
-    // Super Admin check
+    /* 
+     * super admin check
+     *   if) SU: true
+     * else) false
+     */
     public boolean checkSuperAdmin(String loginUserId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
@@ -48,7 +52,11 @@ public class ComService {
         return true;
     }
 
-    // Super Admin & Admin check
+    /* 
+     * super admin & admin check
+     *   if) SU, AD: true
+     * else) false
+     */
     public boolean checkAdmin(String loginUserId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
@@ -65,7 +73,11 @@ public class ComService {
         return false;
     }
 
-    // mod_yn check
+    /* 
+     * mod_yn check
+     *   if) SU: true
+     * else) AD, NO, AS: modify authority check
+     */
     public boolean checkModYn(String loginUserId, String menuCode) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
@@ -90,7 +102,39 @@ public class ComService {
         return false;
     }
 
-    // loginUserId & authority check
+    /* 
+     * excel_yn check
+     *   if) SU: true
+     * else) AD, NO, AS: excel authority check
+     */
+    public boolean checkExcelYn(String loginUserId, String menuCode) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+        Users loginUser = this.usersRepository.findUserOne(loginUserId);
+
+        for (GrantedAuthority authority : authorities) {
+            String authorityName = authority.getAuthority();
+
+            if ("SU".equals(authorityName)) {
+                log.info("[checkExcelYn] Super Admin");
+                return true;
+            } else {
+                MenuAuthorityBaseDto dto = this.menuAuthorityRepository.findUserMenuAuthority(loginUser.getCompany().getId(),
+                    authorityName, menuCode);
+                String excelYn = dto.getExcelYn();
+
+                log.info("[checkExcelYn] authority >> {}", authorityName);
+                return excelYn.equals("Y");
+            }
+        }
+
+        return false;
+    }
+
+    /* 
+     * login User mod_yn authority check
+     * return type: ResponseEntity<String>
+     */
     public ResponseEntity<String> checkUserPermissions(Principal principal, String menuCode) {
         String loginUserId = principal.getName();
         if (loginUserId == null || loginUserId.isEmpty()) {
@@ -99,12 +143,16 @@ public class ComService {
 
         boolean isMod = checkModYn(loginUserId, menuCode);
         if (!isMod) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("접근 권한이 없습니다.");
         }
 
         return null;
     }
 
+    /* 
+     * login User mod_yn authority check
+     * return type: ResponseEntity<Map<String, String>>
+     */
     public ResponseEntity<Map<String, String>> checkUserPermissionsMsg(Principal principal, String menuCode) {
         Map<String, String> response = new HashMap<>();
         
@@ -123,6 +171,9 @@ public class ComService {
         return null;
     }
 
+    /* 
+     * super admin check
+     */
     public ResponseEntity<String> checkSuperAdminPermissions(Principal principal) {
         String loginUserId = principal.getName();
         if (loginUserId == null || loginUserId.isEmpty()) {
@@ -131,12 +182,15 @@ public class ComService {
 
         boolean isSuperAdmin = checkSuperAdmin(loginUserId);
         if (!isSuperAdmin) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("접근 권한이 없습니다.");
         }
 
         return null;
     }
 
+    /* 
+     * admin check
+     */
     public ResponseEntity<String> checkAdminPermissions(Principal principal) {
         String loginUserId = principal.getName();
         if (loginUserId == null || loginUserId.isEmpty()) {
@@ -145,12 +199,16 @@ public class ComService {
 
         boolean isAdmin = checkAdmin(loginUserId);
         if (!isAdmin) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("접근 권한이 없습니다.");
         }
 
         return null;
     }
 
+    /* 
+     * super admin check
+     * return type: ResponseEntity<Map<String, String>>
+     */
     public ResponseEntity<Map<String, String>> checkSuperAdminPermissionsMsg(Principal principal) {
         Map<String, String> response = new HashMap<>();
         
@@ -167,6 +225,25 @@ public class ComService {
         }
 
         return null;
+    }
+
+    /* 
+     * login User excel_yn authority check
+     */
+    public boolean checkExcelPermissions(Principal principal, String menuCode) {
+        String loginUserId = principal.getName();
+        if (loginUserId == null || loginUserId.isEmpty()) {
+            log.warn("loginUserId is null");
+            return false;
+        }
+
+        boolean isExcel = checkExcelYn(loginUserId, menuCode);
+        if (!isExcel) {
+            log.warn("No permission to download Excel.");
+            return false;
+        }
+
+        return true;
     }
 
     public List<YearOptionDto> generateYearOptions() {
