@@ -87,24 +87,7 @@ public class ComService {
         }
     }
 
-    @Transactional(readOnly = true)
-    public Long getLoginUserCompanyId(String loginUserId) {
-        try {
-            Users loginUser = this.usersRepository.findUserOne(loginUserId);
-
-            log.info("=== getLoginUserCompanyId: {}", loginUser.getCompany().getId());
-            return loginUser.getCompany().getId();
-        } catch (Exception e) {
-            log.error("[getLoginUserCompanyId] error: {}", e.getMessage());
-            return null;
-        }
-    }
-
-    /*
-     * mod_yn check
-     * if) SU: true
-     * else) AD, NO, AS: modify authority check
-     */
+    // mod_yn check
     public boolean checkModYn(String loginUserId, String menuCode) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
