@@ -518,16 +518,34 @@ function excelDownload(baseUrl, paramKeys) {
         newUrl += `&${key}=${encodeURIComponent(value)}`;
     });
 
-    const a = document.createElement('a');
-    a.style.display = 'none';
-    a.href = newUrl;
-    document.body.appendChild(a);
-    a.click();
+    // 먼저 fetch로 권한 확인
+    fetch(newUrl, {
+        method: 'GET',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    }).then(response => {
+        if (!response.ok) {
+            return response.json().then(err => {
+                console.error(err.error);
+            });
+        }
 
-    // 링크 제거
-    setTimeout(() => {
-        document.body.removeChild(a);
-    }, 1000);
+        // 권한 있으면 다운로드 링크 생성 및 클릭
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = newUrl;
+        document.body.appendChild(a);
+        a.click();
+
+        setTimeout(() => {
+            document.body.removeChild(a);
+        }, 1000);
+
+    }).catch(error => {
+        console.error("요청 중 오류 발생:", error);
+    });
+
 }
 
 function goToList(baseUrl, paramKeys) {

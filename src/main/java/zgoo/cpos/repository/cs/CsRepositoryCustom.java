@@ -29,6 +29,7 @@ public interface CsRepositoryCustom {
     // 충전소 단건 조회
     CsInfoRegDto findCsInfoOne(String stationId);
     CsInfo findStationOne(String stationId);
+    CsInfo findStationByKepcoCustNo(String kepcoCustNo);
 
     // 충전소 단건 상세 조회
     CsInfoDetailDto findCsInfoDetailOne(String stationId);

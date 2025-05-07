@@ -167,10 +167,15 @@ public class PurchaseRepositoryCustomImpl implements PurchaseRepositoryCustom {
             purchase.bizName.as("bizName"),
             purchase.approvalNo.as("approvalNo"),
             purchase.item.as("item"),
+            purchase.unitPrice.as("unitPrice"),
             purchase.supplyPrice.as("supplyPrice"),
             purchase.vat.as("vat"),
+            purchase.charge.as("charge"),
+            purchase.surcharge.as("surcharge"),
+            purchase.cutoffAmount.as("cutoffAmount"),
+            purchase.unpaidAmount.as("unpaidAmount"),
             purchase.totalAmount.as("totalAmount"),
-            Expressions.numberTemplate(Integer.class, "COALESCE({0}, 0)", purchase.charge).as("charge"),
+            purchase.power.as("power"),
             csInfo.stationName.as("stationName"),
             accountCdName.name.as("accountCodeName"),
             paymentName.name.as("paymentMethodName")))
@@ -199,7 +204,11 @@ public class PurchaseRepositoryCustomImpl implements PurchaseRepositoryCustom {
             purchase.amount.as("amount"),
             purchase.supplyPrice.as("supplyPrice"),
             purchase.vat.as("vat"),
-            purchase.charge.as("charge"),
+            Expressions.numberTemplate(Integer.class, "COALESCE({0}, 0)", purchase.charge).as("charge"),
+            Expressions.numberTemplate(Integer.class, "COALESCE({0}, 0)", purchase.surcharge).as("surcharge"),
+            Expressions.numberTemplate(Integer.class, "COALESCE({0}, 0)", purchase.cutoffAmount).as("cutoffAmount"),
+            Expressions.numberTemplate(Integer.class, "COALESCE({0}, 0)", purchase.unpaidAmount).as("unpaidAmount"),
+            Expressions.numberTemplate(Integer.class, "COALESCE({0}, 0)", purchase.power).as("power"),
             purchase.totalAmount.as("totalAmount")))
             .from(purchase)
             .where(purchase.id.eq(id))
@@ -251,6 +260,10 @@ public class PurchaseRepositoryCustomImpl implements PurchaseRepositoryCustom {
             purchase.supplyPrice.as("supplyPrice"),
             purchase.vat.as("vat"),
             Expressions.numberTemplate(Integer.class, "COALESCE({0}, 0)", purchase.charge).as("charge"),
+            Expressions.numberTemplate(Integer.class, "COALESCE({0}, 0)", purchase.surcharge).as("surcharge"),
+            Expressions.numberTemplate(Integer.class, "COALESCE({0}, 0)", purchase.cutoffAmount).as("cutoffAmount"),
+            Expressions.numberTemplate(Integer.class, "COALESCE({0}, 0)", purchase.unpaidAmount).as("unpaidAmount"),
+            Expressions.numberTemplate(Integer.class, "COALESCE({0}, 0)", purchase.power).as("power"),
             purchase.totalAmount.as("totalAmount"),
             accountCdName.name.as("accountCodeName"),
             paymentName.name.as("paymentMethodName")))

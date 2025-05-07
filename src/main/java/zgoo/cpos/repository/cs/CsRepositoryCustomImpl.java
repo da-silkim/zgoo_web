@@ -195,6 +195,15 @@ public class CsRepositoryCustomImpl implements CsRepositoryCustom {
     }
 
     @Override
+    public CsInfo findStationByKepcoCustNo(String kepcoCustNo) {
+        return queryFactory
+            .selectFrom(csInfo)
+            .leftJoin(kepco).on(csInfo.csKepcoContractInfo.eq(kepco))
+            .where(kepco.KepcoCustNo.eq(kepcoCustNo))
+            .fetchOne();
+    }
+
+    @Override
     public CsInfoDetailDto findCsInfoDetailOne(String stationId) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
 
