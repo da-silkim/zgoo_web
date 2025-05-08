@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import zgoo.cpos.domain.biz.QBizInfo;
 import zgoo.cpos.domain.code.QCommonCode;
 import zgoo.cpos.domain.company.QCompany;
+import zgoo.cpos.domain.company.QCompanyRelationInfo;
 import zgoo.cpos.domain.member.QMember;
 import zgoo.cpos.domain.member.QMemberCar;
 import zgoo.cpos.domain.member.QMemberCondition;
@@ -25,6 +26,7 @@ import zgoo.cpos.dto.member.MemberDto.MemberCreditCardDto;
 import zgoo.cpos.dto.member.MemberDto.MemberDetailDto;
 import zgoo.cpos.dto.member.MemberDto.MemberListDto;
 import zgoo.cpos.dto.member.MemberDto.MemberRegDto;
+import zgoo.cpos.util.QueryUtils;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -42,39 +44,52 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
     QCommonCode carTypeName = new QCommonCode("carType");
     QCommonCode conditionCodeName = new QCommonCode("conditionCode");
     QCommonCode userStateName = new QCommonCode("userState");
+    QCompanyRelationInfo relation = QCompanyRelationInfo.companyRelationInfo;
 
     @Override
-    public Page<MemberListDto> findMemberWithPagination(Pageable pageable) {
+    public Page<MemberListDto> findMemberWithPagination(Pageable pageable, String levelPath, boolean isSuperAdmin) {
+        BooleanBuilder builder = new BooleanBuilder();
+
+        if (!isSuperAdmin && levelPath != null && !levelPath.isEmpty()) {
+            builder.and(QueryUtils.hasCompanyLevelAccess(relation, levelPath));
+        }
+
         List<MemberListDto> memberList = queryFactory.select(Projections.fields(MemberListDto.class,
-            member.id.as("memberId"),
-            member.memLoginId.as("memLoginId"),
-            member.bizType.as("bizType"),
-            member.name.as("name"),
-            member.phoneNo.as("phoneNo"),
-            member.idTag.as("idTag"),
-            member.email.as("email"),
-            member.joinedDt.as("joinedDt"),
-            company.companyName.as("companyName"),
-            bizTypeName.name.as("bizTypeName")))
-            .from(member)
-            .leftJoin(company).on(member.company.eq(company))
-            .leftJoin(bizTypeName).on(member.bizType.eq(bizTypeName.commonCode))
-            .orderBy(member.joinedDt.desc())
-            .offset(pageable.getOffset())
-            .limit(pageable.getPageSize())
-            .fetch();
+                member.id.as("memberId"),
+                member.memLoginId.as("memLoginId"),
+                member.bizType.as("bizType"),
+                member.name.as("name"),
+                member.phoneNo.as("phoneNo"),
+                member.idTag.as("idTag"),
+                member.email.as("email"),
+                member.joinedDt.as("joinedDt"),
+                company.companyName.as("companyName"),
+                bizTypeName.name.as("bizTypeName")))
+                .from(member)
+                .leftJoin(company).on(member.company.eq(company))
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
+                .leftJoin(bizTypeName).on(member.bizType.eq(bizTypeName.commonCode))
+                .where(builder)
+                .orderBy(member.joinedDt.desc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
 
         long totalCount = queryFactory
-            .select(member.count())
-            .from(member)
-            .fetchOne();
+                .select(member.count())
+                .from(member)
+                .leftJoin(company).on(member.company.eq(company))
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
+                .leftJoin(bizTypeName).on(member.bizType.eq(bizTypeName.commonCode))
+                .where(builder)
+                .fetchOne();
 
         return new PageImpl<>(memberList, pageable, totalCount);
     }
 
     @Override
     public Page<MemberListDto> searchMemberWithPagination(Long companyId, String idTag, String name,
-            Pageable pageable) {
+            Pageable pageable, String levelPath, boolean isSuperAdmin) {
         BooleanBuilder builder = new BooleanBuilder();
 
         if (companyId != null) {
@@ -89,61 +104,69 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
             builder.and(member.name.contains(name));
         }
 
+        if (!isSuperAdmin && levelPath != null && !levelPath.isEmpty()) {
+            builder.and(QueryUtils.hasCompanyLevelAccess(relation, levelPath));
+        }
+
         List<MemberListDto> memberList = queryFactory.select(Projections.fields(MemberListDto.class,
-            member.id.as("memberId"),
-            member.memLoginId.as("memLoginId"),
-            member.bizType.as("bizType"),
-            member.name.as("name"),
-            member.phoneNo.as("phoneNo"),
-            member.idTag.as("idTag"),
-            member.email.as("email"),
-            member.joinedDt.as("joinedDt"),
-            company.companyName.as("companyName"),
-            bizTypeName.name.as("bizTypeName")))
-            .from(member)
-            .leftJoin(company).on(member.company.eq(company))
-            .leftJoin(bizTypeName).on(member.bizType.eq(bizTypeName.commonCode))
-            .where(builder)
-            .orderBy(member.joinedDt.desc())
-            .offset(pageable.getOffset())
-            .limit(pageable.getPageSize())
-            .fetch();
+                member.id.as("memberId"),
+                member.memLoginId.as("memLoginId"),
+                member.bizType.as("bizType"),
+                member.name.as("name"),
+                member.phoneNo.as("phoneNo"),
+                member.idTag.as("idTag"),
+                member.email.as("email"),
+                member.joinedDt.as("joinedDt"),
+                company.companyName.as("companyName"),
+                bizTypeName.name.as("bizTypeName")))
+                .from(member)
+                .leftJoin(company).on(member.company.eq(company))
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
+                .leftJoin(bizTypeName).on(member.bizType.eq(bizTypeName.commonCode))
+                .where(builder)
+                .orderBy(member.joinedDt.desc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
 
         long totalCount = queryFactory
-            .select(member.count())
-            .from(member)
-            .where(builder)
-            .fetchOne();
+                .select(member.count())
+                .from(member)
+                .leftJoin(company).on(member.company.eq(company))
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
+                .leftJoin(bizTypeName).on(member.bizType.eq(bizTypeName.commonCode))
+                .where(builder)
+                .fetchOne();
 
         return new PageImpl<>(memberList, pageable, totalCount);
     }
 
     @Override
-    public MemberRegDto findMemberOne(Long memberId, List<MemberCreditCardDto> cardInfo, List<MemberCarDto> carInfo, 
+    public MemberRegDto findMemberOne(Long memberId, List<MemberCreditCardDto> cardInfo, List<MemberCarDto> carInfo,
             List<MemberConditionDto> conditionInfo) {
 
         MemberRegDto memberDto = queryFactory.select(Projections.fields(MemberRegDto.class,
-            member.id.as("memberId"),
-            member.bizType.as("bizType"),
-            member.name.as("name"),
-            member.phoneNo.as("phoneNo"),
-            member.memLoginId.as("memLoginId"),
-            member.password.as("password"),
-            member.idTag.as("idTag"),
-            member.userState.as("userState"),
-            member.email.as("email"),
-            member.birth.as("birth"),
-            member.zipCode.as("zipCode"),
-            member.address.as("address"),
-            member.addressDetail.as("addressDetail"),
-            company.id.as("companyId"),
-            company.companyName.as("companyName"),
-            bizTypeName.name.as("bizTypeName")))
-            .from(member)
-            .leftJoin(company).on(member.company.eq(company))
-            .leftJoin(bizTypeName).on(member.bizType.eq(bizTypeName.commonCode))
-            .where(member.id.eq(memberId))
-            .fetchOne();
+                member.id.as("memberId"),
+                member.bizType.as("bizType"),
+                member.name.as("name"),
+                member.phoneNo.as("phoneNo"),
+                member.memLoginId.as("memLoginId"),
+                member.password.as("password"),
+                member.idTag.as("idTag"),
+                member.userState.as("userState"),
+                member.email.as("email"),
+                member.birth.as("birth"),
+                member.zipCode.as("zipCode"),
+                member.address.as("address"),
+                member.addressDetail.as("addressDetail"),
+                company.id.as("companyId"),
+                company.companyName.as("companyName"),
+                bizTypeName.name.as("bizTypeName")))
+                .from(member)
+                .leftJoin(company).on(member.company.eq(company))
+                .leftJoin(bizTypeName).on(member.bizType.eq(bizTypeName.commonCode))
+                .where(member.id.eq(memberId))
+                .fetchOne();
 
         if (memberDto != null) {
             memberDto.setCard(cardInfo);
@@ -155,32 +178,33 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
     }
 
     @Override
-    public MemberRegDto findBizMemberOne(Long memberId, List<MemberCarDto> carInfo, List<MemberConditionDto> conditionInfo) {
+    public MemberRegDto findBizMemberOne(Long memberId, List<MemberCarDto> carInfo,
+            List<MemberConditionDto> conditionInfo) {
 
         MemberRegDto memberDto = queryFactory.select(Projections.fields(MemberRegDto.class,
-            member.id.as("memberId"),
-            member.bizType.as("bizType"),
-            member.name.as("name"),
-            member.phoneNo.as("phoneNo"),
-            member.memLoginId.as("memLoginId"),
-            member.password.as("password"),
-            member.idTag.as("idTag"),
-            member.userState.as("userState"),
-            member.email.as("email"),
-            member.birth.as("birth"),
-            member.zipCode.as("zipCode"),
-            member.address.as("address"),
-            member.addressDetail.as("addressDetail"),
-            company.id.as("companyId"),
-            company.companyName.as("companyName"),
-            biz.id.as("bizId"),
-            bizTypeName.name.as("bizTypeName")))
-            .from(member)
-            .leftJoin(company).on(member.company.eq(company))
-            .leftJoin(biz).on(member.biz.eq(biz))
-            .leftJoin(bizTypeName).on(member.bizType.eq(bizTypeName.commonCode))
-            .where(member.id.eq(memberId))
-            .fetchOne();
+                member.id.as("memberId"),
+                member.bizType.as("bizType"),
+                member.name.as("name"),
+                member.phoneNo.as("phoneNo"),
+                member.memLoginId.as("memLoginId"),
+                member.password.as("password"),
+                member.idTag.as("idTag"),
+                member.userState.as("userState"),
+                member.email.as("email"),
+                member.birth.as("birth"),
+                member.zipCode.as("zipCode"),
+                member.address.as("address"),
+                member.addressDetail.as("addressDetail"),
+                company.id.as("companyId"),
+                company.companyName.as("companyName"),
+                biz.id.as("bizId"),
+                bizTypeName.name.as("bizTypeName")))
+                .from(member)
+                .leftJoin(company).on(member.company.eq(company))
+                .leftJoin(biz).on(member.biz.eq(biz))
+                .leftJoin(bizTypeName).on(member.bizType.eq(bizTypeName.commonCode))
+                .where(member.id.eq(memberId))
+                .fetchOne();
 
         if (memberDto != null) {
             memberDto.setCar(carInfo);
@@ -191,31 +215,32 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
     }
 
     @Override
-    public MemberDetailDto findMemberDetailOne(Long memberId, List<MemberCreditCardDto> cardInfo, List<MemberCarDto> carInfo,
+    public MemberDetailDto findMemberDetailOne(Long memberId, List<MemberCreditCardDto> cardInfo,
+            List<MemberCarDto> carInfo,
             List<MemberConditionDto> conditionInfo) {
         MemberDetailDto memberDetailDto = queryFactory.select(Projections.fields(MemberDetailDto.class,
-            member.id.as("memberId"),
-            member.bizType.as("bizType"),
-            member.name.as("name"),
-            member.phoneNo.as("phoneNo"),
-            member.memLoginId.as("memLoginId"),
-            member.idTag.as("idTag"),
-            member.userState.as("userState"),
-            member.email.as("email"),
-            member.birth.as("birth"),
-            member.zipCode.as("zipCode"),
-            member.address.as("address"),
-            member.addressDetail.as("addressDetail"),
-            company.id.as("companyId"),
-            company.companyName.as("companyName"),
-            bizTypeName.name.as("bizTypeName"),
-            userStateName.name.as("userStateName")))
-            .from(member)
-            .leftJoin(company).on(member.company.eq(company))
-            .leftJoin(bizTypeName).on(member.bizType.eq(bizTypeName.commonCode))
-            .leftJoin(userStateName).on(member.userState.eq(userStateName.commonCode))
-            .where(member.id.eq(memberId))
-            .fetchOne();
+                member.id.as("memberId"),
+                member.bizType.as("bizType"),
+                member.name.as("name"),
+                member.phoneNo.as("phoneNo"),
+                member.memLoginId.as("memLoginId"),
+                member.idTag.as("idTag"),
+                member.userState.as("userState"),
+                member.email.as("email"),
+                member.birth.as("birth"),
+                member.zipCode.as("zipCode"),
+                member.address.as("address"),
+                member.addressDetail.as("addressDetail"),
+                company.id.as("companyId"),
+                company.companyName.as("companyName"),
+                bizTypeName.name.as("bizTypeName"),
+                userStateName.name.as("userStateName")))
+                .from(member)
+                .leftJoin(company).on(member.company.eq(company))
+                .leftJoin(bizTypeName).on(member.bizType.eq(bizTypeName.commonCode))
+                .leftJoin(userStateName).on(member.userState.eq(userStateName.commonCode))
+                .where(member.id.eq(memberId))
+                .fetchOne();
 
         if (memberDetailDto != null) {
             memberDetailDto.setCard(cardInfo);
@@ -227,32 +252,33 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
     }
 
     @Override
-    public MemberDetailDto findBizMemberDetailOne(Long memberId, List<MemberCarDto> carInfo, List<MemberConditionDto> conditionInfo) {
+    public MemberDetailDto findBizMemberDetailOne(Long memberId, List<MemberCarDto> carInfo,
+            List<MemberConditionDto> conditionInfo) {
         MemberDetailDto memberDetailDto = queryFactory.select(Projections.fields(MemberDetailDto.class,
-            member.id.as("memberId"),
-            member.bizType.as("bizType"),
-            member.name.as("name"),
-            member.phoneNo.as("phoneNo"),
-            member.memLoginId.as("memLoginId"),
-            member.idTag.as("idTag"),
-            member.userState.as("userState"),
-            member.email.as("email"),
-            member.birth.as("birth"),
-            member.zipCode.as("zipCode"),
-            member.address.as("address"),
-            member.addressDetail.as("addressDetail"),
-            company.id.as("companyId"),
-            company.companyName.as("companyName"),
-            biz.id.as("bizId"),
-            bizTypeName.name.as("bizTypeName"),
-            userStateName.name.as("userStateName")))
-            .from(member)
-            .leftJoin(company).on(member.company.eq(company))
-            .leftJoin(biz).on(member.biz.eq(biz))
-            .leftJoin(bizTypeName).on(member.bizType.eq(bizTypeName.commonCode))
-            .leftJoin(userStateName).on(member.userState.eq(userStateName.commonCode))
-            .where(member.id.eq(memberId))
-            .fetchOne();
+                member.id.as("memberId"),
+                member.bizType.as("bizType"),
+                member.name.as("name"),
+                member.phoneNo.as("phoneNo"),
+                member.memLoginId.as("memLoginId"),
+                member.idTag.as("idTag"),
+                member.userState.as("userState"),
+                member.email.as("email"),
+                member.birth.as("birth"),
+                member.zipCode.as("zipCode"),
+                member.address.as("address"),
+                member.addressDetail.as("addressDetail"),
+                company.id.as("companyId"),
+                company.companyName.as("companyName"),
+                biz.id.as("bizId"),
+                bizTypeName.name.as("bizTypeName"),
+                userStateName.name.as("userStateName")))
+                .from(member)
+                .leftJoin(company).on(member.company.eq(company))
+                .leftJoin(biz).on(member.biz.eq(biz))
+                .leftJoin(bizTypeName).on(member.bizType.eq(bizTypeName.commonCode))
+                .leftJoin(userStateName).on(member.userState.eq(userStateName.commonCode))
+                .where(member.id.eq(memberId))
+                .fetchOne();
 
         if (memberDetailDto != null) {
             memberDetailDto.setCar(carInfo);
@@ -275,32 +301,33 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
         }
 
         List<MemberListDto> memberList = queryFactory.select(Projections.fields(MemberListDto.class,
-            member.id.as("memberId"),
-            member.bizType.as("bizType"),
-            member.name.as("name"),
-            member.phoneNo.as("phoneNo"),
-            member.memLoginId.as("memLoginId"),
-            member.idTag.as("idTag"),
-            member.userState.as("userState"),
-            member.email.as("email"),
-            member.birth.as("birth"),
-            member.zipCode.as("zipCode"),
-            member.address.as("address"),
-            member.addressDetail.as("addressDetail"),
-            company.id.as("companyId"),
-            company.companyName.as("companyName"),
-            bizTypeName.name.as("bizTypeName")))
-            .from(member)
-            .leftJoin(company).on(member.company.eq(company))
-            .leftJoin(bizTypeName).on(member.bizType.eq(bizTypeName.commonCode))
-            .where(builder)
-            .fetch();
+                member.id.as("memberId"),
+                member.bizType.as("bizType"),
+                member.name.as("name"),
+                member.phoneNo.as("phoneNo"),
+                member.memLoginId.as("memLoginId"),
+                member.idTag.as("idTag"),
+                member.userState.as("userState"),
+                member.email.as("email"),
+                member.birth.as("birth"),
+                member.zipCode.as("zipCode"),
+                member.address.as("address"),
+                member.addressDetail.as("addressDetail"),
+                company.id.as("companyId"),
+                company.companyName.as("companyName"),
+                bizTypeName.name.as("bizTypeName")))
+                .from(member)
+                .leftJoin(company).on(member.company.eq(company))
+                .leftJoin(bizTypeName).on(member.bizType.eq(bizTypeName.commonCode))
+                .where(builder)
+                .fetch();
 
         return memberList;
     }
 
     @Override
-    public List<MemberListDto> findAllMemberListWithoutPagination(Long companyId, String idTag, String name) {
+    public List<MemberListDto> findAllMemberListWithoutPagination(Long companyId, String idTag, String name,
+            String levelPath, boolean isSuperAdmin) {
         BooleanBuilder builder = new BooleanBuilder();
 
         if (companyId != null) {
@@ -315,22 +342,27 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
             builder.and(member.name.contains(name));
         }
 
+        if (!isSuperAdmin && levelPath != null && !levelPath.isEmpty()) {
+            builder.and(QueryUtils.hasCompanyLevelAccess(relation, levelPath));
+        }
+
         return queryFactory.select(Projections.fields(MemberListDto.class,
-            member.id.as("memberId"),
-            member.memLoginId.as("memLoginId"),
-            member.bizType.as("bizType"),
-            member.name.as("name"),
-            member.phoneNo.as("phoneNo"),
-            member.idTag.as("idTag"),
-            member.email.as("email"),
-            member.joinedDt.as("joinedDt"),
-            company.companyName.as("companyName"),
-            bizTypeName.name.as("bizTypeName")))
-            .from(member)
-            .leftJoin(company).on(member.company.eq(company))
-            .leftJoin(bizTypeName).on(member.bizType.eq(bizTypeName.commonCode))
-            .where(builder)
-            .orderBy(member.joinedDt.desc())
-            .fetch();
+                member.id.as("memberId"),
+                member.memLoginId.as("memLoginId"),
+                member.bizType.as("bizType"),
+                member.name.as("name"),
+                member.phoneNo.as("phoneNo"),
+                member.idTag.as("idTag"),
+                member.email.as("email"),
+                member.joinedDt.as("joinedDt"),
+                company.companyName.as("companyName"),
+                bizTypeName.name.as("bizTypeName")))
+                .from(member)
+                .leftJoin(company).on(member.company.eq(company))
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
+                .leftJoin(bizTypeName).on(member.bizType.eq(bizTypeName.commonCode))
+                .where(builder)
+                .orderBy(member.joinedDt.desc())
+                .fetch();
     }
 }

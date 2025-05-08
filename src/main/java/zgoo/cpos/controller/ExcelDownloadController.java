@@ -69,21 +69,22 @@ public class ExcelDownloadController {
         }
 
         List<MemberListDto> memberList = this.memberService.findAllMemberListWithoutPagination(companyIdSearch,
-                idTagSearch, nameSearch);
+                idTagSearch, nameSearch, principal.getName());
 
         String[] headers = { "사업자", "사용자명", "사용자ID", "회원카드번호", "휴대전화", "이메일", "개인/법인", "가입일자" };
-        Function<MemberListDto, Object[]> dataMapper = member -> new Object[]{
+        Function<MemberListDto, Object[]> dataMapper = member -> new Object[] {
                 member.getCompanyName(), member.getName(), member.getMemLoginId(),
                 member.getIdTag(), member.getPhoneNo(), member.getEmail(),
                 member.getBizTypeName(),
-                member.getJoinedDt() != null ? member.getJoinedDt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) : ""
+                member.getJoinedDt() != null ? member.getJoinedDt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+                        : ""
         };
 
         Workbook workbook = createExcelFile(memberList, "회원리스트", headers, dataMapper);
         writeExcelToResponse(response, workbook, "member_list");
     }
 
-    /* 
+    /*
      * member tag excel download
      */
     @GetMapping("/download/member_tag")
@@ -101,7 +102,8 @@ public class ExcelDownloadController {
             return;
         }
 
-        List<MemberAuthDto> memtagList = this.memberService.findAllMemberTagWithoutPagination(idTagSearch, nameSearch);
+        List<MemberAuthDto> memtagList = this.memberService.findAllMemberTagWithoutPagination(idTagSearch, nameSearch,
+                principal.getName());
 
         String[] headers = { "사업자", "회원명", "휴대전화", "회원카드번호", "부모IDTAG", "사용여부", "누적충전량(kWh)", "누적충전금액(원)", "상태" };
         Function<MemberAuthDto, Object[]> dataMapper = memtag -> new Object[] {
@@ -114,7 +116,7 @@ public class ExcelDownloadController {
         writeExcelToResponse(response, workbook, "member_tag");
     }
 
-    /* 
+    /*
      * station list excel download
      */
     @GetMapping("/download/station")
@@ -133,20 +135,21 @@ public class ExcelDownloadController {
             return;
         }
 
-        List<CsInfoListDto> csList = this.csService.findAllStationWithoutPagination(companyIdSearch, opSearch, contentSearch);
+        List<CsInfoListDto> csList = this.csService.findAllStationWithoutPagination(companyIdSearch, opSearch,
+                contentSearch);
 
         String[] headers = { "사업자", " 충전소명", "충전소ID", "설치주소", "충전기수", "운영상태", "운영시작시간", "운영종료시간" };
         Function<CsInfoListDto, Object[]> dataMapper = station -> new Object[] {
-            station.getCompanyName(), station.getStationName(), station.getStationId(),
-            station.getAddress(), station.getCpCount(), station.getOpStatusName(),
-            station.getOpenStartTime(), station.getOpenEndTime()
+                station.getCompanyName(), station.getStationName(), station.getStationId(),
+                station.getAddress(), station.getCpCount(), station.getOpStatusName(),
+                station.getOpenStartTime(), station.getOpenEndTime()
         };
 
         Workbook workbook = createExcelFile(csList, "충전소리스트", headers, dataMapper);
         writeExcelToResponse(response, workbook, "station_list");
     }
 
-    /* 
+    /*
      * purchase excel download
      */
     @GetMapping("/download/purchase")
@@ -155,7 +158,7 @@ public class ExcelDownloadController {
             @RequestParam(value = "contentSearch", required = false) String searchContent,
             @RequestParam(value = "startDate", required = false) LocalDate startDate,
             @RequestParam(value = "endDate", required = false) LocalDate endDate,
-            HttpServletResponse response, Principal principal) throws IOException  {
+            HttpServletResponse response, Principal principal) throws IOException {
         log.info("=== purchase excel download info ===");
 
         boolean isExcel = this.comService.checkExcelPermissions(principal, MenuConstants.CALC_PURCHASE);
@@ -166,22 +169,27 @@ public class ExcelDownloadController {
             return;
         }
 
-        List<PurchaseListDto> purList = this.purchaseService.findAllPurchaseWithoutPagination(searchOp, searchContent, startDate, endDate);
+        List<PurchaseListDto> purList = this.purchaseService.findAllPurchaseWithoutPagination(searchOp, searchContent,
+                startDate, endDate);
 
-        String[] headers = { "충전소명", "거래처명", "계정과목", "공급가액", "부가세", "부담금", "가산금", "절사액", "미납금액", "합계", "지불방법", "승인번호", "매입일자" };
-        Function<PurchaseListDto, Object[]> dataMapper = purchase -> new Object[]{
-            purchase.getStationName(), purchase.getBizName(), purchase.getAccountCodeName(),
-            purchase.getSupplyPrice(), purchase.getVat(), purchase.getCharge(), purchase.getSurcharge(),
-            purchase.getCutoffAmount(),purchase.getUnpaidAmount(), purchase.getTotalAmount(),
-            purchase.getPaymentMethodName(), purchase.getApprovalNo(),
-            purchase.getPurchaseDate() != null ? purchase.getPurchaseDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) : ""
+        String[] headers = { "충전소명", "거래처명", "계정과목", "공급가액", "부가세", "부담금", "가산금", "절사액", "미납금액", "합계", "지불방법", "승인번호",
+                "매입일자" };
+        Function<PurchaseListDto, Object[]> dataMapper = purchase -> new Object[] {
+                purchase.getStationName(), purchase.getBizName(), purchase.getAccountCodeName(),
+                purchase.getSupplyPrice(), purchase.getVat(), purchase.getCharge(), purchase.getSurcharge(),
+                purchase.getCutoffAmount(), purchase.getUnpaidAmount(), purchase.getTotalAmount(),
+                purchase.getPaymentMethodName(), purchase.getApprovalNo(),
+                purchase.getPurchaseDate() != null
+                        ? purchase.getPurchaseDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+                        : ""
         };
 
         Workbook workbook = createExcelFile(purList, "매입관리", headers, dataMapper);
         writeExcelToResponse(response, workbook, "purchase");
     }
 
-    private <T> Workbook createExcelFile(List<T> data, String sheetName, String[] headers, Function<T, Object[]> dataMapper) {
+    private <T> Workbook createExcelFile(List<T> data, String sheetName, String[] headers,
+            Function<T, Object[]> dataMapper) {
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet(sheetName);
 
@@ -219,7 +227,7 @@ public class ExcelDownloadController {
         return workbook;
     }
 
-    /* 
+    /*
      * 헤더 스타일 설정
      */
     private CellStyle createHeaderStyle(Workbook workbook) {
