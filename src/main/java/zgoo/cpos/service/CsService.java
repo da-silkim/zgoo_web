@@ -8,6 +8,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import zgoo.cpos.domain.company.Company;
@@ -36,24 +37,34 @@ public class CsService {
     private final CsKepcoContractInfoRepository csKepcoContractInfoRepository;
     private final CsLandInfoRepository csLandInfoRepository;
     private final ChargerRepository chargerRepository;
+    private final ComService comService;
 
     // 충전소 조회
-    public Page<CsInfoListDto> findCsInfoWithPagination(Long companyId, String searchOp, String searchContent, int page, int size) {
+    public Page<CsInfoListDto> findCsInfoWithPagination(Long companyId, String searchOp, String searchContent, int page,
+            int size, String userId) {
         Pageable pageable = PageRequest.of(page, size);
 
         try {
+
+            boolean isSuperAdmin = comService.checkSuperAdmin(userId);
+            Long loginUserCompanyId = comService.getLoginUserCompanyId(userId);
+            String levelPath = companyRepository.findLevelPathByCompanyId(loginUserCompanyId);
+            log.info("== levelPath : {}", levelPath);
+
             Page<CsInfoListDto> csList;
 
-            if (companyId == null && (searchOp == null || searchOp.isEmpty()) && (searchContent == null || searchContent.isEmpty())) {
+            if (companyId == null && (searchOp == null || searchOp.isEmpty())
+                    && (searchContent == null || searchContent.isEmpty())) {
                 log.info("Executing the [findCsInfoWithPagination]");
-                csList = this.csRepository.findCsInfoWithPagination(pageable);
+                csList = this.csRepository.findCsInfoWithPagination(pageable, levelPath, isSuperAdmin);
             } else {
                 log.info("Executing the [searchCsInfoWithPagination]");
-                csList = this.csRepository.searchCsInfoWithPagination(companyId, searchOp, searchContent, pageable);
+                csList = this.csRepository.searchCsInfoWithPagination(companyId, searchOp, searchContent, pageable,
+                        levelPath, isSuperAdmin);
             }
 
             for (CsInfoListDto station : csList) {
-                long cpCount = this.chargerRepository.countByStationId(station.getStationId());
+                long cpCount = this.chargerRepository.countByStationId(station.getStationId(), levelPath, isSuperAdmin);
                 station.setCpCount(cpCount);
             }
 
@@ -96,7 +107,8 @@ public class CsService {
     public String saveCsInfo(CsInfoRegDto dto) {
         try {
             Company company = this.companyRepository.findById(dto.getCompanyId())
-                .orElseThrow(() -> new IllegalArgumentException("company not found with id: " + dto.getCompanyId()));
+                    .orElseThrow(
+                            () -> new IllegalArgumentException("company not found with id: " + dto.getCompanyId()));
 
             CsKepcoContractInfo kepcoInfo = CsMapper.toEntityKepco(dto);
             CsLandInfo landInfo = CsMapper.toEntityLand(dto);
@@ -182,7 +194,7 @@ public class CsService {
                 csInfo = csInfo.toBuilder()
                         .csLandInfo(land)
                         .build();
-                
+
                 this.csRepository.save(csInfo);
             } else {
                 Long landId = csInfo.getCsLandInfo().getId();
@@ -219,9 +231,15 @@ public class CsService {
     }
 
     // 키워드로 충전소 조회
-    public List<StationSearchDto> saerchStationList(String keyword) {
+    public List<StationSearchDto> saerchStationList(String keyword, String userId) {
         try {
-            List<StationSearchDto> csList = this.csRepository.findCsInfoContainKeyword(keyword);
+            boolean isSuperAdmin = comService.checkSuperAdmin(userId);
+            Long loginUserCompanyId = comService.getLoginUserCompanyId(userId);
+            String levelPath = companyRepository.findLevelPathByCompanyId(loginUserCompanyId);
+            log.info("== levelPath : {}", levelPath);
+
+            List<StationSearchDto> csList = this.csRepository.findCsInfoContainKeyword(keyword, levelPath,
+                    isSuperAdmin);
             return csList;
         } catch (Exception e) {
             log.error("[saerchStationList] error: {}", e.getMessage());
@@ -230,9 +248,16 @@ public class CsService {
     }
 
     // 사용자 위치 기반, 주변 충전소 조회
-    public List<CsInfoDetailDto> findNearbyStations(double latitude, double longitude) {
+    public List<CsInfoDetailDto> findNearbyStations(double latitude, double longitude, String userId) {
         try {
-            List<CsInfoDetailDto> csList = this.csRepository.findStationsWithinRadius(latitude, longitude, 10.0); // 10km 이내
+            boolean isSuperAdmin = comService.checkSuperAdmin(userId);
+            Long loginUserCompanyId = comService.getLoginUserCompanyId(userId);
+            String levelPath = companyRepository.findLevelPathByCompanyId(loginUserCompanyId);
+            log.info("== levelPath : {}", levelPath);
+
+            List<CsInfoDetailDto> csList = this.csRepository.findStationsWithinRadius(latitude, longitude, 10.0,
+                    levelPath, isSuperAdmin); // 10km
+                                              // 이내
             System.out.println("주변 충전소 >> " + csList.toString());
             return csList;
         } catch (Exception e) {
@@ -242,17 +267,24 @@ public class CsService {
     }
 
     // 충전소 조회
-    public List<CsInfoListDto> findAllStationWithoutPagination(Long companyId, String searchOp, String searchContent) {
+    public List<CsInfoListDto> findAllStationWithoutPagination(Long companyId, String searchOp, String searchContent,
+            String userId) {
         log.info("=== Finding all station list: searchOp={}, searchContent={} ===", searchOp, searchContent);
 
         try {
-            List<CsInfoListDto> csList = this.csRepository.findAllStationWithoutPagination(companyId, searchOp, searchContent);
+            boolean isSuperAdmin = comService.checkSuperAdmin(userId);
+            Long loginUserCompanyId = comService.getLoginUserCompanyId(userId);
+            String levelPath = companyRepository.findLevelPathByCompanyId(loginUserCompanyId);
+            log.info("== levelPath : {}", levelPath);
+
+            List<CsInfoListDto> csList = this.csRepository.findAllStationWithoutPagination(companyId, searchOp,
+                    searchContent, levelPath, isSuperAdmin);
 
             for (CsInfoListDto station : csList) {
-                long cpCount = this.chargerRepository.countByStationId(station.getStationId());
+                long cpCount = this.chargerRepository.countByStationId(station.getStationId(), levelPath, isSuperAdmin);
                 station.setCpCount(cpCount);
             }
-    
+
             return csList;
         } catch (Exception e) {
             log.error("[findAllStationWithoutPagination] error: {}", e.getMessage());
@@ -261,24 +293,34 @@ public class CsService {
 
     }
 
-    public StationOpStatusDto getStationOpStatusCount() {
+    public StationOpStatusDto getStationOpStatusCount(String userId) {
         try {
-            StationOpStatusDto dto = this.csRepository.getStationOpStatusCount();
+            boolean isSuperAdmin = comService.checkSuperAdmin(userId);
+            Long loginUserCompanyId = comService.getLoginUserCompanyId(userId);
+            String levelPath = companyRepository.findLevelPathByCompanyId(loginUserCompanyId);
+            log.info("== levelPath : {}", levelPath);
+
+            StationOpStatusDto dto = this.csRepository.getStationOpStatusCount(levelPath, isSuperAdmin);
             log.info("[getStationOpStatusCount] dto >> {}", dto.toString());
             Long total = dto.getOpStopCount() + dto.getOpTestCount() + dto.getOperatingCount();
-            dto.setOpTestPer((double)dto.getOpTestCount()/total*100);
-            dto.setOpStopPer((double)dto.getOpStopCount()/total*100);
-            dto.setOperatingPer((double)dto.getOperatingCount()/total*100);
+            dto.setOpTestPer((double) dto.getOpTestCount() / total * 100);
+            dto.setOpStopPer((double) dto.getOpStopCount() / total * 100);
+            dto.setOperatingPer((double) dto.getOperatingCount() / total * 100);
             return dto;
         } catch (Exception e) {
             log.error("[getStationOpStatusCount] error: {}", e.getMessage());
             return null;
         }
     }
-    
-    public List<StationSearchDto> searchStationByOption(String searchOp, String searchContent) {
+
+    public List<StationSearchDto> searchStationByOption(String searchOp, String searchContent, String userId) {
         try {
-            return this.csRepository.searchStationByOption(searchOp, searchContent);
+            boolean isSuperAdmin = comService.checkSuperAdmin(userId);
+            Long loginUserCompanyId = comService.getLoginUserCompanyId(userId);
+            String levelPath = companyRepository.findLevelPathByCompanyId(loginUserCompanyId);
+            log.info("== levelPath : {}", levelPath);
+
+            return this.csRepository.searchStationByOption(searchOp, searchContent, levelPath, isSuperAdmin);
         } catch (Exception e) {
             log.error("[searchStationByOption] error: {}", e.getMessage());
             return new ArrayList<>();

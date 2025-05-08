@@ -32,13 +32,14 @@ public class MapController {
 
     // 충전소 조회
     @GetMapping("/search/station/{keyword}")
-    public ResponseEntity<Map<String, Object>> searchStation(@PathVariable("keyword") String keyword) {
+    public ResponseEntity<Map<String, Object>> searchStation(@PathVariable("keyword") String keyword,
+            Principal principal) {
         log.info("=== search station info ===");
 
         Map<String, Object> response = new HashMap<>();
 
         try {
-            List<StationSearchDto> csList = this.csService.saerchStationList(keyword);
+            List<StationSearchDto> csList = this.csService.saerchStationList(keyword, principal.getName());
             System.out.println("csList >> " + csList.toString());
 
             response.put("csList", csList);
@@ -81,13 +82,14 @@ public class MapController {
     // 사용자 위치 기반, 주변 충전소 조회
     @GetMapping("/nearby")
     public ResponseEntity<Map<String, Object>> getNearbyStations(@RequestParam("latitude") double latitude,
-            @RequestParam("longitude") double longitude) {
+            @RequestParam("longitude") double longitude, Principal principal) {
         log.info("=== find nearby charging stations ===");
 
         Map<String, Object> response = new HashMap<>();
 
         try {
-            List<CsInfoDetailDto> stationList = this.csService.findNearbyStations(latitude, longitude);
+            List<CsInfoDetailDto> stationList = this.csService.findNearbyStations(latitude, longitude,
+                    principal.getName());
             response.put("stationsList", stationList);
 
             return ResponseEntity.ok(response);
