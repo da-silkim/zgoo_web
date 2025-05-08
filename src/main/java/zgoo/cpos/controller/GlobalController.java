@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
 import zgoo.cpos.dto.users.UsersDto.UsersRegDto;
+import zgoo.cpos.service.CodeService;
 import zgoo.cpos.service.MenuService;
 import zgoo.cpos.service.UsersService;
 
@@ -14,10 +15,12 @@ import zgoo.cpos.service.UsersService;
 public class GlobalController {
     private MenuService menuService;
     private UsersService usersService;
+    private CodeService codeService;
 
-    public GlobalController(MenuService menuService, UsersService usersService) {
+    public GlobalController(MenuService menuService, UsersService usersService, CodeService codeService) {
         this.menuService = menuService;
         this.usersService = usersService;
+        this.codeService = codeService;
     }
 
     @ModelAttribute("loginUserId")
@@ -29,12 +32,13 @@ public class GlobalController {
             String loginUserId = authentication.getName();
             System.out.println("loginUserId: " + loginUserId);
             model.addAttribute("loginUserId", loginUserId);
-            // List<MenuDto.MenuListDto> menuList = menuService.findMenuListWithChild();
-            // model.addAttribute("navList", menuList);
 
             UsersRegDto user = this.usersService.findUserOne(loginUserId);
             String loginUserName = user.getName();
             model.addAttribute("loginUserName", loginUserName);
+
+            String authority = user.getAuthority();
+            model.addAttribute("loginUserAuthority", this.codeService.findCommonCodeName(authority));
 
             Long companyId = this.usersService.findCompanyId(loginUserId);
             model.addAttribute("companyId", companyId);

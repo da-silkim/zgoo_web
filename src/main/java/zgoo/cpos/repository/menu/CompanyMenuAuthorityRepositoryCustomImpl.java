@@ -15,6 +15,7 @@ import zgoo.cpos.domain.company.QCompany;
 import zgoo.cpos.domain.menu.CompanyMenuAuthority;
 import zgoo.cpos.domain.menu.QCompanyMenuAuthority;
 import zgoo.cpos.domain.menu.QMenu;
+import zgoo.cpos.domain.menu.QMenuAuthority;
 import zgoo.cpos.dto.menu.CompanyMenuAuthorityDto;
 import zgoo.cpos.dto.menu.CompanyMenuAuthorityDto.CompanyMenuAuthorityListDto;
 import zgoo.cpos.dto.menu.CompanyMenuAuthorityDto.CompanyMenuRegDto;
@@ -29,6 +30,7 @@ public class CompanyMenuAuthorityRepositoryCustomImpl implements CompanyMenuAuth
     QMenu childMenu = new QMenu("childMenu");
     QCompanyMenuAuthority companyMenuAuthority = QCompanyMenuAuthority.companyMenuAuthority;
     QCompanyMenuAuthority childCma = new QCompanyMenuAuthority("childCma");
+    QMenuAuthority menuAuthority = QMenuAuthority.menuAuthority;
 
     @Override
     public List<Long> findDistinctCompanyIds() {
@@ -111,6 +113,49 @@ public class CompanyMenuAuthorityRepositoryCustomImpl implements CompanyMenuAuth
                 .leftJoin(menu).on(companyMenuAuthority.menuCode.eq(menu.menuCode))
                 .leftJoin(parentMenu).on(parentMenu.menuCode.eq(menu.parentCode))
                 .where(companyMenuAuthority.companyId.eq(companyId))
+                .orderBy(companyMenuAuthority.companyId.asc(), companyMenuAuthority.menuCode.asc())
+                .fetch();
+
+        for (CompanyMenuAuthorityListDto dto : companyList) {
+            // 자식 메뉴 수를 계산하는 서브쿼리
+            Long childCount = queryFactory
+                .select(childMenu.count())
+                .from(childMenu)
+                .join(childCma).on(childCma.menuCode.eq(childMenu.menuCode))
+                .where(childMenu.parentCode.eq(dto.getMenuCode())     // 현재 메뉴의 menuCode와 자식 메뉴의 parentCode 비교
+                    .and(childCma.useYn.eq("Y"))                // 자식 메뉴의 use_yn이 'Y'인 경우만 계산
+                    .and(childCma.companyId.eq(dto.getCompanyId())))  // 동일한 companyId의 자식 메뉴만 카운트
+                .fetchOne();
+        
+            dto.setChildCnt(childCount != null ? childCount : 0);     // 자식 메뉴 카운트를 DTO에 설정
+        }
+
+        return companyList;
+    }
+
+    @Override
+    public List<CompanyMenuAuthorityListDto> findCompanyMenuAuthorityBasedUserAuthority(Long companyId, String authority) {
+        List<CompanyMenuAuthorityListDto> companyList = queryFactory
+                .select(Projections.fields(CompanyMenuAuthorityListDto.class,
+                    companyMenuAuthority.companyId.as("companyId"),
+                    companyMenuAuthority.menuCode.as("menuCode"),
+                    companyMenuAuthority.useYn.as("useYn"),
+                    menu.iconClass.as("iconClass"),
+                    menu.menuLv.as("menuLv"),
+                    menu.menuUrl.as("menuUrl"),
+                    menu.parentCode.as("parentCode"),
+                    menu.menuName.as("menuName"),
+                    parentMenu.menuName.as("parentCodeName"),
+                    menuAuthority.readYn.as("readYn")))
+                .from(companyMenuAuthority)
+                .leftJoin(menu).on(companyMenuAuthority.menuCode.eq(menu.menuCode))
+                .leftJoin(parentMenu).on(parentMenu.menuCode.eq(menu.parentCode))
+                .leftJoin(menuAuthority).on(companyMenuAuthority.menuCode.eq(menuAuthority.menu.menuCode),
+                    companyMenuAuthority.companyId.eq(menuAuthority.company.id))
+                .where(companyMenuAuthority.companyId.eq(companyId)
+                    .and(menuAuthority.authority.eq(authority))
+                    .and(companyMenuAuthority.useYn.eq("Y"))
+                    .and(menuAuthority.readYn.eq("Y")))
                 .orderBy(companyMenuAuthority.companyId.asc(), companyMenuAuthority.menuCode.asc())
                 .fetch();
 

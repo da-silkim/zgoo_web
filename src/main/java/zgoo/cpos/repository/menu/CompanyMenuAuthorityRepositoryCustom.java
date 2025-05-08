@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 
 import zgoo.cpos.domain.menu.CompanyMenuAuthority;
 import zgoo.cpos.dto.menu.CompanyMenuAuthorityDto;
+import zgoo.cpos.dto.menu.CompanyMenuAuthorityDto.CompanyMenuAuthorityListDto;
 import zgoo.cpos.dto.menu.CompanyMenuAuthorityDto.CompanyMenuRegDto;
 
 public interface CompanyMenuAuthorityRepositoryCustom {
@@ -20,6 +21,7 @@ public interface CompanyMenuAuthorityRepositoryCustom {
 
     // 해당 사업장의 메뉴 전체 조회
     List<CompanyMenuAuthorityDto.CompanyMenuAuthorityListDto> findCompanyMenuAuthorityList(Long companyId);
+    List<CompanyMenuAuthorityListDto> findCompanyMenuAuthorityBasedUserAuthority(Long companyId, String authority);
 
     // 사용여부에 따른 부모메뉴 useYn 업데이트
     void companyMenuAuthorityUseYnUpdate(CompanyMenuAuthority cma);
