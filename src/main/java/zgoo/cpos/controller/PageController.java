@@ -139,7 +139,7 @@ public class PageController {
             ConnectorStatusCountDto connStatus = this.chargerService.getConnectorStatusCount(principal.getName());
             model.addAttribute("connStatus", connStatus);
 
-            StationOpStatusDto opStatus = this.csService.getStationOpStatusCount();
+            StationOpStatusDto opStatus = this.csService.getStationOpStatusCount(principal.getName());
             model.addAttribute("opStatus", opStatus);
 
             TotalkwDashboardDto chgStatus = this.chargingHistService.findChargingHistByPeriod();
@@ -320,7 +320,7 @@ public class PageController {
         try {
             // 충전소 list
             Page<CsInfoListDto> csList = this.csService.findCsInfoWithPagination(companyId, searchOp, searchContent,
-                    page, size);
+                    page, size, principal.getName());
 
             // 검색 조건 저장
             model.addAttribute("selectedCompanyId", companyId);

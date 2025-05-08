@@ -79,7 +79,7 @@ public class PurchaseController {
     // 충전소 조회
     @GetMapping("/search/station")
     public ResponseEntity<Map<String, Object>> searchStationByOption(@RequestParam("searchOp") String searchOp,
-            @RequestParam("searchContent") String searchContent) {
+            @RequestParam("searchContent") String searchContent, Principal principal) {
         log.info("=== search station info ===");
 
         log.info("searchOp: {}, searchContent: {}", searchOp, searchContent);
@@ -87,9 +87,9 @@ public class PurchaseController {
         Map<String, Object> response = new HashMap<>();
 
         try {
-            List<StationSearchDto> csList = this.csService.searchStationByOption(searchOp, searchContent);
+            List<StationSearchDto> csList = this.csService.searchStationByOption(searchOp, searchContent,
+                    principal.getName());
             log.info("[searchStationByOption] csList >> {}", csList.toString());
-
 
             if (csList.isEmpty()) {
                 response.put("message", "조회된 데이터가 없습니다.");
@@ -124,7 +124,7 @@ public class PurchaseController {
 
         try {
             PurchaseDetailDto purchase = this.purchaseService.findPurchaseDetailOne(id);
-            model.addAttribute("purchase", purchase);          
+            model.addAttribute("purchase", purchase);
         } catch (Exception e) {
             log.error("[detailPurchase] error: {}", e.getMessage());
         }
@@ -149,7 +149,7 @@ public class PurchaseController {
         } catch (Exception e) {
             log.error("[createPurchase] error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                    .body("매입 정보 등록 중 오류가 발생했습니다.");
+                    .body("매입 정보 등록 중 오류가 발생했습니다.");
         }
     }
 
@@ -177,7 +177,7 @@ public class PurchaseController {
         } catch (Exception e) {
             log.error("[createPurchaseElec] error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                    .body("한전전기요금 정보 등록 중 오류가 발생했습니다.");
+                    .body("한전전기요금 정보 등록 중 오류가 발생했습니다.");
         }
     }
 
@@ -199,7 +199,7 @@ public class PurchaseController {
         } catch (Exception e) {
             log.error("[updatePurchase] error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                    .body("매입 정보 수정 중 오류가 발생했습니다.");
+                    .body("매입 정보 수정 중 오류가 발생했습니다.");
         }
     }
 

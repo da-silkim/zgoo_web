@@ -136,7 +136,7 @@ public class ExcelDownloadController {
         }
 
         List<CsInfoListDto> csList = this.csService.findAllStationWithoutPagination(companyIdSearch, opSearch,
-                contentSearch);
+                contentSearch, principal.getName());
 
         String[] headers = { "사업자", " 충전소명", "충전소ID", "설치주소", "충전기수", "운영상태", "운영시작시간", "운영종료시간" };
         Function<CsInfoListDto, Object[]> dataMapper = station -> new Object[] {

@@ -226,11 +226,24 @@ public class ChargerRepositoryCustomImpl implements ChargerRepositoryCustom {
     }
 
     @Override
-    public long countByStationId(String stationId) {
+    public long countByStationId(String stationId, String levelPath, boolean isSuperAdmin) {
+        BooleanBuilder builder = new BooleanBuilder();
+
+        if (stationId != null && !stationId.isEmpty()) {
+            builder.and(cpInfo.stationId.id.eq(stationId));
+        }
+
+        if (!isSuperAdmin && levelPath != null && !levelPath.isEmpty()) {
+            builder.and(QueryUtils.hasCompanyLevelAccess(relation, levelPath));
+        }
+
         return queryFactory
                 .select(cpInfo.count())
                 .from(cpInfo)
-                .where(cpInfo.stationId.id.eq(stationId))
+                .leftJoin(csInfo).on(cpInfo.stationId.eq(csInfo))
+                .leftJoin(company).on(csInfo.company.eq(company))
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
+                .where(builder)
                 .fetchOne();
     }
 
