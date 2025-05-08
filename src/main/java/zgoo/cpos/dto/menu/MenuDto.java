@@ -44,6 +44,7 @@ public class MenuDto {
     public static class MenuListDto extends MenuBaseDto {
         private String menuLvName;
         private long childCnt;
+        private String readYn;
     }
 
     @Data

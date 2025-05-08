@@ -276,4 +276,13 @@ public class CodeService {
             return null;
         }
     }
+
+    public String findCommonCodeName(String commonCode) {
+        try {
+            return commonCodeRepository.findCommonCodeName(commonCode);
+        } catch (Exception e) {
+            log.error("[findCommonCodeName] error: {}", e.getMessage());
+            return null;
+        }
+    }
 }

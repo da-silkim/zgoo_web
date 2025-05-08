@@ -20,7 +20,9 @@ import zgoo.cpos.domain.menu.Menu;
 import zgoo.cpos.domain.menu.MenuAuthority;
 import zgoo.cpos.dto.menu.CompanyMenuAuthorityDto;
 import zgoo.cpos.dto.menu.MenuAuthorityDto.MenuAuthorityBaseDto;
+import zgoo.cpos.dto.menu.MenuDto.MenuListDto;
 import zgoo.cpos.dto.menu.MenuDto;
+import zgoo.cpos.dto.menu.CompanyMenuAuthorityDto.CompanyMenuAuthorityListDto;
 import zgoo.cpos.dto.menu.CompanyMenuAuthorityDto.CompanyMenuRegDto;
 import zgoo.cpos.mapper.MenuAuthorityMapper;
 import zgoo.cpos.mapper.MenuMapper;
@@ -68,9 +70,15 @@ public class MenuService {
     }
 
     // 메뉴 - 전체 조회(자식 메뉴 개수, 메뉴 레벨명 추가)
-    public List<MenuDto.MenuListDto> findMenuListWithChild() {
+    public List<MenuDto.MenuListDto> findMenuListWithChild(String authority) {
         try {
             List<MenuDto.MenuListDto> menuListDto =this.menuRepository.getMuenListWithChildCount();
+            if ("SU".equals(authority)) {
+                for (MenuListDto dto : menuListDto) {
+                    dto.setReadYn("Y");
+                }
+            }
+            log.info("[MenuService] >> findMenuListWithChild");
             return menuListDto;
         } catch (Exception e) {
             log.error("[findMenuListWithChild] error: {}", e.getMessage());
@@ -221,12 +229,21 @@ public class MenuService {
         }
     }
 
-    public List<CompanyMenuAuthorityDto.CompanyMenuAuthorityListDto> findCompanyMenuAuthorityList(Long companyId) {
+    public List<CompanyMenuAuthorityDto.CompanyMenuAuthorityListDto>findCompanyMenuAuthorityList(Long companyId) {
         try {
             List<CompanyMenuAuthorityDto.CompanyMenuAuthorityListDto> cmaList = this.companyMenuAuthorityRepository.findCompanyMenuAuthorityList(companyId);
             return cmaList;
         } catch (Exception e) {
             log.error("[findCompanyMenuAuthorityList] error: {}", e.getMessage());
+            return new ArrayList<>();
+        }
+    }
+
+    public List<CompanyMenuAuthorityListDto> findCompanyMenuAuthorityBasedUserAuthority(Long companyId, String authority) {
+        try {
+            return this.companyMenuAuthorityRepository.findCompanyMenuAuthorityBasedUserAuthority(companyId, authority);
+        } catch (Exception e) {
+            log.error("[findCompanyMenuAuthorityBasedUserAuthority] error: {}", e.getMessage());
             return new ArrayList<>();
         }
     }

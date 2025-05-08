@@ -10,7 +10,7 @@
             <span id="logoutContainer" sec:authorize="isAuthenticated()">
                 <span>
                     <i class="fa-solid fa-user"></i>
-                    <span th:text="${loginUserName}"></span>
+                    <span th:text="|${loginUserName}(${loginUserAuthority}) 님|"></span>
                 </span>
                 <a th:href="@{/logout}" class="me-4" id="logout">Sign Out<i class="fa-solid fa-right-from-bracket ms-3"></i></i></a>
             </span>

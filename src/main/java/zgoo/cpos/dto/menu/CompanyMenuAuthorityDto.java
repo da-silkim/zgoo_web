@@ -38,6 +38,7 @@ public class CompanyMenuAuthorityDto {
         private String parentCode;
         private String parentCodeName;
         private long childCnt;
+        private String readYn;
     }
 
     @Data
