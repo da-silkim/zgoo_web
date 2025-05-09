@@ -770,7 +770,8 @@ public class ChargerPaymentInfoRepositoryCustomImpl implements ChargerPaymentInf
 
                 if (endYearMonth.getYear() == currentDate.getYear() &&
                         endYearMonth.getMonthValue() == currentDate.getMonthValue()) {
-                    toDateTime = LocalDate.now().atTime(23, 59, 59);
+                    // 현재 날짜의 전일 23:59:59로 설정
+                    toDateTime = LocalDate.now().minusDays(1).atTime(23, 59, 59);
                 } else {
                     toDateTime = endYearMonth.atEndOfMonth().atTime(23, 59, 59);
                 }

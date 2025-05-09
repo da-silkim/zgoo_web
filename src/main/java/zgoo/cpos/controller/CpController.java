@@ -89,6 +89,10 @@ public class CpController {
                 response.put("message", "충전기 등록에 실패했습니다.");
                 return ResponseEntity.badRequest().body(response);
             }
+
+            // 충전기 저장 성공 후 ocpp 충전기 디폴트 설정정보 저장
+            chargerService.createDefaultOcppConfig(reqdto.getChargerId());
+
             response.put("chargerId", result);
             response.put("message", "충전기 정보가 정상적으로 등록되었습니다.");
             return ResponseEntity.ok(response);

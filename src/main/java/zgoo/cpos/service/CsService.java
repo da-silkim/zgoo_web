@@ -113,6 +113,7 @@ public class CsService {
             CsKepcoContractInfo kepcoInfo = CsMapper.toEntityKepco(dto);
             CsLandInfo landInfo = CsMapper.toEntityLand(dto);
             String lastCsId = this.csRepository.findRecentStationId(dto.getCompanyId());
+            log.info("== lastCsId : {}", lastCsId);
 
             String stationId;
             if (lastCsId == null) {

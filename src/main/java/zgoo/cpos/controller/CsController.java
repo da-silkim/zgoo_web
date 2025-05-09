@@ -98,7 +98,7 @@ public class CsController {
     @PostMapping("/new")
     public ResponseEntity<Map<String, String>> createCsInfo(@Valid @RequestBody CsInfoRegDto dto,
             Principal principal) {
-        log.info("=== create charge station info ===");
+        log.info("=== create charge station info : {}", dto);
 
         Map<String, String> response = new HashMap<>();
 

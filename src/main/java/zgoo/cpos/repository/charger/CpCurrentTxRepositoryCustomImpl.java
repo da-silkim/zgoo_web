@@ -16,9 +16,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import zgoo.cpos.domain.charger.QCpCurrentTx;
 import zgoo.cpos.domain.charger.QCpInfo;
+import zgoo.cpos.domain.company.QCompany;
+import zgoo.cpos.domain.company.QCompanyRelationInfo;
 import zgoo.cpos.domain.cs.QCsInfo;
 import zgoo.cpos.domain.member.QMember;
 import zgoo.cpos.dto.cp.CurrentChargingListDto;
+import zgoo.cpos.util.QueryUtils;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -29,9 +32,18 @@ public class CpCurrentTxRepositoryCustomImpl implements CpCurrentTxRepositoryCus
     QCsInfo csInfo = QCsInfo.csInfo;
     QCpInfo cpInfo = QCpInfo.cpInfo;
     QMember member = QMember.member;
+    QCompany company = QCompany.company;
+    QCompanyRelationInfo relation = QCompanyRelationInfo.companyRelationInfo;
 
     @Override
-    public Page<CurrentChargingListDto> findAllChargerListPaging(Pageable page) {
+    public Page<CurrentChargingListDto> findAllChargerListPaging(Pageable page, String levelPath,
+            boolean isSuperAdmin) {
+
+        BooleanBuilder builder = new BooleanBuilder();
+
+        if (!isSuperAdmin && levelPath != null && !levelPath.isEmpty()) {
+            builder.and(QueryUtils.hasCompanyLevelAccess(relation, levelPath));
+        }
 
         List<CurrentChargingListDto> chargingList = queryFactory.select(Projections.fields(CurrentChargingListDto.class,
                 csInfo.company.companyName.as("companyName"),
@@ -49,7 +61,10 @@ public class CpCurrentTxRepositoryCustomImpl implements CpCurrentTxRepositoryCus
                 .from(cpCurrentTx)
                 .leftJoin(cpInfo).on(cpCurrentTx.id.chargerId.eq(cpInfo.id))
                 .leftJoin(csInfo).on(cpInfo.stationId.eq(csInfo))
+                .join(company).on(csInfo.company.eq(company))
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
                 .leftJoin(member).on(cpCurrentTx.idTag.eq(member.idTag))
+                .where(builder)
                 .orderBy(cpCurrentTx.startTime.desc())
                 .offset(page.getOffset())
                 .limit(page.getPageSize())
@@ -60,7 +75,10 @@ public class CpCurrentTxRepositoryCustomImpl implements CpCurrentTxRepositoryCus
                 .from(cpCurrentTx)
                 .leftJoin(cpInfo).on(cpCurrentTx.id.chargerId.eq(cpInfo.id))
                 .leftJoin(csInfo).on(cpInfo.stationId.eq(csInfo))
+                .join(company).on(csInfo.company.eq(company))
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
                 .leftJoin(member).on(cpCurrentTx.idTag.eq(member.idTag))
+                .where(builder)
                 .fetchOne();
 
         return new PageImpl<>(chargingList, page, totalCount);
@@ -68,9 +86,14 @@ public class CpCurrentTxRepositoryCustomImpl implements CpCurrentTxRepositoryCus
 
     @Override
     public Page<CurrentChargingListDto> findChargerListPaging(Long companyId, String chgStartTimeFrom,
-            String chgStartTimeTo, String searchOp, String searchContent, Pageable pageable) {
+            String chgStartTimeTo, String searchOp, String searchContent, Pageable pageable, String levelPath,
+            boolean isSuperAdmin) {
 
         BooleanBuilder builder = new BooleanBuilder();
+
+        if (!isSuperAdmin && levelPath != null && !levelPath.isEmpty()) {
+            builder.and(QueryUtils.hasCompanyLevelAccess(relation, levelPath));
+        }
 
         if (companyId != null) {
             builder.and(csInfo.company.id.eq(companyId));
@@ -134,6 +157,8 @@ public class CpCurrentTxRepositoryCustomImpl implements CpCurrentTxRepositoryCus
                 .from(cpCurrentTx)
                 .leftJoin(cpInfo).on(cpCurrentTx.id.chargerId.eq(cpInfo.id))
                 .leftJoin(csInfo).on(cpInfo.stationId.eq(csInfo))
+                .join(company).on(csInfo.company.eq(company))
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
                 .leftJoin(member).on(cpCurrentTx.idTag.eq(member.idTag))
                 .where(builder)
                 .orderBy(cpCurrentTx.startTime.desc())
@@ -146,6 +171,8 @@ public class CpCurrentTxRepositoryCustomImpl implements CpCurrentTxRepositoryCus
                 .from(cpCurrentTx)
                 .leftJoin(cpInfo).on(cpCurrentTx.id.chargerId.eq(cpInfo.id))
                 .leftJoin(csInfo).on(cpInfo.stationId.eq(csInfo))
+                .join(company).on(csInfo.company.eq(company))
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
                 .leftJoin(member).on(cpCurrentTx.idTag.eq(member.idTag))
                 .where(builder)
                 .fetchOne();
@@ -156,9 +183,13 @@ public class CpCurrentTxRepositoryCustomImpl implements CpCurrentTxRepositoryCus
 
     @Override
     public List<CurrentChargingListDto> findAllCurrentTxListWithoutPagination(Long companyId, String startFrom,
-            String startTo, String searchOp, String searchContent) {
+            String startTo, String searchOp, String searchContent, String levelPath, boolean isSuperAdmin) {
 
         BooleanBuilder builder = new BooleanBuilder();
+
+        if (!isSuperAdmin && levelPath != null && !levelPath.isEmpty()) {
+            builder.and(QueryUtils.hasCompanyLevelAccess(relation, levelPath));
+        }
 
         if (companyId != null) {
             builder.and(csInfo.company.id.eq(companyId));
@@ -222,6 +253,8 @@ public class CpCurrentTxRepositoryCustomImpl implements CpCurrentTxRepositoryCus
                 .from(cpCurrentTx)
                 .leftJoin(cpInfo).on(cpCurrentTx.id.chargerId.eq(cpInfo.id))
                 .leftJoin(csInfo).on(cpInfo.stationId.eq(csInfo))
+                .join(company).on(csInfo.company.eq(company))
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
                 .leftJoin(member).on(cpCurrentTx.idTag.eq(member.idTag))
                 .where(builder)
                 .orderBy(cpCurrentTx.startTime.desc())

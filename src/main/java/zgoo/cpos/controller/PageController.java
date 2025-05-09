@@ -559,13 +559,13 @@ public class PageController {
             if (reqCompanyId == null && reqChgStartTimeFrom == null && reqChgStartTimeTo == null
                     && reqOpSearch == null) {
                 log.info("Search all current charging list >>");
-                chargingList = cpCurrentTxService.findCurrentChargingListAll(page, size);
+                chargingList = cpCurrentTxService.findCurrentChargingListAll(page, size, principal.getName());
             } else {
                 log.info(
                         "Search current charging list by options:companyid:{},chgStartTimeFrom:{},chgStartTimeTo:{},op:{},content:{} >>",
                         reqCompanyId, reqChgStartTimeFrom, reqChgStartTimeTo, reqOpSearch, reqSearchContent);
                 chargingList = cpCurrentTxService.findCurrentChargingList(reqCompanyId, reqChgStartTimeFrom,
-                        reqChgStartTimeTo, reqOpSearch, reqSearchContent, page, size);
+                        reqChgStartTimeTo, reqOpSearch, reqSearchContent, page, size, principal.getName());
             }
 
             // page 처리

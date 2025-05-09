@@ -1,5 +1,6 @@
 package zgoo.cpos.service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -16,6 +17,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import zgoo.cpos.domain.charger.CpInfo;
 import zgoo.cpos.domain.charger.CpModem;
+import zgoo.cpos.domain.charger.KeyValue;
+import zgoo.cpos.domain.charger.KeyValueId;
 import zgoo.cpos.domain.company.CpPlanPolicy;
 import zgoo.cpos.domain.cs.CsInfo;
 import zgoo.cpos.dto.cp.ChargerDto.ChargerCountBySidoDto;
@@ -32,11 +35,13 @@ import zgoo.cpos.mapper.CpModemMapper;
 import zgoo.cpos.repository.charger.ChargerRepository;
 import zgoo.cpos.repository.charger.ConnectorStatusRepository;
 import zgoo.cpos.repository.charger.CpModemRepository;
+import zgoo.cpos.repository.charger.KeyValueRepository;
 import zgoo.cpos.repository.code.CommonCodeRepository;
 import zgoo.cpos.repository.company.CompanyRepository;
 import zgoo.cpos.repository.company.CpPlanPolicyRepository;
 import zgoo.cpos.repository.cpmodel.CpModelRepository;
 import zgoo.cpos.repository.cs.CsRepository;
+import zgoo.cpos.type.ocpp.ConfigurationKey;
 
 @Service
 @RequiredArgsConstructor
@@ -52,6 +57,7 @@ public class ChargerService {
     private final CommonCodeRepository commonCodeRepository;
     private final ComService comService;
     private final CompanyRepository companyRepository;
+    private final KeyValueRepository keyValueRepository;
 
     /*
      * 저장 > 충전기 정보 저장
@@ -80,6 +86,40 @@ public class ChargerService {
         } catch (Exception e) {
             log.error("[ChargerService >> saveCpInfo] error: {}", e.getMessage());
             return null;
+        }
+    }
+
+    /*
+     * ocpp 충전기 디폴트 설정정보 저장
+     */
+    @Transactional
+    public void createDefaultOcppConfig(String chargerId) {
+        try {
+            // 충전기 ocpp 설정 정보 저장(authorizationKey)
+            KeyValue authkey = KeyValue.builder()
+                    .id(new KeyValueId(chargerId, ConfigurationKey.AuthorizationKey))
+                    .configValue("dongahdongahdongah")
+                    .readOnly(false)
+                    .regDt(LocalDateTime.now())
+                    .modDt(LocalDateTime.now())
+                    .build();
+            KeyValue authkeysaved = keyValueRepository.save(authkey);
+            log.info("충전기 ocpp 설정 정보 저장완료 >> (key: {}, value: {})", authkeysaved.getId().getConfigKey(),
+                    authkeysaved.getConfigValue());
+
+            // 충전기 ocpp 설정 정보 저장(securityProfile)
+            KeyValue securityProfile = KeyValue.builder()
+                    .id(new KeyValueId(chargerId, ConfigurationKey.SecurityProfile))
+                    .configValue("2")
+                    .readOnly(false)
+                    .regDt(LocalDateTime.now())
+                    .modDt(LocalDateTime.now())
+                    .build();
+            KeyValue securityProfileSaved = keyValueRepository.save(securityProfile);
+            log.info("충전기 ocpp 설정 정보 저장완료 >> (key: {}, value: {})", securityProfileSaved.getId().getConfigKey(),
+                    securityProfileSaved.getConfigValue());
+        } catch (Exception e) {
+            log.error("[ChargerService >> createDefaultOcppConfig] error: {}", e.getMessage());
         }
     }
 

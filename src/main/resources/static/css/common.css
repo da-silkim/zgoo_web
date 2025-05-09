@@ -1270,14 +1270,20 @@ table.table tbody tr.row-selected {
 .fa-plug.available {
   color: #346906;
 }
-.fa-plug.charging {
-  color: #39afe2;
-}
 .fa-plug.preparing {
   color: #f0a503;
 }
+.fa-plug.charging {
+  color: #39afe2;
+}
+.fa-plug.finishing {
+  color: #6f03fd;
+}
 .fa-plug.faulted {
   color: #dc3545;
+}
+.fa-plug.reserved {
+  color: #c4e605;
 }
 .fa-plug.disconnected {
   color: #6c757d;

@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import zgoo.cpos.dto.cp.CurrentChargingListDto;
 import zgoo.cpos.repository.charger.CpCurrentTxRepository;
+import zgoo.cpos.repository.company.CompanyRepository;
 
 @Service
 @RequiredArgsConstructor
@@ -20,14 +21,23 @@ import zgoo.cpos.repository.charger.CpCurrentTxRepository;
 public class CpCurrentTxService {
 
     private final CpCurrentTxRepository cpCurrentTxRepository;
+    private final ComService comService;
+    private final CompanyRepository companyRepository;
 
     /*
      * paging - 현재 충전목록 전체 조회
      */
-    public Page<CurrentChargingListDto> findCurrentChargingListAll(int page, int size) {
+    public Page<CurrentChargingListDto> findCurrentChargingListAll(int page, int size, String userId) {
+
         Pageable pageable = PageRequest.of(page, size);
         try {
-            Page<CurrentChargingListDto> currentChargingList = cpCurrentTxRepository.findAllChargerListPaging(pageable);
+            boolean isSuperAdmin = comService.checkSuperAdmin(userId);
+            Long loginUserCompanyId = comService.getLoginUserCompanyId(userId);
+            String levelPath = companyRepository.findLevelPathByCompanyId(loginUserCompanyId);
+            log.info("== levelPath : {}", levelPath);
+
+            Page<CurrentChargingListDto> currentChargingList = cpCurrentTxRepository.findAllChargerListPaging(pageable,
+                    levelPath, isSuperAdmin);
             return currentChargingList;
         } catch (DataAccessException dae) {
             log.error("Database error occurred while fetching current charging list: {}", dae.getMessage(), dae);
@@ -42,11 +52,16 @@ public class CpCurrentTxService {
      * paging - 현재 충전목록 조회 with 검색조건
      */
     public Page<CurrentChargingListDto> findCurrentChargingList(Long companyId, String chgStartTimeFrom,
-            String chgStartTimeTo, String searchOp, String searchContent, int page, int size) {
+            String chgStartTimeTo, String searchOp, String searchContent, int page, int size, String userId) {
         Pageable pageable = PageRequest.of(page, size);
         try {
+            boolean isSuperAdmin = comService.checkSuperAdmin(userId);
+            Long loginUserCompanyId = comService.getLoginUserCompanyId(userId);
+            String levelPath = companyRepository.findLevelPathByCompanyId(loginUserCompanyId);
+            log.info("== levelPath : {}", levelPath);
+
             Page<CurrentChargingListDto> currentChargingList = cpCurrentTxRepository.findChargerListPaging(companyId,
-                    chgStartTimeFrom, chgStartTimeTo, searchOp, searchContent, pageable);
+                    chgStartTimeFrom, chgStartTimeTo, searchOp, searchContent, pageable, levelPath, isSuperAdmin);
             return currentChargingList;
         } catch (DataAccessException dae) {
             log.error("Database error occurred while fetching current charging list: {}", dae.getMessage(), dae);
@@ -62,13 +77,18 @@ public class CpCurrentTxService {
      */
     @Transactional(readOnly = true)
     public List<CurrentChargingListDto> findAllCurrentTxListWithoutPagination(Long companyId, String startFrom,
-            String startTo, String searchOp, String searchContent) {
+            String startTo, String searchOp, String searchContent, String userId) {
         log.info(
                 "=== Finding all charger list: companyId={}, startFrom={}, startTo={}, searchOp={}, searchContent={} ===",
                 companyId, startFrom, startTo, searchOp, searchContent);
 
+        boolean isSuperAdmin = comService.checkSuperAdmin(userId);
+        Long loginUserCompanyId = comService.getLoginUserCompanyId(userId);
+        String levelPath = companyRepository.findLevelPathByCompanyId(loginUserCompanyId);
+        log.info("== levelPath : {}", levelPath);
+
         // 대용량 데이터 처리를 위한 스트림 처리 또는 배치 처리 고려
         return cpCurrentTxRepository.findAllCurrentTxListWithoutPagination(companyId, startFrom, startTo, searchOp,
-                searchContent);
+                searchContent, levelPath, isSuperAdmin);
     }
 }
