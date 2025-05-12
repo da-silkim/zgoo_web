@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import zgoo.cpos.domain.code.QCommonCode;
 import zgoo.cpos.domain.company.QCompany;
+import zgoo.cpos.domain.company.QCompanyRelationInfo;
 import zgoo.cpos.domain.cp.QCpConnector;
 import zgoo.cpos.domain.cp.QCpModel;
 import zgoo.cpos.domain.cp.QCpModelDetail;
@@ -22,6 +23,7 @@ import zgoo.cpos.dto.cp.CpModelDto.CpConnectorDto;
 import zgoo.cpos.dto.cp.CpModelDto.CpModelDetailDto;
 import zgoo.cpos.dto.cp.CpModelDto.CpModelListDto;
 import zgoo.cpos.dto.cp.CpModelDto.CpModelRegDto;
+import zgoo.cpos.util.QueryUtils;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -31,13 +33,22 @@ public class CpModelRepositoryCustomImpl implements CpModelRepositoryCustom {
     QCpModelDetail modelDetail = QCpModelDetail.cpModelDetail;
     QCpConnector connector = QCpConnector.cpConnector;
     QCompany company = QCompany.company;
+    QCompanyRelationInfo relation = QCompanyRelationInfo.companyRelationInfo;
     QCommonCode manufCdName = new QCommonCode("manufCd");
     QCommonCode cpTypeName = new QCommonCode("cpType");
     QCommonCode installationTypeName = new QCommonCode("installationType");
     QCommonCode connectorTypeName = new QCommonCode("connectorType");
 
     @Override
-    public Page<CpModelListDto> findCpModelWithPagination(Pageable pageable) {
+    public Page<CpModelListDto> findCpModelWithPagination(Pageable pageable, String levelPath,
+            boolean isSuperAdmin) {
+
+        BooleanBuilder builder = new BooleanBuilder();
+
+        if (!isSuperAdmin && levelPath != null && !levelPath.isEmpty()) {
+            builder.and(QueryUtils.hasCompanyLevelAccess(relation, levelPath));
+        }
+
         List<CpModelListDto> modelList = queryFactory.select(Projections.fields(CpModelListDto.class,
                 model.id.as("modelId"),
                 model.modelCode.as("modelCode"),
@@ -49,8 +60,10 @@ public class CpModelRepositoryCustomImpl implements CpModelRepositoryCustom {
                 company.companyName.as("companyName")))
                 .from(model)
                 .leftJoin(company).on(model.company.eq(company))
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
                 .leftJoin(manufCdName).on(model.manufCd.eq(manufCdName.commonCode))
                 .leftJoin(cpTypeName).on(model.cpType.eq(cpTypeName.commonCode))
+                .where(builder)
                 .orderBy(model.id.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -59,6 +72,11 @@ public class CpModelRepositoryCustomImpl implements CpModelRepositoryCustom {
         long totalCount = queryFactory
                 .select(model.count())
                 .from(model)
+                .leftJoin(company).on(model.company.eq(company))
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
+                .leftJoin(manufCdName).on(model.manufCd.eq(manufCdName.commonCode))
+                .leftJoin(cpTypeName).on(model.cpType.eq(cpTypeName.commonCode))
+                .where(builder)
                 .fetchOne();
 
         return new PageImpl<>(modelList, pageable, totalCount);
@@ -66,8 +84,12 @@ public class CpModelRepositoryCustomImpl implements CpModelRepositoryCustom {
 
     @Override
     public Page<CpModelListDto> searchCpModelWithPagination(Long companyId, String manuf, String chgSpeed,
-            Pageable pageable) {
+            Pageable pageable, String levelPath, boolean isSuperAdmin) {
         BooleanBuilder builder = new BooleanBuilder();
+
+        if (!isSuperAdmin && levelPath != null && !levelPath.isEmpty()) {
+            builder.and(QueryUtils.hasCompanyLevelAccess(relation, levelPath));
+        }
 
         if (companyId != null) {
             builder.and(model.company.id.eq(companyId));
@@ -92,6 +114,7 @@ public class CpModelRepositoryCustomImpl implements CpModelRepositoryCustom {
                 company.companyName.as("companyName")))
                 .from(model)
                 .leftJoin(company).on(model.company.eq(company))
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
                 .leftJoin(manufCdName).on(model.manufCd.eq(manufCdName.commonCode))
                 .leftJoin(cpTypeName).on(model.cpType.eq(cpTypeName.commonCode))
                 .orderBy(model.id.desc())
@@ -103,6 +126,10 @@ public class CpModelRepositoryCustomImpl implements CpModelRepositoryCustom {
         long totalCount = queryFactory
                 .select(model.count())
                 .from(model)
+                .leftJoin(company).on(model.company.eq(company))
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
+                .leftJoin(manufCdName).on(model.manufCd.eq(manufCdName.commonCode))
+                .leftJoin(cpTypeName).on(model.cpType.eq(cpTypeName.commonCode))
                 .where(builder)
                 .fetchOne();
 

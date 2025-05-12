@@ -153,7 +153,7 @@ public class PageController {
                     principal.getName());
             model.addAttribute("facilityList", facilityList);
 
-            List<NoticeListDto> noticeList = this.noticeService.findLatestNoticeList();
+            List<NoticeListDto> noticeList = this.noticeService.findLatestNoticeList(principal.getName());
             model.addAttribute("noticeList", noticeList);
         } catch (Exception e) {
             e.getStackTrace();
@@ -619,8 +619,7 @@ public class PageController {
         try {
             // 충전기 모델 list
             Page<CpModelListDto> modelList = this.cpModelService.findCpModelInfoWithPagination(companyId, manfCode,
-                    chgSpeedCode,
-                    page, size);
+                    chgSpeedCode, page, size, principal.getName());
 
             model.addAttribute("selectedCompanyId", companyId);
             model.addAttribute("selectedManfCd", manfCode);
@@ -729,7 +728,7 @@ public class PageController {
 
             // 사용자 list
             Page<UsersDto.UsersListDto> userList = this.usersService.findUsersWithPagination(companyId, companyType,
-                    name, page, size);
+                    name, page, size, principal.getName());
 
             // 검색 조건 저장
             model.addAttribute("selectedCompanyId", companyId);
@@ -798,8 +797,7 @@ public class PageController {
             model.addAttribute("companyList", companyList);
 
             Page<NoticeDto.NoticeListDto> noticeList = this.noticeService.findNoticeWithPagintaion(companyId,
-                    startDateSearch,
-                    endDateSearch, page, size);
+                    startDateSearch, endDateSearch, page, size, principal.getName());
 
             int totalPages = noticeList.getTotalPages() == 0 ? 1 : noticeList.getTotalPages();
 
@@ -869,10 +867,11 @@ public class PageController {
 
             if (companyName == null || companyName.isEmpty()) {
                 log.info("[findCompanyMenuAll] companyName: {}", companyName);
-                companyMenuList = this.menuService.findCompanyMenuAll(page, size);
+                companyMenuList = this.menuService.findCompanyMenuAll(page, size, principal.getName());
             } else {
                 log.info("[searchCompanyMenuWithPagination] companyName: {}", companyName);
-                companyMenuList = this.menuService.searchCompanyMenuWithPagination(companyName, page, size);
+                companyMenuList = this.menuService.searchCompanyMenuWithPagination(companyName, page, size,
+                        principal.getName());
             }
 
             int totalPages = companyMenuList.getTotalPages() == 0 ? 1 : companyMenuList.getTotalPages();
@@ -965,7 +964,7 @@ public class PageController {
         try {
             // 에러코드 list
             Page<ChgErrorCodeListDto> errcdList = this.chgErrorCodeService.findErrorCodeInfoWithPagination(manfCode,
-                    searchOp, searchContent, page, size);
+                    searchOp, searchContent, page, size, principal.getName());
 
             // 검색 조건 저장
             model.addAttribute("selectedManfCd", manfCode);
@@ -1026,10 +1025,11 @@ public class PageController {
             // check null and call the approrpiate search method
             if (companyId != null) {
                 log.info("Searching by companyId: {}", companyId);
-                tariffpolicyList = tariffService.searchTariffPolicyByCompanyId(page, size, companyId);
+                tariffpolicyList = tariffService.searchTariffPolicyByCompanyId(page, size, companyId,
+                        principal.getName());
             } else {
                 log.info("Fetching all Tariff >> ");
-                tariffpolicyList = tariffService.searchTariffPolicyAll(page, size);
+                tariffpolicyList = tariffService.searchTariffPolicyAll(page, size, principal.getName());
 
             }
 
@@ -1049,7 +1049,7 @@ public class PageController {
             log.info("== selectOption >> companyList : {}", companyList.toString());
             model.addAttribute("companyList", companyList);
             // 요금제 리스트(cpPlanPolicy)
-            List<CpPlanDto> planList = tariffService.searchPlanPolicyAll();
+            List<CpPlanDto> planList = tariffService.searchPlanPolicyAll(principal.getName());
             log.info("== selectOption >> planPolicy count : {}", planList.size());
             model.addAttribute("planList", planList);
             // grid row count

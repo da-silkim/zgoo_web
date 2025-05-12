@@ -6,12 +6,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import zgoo.cpos.domain.company.QCompany;
+import zgoo.cpos.domain.company.QCompanyRelationInfo;
 import zgoo.cpos.domain.menu.CompanyMenuAuthority;
 import zgoo.cpos.domain.menu.QCompanyMenuAuthority;
 import zgoo.cpos.domain.menu.QMenu;
@@ -19,12 +21,14 @@ import zgoo.cpos.domain.menu.QMenuAuthority;
 import zgoo.cpos.dto.menu.CompanyMenuAuthorityDto;
 import zgoo.cpos.dto.menu.CompanyMenuAuthorityDto.CompanyMenuAuthorityListDto;
 import zgoo.cpos.dto.menu.CompanyMenuAuthorityDto.CompanyMenuRegDto;
+import zgoo.cpos.util.QueryUtils;
 
 @Slf4j
 @RequiredArgsConstructor
 public class CompanyMenuAuthorityRepositoryCustomImpl implements CompanyMenuAuthorityRepositoryCustom {
     private final JPAQueryFactory queryFactory;
     QCompany company = QCompany.company;
+    QCompanyRelationInfo relation = QCompanyRelationInfo.companyRelationInfo;
     QMenu menu = QMenu.menu;
     QMenu parentMenu = new QMenu("parentMenu");
     QMenu childMenu = new QMenu("childMenu");
@@ -43,9 +47,11 @@ public class CompanyMenuAuthorityRepositoryCustomImpl implements CompanyMenuAuth
 
     @Override
     public List<CompanyMenuAuthorityDto.CompanyMenuRegDto> findDistinctCompanyWithCompanyName() {
-        List<CompanyMenuAuthorityDto.CompanyMenuRegDto> companyList = queryFactory.select(Projections.fields(CompanyMenuAuthorityDto.CompanyMenuRegDto.class,
-                companyMenuAuthority.companyId.as("companyId"),
-                company.companyName.as("companyName"))).distinct()
+        List<CompanyMenuAuthorityDto.CompanyMenuRegDto> companyList = queryFactory
+                .select(Projections.fields(CompanyMenuAuthorityDto.CompanyMenuRegDto.class,
+                        companyMenuAuthority.companyId.as("companyId"),
+                        company.companyName.as("companyName")))
+                .distinct()
                 .from(companyMenuAuthority)
                 .leftJoin(company).on(companyMenuAuthority.companyId.eq(company.id))
                 .fetch();
@@ -54,12 +60,22 @@ public class CompanyMenuAuthorityRepositoryCustomImpl implements CompanyMenuAuth
     }
 
     @Override
-    public Page<CompanyMenuRegDto> findCompanyMenuWithPagination(Pageable pageable) {
-        List<CompanyMenuAuthorityDto.CompanyMenuRegDto> companyList = queryFactory.select(Projections.fields(CompanyMenuAuthorityDto.CompanyMenuRegDto.class,
-                companyMenuAuthority.companyId.as("companyId"),
-                company.companyName.as("companyName")))
+    public Page<CompanyMenuRegDto> findCompanyMenuWithPagination(Pageable pageable, String levelPath,
+            boolean isSuperAdmin) {
+
+        BooleanBuilder builder = new BooleanBuilder();
+        if (!isSuperAdmin && levelPath != null && !levelPath.isEmpty()) {
+            builder.and(QueryUtils.hasCompanyLevelAccess(relation, levelPath));
+        }
+
+        List<CompanyMenuAuthorityDto.CompanyMenuRegDto> companyList = queryFactory
+                .select(Projections.fields(CompanyMenuAuthorityDto.CompanyMenuRegDto.class,
+                        companyMenuAuthority.companyId.as("companyId"),
+                        company.companyName.as("companyName")))
                 .from(companyMenuAuthority)
                 .leftJoin(company).on(companyMenuAuthority.companyId.eq(company.id))
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
+                .where(builder)
                 .distinct()
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -68,19 +84,33 @@ public class CompanyMenuAuthorityRepositoryCustomImpl implements CompanyMenuAuth
         long totalCount = queryFactory
                 .select(companyMenuAuthority.companyId.countDistinct())
                 .from(companyMenuAuthority)
+                .leftJoin(company).on(companyMenuAuthority.companyId.eq(company.id))
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
+                .where(builder)
                 .fetchOne();
 
         return new PageImpl<>(companyList, pageable, totalCount);
     }
 
     @Override
-    public Page<CompanyMenuRegDto> searchCompanyMenuWithPagination(String companyName, Pageable pageable) {
-        List<CompanyMenuAuthorityDto.CompanyMenuRegDto> companyList = queryFactory.select(Projections.fields(CompanyMenuAuthorityDto.CompanyMenuRegDto.class,
-                companyMenuAuthority.companyId.as("companyId"),
-                company.companyName.as("companyName")))
+    public Page<CompanyMenuRegDto> searchCompanyMenuWithPagination(String companyName, Pageable pageable,
+            String levelPath, boolean isSuperAdmin) {
+
+        BooleanBuilder builder = new BooleanBuilder();
+        if (!isSuperAdmin && levelPath != null && !levelPath.isEmpty()) {
+            builder.and(QueryUtils.hasCompanyLevelAccess(relation, levelPath));
+        }
+
+        builder.and(company.companyName.like("%" + companyName + "%"));
+
+        List<CompanyMenuAuthorityDto.CompanyMenuRegDto> companyList = queryFactory
+                .select(Projections.fields(CompanyMenuAuthorityDto.CompanyMenuRegDto.class,
+                        companyMenuAuthority.companyId.as("companyId"),
+                        company.companyName.as("companyName")))
                 .from(companyMenuAuthority)
                 .leftJoin(company).on(companyMenuAuthority.companyId.eq(company.id))
-                .where(company.companyName.like("%" + companyName + "%"))
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
+                .where(builder)
                 .distinct()
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -89,26 +119,27 @@ public class CompanyMenuAuthorityRepositoryCustomImpl implements CompanyMenuAuth
         long totalCount = queryFactory
                 .select(companyMenuAuthority.companyId.countDistinct())
                 .from(companyMenuAuthority)
-                .leftJoin(company).on(companyMenuAuthority.companyId.eq(company.id)) 
-                .where(company.companyName.like("%" + companyName + "%"))
+                .leftJoin(company).on(companyMenuAuthority.companyId.eq(company.id))
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
+                .where(builder)
                 .fetchOne();
 
         return new PageImpl<>(companyList, pageable, totalCount);
     }
 
     @Override
-    public List<CompanyMenuAuthorityListDto> findCompanyMenuAuthorityList(Long companyId) {            
+    public List<CompanyMenuAuthorityListDto> findCompanyMenuAuthorityList(Long companyId) {
         List<CompanyMenuAuthorityListDto> companyList = queryFactory
                 .select(Projections.fields(CompanyMenuAuthorityListDto.class,
-                    companyMenuAuthority.companyId.as("companyId"),
-                    companyMenuAuthority.menuCode.as("menuCode"),
-                    companyMenuAuthority.useYn.as("useYn"),
-                    menu.iconClass.as("iconClass"),
-                    menu.menuLv.as("menuLv"),
-                    menu.menuUrl.as("menuUrl"),
-                    menu.parentCode.as("parentCode"),
-                    menu.menuName.as("menuName"),
-                    parentMenu.menuName.as("parentCodeName")))
+                        companyMenuAuthority.companyId.as("companyId"),
+                        companyMenuAuthority.menuCode.as("menuCode"),
+                        companyMenuAuthority.useYn.as("useYn"),
+                        menu.iconClass.as("iconClass"),
+                        menu.menuLv.as("menuLv"),
+                        menu.menuUrl.as("menuUrl"),
+                        menu.parentCode.as("parentCode"),
+                        menu.menuName.as("menuName"),
+                        parentMenu.menuName.as("parentCodeName")))
                 .from(companyMenuAuthority)
                 .leftJoin(menu).on(companyMenuAuthority.menuCode.eq(menu.menuCode))
                 .leftJoin(parentMenu).on(parentMenu.menuCode.eq(menu.parentCode))
@@ -119,58 +150,59 @@ public class CompanyMenuAuthorityRepositoryCustomImpl implements CompanyMenuAuth
         for (CompanyMenuAuthorityListDto dto : companyList) {
             // 자식 메뉴 수를 계산하는 서브쿼리
             Long childCount = queryFactory
-                .select(childMenu.count())
-                .from(childMenu)
-                .join(childCma).on(childCma.menuCode.eq(childMenu.menuCode))
-                .where(childMenu.parentCode.eq(dto.getMenuCode())     // 현재 메뉴의 menuCode와 자식 메뉴의 parentCode 비교
-                    .and(childCma.useYn.eq("Y"))                // 자식 메뉴의 use_yn이 'Y'인 경우만 계산
-                    .and(childCma.companyId.eq(dto.getCompanyId())))  // 동일한 companyId의 자식 메뉴만 카운트
-                .fetchOne();
-        
-            dto.setChildCnt(childCount != null ? childCount : 0);     // 자식 메뉴 카운트를 DTO에 설정
+                    .select(childMenu.count())
+                    .from(childMenu)
+                    .join(childCma).on(childCma.menuCode.eq(childMenu.menuCode))
+                    .where(childMenu.parentCode.eq(dto.getMenuCode()) // 현재 메뉴의 menuCode와 자식 메뉴의 parentCode 비교
+                            .and(childCma.useYn.eq("Y")) // 자식 메뉴의 use_yn이 'Y'인 경우만 계산
+                            .and(childCma.companyId.eq(dto.getCompanyId()))) // 동일한 companyId의 자식 메뉴만 카운트
+                    .fetchOne();
+
+            dto.setChildCnt(childCount != null ? childCount : 0); // 자식 메뉴 카운트를 DTO에 설정
         }
 
         return companyList;
     }
 
     @Override
-    public List<CompanyMenuAuthorityListDto> findCompanyMenuAuthorityBasedUserAuthority(Long companyId, String authority) {
+    public List<CompanyMenuAuthorityListDto> findCompanyMenuAuthorityBasedUserAuthority(Long companyId,
+            String authority) {
         List<CompanyMenuAuthorityListDto> companyList = queryFactory
                 .select(Projections.fields(CompanyMenuAuthorityListDto.class,
-                    companyMenuAuthority.companyId.as("companyId"),
-                    companyMenuAuthority.menuCode.as("menuCode"),
-                    companyMenuAuthority.useYn.as("useYn"),
-                    menu.iconClass.as("iconClass"),
-                    menu.menuLv.as("menuLv"),
-                    menu.menuUrl.as("menuUrl"),
-                    menu.parentCode.as("parentCode"),
-                    menu.menuName.as("menuName"),
-                    parentMenu.menuName.as("parentCodeName"),
-                    menuAuthority.readYn.as("readYn")))
+                        companyMenuAuthority.companyId.as("companyId"),
+                        companyMenuAuthority.menuCode.as("menuCode"),
+                        companyMenuAuthority.useYn.as("useYn"),
+                        menu.iconClass.as("iconClass"),
+                        menu.menuLv.as("menuLv"),
+                        menu.menuUrl.as("menuUrl"),
+                        menu.parentCode.as("parentCode"),
+                        menu.menuName.as("menuName"),
+                        parentMenu.menuName.as("parentCodeName"),
+                        menuAuthority.readYn.as("readYn")))
                 .from(companyMenuAuthority)
                 .leftJoin(menu).on(companyMenuAuthority.menuCode.eq(menu.menuCode))
                 .leftJoin(parentMenu).on(parentMenu.menuCode.eq(menu.parentCode))
                 .leftJoin(menuAuthority).on(companyMenuAuthority.menuCode.eq(menuAuthority.menu.menuCode),
-                    companyMenuAuthority.companyId.eq(menuAuthority.company.id))
+                        companyMenuAuthority.companyId.eq(menuAuthority.company.id))
                 .where(companyMenuAuthority.companyId.eq(companyId)
-                    .and(menuAuthority.authority.eq(authority))
-                    .and(companyMenuAuthority.useYn.eq("Y"))
-                    .and(menuAuthority.readYn.eq("Y")))
+                        .and(menuAuthority.authority.eq(authority))
+                        .and(companyMenuAuthority.useYn.eq("Y"))
+                        .and(menuAuthority.readYn.eq("Y")))
                 .orderBy(companyMenuAuthority.companyId.asc(), companyMenuAuthority.menuCode.asc())
                 .fetch();
 
         for (CompanyMenuAuthorityListDto dto : companyList) {
             // 자식 메뉴 수를 계산하는 서브쿼리
             Long childCount = queryFactory
-                .select(childMenu.count())
-                .from(childMenu)
-                .join(childCma).on(childCma.menuCode.eq(childMenu.menuCode))
-                .where(childMenu.parentCode.eq(dto.getMenuCode())     // 현재 메뉴의 menuCode와 자식 메뉴의 parentCode 비교
-                    .and(childCma.useYn.eq("Y"))                // 자식 메뉴의 use_yn이 'Y'인 경우만 계산
-                    .and(childCma.companyId.eq(dto.getCompanyId())))  // 동일한 companyId의 자식 메뉴만 카운트
-                .fetchOne();
-        
-            dto.setChildCnt(childCount != null ? childCount : 0);     // 자식 메뉴 카운트를 DTO에 설정
+                    .select(childMenu.count())
+                    .from(childMenu)
+                    .join(childCma).on(childCma.menuCode.eq(childMenu.menuCode))
+                    .where(childMenu.parentCode.eq(dto.getMenuCode()) // 현재 메뉴의 menuCode와 자식 메뉴의 parentCode 비교
+                            .and(childCma.useYn.eq("Y")) // 자식 메뉴의 use_yn이 'Y'인 경우만 계산
+                            .and(childCma.companyId.eq(dto.getCompanyId()))) // 동일한 companyId의 자식 메뉴만 카운트
+                    .fetchOne();
+
+            dto.setChildCnt(childCount != null ? childCount : 0); // 자식 메뉴 카운트를 DTO에 설정
         }
 
         return companyList;
@@ -196,80 +228,80 @@ public class CompanyMenuAuthorityRepositoryCustomImpl implements CompanyMenuAuth
     @Override
     public String getParentCode(String menuCode) {
         return queryFactory
-            .select(menu.parentCode)
-            .from(menu)
-            .where(menu.menuCode.eq(menuCode))
-            .fetchOne();
+                .select(menu.parentCode)
+                .from(menu)
+                .where(menu.menuCode.eq(menuCode))
+                .fetchOne();
     }
 
     @Override
     public void updateParentMenuUseYn(String parentCode, CompanyMenuAuthority cma) {
         Long childMenuCount = queryFactory
-            .select(companyMenuAuthority.count())
-            .from(companyMenuAuthority)
-            .leftJoin(menu).on(companyMenuAuthority.menuCode.eq(menu.menuCode))
-            .where(menu.parentCode.eq(parentCode)
-                    .and(companyMenuAuthority.companyId.eq(cma.getCompanyId()))  // 동일한 companyId 내에서 조회
-                    .and(companyMenuAuthority.useYn.eq("Y")))              // 자식 메뉴 중 useYn이 'Y'인 것만 카운트
-            .fetchOne();
+                .select(companyMenuAuthority.count())
+                .from(companyMenuAuthority)
+                .leftJoin(menu).on(companyMenuAuthority.menuCode.eq(menu.menuCode))
+                .where(menu.parentCode.eq(parentCode)
+                        .and(companyMenuAuthority.companyId.eq(cma.getCompanyId())) // 동일한 companyId 내에서 조회
+                        .and(companyMenuAuthority.useYn.eq("Y"))) // 자식 메뉴 중 useYn이 'Y'인 것만 카운트
+                .fetchOne();
 
         // 자식 메뉴가 없으면 부모 메뉴의 useYn을 "N"으로 변경
         String newUseYn = (childMenuCount == null || childMenuCount == 0) ? "N" : "Y";
 
         // 부모 메뉴의 useYn 업데이트
         queryFactory
-            .update(companyMenuAuthority)
-            .set(companyMenuAuthority.useYn, newUseYn)
-            .where(companyMenuAuthority.menuCode.eq(parentCode)
-                    .and(companyMenuAuthority.companyId.eq(cma.getCompanyId())))
-            .execute();
+                .update(companyMenuAuthority)
+                .set(companyMenuAuthority.useYn, newUseYn)
+                .where(companyMenuAuthority.menuCode.eq(parentCode)
+                        .and(companyMenuAuthority.companyId.eq(cma.getCompanyId())))
+                .execute();
     }
 
     @Override
     public Long companyMenuAuthorityRegCheck(Long companyId) {
         return queryFactory
-            .selectFrom(companyMenuAuthority)
-            .where(companyMenuAuthority.companyId.eq(companyId))
-            .fetchCount();
+                .selectFrom(companyMenuAuthority)
+                .where(companyMenuAuthority.companyId.eq(companyId))
+                .fetchCount();
     }
 
     @Override
     public CompanyMenuAuthority findCompanyMenuAuthorityOne(Long companyId, String menuCode) {
         return queryFactory
-            .selectFrom(companyMenuAuthority)
-            .where(companyMenuAuthority.companyId.eq(companyId)
-                .and(companyMenuAuthority.menuCode.eq(menuCode)))
-            .fetchOne();
+                .selectFrom(companyMenuAuthority)
+                .where(companyMenuAuthority.companyId.eq(companyId)
+                        .and(companyMenuAuthority.menuCode.eq(menuCode)))
+                .fetchOne();
 
     }
 
     @Override
     public Long deleteCompanyMenuAuthorityOne(Long companyId) {
         return queryFactory
-            .delete(companyMenuAuthority)
-            .where(companyMenuAuthority.companyId.eq(companyId))
-            .execute();
+                .delete(companyMenuAuthority)
+                .where(companyMenuAuthority.companyId.eq(companyId))
+                .execute();
     }
 
     @Override
     public Long deleteCompanyMenuAuthorityMenuCodeAll(String menuCode) {
         return queryFactory
-            .delete(companyMenuAuthority)
-            .where(companyMenuAuthority.menuCode.eq(menuCode))
-            .execute();
+                .delete(companyMenuAuthority)
+                .where(companyMenuAuthority.menuCode.eq(menuCode))
+                .execute();
     }
 
     @Override
     public List<CompanyMenuRegDto> findCompanyMenuList(Long companyId) {
         List<CompanyMenuRegDto> companyList = queryFactory
-            .select(Projections.fields(CompanyMenuRegDto.class,
-                companyMenuAuthority.companyId.as("companyId"),
-                companyMenuAuthority.menuCode.as("menuCode"),
-                companyMenuAuthority.useYn.as("useYn")))
-            .from(companyMenuAuthority)
-            .where(companyMenuAuthority.companyId.eq(companyId))
-            .orderBy(companyMenuAuthority.menuCode.asc())
-            .fetch();
+                .select(Projections.fields(CompanyMenuRegDto.class,
+                        companyMenuAuthority.companyId.as("companyId"),
+                        companyMenuAuthority.menuCode.as("menuCode"),
+                        companyMenuAuthority.useYn.as("useYn")))
+                .from(companyMenuAuthority)
+                .where(companyMenuAuthority.companyId.eq(companyId))
+                .orderBy(companyMenuAuthority.menuCode.asc())
+                .fetch();
         return companyList;
     }
 }

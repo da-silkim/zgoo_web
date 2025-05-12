@@ -19,11 +19,11 @@ import zgoo.cpos.domain.menu.CompanyMenuAuthority;
 import zgoo.cpos.domain.menu.Menu;
 import zgoo.cpos.domain.menu.MenuAuthority;
 import zgoo.cpos.dto.menu.CompanyMenuAuthorityDto;
-import zgoo.cpos.dto.menu.MenuAuthorityDto.MenuAuthorityBaseDto;
-import zgoo.cpos.dto.menu.MenuDto.MenuListDto;
-import zgoo.cpos.dto.menu.MenuDto;
 import zgoo.cpos.dto.menu.CompanyMenuAuthorityDto.CompanyMenuAuthorityListDto;
 import zgoo.cpos.dto.menu.CompanyMenuAuthorityDto.CompanyMenuRegDto;
+import zgoo.cpos.dto.menu.MenuAuthorityDto.MenuAuthorityBaseDto;
+import zgoo.cpos.dto.menu.MenuDto;
+import zgoo.cpos.dto.menu.MenuDto.MenuListDto;
 import zgoo.cpos.mapper.MenuAuthorityMapper;
 import zgoo.cpos.mapper.MenuMapper;
 import zgoo.cpos.repository.company.CompanyRepository;
@@ -40,11 +40,12 @@ public class MenuService {
     private final CompanyRepository companyRepository;
     private final MenuAuthorityRepository menuAuthorityRepository;
     private final CompanyMenuAuthorityRepository companyMenuAuthorityRepository;
+    private final ComService comService;
 
     // 메뉴 - 전체 조회
     public List<MenuDto.MenuListDto> findMenuList() {
         try {
-            List<Menu> menuList= this.menuRepository.findAll();
+            List<Menu> menuList = this.menuRepository.findAll();
 
             if (menuList.isEmpty()) {
                 log.info("=== no menu found ===");
@@ -72,7 +73,7 @@ public class MenuService {
     // 메뉴 - 전체 조회(자식 메뉴 개수, 메뉴 레벨명 추가)
     public List<MenuDto.MenuListDto> findMenuListWithChild(String authority) {
         try {
-            List<MenuDto.MenuListDto> menuListDto =this.menuRepository.getMuenListWithChildCount();
+            List<MenuDto.MenuListDto> menuListDto = this.menuRepository.getMuenListWithChildCount();
             if ("SU".equals(authority)) {
                 for (MenuListDto dto : menuListDto) {
                     dto.setReadYn("Y");
@@ -102,8 +103,8 @@ public class MenuService {
         try {
             List<Menu> menuList = this.menuRepository.findByMenuLv(menuLv);
             return menuList.stream()
-                        .map(MenuMapper::toDto)
-                        .collect(Collectors.toList());
+                    .map(MenuMapper::toDto)
+                    .collect(Collectors.toList());
         } catch (Exception e) {
             log.error("[getParentMenuByMenuLv] error: {}", e.getMessage());
             return Collections.emptyList();
@@ -117,7 +118,7 @@ public class MenuService {
             Menu menu = MenuMapper.toEntity(dto);
             this.menuRepository.save(menu);
 
-            /* 
+            /*
              * 메뉴 권한이 설정된 사업장이 존재하면, 새메뉴 정보 추가
              */
             List<Long> companyIds = this.companyMenuAuthorityRepository.findDistinctCompanyIds();
@@ -125,7 +126,8 @@ public class MenuService {
             if (companyIds != null && !companyIds.isEmpty()) {
                 for (Long companyId : companyIds) {
                     CompanyMenuAuthority cma = MenuMapper.toEntityCompanyMenu(companyId, dto);
-                    log.info("Found CompanyMenuAuthority for companyId: {}, menuCode: {}, cma: {}", companyId, dto.getMenuCode(), cma);
+                    log.info("Found CompanyMenuAuthority for companyId: {}, menuCode: {}, cma: {}", companyId,
+                            dto.getMenuCode(), cma);
                     this.companyMenuAuthorityRepository.save(cma);
                     this.companyMenuAuthorityRepository.companyMenuAuthorityUseYnUpdate(cma);
                 }
@@ -146,7 +148,7 @@ public class MenuService {
             log.info("=== before update: {}", menu.toString());
 
             menu.updateMenuInfo(dto);
-            
+
             log.info("=== after update: {}", menu.toString());
 
             // 사업장 전체 메뉴 useYn 업데이트
@@ -154,8 +156,10 @@ public class MenuService {
             log.info("companyIds: {}", companyIds);
             if (companyIds != null && !companyIds.isEmpty()) {
                 for (Long companyId : companyIds) {
-                    CompanyMenuAuthority cma = this.companyMenuAuthorityRepository.findCompanyMenuAuthorityOne(companyId, dto.getMenuCode());
-                    log.info("Found CompanyMenuAuthority for companyId: {}, menuCode: {}, cma: {}", companyId, dto.getMenuCode(), cma);
+                    CompanyMenuAuthority cma = this.companyMenuAuthorityRepository
+                            .findCompanyMenuAuthorityOne(companyId, dto.getMenuCode());
+                    log.info("Found CompanyMenuAuthority for companyId: {}, menuCode: {}, cma: {}", companyId,
+                            dto.getMenuCode(), cma);
                     cma.updateCompanyMenuInfoWithMenu(dto.getUseYn());
                     this.companyMenuAuthorityRepository.companyMenuAuthorityUseYnUpdate(cma);
                 }
@@ -187,11 +191,20 @@ public class MenuService {
     }
 
     // 사업장별 메뉴 접근 권한 전체 조회
-    public Page<CompanyMenuAuthorityDto.CompanyMenuRegDto> findCompanyMenuAll(int page, int size) {
+    public Page<CompanyMenuAuthorityDto.CompanyMenuRegDto> findCompanyMenuAll(int page, int size, String userId) {
         Pageable pageable = PageRequest.of(page, size);
 
         try {
-            Page<CompanyMenuAuthorityDto.CompanyMenuRegDto> cmaList = this.companyMenuAuthorityRepository.findCompanyMenuWithPagination(pageable);
+            boolean isSuperAdmin = comService.checkSuperAdmin(userId);
+            Long loginUserCompanyId = comService.getLoginUserCompanyId(userId);
+            String levelPath = companyRepository.findLevelPathByCompanyId(loginUserCompanyId);
+            log.info("== levelPath : {}", levelPath);
+            if (levelPath == null) {
+                // 관계정보가 없을경우 빈 리스트 전달
+                return Page.empty(pageable);
+            }
+            Page<CompanyMenuAuthorityDto.CompanyMenuRegDto> cmaList = this.companyMenuAuthorityRepository
+                    .findCompanyMenuWithPagination(pageable, levelPath, isSuperAdmin);
             return cmaList;
         } catch (DataAccessException dae) {
             log.error("[findCompanyMenuAll] database error: {}", dae.getMessage());
@@ -203,11 +216,21 @@ public class MenuService {
     }
 
     // 사업장별 메뉴 접근 권한 검색 조회
-    public Page<CompanyMenuAuthorityDto.CompanyMenuRegDto> searchCompanyMenuWithPagination(String companyName, int page, int size) {
+    public Page<CompanyMenuAuthorityDto.CompanyMenuRegDto> searchCompanyMenuWithPagination(String companyName, int page,
+            int size, String userId) {
         Pageable pageable = PageRequest.of(page, size);
 
         try {
-            Page<CompanyMenuAuthorityDto.CompanyMenuRegDto> cmaList = this.companyMenuAuthorityRepository.searchCompanyMenuWithPagination(companyName, pageable);
+            boolean isSuperAdmin = comService.checkSuperAdmin(userId);
+            Long loginUserCompanyId = comService.getLoginUserCompanyId(userId);
+            String levelPath = companyRepository.findLevelPathByCompanyId(loginUserCompanyId);
+            log.info("== levelPath : {}", levelPath);
+            if (levelPath == null) {
+                // 관계정보가 없을경우 빈 리스트 전달
+                return Page.empty(pageable);
+            }
+            Page<CompanyMenuAuthorityDto.CompanyMenuRegDto> cmaList = this.companyMenuAuthorityRepository
+                    .searchCompanyMenuWithPagination(companyName, pageable, levelPath, isSuperAdmin);
             return cmaList;
         } catch (DataAccessException dae) {
             log.error("[searchCompanyMenuWithPagination] database error: {}", dae.getMessage());
@@ -221,7 +244,8 @@ public class MenuService {
     // 메뉴권한이 등록된 사업자 조회
     public List<CompanyMenuAuthorityDto.CompanyMenuRegDto> findCompanyDistinctList() {
         try {
-            List<CompanyMenuAuthorityDto.CompanyMenuRegDto> cmaList = this.companyMenuAuthorityRepository.findDistinctCompanyWithCompanyName();
+            List<CompanyMenuAuthorityDto.CompanyMenuRegDto> cmaList = this.companyMenuAuthorityRepository
+                    .findDistinctCompanyWithCompanyName();
             return cmaList;
         } catch (Exception e) {
             log.error("[findCompanyDistinctList] error: {}", e.getMessage());
@@ -229,9 +253,10 @@ public class MenuService {
         }
     }
 
-    public List<CompanyMenuAuthorityDto.CompanyMenuAuthorityListDto>findCompanyMenuAuthorityList(Long companyId) {
+    public List<CompanyMenuAuthorityDto.CompanyMenuAuthorityListDto> findCompanyMenuAuthorityList(Long companyId) {
         try {
-            List<CompanyMenuAuthorityDto.CompanyMenuAuthorityListDto> cmaList = this.companyMenuAuthorityRepository.findCompanyMenuAuthorityList(companyId);
+            List<CompanyMenuAuthorityDto.CompanyMenuAuthorityListDto> cmaList = this.companyMenuAuthorityRepository
+                    .findCompanyMenuAuthorityList(companyId);
             return cmaList;
         } catch (Exception e) {
             log.error("[findCompanyMenuAuthorityList] error: {}", e.getMessage());
@@ -239,7 +264,8 @@ public class MenuService {
         }
     }
 
-    public List<CompanyMenuAuthorityListDto> findCompanyMenuAuthorityBasedUserAuthority(Long companyId, String authority) {
+    public List<CompanyMenuAuthorityListDto> findCompanyMenuAuthorityBasedUserAuthority(Long companyId,
+            String authority) {
         try {
             return this.companyMenuAuthorityRepository.findCompanyMenuAuthorityBasedUserAuthority(companyId, authority);
         } catch (Exception e) {
@@ -274,7 +300,7 @@ public class MenuService {
             // 등록이 완료된 사업장별 메뉴 권한 조회
             List<CompanyMenuRegDto> comList = this.companyMenuAuthorityRepository.findCompanyMenuList(companyId);
             Company company = this.companyRepository.findById(companyId)
-                .orElseThrow(() -> new IllegalArgumentException("=== company not found ==="));
+                    .orElseThrow(() -> new IllegalArgumentException("=== company not found ==="));
 
             // AD, AS, NO authority
             userAuthorityDefault(comList, company, "AD");
@@ -293,18 +319,19 @@ public class MenuService {
         try {
             Long companyId = company.getId();
 
-            /* 
+            /*
              * 1. 권한이 이미 설정되어 있는지 확인
              * 2. 권한이 설정되어 있으면 return;
              * 3. 권한이 설정되어 있지 않으면, 사용자 권한 설정
              * 
-             *     read_yn     mod_yn      excel_yn
-             * AD    Y           Y            Y
-             * AS    Y           Y            Y
-             * NO    Y           N            Y
+             * read_yn mod_yn excel_yn
+             * AD Y Y Y
+             * AS Y Y Y
+             * NO Y N Y
              */
             Long authorityIsExis = this.menuAuthorityRepository.menuAuthorityRegCheck(companyId, authority);
-            if (authorityIsExis > 0) return;
+            if (authorityIsExis > 0)
+                return;
 
             String modYn = authority.equals("NO") ? "N" : "Y";
             for (CompanyMenuRegDto dto : comList) {
@@ -330,7 +357,8 @@ public class MenuService {
     public void updateCompanyMenuAuthority(List<CompanyMenuAuthorityDto.CompanyMenuAuthorityBaseDto> menuAuthorites) {
         try {
             for (CompanyMenuAuthorityDto.CompanyMenuAuthorityBaseDto dto : menuAuthorites) {
-                CompanyMenuAuthority cma = this.companyMenuAuthorityRepository.findCompanyMenuAuthorityOne(dto.getCompanyId(), dto.getMenuCode());
+                CompanyMenuAuthority cma = this.companyMenuAuthorityRepository
+                        .findCompanyMenuAuthorityOne(dto.getCompanyId(), dto.getMenuCode());
                 cma.updateCompanyMenuInfo(dto);
                 this.companyMenuAuthorityRepository.companyMenuAuthorityUseYnUpdate(cma);
             }

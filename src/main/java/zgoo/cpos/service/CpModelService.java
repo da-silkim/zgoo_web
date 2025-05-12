@@ -39,20 +39,32 @@ public class CpModelService {
     private final CpModelRepository cpModelRepository;
     private final CpModelDetailRepository cpModelDetailRepository;
     private final CpConnectorRepository cpConnectorRepository;
+    private final ComService comService;
 
     // 충전기 모델 조회
-    public Page<CpModelListDto> findCpModelInfoWithPagination(Long companyId, String manuf, String chgSpeed, int page, int size) {
+    public Page<CpModelListDto> findCpModelInfoWithPagination(Long companyId, String manuf, String chgSpeed, int page,
+            int size, String userId) {
         Pageable pageable = PageRequest.of(page, size);
 
         try {
+            boolean isSuperAdmin = comService.checkSuperAdmin(userId);
+            Long loginUserCompanyId = comService.getLoginUserCompanyId(userId);
+            String levelPath = companyRepository.findLevelPathByCompanyId(loginUserCompanyId);
+            log.info("== levelPath : {}", levelPath);
+            if (levelPath == null) {
+                // 관계정보가 없을경우 빈 리스트 전달
+                return Page.empty(pageable);
+            }
+
             Page<CpModelListDto> modelList;
 
             if (companyId == null && (manuf == null || manuf.isEmpty()) && (chgSpeed == null || chgSpeed.isEmpty())) {
-                log.info("Executing the [findCpModelWithPagination]");      // 전체 조회
-                modelList = this.cpModelRepository.findCpModelWithPagination(pageable);
+                log.info("Executing the [findCpModelWithPagination]"); // 전체 조회
+                modelList = this.cpModelRepository.findCpModelWithPagination(pageable, levelPath, isSuperAdmin);
             } else {
-                log.info("Executing the [searchCpModelWithPagination]");    // 검색 조회
-                modelList = this.cpModelRepository.searchCpModelWithPagination(companyId, manuf, chgSpeed, pageable);
+                log.info("Executing the [searchCpModelWithPagination]"); // 검색 조회
+                modelList = this.cpModelRepository.searchCpModelWithPagination(companyId, manuf, chgSpeed, pageable,
+                        levelPath, isSuperAdmin);
             }
 
             return modelList;

@@ -43,7 +43,7 @@ public class NoticeController {
         } catch (Exception e) {
             log.error("[createNotice] error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                    .body("공지사항 등록 중 오류가 발생했습니다.");
+                    .body("공지사항 등록 중 오류가 발생했습니다.");
         }
     }
 
@@ -61,26 +61,27 @@ public class NoticeController {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
             }
         } catch (Exception e) {
-                log.error("[findNoticeOne] error: {}", e.getMessage());
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            log.error("[findNoticeOne] error: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
     // 공지사항 - 상세내용
     @GetMapping("/detail/{id}")
     public String deatilNotice(Model model, @PathVariable("id") Long idx,
-                    @RequestParam(value = "page", defaultValue = "0") int page,
-                    @RequestParam(value = "size", defaultValue = "10") int size,
-                    @RequestParam(value = "companyIdSearch", required = false) Long companyId,
-                    @RequestParam(value = "startDateSearch", required = false) String startDate,
-                    @RequestParam(value = "endDateSearch", required = false) String endDate) {
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size,
+            @RequestParam(value = "companyIdSearch", required = false) Long companyId,
+            @RequestParam(value = "startDateSearch", required = false) String startDate,
+            @RequestParam(value = "endDateSearch", required = false) String endDate,
+            Principal principal) {
         log.info("=== detail notice info ===");
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDate startDateSearch = null;
         LocalDate endDateSearch = null;
 
-        try { 
+        try {
             if (startDate != null && !startDate.trim().isEmpty()) {
                 startDateSearch = LocalDate.parse(startDate.trim(), formatter);
             }
@@ -99,8 +100,10 @@ public class NoticeController {
             model.addAttribute("content", content);
 
             // 이전글, 다음글 조회
-            NoticeDto.NoticeDetailDto previousNotice = this.noticeService.findPreviousNotice(idx, companyId, startDateSearch, endDateSearch);
-            NoticeDto.NoticeDetailDto  nextNotice  = this.noticeService.findNextNotice(idx, companyId, startDateSearch, endDateSearch);
+            NoticeDto.NoticeDetailDto previousNotice = this.noticeService.findPreviousNotice(idx, companyId,
+                    startDateSearch, endDateSearch, principal.getName());
+            NoticeDto.NoticeDetailDto nextNotice = this.noticeService.findNextNotice(idx, companyId, startDateSearch,
+                    endDateSearch, principal.getName());
             model.addAttribute("previousNotice", previousNotice);
             model.addAttribute("nextNotice", nextNotice);
 
@@ -127,7 +130,7 @@ public class NoticeController {
             if (idx == null) {
                 log.error("[updateNotice] noticeId is null");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                                    .body("공지사항 ID값이 누락됐습니다.");
+                        .body("공지사항 ID값이 누락됐습니다.");
             }
             dto.setIdx(idx);
 
@@ -136,7 +139,7 @@ public class NoticeController {
         } catch (Exception e) {
             log.error("[updateNotice] error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                    .body("공지사항 수정 중 오류가 발생했습니다.");
+                    .body("공지사항 수정 중 오류가 발생했습니다.");
         }
     }
 
@@ -149,14 +152,14 @@ public class NoticeController {
             if (idx == null) {
                 log.error("[deleteNotice] noticeId is null");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                                    .body("공지사항 ID값이 누락됐습니다.");
+                        .body("공지사항 ID값이 누락됐습니다.");
             }
             this.noticeService.deleteNotice(idx, principal.getName());
-            return ResponseEntity.ok("공지사항이 정상적으로 삭제되었습니다."); 
+            return ResponseEntity.ok("공지사항이 정상적으로 삭제되었습니다.");
         } catch (Exception e) {
             log.error("[deleteNotice] error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                    .body("공지사항 삭제 중 오류가 발생했습니다.");
+                    .body("공지사항 삭제 중 오류가 발생했습니다.");
         }
     }
 

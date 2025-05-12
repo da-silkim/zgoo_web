@@ -13,7 +13,7 @@ public interface CpPlanPolicyRepositoryCustom {
 
     CpPlanPolicy findByPlanName(String planName);
 
-    List<CpPlanPolicy> findAll();
+    List<CpPlanPolicy> findAll(boolean isSuperAdmin, String levelPath);
 
     CpPlanPolicy findByPlanNameAndCompanyId(String planName, Long companyId);
 

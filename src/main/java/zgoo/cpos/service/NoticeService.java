@@ -21,6 +21,7 @@ import zgoo.cpos.dto.menu.MenuAuthorityDto.MenuAuthorityBaseDto;
 import zgoo.cpos.dto.users.NoticeDto;
 import zgoo.cpos.dto.users.NoticeDto.NoticeListDto;
 import zgoo.cpos.mapper.NoticeMapper;
+import zgoo.cpos.repository.company.CompanyRepository;
 import zgoo.cpos.repository.menu.MenuAuthorityRepository;
 import zgoo.cpos.repository.users.NoticeRepository;
 import zgoo.cpos.repository.users.UsersRepository;
@@ -33,13 +34,25 @@ public class NoticeService {
     private final NoticeRepository noticeRepository;
     private final UsersRepository usersRepository;
     private final MenuAuthorityRepository menuAuthorityRepository;
+    private final CompanyRepository companyRepository;
+    private final ComService comService;
 
     // 공지사항 - 전체 조회 페이징
-    public Page<NoticeDto.NoticeListDto> findNoticeAll(int page, int size) {
+    public Page<NoticeDto.NoticeListDto> findNoticeAll(int page, int size, String userId) {
         Pageable pageable = PageRequest.of(page, size);
 
         try {
-            Page<NoticeDto.NoticeListDto> noticeList = this.noticeRepository.findNoticeWithPagination(pageable);
+            boolean isSuperAdmin = comService.checkSuperAdmin(userId);
+            Long loginUserCompanyId = comService.getLoginUserCompanyId(userId);
+            String levelPath = companyRepository.findLevelPathByCompanyId(loginUserCompanyId);
+            log.info("== levelPath : {}", levelPath);
+            if (levelPath == null) {
+                // 관계정보가 없을경우 빈 리스트 전달
+                return Page.empty(pageable);
+            }
+
+            Page<NoticeDto.NoticeListDto> noticeList = this.noticeRepository.findNoticeWithPagination(pageable,
+                    levelPath, isSuperAdmin);
             return noticeList;
         } catch (DataAccessException dae) {
             log.error("[findNoticeAll] database error : {}", dae.getMessage());
@@ -52,11 +65,22 @@ public class NoticeService {
 
     // 공지사항 - 검색 페이징
     @Transactional
-    public Page<NoticeDto.NoticeListDto> searchNoticeListwithPagination(Long companyId, LocalDate startDate, LocalDate endDate, int page, int size) {
+    public Page<NoticeDto.NoticeListDto> searchNoticeListwithPagination(Long companyId, LocalDate startDate,
+            LocalDate endDate, int page, int size, String userId) {
         Pageable pageable = PageRequest.of(page, size);
 
         try {
-            Page<NoticeDto.NoticeListDto> noticeList = this.noticeRepository.searchNoticeListwithPagination(companyId, startDate, endDate, pageable);
+            boolean isSuperAdmin = comService.checkSuperAdmin(userId);
+            Long loginUserCompanyId = comService.getLoginUserCompanyId(userId);
+            String levelPath = companyRepository.findLevelPathByCompanyId(loginUserCompanyId);
+            log.info("== levelPath : {}", levelPath);
+            if (levelPath == null) {
+                // 관계정보가 없을경우 빈 리스트 전달
+                return Page.empty(pageable);
+            }
+
+            Page<NoticeDto.NoticeListDto> noticeList = this.noticeRepository.searchNoticeListwithPagination(companyId,
+                    startDate, endDate, pageable, levelPath, isSuperAdmin);
             return noticeList;
         } catch (DataAccessException dae) {
             log.error("[searchNoticeListwithPagination] database error : {}", dae.getMessage());
@@ -68,18 +92,29 @@ public class NoticeService {
     }
 
     // 공지사항 조회
-    public Page<NoticeListDto> findNoticeWithPagintaion(Long companyId, LocalDate startDate, LocalDate endDate, int page, int size) {
+    public Page<NoticeListDto> findNoticeWithPagintaion(Long companyId, LocalDate startDate, LocalDate endDate,
+            int page, int size, String userId) {
         Pageable pageable = PageRequest.of(page, size);
 
         try {
+            boolean isSuperAdmin = comService.checkSuperAdmin(userId);
+            Long loginUserCompanyId = comService.getLoginUserCompanyId(userId);
+            String levelPath = companyRepository.findLevelPathByCompanyId(loginUserCompanyId);
+            log.info("== levelPath : {}", levelPath);
+            if (levelPath == null) {
+                // 관계정보가 없을경우 빈 리스트 전달
+                return Page.empty(pageable);
+            }
+
             Page<NoticeListDto> noticeList;
 
             if (companyId == null && startDate == null && endDate == null) {
                 log.info("Executing the [findNoticeWithPagination]");
-                noticeList = this.noticeRepository.findNoticeWithPagination(pageable);
+                noticeList = this.noticeRepository.findNoticeWithPagination(pageable, levelPath, isSuperAdmin);
             } else {
                 log.info("Executing the [searchNoticeListwithPagination]");
-                noticeList = this.noticeRepository.searchNoticeListwithPagination(companyId, startDate, endDate, pageable);
+                noticeList = this.noticeRepository.searchNoticeListwithPagination(companyId, startDate, endDate,
+                        pageable, levelPath, isSuperAdmin);
             }
 
             LocalDateTime now = LocalDateTime.now();
@@ -120,9 +155,20 @@ public class NoticeService {
     }
 
     // 이전글 조회
-    public NoticeDto.NoticeDetailDto findPreviousNotice(Long idx, Long companyId, LocalDate startDate, LocalDate endDate) {
+    public NoticeDto.NoticeDetailDto findPreviousNotice(Long idx, Long companyId, LocalDate startDate,
+            LocalDate endDate, String userId) {
         try {
-            NoticeDto.NoticeDetailDto notice = this.noticeRepository.findPreviousNotice(idx, companyId, startDate, endDate);
+            boolean isSuperAdmin = comService.checkSuperAdmin(userId);
+            Long loginUserCompanyId = comService.getLoginUserCompanyId(userId);
+            String levelPath = companyRepository.findLevelPathByCompanyId(loginUserCompanyId);
+            log.info("== levelPath : {}", levelPath);
+            if (levelPath == null) {
+                // 관계정보가 없을경우 빈 리스트 전달
+                return null;
+            }
+
+            NoticeDto.NoticeDetailDto notice = this.noticeRepository.findPreviousNotice(idx, companyId, startDate,
+                    endDate, levelPath, isSuperAdmin);
             return notice;
         } catch (Exception e) {
             log.error("[findPreviousNotice] error : {}", e.getMessage());
@@ -131,9 +177,20 @@ public class NoticeService {
     }
 
     // 다음글 조회
-    public NoticeDto.NoticeDetailDto findNextNotice(Long idx, Long companyId, LocalDate startDate, LocalDate endDate) {
+    public NoticeDto.NoticeDetailDto findNextNotice(Long idx, Long companyId, LocalDate startDate, LocalDate endDate,
+            String userId) {
         try {
-            NoticeDto.NoticeDetailDto notice = this.noticeRepository.findNextNotice(idx, companyId, startDate, endDate);
+            boolean isSuperAdmin = comService.checkSuperAdmin(userId);
+            Long loginUserCompanyId = comService.getLoginUserCompanyId(userId);
+            String levelPath = companyRepository.findLevelPathByCompanyId(loginUserCompanyId);
+            log.info("== levelPath : {}", levelPath);
+            if (levelPath == null) {
+                // 관계정보가 없을경우 빈 리스트 전달
+                return null;
+            }
+
+            NoticeDto.NoticeDetailDto notice = this.noticeRepository.findNextNotice(idx, companyId, startDate,
+                    endDate, levelPath, isSuperAdmin);
             return notice;
         } catch (Exception e) {
             log.error("[findNextNotice] error : {}", e.getMessage());
@@ -161,7 +218,7 @@ public class NoticeService {
     public void saveNotice(NoticeDto.NoticeRegDto dto, String loginUserId) {
         try {
             if (loginUserId == null || loginUserId.isEmpty()) {
-                throw new IllegalArgumentException("User ID is missing. Cannot save notice without login user ID."); 
+                throw new IllegalArgumentException("User ID is missing. Cannot save notice without login user ID.");
             }
             dto.setUserId(loginUserId);
 
@@ -170,7 +227,7 @@ public class NoticeService {
                 log.warn("[saveNotice] Access without permission.");
                 return;
             }
-            
+
             Users users = this.usersRepository.finsUserOneNotJoinedComapny(dto.getUserId());
             Notice notice = NoticeMapper.toEntity(dto, users);
             this.noticeRepository.save(notice);
@@ -187,11 +244,12 @@ public class NoticeService {
     public NoticeDto.NoticeRegDto updateNotice(NoticeDto.NoticeRegDto dto, String loginUserId) {
         try {
             if (loginUserId == null || loginUserId.isEmpty()) {
-                throw new IllegalArgumentException("User ID is missing. Cannot update notice without login user ID."); 
+                throw new IllegalArgumentException("User ID is missing. Cannot update notice without login user ID.");
             }
 
             boolean isMod = checkUpdateAndDeleteAuthority(dto.getIdx(), loginUserId);
-            if (!isMod) return null;
+            if (!isMod)
+                return null;
 
             Notice notice = this.noticeRepository.findNoticeOne(dto.getIdx());
 
@@ -210,13 +268,13 @@ public class NoticeService {
             return null;
         }
     }
-    
+
     // 공지사항 - 삭제(Invisible)
     @Transactional
     public void deleteNotice(Long idx, String loginUserId) {
         try {
             if (loginUserId == null || loginUserId.isEmpty()) {
-                throw new IllegalArgumentException("User ID is missing. Cannot delete notice without login user ID."); 
+                throw new IllegalArgumentException("User ID is missing. Cannot delete notice without login user ID.");
             }
 
             boolean isMod = checkUpdateAndDeleteAuthority(idx, loginUserId);
@@ -236,9 +294,18 @@ public class NoticeService {
     }
 
     // 공지사항 최신 조회
-    public List<NoticeListDto> findLatestNoticeList() {
+    public List<NoticeListDto> findLatestNoticeList(String userId) {
         try {
-            List<NoticeListDto> noticeList = this.noticeRepository.findLatestNoticeList();
+            boolean isSuperAdmin = comService.checkSuperAdmin(userId);
+            Long loginUserCompanyId = comService.getLoginUserCompanyId(userId);
+            String levelPath = companyRepository.findLevelPathByCompanyId(loginUserCompanyId);
+            log.info("== levelPath : {}", levelPath);
+            if (levelPath == null) {
+                // 관계정보가 없을경우 빈 리스트 전달
+                return new ArrayList<>();
+            }
+
+            List<NoticeListDto> noticeList = this.noticeRepository.findLatestNoticeList(levelPath, isSuperAdmin);
 
             LocalDateTime now = LocalDateTime.now();
             noticeList.forEach(notice -> {
@@ -246,7 +313,7 @@ public class NoticeService {
                 long daysBetween = Duration.between(registrationDate, now).toDays();
                 notice.setNew(daysBetween < 3);
             });
-            
+
             log.info("[findLatestNoticeList] success");
             return noticeList;
         } catch (Exception e) {
@@ -285,7 +352,7 @@ public class NoticeService {
     // notice save check
     public boolean checkSaveAuthority(String loginUserId) {
         Users loginUser = this.usersRepository.findUserOne(loginUserId); // 로그인 사용자
-        String loginUserAuthority = loginUser.getAuthority();            // 로그인 사용자 권한
+        String loginUserAuthority = loginUser.getAuthority(); // 로그인 사용자 권한
 
         if (loginUserAuthority.equals("SU")) {
             log.info("[checkSaveAuthority] Super Admin");
@@ -294,14 +361,14 @@ public class NoticeService {
 
         // mod_yn check
         MenuAuthorityBaseDto dto = this.menuAuthorityRepository.findUserMenuAuthority(loginUser.getCompany().getId(),
-            loginUserAuthority, MenuConstants.NOTICE);
+                loginUserAuthority, MenuConstants.NOTICE);
         return dto.getModYn().equals("Y");
     }
 
     // notice update, delete check
     public boolean checkUpdateAndDeleteAuthority(Long id, String loginUserId) {
         Users loginUser = this.usersRepository.findUserOne(loginUserId); // 로그인 사용자
-        String loginUserAuthority = loginUser.getAuthority();            // 로그인 사용자 권한
+        String loginUserAuthority = loginUser.getAuthority(); // 로그인 사용자 권한
 
         if (loginUserAuthority.equals("SU")) {
             log.info("[NoticeService >> checkUpdateAndDeleteAuthority] Super Admin");
@@ -311,11 +378,11 @@ public class NoticeService {
         Notice notice = this.noticeRepository.findNoticeOne(id);
         String writer = notice.getUser().getUserId();
         Users user = this.usersRepository.findUserOne(writer); // 작성자
-        String userAuthority = user.getAuthority();            // 작성자 권한
+        String userAuthority = user.getAuthority(); // 작성자 권한
 
         // mod_yn check
         MenuAuthorityBaseDto dto = this.menuAuthorityRepository.findUserMenuAuthority(loginUser.getCompany().getId(),
-            loginUserAuthority, MenuConstants.NOTICE);
+                loginUserAuthority, MenuConstants.NOTICE);
         String modYn = dto.getModYn();
 
         if (modYn.equals("Y")) {

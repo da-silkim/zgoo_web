@@ -14,9 +14,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import zgoo.cpos.domain.code.QCommonCode;
 import zgoo.cpos.domain.company.QCompany;
+import zgoo.cpos.domain.company.QCompanyRelationInfo;
 import zgoo.cpos.domain.users.QUsers;
 import zgoo.cpos.domain.users.Users;
 import zgoo.cpos.dto.users.UsersDto;
+import zgoo.cpos.util.QueryUtils;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -24,54 +26,57 @@ public class UsersRepositoryCustomImpl implements UsersRepositoryCustom {
     private final JPAQueryFactory queryFactory;
     QUsers users = QUsers.users;
     QCompany company = QCompany.company;
-    QCommonCode companyTypeCommonCode =  new QCommonCode("companyType");
+    QCompanyRelationInfo relation = QCompanyRelationInfo.companyRelationInfo;
+    QCommonCode companyTypeCommonCode = new QCommonCode("companyType");
     QCommonCode userAuthorityCommonCode = new QCommonCode("authority");
 
     @Override
     public List<Users> findAll() {
         return queryFactory
-            .selectFrom(users)
-            .leftJoin(users.company, company)
-            .fetch();
+                .selectFrom(users)
+                .leftJoin(users.company, company)
+                .fetch();
     }
 
     @Override
     public Page<Users> findUsersWithPagination(Pageable pageable) {
-        List<Users> usersList =  queryFactory
-                                .selectFrom(users)
-                                .leftJoin(users.company, company).fetchJoin()
-                                .orderBy(users.regDt.desc())
-                                .offset(pageable.getOffset())
-                                .limit(pageable.getPageSize())
-                                .fetch();
+        List<Users> usersList = queryFactory
+                .selectFrom(users)
+                .leftJoin(users.company, company).fetchJoin()
+                .orderBy(users.regDt.desc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
 
         long totalCount = queryFactory
-                                .selectFrom(users)
-                                .fetchCount();
-                            
+                .selectFrom(users)
+                .fetchCount();
+
         return new PageImpl<>(usersList, pageable, totalCount);
     }
 
     @Override
     public Users findUserOne(String userID) {
         return queryFactory
-            .selectFrom(users)
-            .leftJoin(users.company, company)
-            .where(users.userId.eq(userID))
-            .fetchOne();
+                .selectFrom(users)
+                .leftJoin(users.company, company)
+                .where(users.userId.eq(userID))
+                .fetchOne();
     }
 
     @Override
     public Users finsUserOneNotJoinedComapny(String userID) {
         return queryFactory
-            .selectFrom(users)
-            .where(users.userId.eq(userID))
-            .fetchOne();
+                .selectFrom(users)
+                .where(users.userId.eq(userID))
+                .fetchOne();
     }
 
     @Override
-    public List<Users> searchUsers(Long companyId, String companyType, String name) {
-        log.info("Executing query to search users with companyId: {}, companyType: {}, name: {}", companyId, companyType, name);
+    public List<Users> searchUsers(Long companyId, String companyType, String name, String levelPath,
+            boolean isSuperAdmin) {
+        log.info("Executing query to search users with companyId: {}, companyType: {}, name: {}", companyId,
+                companyType, name);
         BooleanBuilder builder = new BooleanBuilder();
 
         if (companyId != null) {
@@ -86,11 +91,16 @@ public class UsersRepositoryCustomImpl implements UsersRepositoryCustom {
             builder.and(users.name.contains(name));
         }
 
+        if (!isSuperAdmin && levelPath != null && !levelPath.isEmpty()) {
+            builder.and(QueryUtils.hasCompanyLevelAccess(relation, levelPath));
+        }
+
         return queryFactory
-            .selectFrom(users)
-            .leftJoin(users.company, company)
-            .where(builder)
-            .fetch();
+                .selectFrom(users)
+                .leftJoin(users.company, company)
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
+                .where(builder)
+                .fetch();
     }
 
     @Override
@@ -109,41 +119,48 @@ public class UsersRepositoryCustomImpl implements UsersRepositoryCustom {
             builder.and(users.name.contains(name));
         }
 
-        List<Users> usersList =  queryFactory
-                                .selectFrom(users)
-                                .leftJoin(users.company, company)
-                                .where(builder)
-                                .offset(pageable.getOffset())
-                                .limit(pageable.getPageSize())
-                                .fetch();
+        List<Users> usersList = queryFactory
+                .selectFrom(users)
+                .leftJoin(users.company, company)
+                .where(builder)
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
 
         long totalCount = queryFactory
-                                .selectFrom(users)
-                                .leftJoin(users.company, company)
-                                .where(builder)
-                                .fetchCount();
-                           
+                .selectFrom(users)
+                .leftJoin(users.company, company)
+                .where(builder)
+                .fetchCount();
+
         return new PageImpl<>(usersList, pageable, totalCount);
     }
 
     @Override
     public Long deleteUserOne(String userID) {
         return queryFactory
-            .delete(users)
-            .where(users.userId.eq(userID))
-            .execute();
+                .delete(users)
+                .where(users.userId.eq(userID))
+                .execute();
     }
 
     @Override
-    public Page<UsersDto.UsersListDto> findUsersWithPaginationToDto(Pageable pageable) {
-         List<UsersDto.UsersListDto> usersList = queryFactory.select(Projections.fields(UsersDto.UsersListDto.class,
+    public Page<UsersDto.UsersListDto> findUsersWithPaginationToDto(Pageable pageable, String levelPath,
+            boolean isSuperAdmin) {
+        BooleanBuilder builder = new BooleanBuilder();
+
+        if (!isSuperAdmin && levelPath != null && !levelPath.isEmpty()) {
+            builder.and(QueryUtils.hasCompanyLevelAccess(relation, levelPath));
+        }
+
+        List<UsersDto.UsersListDto> usersList = queryFactory.select(Projections.fields(UsersDto.UsersListDto.class,
                 users.userId.as("userId"),
                 users.name.as("name"),
                 users.password.as("password"),
                 users.phone.as("phone"),
                 users.email.as("email"),
                 users.authority.as("authority"),
-                users.regDt.as("regDt"), 
+                users.regDt.as("regDt"),
                 company.id.as("companyId"),
                 company.companyName.as("companyName"),
                 company.companyType.as("companyType"),
@@ -151,29 +168,41 @@ public class UsersRepositoryCustomImpl implements UsersRepositoryCustom {
                 companyTypeCommonCode.name.as("companyTypeName")))
                 .from(users)
                 .leftJoin(users.company, company)
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
                 .leftJoin(userAuthorityCommonCode).on(users.authority.eq(userAuthorityCommonCode.commonCode))
                 .leftJoin(companyTypeCommonCode).on(company.companyType.eq(companyTypeCommonCode.commonCode))
+                .where(builder)
                 .orderBy(users.regDt.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
 
         long totalCount = queryFactory
-                .selectFrom(users)
-                .fetchCount();
+                .select(users.count())
+                .from(users)
+                .leftJoin(users.company, company)
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
+                .leftJoin(userAuthorityCommonCode).on(users.authority.eq(userAuthorityCommonCode.commonCode))
+                .leftJoin(companyTypeCommonCode).on(company.companyType.eq(companyTypeCommonCode.commonCode))
+                .where(builder)
+                .fetchOne();
 
         usersList.forEach(user -> {
             log.info("Authority Name: {}", user.getAuthorityName());
             log.info("Company Type Name: {}", user.getCompanyTypeName());
         });
-                
-            
+
         return new PageImpl<>(usersList, pageable, totalCount);
     }
 
     @Override
-    public Page<UsersDto.UsersListDto> searchUsersWithPaginationToDto(Long companyId, String companyType, String name, Pageable pageable) {
+    public Page<UsersDto.UsersListDto> searchUsersWithPaginationToDto(Long companyId, String companyType, String name,
+            Pageable pageable, String levelPath, boolean isSuperAdmin) {
         BooleanBuilder builder = new BooleanBuilder();
+
+        if (!isSuperAdmin && levelPath != null && !levelPath.isEmpty()) {
+            builder.and(QueryUtils.hasCompanyLevelAccess(relation, levelPath));
+        }
 
         if (companyId != null) {
             builder.and(users.company.id.eq(companyId));
@@ -194,7 +223,7 @@ public class UsersRepositoryCustomImpl implements UsersRepositoryCustom {
                 users.phone.as("phone"),
                 users.email.as("email"),
                 users.authority.as("authority"),
-                users.regDt.as("regDt"), 
+                users.regDt.as("regDt"),
                 company.id.as("companyId"),
                 company.companyName.as("companyName"),
                 company.companyType.as("companyType"),
@@ -202,6 +231,7 @@ public class UsersRepositoryCustomImpl implements UsersRepositoryCustom {
                 companyTypeCommonCode.name.as("companyTypeName")))
                 .from(users)
                 .leftJoin(users.company, company)
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
                 .leftJoin(userAuthorityCommonCode).on(users.authority.eq(userAuthorityCommonCode.commonCode))
                 .leftJoin(companyTypeCommonCode).on(company.companyType.eq(companyTypeCommonCode.commonCode))
                 .orderBy(users.regDt.desc())
@@ -211,11 +241,15 @@ public class UsersRepositoryCustomImpl implements UsersRepositoryCustom {
                 .fetch();
 
         long totalCount = queryFactory
-                .selectFrom(users)
+                .select(users.count())
+                .from(users)
                 .leftJoin(users.company, company)
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
+                .leftJoin(userAuthorityCommonCode).on(users.authority.eq(userAuthorityCommonCode.commonCode))
+                .leftJoin(companyTypeCommonCode).on(company.companyType.eq(companyTypeCommonCode.commonCode))
                 .where(builder)
-                .fetchCount();
-           
+                .fetchOne();
+
         return new PageImpl<>(usersList, pageable, totalCount);
     }
 

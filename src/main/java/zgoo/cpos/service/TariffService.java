@@ -1,6 +1,7 @@
 package zgoo.cpos.service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -35,6 +36,7 @@ public class TariffService {
     private final CpPlanPolicyRepository planRepository;
     private final TariffPolicyRepository tariffPolicyRepository;
     private final TariffInfoRepository tariffInfoRepository;
+    private final ComService comService;
 
     // 저장
     @Transactional
@@ -169,12 +171,29 @@ public class TariffService {
     }
 
     // 조회
-    public List<CpPlanDto> searchPlanPolicyAll() {
+    public List<CpPlanDto> searchPlanPolicyAll(String userId) {
         log.info("==  Start search PlanPolicy All");
-        List<CpPlanPolicy> planEntityList = planRepository.findAll();
-        List<CpPlanDto> dtolist = CompanyMapper.toDtoListCpPolicyPlan(planEntityList);
+        try {
 
-        return dtolist;
+            boolean isSuperAdmin = comService.checkSuperAdmin(userId);
+            Long loginUserCompanyId = comService.getLoginUserCompanyId(userId);
+            String levelPath = companyRepository.findLevelPathByCompanyId(loginUserCompanyId);
+            log.info("== levelPath : {}", levelPath);
+
+            if (levelPath == null) {
+                // 관계정보가 없을경우 빈 리스트 전달
+                return new ArrayList<>();
+            }
+
+            List<CpPlanPolicy> planEntityList = planRepository.findAll(isSuperAdmin, levelPath);
+            List<CpPlanDto> dtolist = CompanyMapper.toDtoListCpPolicyPlan(planEntityList);
+
+            return dtolist;
+        } catch (Exception e) {
+            log.error("searchPlanPolicyAll error: {}", e.getMessage());
+            return new ArrayList<>();
+        }
+
     }
 
     public List<CpPlanDto> searchPlanListWithCompanyId(Long companyId) {
@@ -192,18 +211,53 @@ public class TariffService {
         return findList;
     }
 
-    public Page<TariffPolicyDto> searchTariffPolicyAll(int page, int size) {
+    public Page<TariffPolicyDto> searchTariffPolicyAll(int page, int size, String userId) {
         log.info("==  Start search TariffPolicy All");
 
         Pageable pageable = PageRequest.of(page, size);
-        return tariffPolicyRepository.findAllTariffPolicyPaging(pageable);
+
+        try {
+            boolean isSuperAdmin = comService.checkSuperAdmin(userId);
+            Long loginUserCompanyId = comService.getLoginUserCompanyId(userId);
+            String levelPath = companyRepository.findLevelPathByCompanyId(loginUserCompanyId);
+            log.info("== levelPath : {}", levelPath);
+
+            if (levelPath == null) {
+                // 관계정보가 없을경우 빈 리스트 전달
+                return Page.empty(pageable);
+            }
+
+            return tariffPolicyRepository.findAllTariffPolicyPaging(pageable, levelPath, isSuperAdmin);
+        } catch (Exception e) {
+            log.error("searchTariffPolicyAll error: {}", e.getMessage());
+            return Page.empty(pageable);
+        }
+
     }
 
-    public Page<TariffPolicyDto> searchTariffPolicyByCompanyId(int page, int size, Long companyId) {
+    public Page<TariffPolicyDto> searchTariffPolicyByCompanyId(int page, int size, Long companyId, String userId) {
         log.info("==  Start search TariffPolicy By CompanyID : {}", companyId);
 
         Pageable pageable = PageRequest.of(page, size);
-        return tariffPolicyRepository.findTariffPolicyByCompanyIdPaging(pageable, companyId);
+        try {
+            boolean isSuperAdmin = comService.checkSuperAdmin(userId);
+            Long loginUserCompanyId = comService.getLoginUserCompanyId(userId);
+            String levelPath = companyRepository.findLevelPathByCompanyId(loginUserCompanyId);
+            log.info("== levelPath : {}", levelPath);
+
+            if (levelPath == null) {
+                // 관계정보가 없을경우 빈 리스트 전달
+                return Page.empty(pageable);
+            }
+
+            return tariffPolicyRepository.findTariffPolicyByCompanyIdPaging(pageable, companyId, levelPath,
+                    isSuperAdmin);
+
+        } catch (Exception e) {
+            log.error("searchTariffPolicyByCompanyId error: {}", e.getMessage());
+            return Page.empty(pageable);
+        }
+
     }
 
     public CpPlanPolicy searchPlanByPlanName(String planName) {

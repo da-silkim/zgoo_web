@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
@@ -14,12 +15,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import zgoo.cpos.domain.code.QCommonCode;
 import zgoo.cpos.domain.company.QCompany;
+import zgoo.cpos.domain.company.QCompanyRelationInfo;
 import zgoo.cpos.domain.company.QCpPlanPolicy;
 import zgoo.cpos.domain.tariff.QTariffInfo;
 import zgoo.cpos.domain.tariff.QTariffPolicy;
 import zgoo.cpos.domain.tariff.TariffPolicy;
 import zgoo.cpos.dto.tariff.TariffDto.TariffInfoDto;
 import zgoo.cpos.dto.tariff.TariffDto.TariffPolicyDto;
+import zgoo.cpos.util.QueryUtils;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -27,13 +30,20 @@ public class TariffPolicyRepositoryCustomImpl implements TariffPolicyRepositoryC
 
     private final JPAQueryFactory queryFactory;
     QCompany company = QCompany.company;
+    QCompanyRelationInfo relation = QCompanyRelationInfo.companyRelationInfo;
     QTariffPolicy tpolicy = QTariffPolicy.tariffPolicy;
     QCpPlanPolicy ppolicy = QCpPlanPolicy.cpPlanPolicy;
     QTariffInfo tinfo = QTariffInfo.tariffInfo;
     QCommonCode applyCodeName = new QCommonCode("applyCode");
 
     @Override
-    public Page<TariffPolicyDto> findAllTariffPolicyPaging(Pageable page) {
+    public Page<TariffPolicyDto> findAllTariffPolicyPaging(Pageable page, String levelPath, boolean isSuperAdmin) {
+        BooleanBuilder builder = new BooleanBuilder();
+
+        if (!isSuperAdmin && levelPath != null && !levelPath.isEmpty()) {
+            builder.and(QueryUtils.hasCompanyLevelAccess(relation, levelPath));
+        }
+
         List<TariffPolicyDto> resultList = queryFactory
                 .select(Projections.fields(
                         TariffPolicyDto.class,
@@ -48,7 +58,9 @@ public class TariffPolicyRepositoryCustomImpl implements TariffPolicyRepositoryC
                 .from(tpolicy)
                 .leftJoin(ppolicy).on(tpolicy.policy.eq(ppolicy))
                 .leftJoin(company).on(ppolicy.company.eq(company))
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
                 .leftJoin(applyCodeName).on(tpolicy.apply_code.eq(applyCodeName.commonCode))
+                .where(builder)
                 .offset(page.getOffset())
                 .limit(page.getPageSize())
                 .orderBy(tpolicy.regDt.desc())
@@ -58,13 +70,26 @@ public class TariffPolicyRepositoryCustomImpl implements TariffPolicyRepositoryC
         long total = queryFactory
                 .select(tpolicy.count())
                 .from(tpolicy)
+                .leftJoin(ppolicy).on(tpolicy.policy.eq(ppolicy))
+                .leftJoin(company).on(ppolicy.company.eq(company))
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
+                .where(builder)
                 .fetchOne();
 
         return new PageImpl<>(resultList, page, total);
     }
 
     @Override
-    public Page<TariffPolicyDto> findTariffPolicyByCompanyIdPaging(Pageable pageable, Long companyId) {
+    public Page<TariffPolicyDto> findTariffPolicyByCompanyIdPaging(Pageable pageable, Long companyId,
+            String levelPath, boolean isSuperAdmin) {
+        BooleanBuilder builder = new BooleanBuilder();
+
+        builder.and(company.id.eq(companyId));
+
+        if (!isSuperAdmin && levelPath != null && !levelPath.isEmpty()) {
+            builder.and(QueryUtils.hasCompanyLevelAccess(relation, levelPath));
+        }
+
         List<TariffPolicyDto> resultList = queryFactory
                 .select(Projections.fields(TariffPolicyDto.class,
                         tpolicy.id.as("tariffId"),
@@ -78,8 +103,9 @@ public class TariffPolicyRepositoryCustomImpl implements TariffPolicyRepositoryC
                 .from(tpolicy)
                 .leftJoin(ppolicy).on(tpolicy.policy.eq(ppolicy))
                 .leftJoin(company).on(ppolicy.company.eq(company))
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
                 .leftJoin(applyCodeName).on(tpolicy.apply_code.eq(applyCodeName.commonCode))
-                .where(company.id.eq(companyId))
+                .where(builder)
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .orderBy(tpolicy.regDt.desc())
@@ -89,6 +115,10 @@ public class TariffPolicyRepositoryCustomImpl implements TariffPolicyRepositoryC
         long total = queryFactory
                 .select(tpolicy.count())
                 .from(tpolicy)
+                .leftJoin(ppolicy).on(tpolicy.policy.eq(ppolicy))
+                .leftJoin(company).on(ppolicy.company.eq(company))
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
+                .where(builder)
                 .fetchOne();
 
         return new PageImpl<>(resultList, pageable, total);

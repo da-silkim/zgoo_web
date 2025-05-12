@@ -15,12 +15,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import zgoo.cpos.domain.code.QCommonCode;
 import zgoo.cpos.domain.company.QCompany;
+import zgoo.cpos.domain.company.QCompanyRelationInfo;
 import zgoo.cpos.domain.users.Notice;
 import zgoo.cpos.domain.users.QNotice;
 import zgoo.cpos.domain.users.QUsers;
 import zgoo.cpos.domain.users.Users;
 import zgoo.cpos.dto.users.NoticeDto.NoticeDetailDto;
 import zgoo.cpos.dto.users.NoticeDto.NoticeListDto;
+import zgoo.cpos.util.QueryUtils;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -29,52 +31,65 @@ public class NoticeRepositoryCustomImpl implements NoticeRepositoryCustom {
     QNotice notice = QNotice.notice;
     QUsers users = QUsers.users;
     QCompany company = QCompany.company;
+    QCompanyRelationInfo relation = QCompanyRelationInfo.companyRelationInfo;
     QCommonCode typeCommonCode = new QCommonCode("type");
     LocalDate today = LocalDate.now();
 
     @Override
-    public Page<NoticeListDto> findNoticeWithPagination(Pageable pageable) {
+    public Page<NoticeListDto> findNoticeWithPagination(Pageable pageable, String levelPath, boolean isSuperAdmin) {
+        BooleanBuilder builder = new BooleanBuilder();
+        builder.and(notice.delYn.eq("N"));
+        builder.and(notice.startDate.loe(today));
+        builder.and(notice.endDate.goe(today));
+
+        if (!isSuperAdmin && levelPath != null && !levelPath.isEmpty()) {
+            builder.and(QueryUtils.hasCompanyLevelAccess(relation, levelPath));
+        }
+
         List<NoticeListDto> noticeList = queryFactory.select(Projections.fields(NoticeListDto.class,
-            notice.idx.as("idx"),
-            notice.title.as("title"),
-            notice.content.as("content"),
-            notice.type.as("type"),
-            notice.views.as("views"),
-            notice.regDt.as("regDt"),
-            users.userId.as("userId"),
-            users.name.as("userName"),
-            company.id.as("companyId"),
-            company.companyName.as("companyName"),
-            typeCommonCode.name.as("typeName")))
-            .from(notice)
-            .leftJoin(users).on(notice.user.userId.eq(users.userId))
-            .leftJoin(company).on(users.company.id.eq(company.id))
-            .leftJoin(typeCommonCode).on(notice.type.eq(typeCommonCode.commonCode))
-            .where(
-                notice.delYn.eq("N"),
-                notice.startDate.loe(today),
-                notice.endDate.goe(today)
-            )
-            .orderBy(notice.regDt.desc(), notice.idx.desc())
-            .offset(pageable.getOffset())
-            .limit(pageable.getPageSize())
-            .fetch();
+                notice.idx.as("idx"),
+                notice.title.as("title"),
+                notice.content.as("content"),
+                notice.type.as("type"),
+                notice.views.as("views"),
+                notice.regDt.as("regDt"),
+                users.userId.as("userId"),
+                users.name.as("userName"),
+                company.id.as("companyId"),
+                company.companyName.as("companyName"),
+                typeCommonCode.name.as("typeName")))
+                .from(notice)
+                .leftJoin(users).on(notice.user.userId.eq(users.userId))
+                .leftJoin(company).on(users.company.id.eq(company.id))
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
+                .leftJoin(typeCommonCode).on(notice.type.eq(typeCommonCode.commonCode))
+                .where(builder)
+                .orderBy(notice.regDt.desc(), notice.idx.desc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
 
         long totalCount = queryFactory
-            .select(notice.count())
-            .from(notice)
-            .where(notice.delYn.eq("N"),
-                    notice.startDate.loe(today),
-                    notice.endDate.goe(today))
-            .fetchOne();
+                .select(notice.count())
+                .from(notice)
+                .leftJoin(users).on(notice.user.userId.eq(users.userId))
+                .leftJoin(company).on(users.company.id.eq(company.id))
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
+                .leftJoin(typeCommonCode).on(notice.type.eq(typeCommonCode.commonCode))
+                .where(builder)
+                .fetchOne();
 
         return new PageImpl<>(noticeList, pageable, totalCount);
     }
 
     @Override
     public Page<NoticeListDto> searchNoticeListwithPagination(Long companyId, LocalDate startDate,
-            LocalDate endDate, Pageable pageable) {
+            LocalDate endDate, Pageable pageable, String levelPath, boolean isSuperAdmin) {
         BooleanBuilder builder = new BooleanBuilder();
+
+        if (!isSuperAdmin && levelPath != null && !levelPath.isEmpty()) {
+            builder.and(QueryUtils.hasCompanyLevelAccess(relation, levelPath));
+        }
 
         builder.and(notice.delYn.eq("N"));
         builder.and(notice.startDate.loe(today));
@@ -93,34 +108,37 @@ public class NoticeRepositoryCustomImpl implements NoticeRepositoryCustom {
         }
 
         List<NoticeListDto> noticeList = queryFactory.select(Projections.fields(NoticeListDto.class,
-            notice.idx.as("idx"),
-            notice.title.as("title"),
-            notice.content.as("content"),
-            notice.type.as("type"),
-            notice.views.as("views"),
-            notice.regDt.as("regDt"),
-            users.userId.as("userId"),
-            users.name.as("userName"),
-            company.id.as("companyId"),
-            company.companyName.as("companyName"),
-            typeCommonCode.name.as("typeName")))
-            .from(notice)
-            .leftJoin(users).on(notice.user.userId.eq(users.userId))
-            .leftJoin(company).on(users.company.id.eq(company.id))
-            .leftJoin(typeCommonCode).on(notice.type.eq(typeCommonCode.commonCode))
-            .where(builder)
-            .orderBy(notice.regDt.desc(), notice.idx.desc())
-            .offset(pageable.getOffset())
-            .limit(pageable.getPageSize())
-            .fetch();
+                notice.idx.as("idx"),
+                notice.title.as("title"),
+                notice.content.as("content"),
+                notice.type.as("type"),
+                notice.views.as("views"),
+                notice.regDt.as("regDt"),
+                users.userId.as("userId"),
+                users.name.as("userName"),
+                company.id.as("companyId"),
+                company.companyName.as("companyName"),
+                typeCommonCode.name.as("typeName")))
+                .from(notice)
+                .leftJoin(users).on(notice.user.userId.eq(users.userId))
+                .leftJoin(company).on(users.company.id.eq(company.id))
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
+                .leftJoin(typeCommonCode).on(notice.type.eq(typeCommonCode.commonCode))
+                .where(builder)
+                .orderBy(notice.regDt.desc(), notice.idx.desc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
 
         long totalCount = queryFactory
-            .select(notice.count())
-            .from(notice)
-            .leftJoin(users).on(notice.user.userId.eq(users.userId))
-            .leftJoin(company).on(users.company.id.eq(company.id))
-            .where(builder)
-            .fetchOne();
+                .select(notice.count())
+                .from(notice)
+                .leftJoin(users).on(notice.user.userId.eq(users.userId))
+                .leftJoin(company).on(users.company.id.eq(company.id))
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
+                .leftJoin(typeCommonCode).on(notice.type.eq(typeCommonCode.commonCode))
+                .where(builder)
+                .fetchOne();
 
         return new PageImpl<>(noticeList, pageable, totalCount);
     }
@@ -133,17 +151,17 @@ public class NoticeRepositoryCustomImpl implements NoticeRepositoryCustom {
         }
 
         return queryFactory
-            .selectFrom(notice)
-            .where(notice.idx.eq(idx))
-            .fetchOne();
+                .selectFrom(notice)
+                .where(notice.idx.eq(idx))
+                .fetchOne();
     }
 
     @Override
     public Users findUserOne(String userId) {
         return queryFactory
-            .selectFrom(users)
-            .where(users.userId.eq(userId))
-            .fetchOne();
+                .selectFrom(users)
+                .where(users.userId.eq(userId))
+                .fetchOne();
     }
 
     @Override
@@ -165,11 +183,16 @@ public class NoticeRepositoryCustomImpl implements NoticeRepositoryCustom {
     }
 
     @Override
-    public NoticeDetailDto findPreviousNotice(Long idx, Long companyId, LocalDate startDate, LocalDate endDate) {
+    public NoticeDetailDto findPreviousNotice(Long idx, Long companyId, LocalDate startDate, LocalDate endDate,
+            String levelPath, boolean isSuperAdmin) {
         BooleanBuilder builder = new BooleanBuilder();
         builder.and(notice.delYn.eq("N"));
         builder.and(notice.startDate.loe(today));
         builder.and(notice.endDate.goe(today));
+
+        if (!isSuperAdmin && levelPath != null && !levelPath.isEmpty()) {
+            builder.and(QueryUtils.hasCompanyLevelAccess(relation, levelPath));
+        }
 
         if (companyId != null) {
             builder.and(company.id.eq(companyId));
@@ -196,6 +219,7 @@ public class NoticeRepositoryCustomImpl implements NoticeRepositoryCustom {
                 .from(notice)
                 .leftJoin(users).on(notice.user.userId.eq(users.userId))
                 .leftJoin(company).on(users.company.id.eq(company.id))
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
                 .leftJoin(typeCommonCode).on(notice.type.eq(typeCommonCode.commonCode))
                 .where(builder)
                 .orderBy(notice.idx.desc())
@@ -203,11 +227,16 @@ public class NoticeRepositoryCustomImpl implements NoticeRepositoryCustom {
     }
 
     @Override
-    public NoticeDetailDto findNextNotice(Long idx, Long companyId, LocalDate startDate, LocalDate endDate) {
+    public NoticeDetailDto findNextNotice(Long idx, Long companyId, LocalDate startDate, LocalDate endDate,
+            String levelPath, boolean isSuperAdmin) {
         BooleanBuilder builder = new BooleanBuilder();
         builder.and(notice.delYn.eq("N"));
         builder.and(notice.startDate.loe(today));
         builder.and(notice.endDate.goe(today));
+
+        if (!isSuperAdmin && levelPath != null && !levelPath.isEmpty()) {
+            builder.and(QueryUtils.hasCompanyLevelAccess(relation, levelPath));
+        }
 
         if (companyId != null) {
             builder.and(company.id.eq(companyId));
@@ -234,6 +263,7 @@ public class NoticeRepositoryCustomImpl implements NoticeRepositoryCustom {
                 .from(notice)
                 .leftJoin(users).on(notice.user.userId.eq(users.userId))
                 .leftJoin(company).on(users.company.id.eq(company.id))
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
                 .leftJoin(typeCommonCode).on(notice.type.eq(typeCommonCode.commonCode))
                 .where(builder)
                 .orderBy(notice.idx.asc())
@@ -246,36 +276,42 @@ public class NoticeRepositoryCustomImpl implements NoticeRepositoryCustom {
                 .update(notice)
                 .set(notice.delYn, "Y")
                 .where(notice.idx.eq(idx)
-                    .and(notice.delYn.eq("N")))
+                        .and(notice.delYn.eq("N")))
                 .execute();
     }
 
     @Override
-    public List<NoticeListDto> findLatestNoticeList() {
+    public List<NoticeListDto> findLatestNoticeList(String levelPath, boolean isSuperAdmin) {
+        BooleanBuilder builder = new BooleanBuilder();
+        builder.and(notice.delYn.eq("N"));
+        builder.and(notice.startDate.loe(today));
+        builder.and(notice.endDate.goe(today));
+
+        if (!isSuperAdmin && levelPath != null && !levelPath.isEmpty()) {
+            builder.and(QueryUtils.hasCompanyLevelAccess(relation, levelPath));
+        }
+
         List<NoticeListDto> noticeList = queryFactory.select(Projections.fields(NoticeListDto.class,
-            notice.idx.as("idx"),
-            notice.title.as("title"),
-            notice.content.as("content"),
-            notice.type.as("type"),
-            notice.views.as("views"),
-            notice.regDt.as("regDt"),
-            users.userId.as("userId"),
-            users.name.as("userName"),
-            company.id.as("companyId"),
-            company.companyName.as("companyName"),
-            typeCommonCode.name.as("typeName")))
-            .from(notice)
-            .leftJoin(users).on(notice.user.userId.eq(users.userId))
-            .leftJoin(company).on(users.company.id.eq(company.id))
-            .leftJoin(typeCommonCode).on(notice.type.eq(typeCommonCode.commonCode))
-            .where(
-                notice.delYn.eq("N"),
-                notice.startDate.loe(today),
-                notice.endDate.goe(today)
-            )
-            .orderBy(notice.regDt.desc(), notice.idx.desc())
-            .limit(5)
-            .fetch();
+                notice.idx.as("idx"),
+                notice.title.as("title"),
+                notice.content.as("content"),
+                notice.type.as("type"),
+                notice.views.as("views"),
+                notice.regDt.as("regDt"),
+                users.userId.as("userId"),
+                users.name.as("userName"),
+                company.id.as("companyId"),
+                company.companyName.as("companyName"),
+                typeCommonCode.name.as("typeName")))
+                .from(notice)
+                .leftJoin(users).on(notice.user.userId.eq(users.userId))
+                .leftJoin(company).on(users.company.id.eq(company.id))
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
+                .leftJoin(typeCommonCode).on(notice.type.eq(typeCommonCode.commonCode))
+                .where(builder)
+                .orderBy(notice.regDt.desc(), notice.idx.desc())
+                .limit(5)
+                .fetch();
         return noticeList;
     }
 }

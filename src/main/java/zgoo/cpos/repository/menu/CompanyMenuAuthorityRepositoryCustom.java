@@ -13,19 +13,26 @@ import zgoo.cpos.dto.menu.CompanyMenuAuthorityDto.CompanyMenuRegDto;
 public interface CompanyMenuAuthorityRepositoryCustom {
     // 메뉴권한이 등록된 사업자 조회(중복제거)
     List<Long> findDistinctCompanyIds(); // companyId만 조회
+
     List<CompanyMenuAuthorityDto.CompanyMenuRegDto> findDistinctCompanyWithCompanyName(); // companyId, companyName 조회
-    Page<CompanyMenuAuthorityDto.CompanyMenuRegDto> findCompanyMenuWithPagination(Pageable pageable);
- 
+
+    Page<CompanyMenuAuthorityDto.CompanyMenuRegDto> findCompanyMenuWithPagination(Pageable pageable, String levelPath,
+            boolean isSuperAdmin);
+
     // 메뉴권한이 등록된 사업자 조회(중복제거) - 검색
-    Page<CompanyMenuAuthorityDto.CompanyMenuRegDto> searchCompanyMenuWithPagination(String companyName, Pageable pageable);
+    Page<CompanyMenuAuthorityDto.CompanyMenuRegDto> searchCompanyMenuWithPagination(String companyName,
+            Pageable pageable, String levelPath, boolean isSuperAdmin);
 
     // 해당 사업장의 메뉴 전체 조회
     List<CompanyMenuAuthorityDto.CompanyMenuAuthorityListDto> findCompanyMenuAuthorityList(Long companyId);
+
     List<CompanyMenuAuthorityListDto> findCompanyMenuAuthorityBasedUserAuthority(Long companyId, String authority);
 
     // 사용여부에 따른 부모메뉴 useYn 업데이트
     void companyMenuAuthorityUseYnUpdate(CompanyMenuAuthority cma);
+
     String getParentCode(String menuCode);
+
     void updateParentMenuUseYn(String parentCode, CompanyMenuAuthority cma);
 
     // 메뉴 접근 권한이 설정된 사업자인지 확인

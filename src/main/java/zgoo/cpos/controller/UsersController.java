@@ -43,7 +43,7 @@ public class UsersController {
         } catch (Exception e) {
             log.error("[createUsers] error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                    .body("사용자 정보 등록 중 오류가 발생했습니다.");
+                    .body("사용자 정보 등록 중 오류가 발생했습니다.");
         }
     }
 
@@ -51,7 +51,7 @@ public class UsersController {
     @GetMapping("/checkUserId")
     public ResponseEntity<Boolean> checkUserId(@RequestParam("userId") String userId) {
         log.info("=== duplicate check userId ===");
-        
+
         try {
             boolean response = usersService.isUserIdDuplicate(userId);
             return ResponseEntity.ok(response);
@@ -69,7 +69,7 @@ public class UsersController {
         try {
             UsersDto.UsersRegDto userFindOne = this.usersService.findUserOne(userId);
 
-            if ( userFindOne != null ) {
+            if (userFindOne != null) {
                 return ResponseEntity.ok(userFindOne);
             }
 
@@ -85,9 +85,9 @@ public class UsersController {
     public ResponseEntity<List<UsersDto.UsersListDto>> searchUsers(
             @RequestParam(required = false) Long companyId,
             @RequestParam(required = false) String companyType,
-            @RequestParam(required = false) String name) {
+            @RequestParam(required = false) String name, Principal principal) {
         log.info("=== search user info ===");
-        
+
         if (companyType != null && companyType.isEmpty()) {
             companyType = null;
         }
@@ -99,15 +99,16 @@ public class UsersController {
         log.info("companyId: {}, companyType: {}, name: {}", companyId, companyType, name);
 
         try {
-            List<UsersDto.UsersListDto> usersList = this.usersService.searchUsersList(companyId, companyType, name);
+            List<UsersDto.UsersListDto> usersList = this.usersService.searchUsersList(companyId, companyType, name,
+                    principal.getName());
             log.info("조회된 사용자 리스트 >> {}", usersList);
             return ResponseEntity.ok(usersList);
         } catch (Exception e) {
             log.error("[searchUsers] error: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build(); 
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-    
+
     // 사용자 수정
     @PatchMapping("/update")
     public ResponseEntity<String> updateUsers(@RequestBody UsersDto.UsersRegDto dto, Principal principal) {
@@ -119,7 +120,7 @@ public class UsersController {
         } catch (Exception e) {
             log.error("[updateUsers] error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                    .body("사용자 정보 수정 중 오류가 발생했습니다.");
+                    .body("사용자 정보 수정 중 오류가 발생했습니다.");
         }
     }
 
@@ -135,7 +136,7 @@ public class UsersController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 사용자 정보를 찾을 수 없습니다.");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                    .body("사용자 정보 삭제 중 오류가 발생했습니다.");
+                    .body("사용자 정보 삭제 중 오류가 발생했습니다.");
         }
     }
 
@@ -151,7 +152,7 @@ public class UsersController {
             Integer result = this.usersService.updateUsersPasswordInfo(userId, dto);
 
             switch (result) {
-                case 0-> response.put("message", "현재 비밀번호와 값이 일치하지 않습니다.");
+                case 0 -> response.put("message", "현재 비밀번호와 값이 일치하지 않습니다.");
                 case 1 -> response.put("message", "비밀번호가 변경되었습니다.");
                 case 2 -> response.put("message", "새 비밀번호 값이 일치하지 않습니다.");
                 default -> response.put("message", "비밀번호 변경에 실패했습니다.");
@@ -167,7 +168,8 @@ public class UsersController {
     }
 
     @GetMapping("/btncontrol/{userId}")
-    public ResponseEntity<Map<String, Object>> buttonControl(@PathVariable("userId") String userId, Principal principal) {
+    public ResponseEntity<Map<String, Object>> buttonControl(@PathVariable("userId") String userId,
+            Principal principal) {
         log.info("=== update & delete button authority info ===");
 
         Map<String, Object> response = new HashMap<>();

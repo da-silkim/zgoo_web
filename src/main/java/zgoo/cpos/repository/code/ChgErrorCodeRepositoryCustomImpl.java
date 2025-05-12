@@ -26,35 +26,37 @@ public class ChgErrorCodeRepositoryCustomImpl implements ChgErrorCodeRepositoryC
     QCommonCode manufCdName = new QCommonCode("manufCd");
 
     @Override
-    public Page<ChgErrorCodeListDto> findErrorCodeWithPagination(Pageable pageable) {
+    public Page<ChgErrorCodeListDto> findErrorCodeWithPagination(Pageable pageable, String levelPath,
+            boolean isSuperAdmin) {
         List<ChgErrorCodeListDto> errcdList = queryFactory.select(Projections.fields(ChgErrorCodeListDto.class,
-            errorCode.id.as("errcdId"),
-            errorCode.errCode.as("errCode"),
-            errorCode.errName.as("errName"),
-            errorCode.menufCode.as("menufCode"),
-            errorCode.regDt.as("regDt"),
-            Expressions.stringTemplate("IF({0} = 'DFT', '없음', {1})", errorCode.menufCode, manufCdName.name).as("menufCodeName")))
-            .from(errorCode)
-            .leftJoin(manufCdName).on(errorCode.menufCode.eq(manufCdName.commonCode))
-            .orderBy(errorCode.regDt.desc())
-            .offset(pageable.getOffset())
-            .limit(pageable.getPageSize())
-            .fetch();
+                errorCode.id.as("errcdId"),
+                errorCode.errCode.as("errCode"),
+                errorCode.errName.as("errName"),
+                errorCode.menufCode.as("menufCode"),
+                errorCode.regDt.as("regDt"),
+                Expressions.stringTemplate("IF({0} = 'DFT', '없음', {1})", errorCode.menufCode, manufCdName.name)
+                        .as("menufCodeName")))
+                .from(errorCode)
+                .leftJoin(manufCdName).on(errorCode.menufCode.eq(manufCdName.commonCode))
+                .orderBy(errorCode.regDt.desc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
 
         long totalCount = queryFactory
-            .select(errorCode.count())
-            .from(errorCode)
-            .fetchOne();
+                .select(errorCode.count())
+                .from(errorCode)
+                .fetchOne();
 
         return new PageImpl<>(errcdList, pageable, totalCount);
     }
-    
+
     @Override
     public Page<ChgErrorCodeListDto> searchErrorCodeWithPagination(String manuf, String searchOp, String searchContent,
-            Pageable pageable) {
+            Pageable pageable, String levelPath, boolean isSuperAdmin) {
         BooleanBuilder builder = new BooleanBuilder();
         log.info("manuf: {}, searchOp: {}, searchContent:{}", manuf, searchOp, searchContent);
-        
+
         if (manuf != null && !manuf.isEmpty()) {
             builder.and(errorCode.menufCode.eq(manuf));
         }
@@ -68,25 +70,26 @@ public class ChgErrorCodeRepositoryCustomImpl implements ChgErrorCodeRepositoryC
         }
 
         List<ChgErrorCodeListDto> errcdList = queryFactory.select(Projections.fields(ChgErrorCodeListDto.class,
-            errorCode.id.as("errcdId"),
-            errorCode.errCode.as("errCode"),
-            errorCode.errName.as("errName"),
-            errorCode.menufCode.as("menufCode"),
-            errorCode.regDt.as("regDt"),
-            Expressions.stringTemplate("IF({0} = 'DFT', '없음', {1})", errorCode.menufCode, manufCdName.name).as("menufCodeName")))
-            .from(errorCode)
-            .leftJoin(manufCdName).on(errorCode.menufCode.eq(manufCdName.commonCode))
-            .orderBy(errorCode.regDt.desc())
-            .where(builder)
-            .offset(pageable.getOffset())
-            .limit(pageable.getPageSize())
-            .fetch();
+                errorCode.id.as("errcdId"),
+                errorCode.errCode.as("errCode"),
+                errorCode.errName.as("errName"),
+                errorCode.menufCode.as("menufCode"),
+                errorCode.regDt.as("regDt"),
+                Expressions.stringTemplate("IF({0} = 'DFT', '없음', {1})", errorCode.menufCode, manufCdName.name)
+                        .as("menufCodeName")))
+                .from(errorCode)
+                .leftJoin(manufCdName).on(errorCode.menufCode.eq(manufCdName.commonCode))
+                .orderBy(errorCode.regDt.desc())
+                .where(builder)
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
 
         long totalCount = queryFactory
-            .select(errorCode.count())
-            .from(errorCode)
-            .where(builder)
-            .fetchOne();
+                .select(errorCode.count())
+                .from(errorCode)
+                .where(builder)
+                .fetchOne();
 
         return new PageImpl<>(errcdList, pageable, totalCount);
     }
@@ -94,14 +97,14 @@ public class ChgErrorCodeRepositoryCustomImpl implements ChgErrorCodeRepositoryC
     @Override
     public ChgErrorCodeRegDto findErrorCodeOne(Long errcdId) {
         ChgErrorCodeRegDto errcd = queryFactory.select(Projections.fields(ChgErrorCodeRegDto.class,
-            errorCode.id.as("errcdId"),
-            errorCode.errCode.as("errCode"),
-            errorCode.errName.as("errName"),
-            errorCode.menufCode.as("menufCode"),
-            errorCode.regDt.as("regDt")))
-            .from(errorCode)
-            .where(errorCode.id.eq(errcdId))
-            .fetchOne();
+                errorCode.id.as("errcdId"),
+                errorCode.errCode.as("errCode"),
+                errorCode.errName.as("errName"),
+                errorCode.menufCode.as("menufCode"),
+                errorCode.regDt.as("regDt")))
+                .from(errorCode)
+                .where(errorCode.id.eq(errcdId))
+                .fetchOne();
 
         return errcd;
     }

@@ -36,15 +36,16 @@ public class UsersService {
     private final UsersRepository usersRepository;
     private final CommonCodeRepository commonCodeRepository;
     private final MenuAuthorityRepository menuAuthorityRepository;
+    private final ComService comService;
 
     // 사용자 - 전체 조회
     @Transactional
     public List<UsersDto.UsersListDto> findUsersAll() {
         List<Users> usersList = this.usersRepository.findAll();
 
-        if(usersList.isEmpty()) {
+        if (usersList.isEmpty()) {
             log.info("=== no users found ===");
-            return new ArrayList<>();   // empty list
+            return new ArrayList<>(); // empty list
         }
 
         List<UsersDto.UsersListDto> userListDto = UsersMapper.toDtoList(usersList);
@@ -61,25 +62,34 @@ public class UsersService {
 
     // 사용자 - 검색
     @Transactional
-    public List<UsersDto.UsersListDto> searchUsersList(Long companyId, String companyType, String name) {
+    public List<UsersDto.UsersListDto> searchUsersList(Long companyId, String companyType, String name, String userId) {
         log.info("=== search user info ===");
 
-        List<Users> usersList = this.usersRepository.searchUsers(companyId, companyType, name);
-        log.info("search data >>> {}", usersList);
-
-        if(usersList.isEmpty()) {
-            log.info("=== no users found ===");
-            return new ArrayList<>();   // empty list
-        }
-        
         try {
+            boolean isSuperAdmin = comService.checkSuperAdmin(userId);
+            Long loginUserCompanyId = comService.getLoginUserCompanyId(userId);
+            String levelPath = companyRepository.findLevelPathByCompanyId(loginUserCompanyId);
+            log.info("== levelPath : {}", levelPath);
+            if (levelPath == null) {
+                // 관계정보가 없을경우 빈 리스트 전달
+                return new ArrayList<>();
+            }
+            List<Users> usersList = this.usersRepository.searchUsers(companyId, companyType, name, levelPath,
+                    isSuperAdmin);
+            log.info("search data >>> {}", usersList);
+
+            if (usersList.isEmpty()) {
+                log.info("=== no users found ===");
+                return new ArrayList<>(); // empty list
+            }
+
             List<UsersDto.UsersListDto> userListDto = UsersMapper.toDtoList(usersList);
             log.info("=== users DB search success ===");
             log.info("entity >> dto user info >>> {}", userListDto);
             return userListDto;
         } catch (Exception e) {
             log.info("=== users DB search failure ===", e);
-            return new ArrayList<>();   // empty list
+            return new ArrayList<>(); // empty list
         }
     }
 
@@ -87,11 +97,11 @@ public class UsersService {
     @Transactional
     public void saveUsers(UsersDto.UsersRegDto dto, String loginUserId) {
         Company company = this.companyRepository.findById(dto.getCompanyId())
-            .orElseThrow(() -> new IllegalArgumentException("=== company not found ==="));
+                .orElseThrow(() -> new IllegalArgumentException("=== company not found ==="));
 
         try {
             if (loginUserId == null || loginUserId.isEmpty()) {
-                throw new IllegalArgumentException("User ID is missing. Cannot save user info without login user ID."); 
+                throw new IllegalArgumentException("User ID is missing. Cannot save user info without login user ID.");
             }
 
             boolean isMod = checkSaveAuthority(loginUserId);
@@ -126,7 +136,8 @@ public class UsersService {
     public UsersDto.UsersRegDto updateUsers(UsersDto.UsersRegDto dto, String loginUserId) {
         try {
             if (loginUserId == null || loginUserId.isEmpty()) {
-                throw new IllegalArgumentException("User ID is missing. Cannot update user info without login user ID."); 
+                throw new IllegalArgumentException(
+                        "User ID is missing. Cannot update user info without login user ID.");
             }
 
             boolean isMod = checkUpdateAndDeleteAuthority(dto.getUserId(), loginUserId);
@@ -135,13 +146,13 @@ public class UsersService {
                 Users user = this.usersRepository.findUserOne(dto.getUserId());
 
                 log.info("=== before update: {}", user.toString());
-        
+
                 // password SHA-256
                 dto.setPassword(EncryptionUtils.encryptSHA256(dto.getPassword()));
                 user.updateUsersinfo(dto);
-        
+
                 log.info("=== after update: {}", user.toString());
-        
+
                 return UsersMapper.toDto(user);
             }
 
@@ -161,7 +172,8 @@ public class UsersService {
     public void deleteUsers(String userId, String loginUserId) {
         try {
             if (loginUserId == null || loginUserId.isEmpty()) {
-                throw new IllegalArgumentException("User ID is missing. Cannot delete user info without login user ID."); 
+                throw new IllegalArgumentException(
+                        "User ID is missing. Cannot delete user info without login user ID.");
             }
 
             boolean isMod = checkUpdateAndDeleteAuthority(userId, loginUserId);
@@ -183,11 +195,21 @@ public class UsersService {
 
     // 사용자 - 전체 조회 페이징
     @Transactional
-    public Page<UsersDto.UsersListDto> findUsersAll(int page, int size) {
+    public Page<UsersDto.UsersListDto> findUsersAll(int page, int size, String userId) {
         Pageable pageable = PageRequest.of(page, size);
-        
+
         try {
-            Page<UsersDto.UsersListDto> usersList = this.usersRepository.findUsersWithPaginationToDto(pageable);
+            boolean isSuperAdmin = comService.checkSuperAdmin(userId);
+            Long loginUserCompanyId = comService.getLoginUserCompanyId(userId);
+            String levelPath = companyRepository.findLevelPathByCompanyId(loginUserCompanyId);
+            log.info("== levelPath : {}", levelPath);
+            if (levelPath == null) {
+                // 관계정보가 없을경우 빈 리스트 전달
+                return Page.empty(pageable);
+            }
+
+            Page<UsersDto.UsersListDto> usersList = this.usersRepository.findUsersWithPaginationToDto(pageable,
+                    levelPath, isSuperAdmin);
             return usersList;
         } catch (DataAccessException dae) {
             log.error("Database error occurred while fetching users with pagination: {}", dae.getMessage(), dae);
@@ -200,11 +222,22 @@ public class UsersService {
 
     // 사용자 - 검색 페이징
     @Transactional
-    public Page<UsersDto.UsersListDto> searchUsersListWithPagination(Long companyId, String companyType, String name, int page, int size) {
+    public Page<UsersDto.UsersListDto> searchUsersListWithPagination(Long companyId, String companyType, String name,
+            int page, int size, String userId) {
         Pageable pageable = PageRequest.of(page, size);
-        
+
         try {
-            Page<UsersDto.UsersListDto> usersList = this.usersRepository.searchUsersWithPaginationToDto(companyId, companyType, name, pageable);
+            boolean isSuperAdmin = comService.checkSuperAdmin(userId);
+            Long loginUserCompanyId = comService.getLoginUserCompanyId(userId);
+            String levelPath = companyRepository.findLevelPathByCompanyId(loginUserCompanyId);
+            log.info("== levelPath : {}", levelPath);
+            if (levelPath == null) {
+                // 관계정보가 없을경우 빈 리스트 전달
+                return Page.empty(pageable);
+            }
+
+            Page<UsersDto.UsersListDto> usersList = this.usersRepository.searchUsersWithPaginationToDto(companyId,
+                    companyType, name, pageable, levelPath, isSuperAdmin);
             return usersList;
         } catch (DataAccessException dae) {
             log.error("Database error occurred while fetching users with pagination: {}", dae.getMessage(), dae);
@@ -216,18 +249,30 @@ public class UsersService {
     }
 
     // 사용자 조회
-    public Page<UsersListDto> findUsersWithPagination(Long companyId, String companyType, String name, int page, int size) {
+    public Page<UsersListDto> findUsersWithPagination(Long companyId, String companyType, String name, int page,
+            int size, String userId) {
         Pageable pageable = PageRequest.of(page, size);
 
         try {
+            boolean isSuperAdmin = comService.checkSuperAdmin(userId);
+            Long loginUserCompanyId = comService.getLoginUserCompanyId(userId);
+            String levelPath = companyRepository.findLevelPathByCompanyId(loginUserCompanyId);
+            log.info("== levelPath : {}", levelPath);
+            if (levelPath == null) {
+                // 관계정보가 없을경우 빈 리스트 전달
+                return Page.empty(pageable);
+            }
+
             Page<UsersListDto> usersList;
 
-            if (companyId == null && (companyType == null || companyType.isEmpty()) && (name == null || name.isEmpty())) {
+            if (companyId == null && (companyType == null || companyType.isEmpty())
+                    && (name == null || name.isEmpty())) {
                 log.info("Executing the [findUsersWithPaginationToDto]");
-                usersList = this.usersRepository.findUsersWithPaginationToDto(pageable);
+                usersList = this.usersRepository.findUsersWithPaginationToDto(pageable, levelPath, isSuperAdmin);
             } else {
                 log.info("Executing the [searchUsersWithPaginationToDto]");
-                usersList = this.usersRepository.searchUsersWithPaginationToDto(companyId, companyType, name, pageable);
+                usersList = this.usersRepository.searchUsersWithPaginationToDto(companyId, companyType, name, pageable,
+                        levelPath, isSuperAdmin);
             }
 
             return usersList;
@@ -240,7 +285,7 @@ public class UsersService {
     public Long findCompanyId(String userId) {
         try {
             Long companyId = this.usersRepository.findCompanyId(userId);
-            
+
             if (companyId != null) {
                 return companyId;
             } else {
@@ -272,7 +317,7 @@ public class UsersService {
             }
             // 2. 새 비밀번호 == 새 비밀번호 확인 값이 같은지 체크
             if (!dto.getNewPassword().equals(dto.getNewPasswordCheck())) {
-                log.info("[updateUsersPasswordInfo] two password values do not match");  
+                log.info("[updateUsersPasswordInfo] two password values do not match");
                 return 2;
             }
             // password SHA-256
@@ -333,7 +378,7 @@ public class UsersService {
         }
 
         MenuAuthorityBaseDto dto = this.menuAuthorityRepository.findUserMenuAuthority(loginUser.getCompany().getId(),
-            loginUserAuthority, MenuConstants.USER);
+                loginUserAuthority, MenuConstants.USER);
         return dto.getModYn().equals("Y");
     }
 
@@ -351,7 +396,7 @@ public class UsersService {
         String userAuthority = user.getAuthority();
 
         MenuAuthorityBaseDto dto = this.menuAuthorityRepository.findUserMenuAuthority(loginUser.getCompany().getId(),
-            loginUserAuthority, MenuConstants.USER);
+                loginUserAuthority, MenuConstants.USER);
         String modYn = dto.getModYn();
 
         if (modYn.equals("Y")) {

@@ -13,6 +13,7 @@ import zgoo.cpos.dto.code.ChgErrorCodeDto.ChgErrorCodeListDto;
 import zgoo.cpos.dto.code.ChgErrorCodeDto.ChgErrorCodeRegDto;
 import zgoo.cpos.mapper.ChgErrorCodeMapper;
 import zgoo.cpos.repository.code.ChgErrorCodeRepository;
+import zgoo.cpos.repository.company.CompanyRepository;
 
 @Service
 @RequiredArgsConstructor
@@ -20,18 +21,31 @@ import zgoo.cpos.repository.code.ChgErrorCodeRepository;
 public class ChgErrorCodeService {
 
     private final ChgErrorCodeRepository chgErrorCodeRepository;
+    private final ComService comService;
+    private final CompanyRepository companyRepository;
 
     // 에러코드 조회(전체 + 검색)
-    public Page<ChgErrorCodeListDto> findErrorCodeInfoWithPagination(String manuf, String searchOp, String searchContent, int page, int size) {
+    public Page<ChgErrorCodeListDto> findErrorCodeInfoWithPagination(String manuf, String searchOp,
+            String searchContent, int page, int size, String userId) {
         Pageable pageable = PageRequest.of(page, size);
 
         try {
-            if ((manuf == null || manuf.isEmpty()) && (searchOp == null || searchOp.isEmpty()) && (searchContent == null || searchContent.isEmpty())) {
+            boolean isSuperAdmin = comService.checkSuperAdmin(userId);
+            Long loginUserCompanyId = comService.getLoginUserCompanyId(userId);
+            String levelPath = companyRepository.findLevelPathByCompanyId(loginUserCompanyId);
+            log.info("== levelPath : {}", levelPath);
+            if (levelPath == null) {
+                // 관계정보가 없을경우 빈 리스트 전달
+                return Page.empty(pageable);
+            }
+            if ((manuf == null || manuf.isEmpty()) && (searchOp == null || searchOp.isEmpty())
+                    && (searchContent == null || searchContent.isEmpty())) {
                 log.info("Executing the [findErrorCodeWithPagination]");
-                return this.chgErrorCodeRepository.findErrorCodeWithPagination(pageable);
+                return this.chgErrorCodeRepository.findErrorCodeWithPagination(pageable, levelPath, isSuperAdmin);
             } else {
                 log.info("Executing the [searchErrorCodeWithPagination]");
-                return this.chgErrorCodeRepository.searchErrorCodeWithPagination(manuf, searchOp, searchContent, pageable);
+                return this.chgErrorCodeRepository.searchErrorCodeWithPagination(manuf, searchOp, searchContent,
+                        pageable, levelPath, isSuperAdmin);
             }
         } catch (Exception e) {
             log.error("[findErrorCodeInfoWithPagination] error: {}", e.getMessage());
@@ -64,7 +78,7 @@ public class ChgErrorCodeService {
     @Transactional
     public void updateErrorCode(Long errcdId, ChgErrorCodeRegDto dto) {
         ChgErrorCode errorCode = this.chgErrorCodeRepository.findById(errcdId)
-            .orElseThrow(() -> new IllegalArgumentException("error code not found with id: " + errcdId));
+                .orElseThrow(() -> new IllegalArgumentException("error code not found with id: " + errcdId));
 
         try {
             errorCode.updateChgErrorCode(dto);
@@ -76,7 +90,7 @@ public class ChgErrorCodeService {
     // 에러코드 삭제
     public void deleteErrorCode(Long errcdId) {
         ChgErrorCode errorCode = this.chgErrorCodeRepository.findById(errcdId)
-            .orElseThrow(() -> new IllegalArgumentException("error code not found with id: " + errcdId));
+                .orElseThrow(() -> new IllegalArgumentException("error code not found with id: " + errcdId));
 
         try {
             this.chgErrorCodeRepository.deleteById(errcdId);

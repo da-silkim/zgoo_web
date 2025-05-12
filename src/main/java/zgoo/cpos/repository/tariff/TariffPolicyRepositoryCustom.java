@@ -11,9 +11,10 @@ import zgoo.cpos.dto.tariff.TariffDto.TariffInfoDto;
 import zgoo.cpos.dto.tariff.TariffDto.TariffPolicyDto;
 
 public interface TariffPolicyRepositoryCustom {
-    Page<TariffPolicyDto> findAllTariffPolicyPaging(Pageable page);
+    Page<TariffPolicyDto> findAllTariffPolicyPaging(Pageable page, String levelPath, boolean isSuperAdmin);
 
-    Page<TariffPolicyDto> findTariffPolicyByCompanyIdPaging(Pageable pageable, Long companyId);
+    Page<TariffPolicyDto> findTariffPolicyByCompanyIdPaging(Pageable pageable, Long companyId, String levelPath,
+            boolean isSuperAdmin);
 
     TariffPolicy findTariffPolicyByPolicyId(Long policyId);
 

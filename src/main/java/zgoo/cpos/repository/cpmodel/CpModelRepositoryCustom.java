@@ -13,10 +13,11 @@ import zgoo.cpos.dto.cp.CpModelDto.CpModelRegDto;
 public interface CpModelRepositoryCustom {
 
     // 충전기 모델 전체 조회
-    Page<CpModelListDto> findCpModelWithPagination(Pageable pageable);
+    Page<CpModelListDto> findCpModelWithPagination(Pageable pageable, String levelPath, boolean isSuperAdmin);
 
     // 충전기 모델 검색 조회
-    Page<CpModelListDto> searchCpModelWithPagination(Long companyId, String manuf, String chgSpeed, Pageable pageable);
+    Page<CpModelListDto> searchCpModelWithPagination(Long companyId, String manuf, String chgSpeed, Pageable pageable,
+            String levelPath, boolean isSuperAdmin);
 
     // 충전기 모델 단건 조회
     CpModelRegDto findCpModelOne(Long modelId);
