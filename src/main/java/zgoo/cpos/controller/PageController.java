@@ -1111,7 +1111,7 @@ public class PageController {
         try {
             Page<CpMaintainListDto> cpList = this.cpMaintainService.findCpMaintainInfoWithPagination(companyId,
                     searchOp, searchContent,
-                    processStatus, startDate, endDate, page, size);
+                    processStatus, startDate, endDate, page, size, principal.getName());
 
             // 검색 조건 저장
             model.addAttribute("selectedCompanyId", companyId);

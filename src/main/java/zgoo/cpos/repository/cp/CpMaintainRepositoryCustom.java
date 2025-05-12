@@ -13,14 +13,15 @@ import zgoo.cpos.dto.cp.CpMaintainDto.CpMaintainRegDto;
 public interface CpMaintainRepositoryCustom {
 
     // 장애 등록 현황 - 전체 조회
-    Page<CpMaintainListDto> findCpMaintainWithPagination(Pageable pageable);
+    Page<CpMaintainListDto> findCpMaintainWithPagination(Pageable pageable, String levelPath, boolean isSuperAdmin);
 
     // 장애 등록 현황 - 검색 조회
     Page<CpMaintainListDto> searchCpMaintainWithPagination(Long companyId, String searchOp, String searchContent,
-        String processStatus, LocalDate startDate, LocalDate endDate, Pageable pageable);
+            String processStatus, LocalDate startDate, LocalDate endDate, Pageable pageable, String levelPath,
+            boolean isSuperAdmin);
 
     // 충전소, 충전기 조회
-    CpInfoDto searchCsCpInfoWithChargerId(String chargerId);
+    CpInfoDto searchCsCpInfoWithChargerId(String chargerId, String levelPath, boolean isSuperAdmin);
 
     // 장애 정보 - 단건 조회
     CpMaintainRegDto findMaintainOne(Long cpmaintainId);

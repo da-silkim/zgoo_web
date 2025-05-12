@@ -26,6 +26,7 @@ import zgoo.cpos.dto.cp.CpMaintainDto.CpMaintainListDto;
 import zgoo.cpos.dto.cp.CpMaintainDto.CpMaintainRegDto;
 import zgoo.cpos.dto.menu.MenuAuthorityDto.MenuAuthorityBaseDto;
 import zgoo.cpos.mapper.CpMaintainMapper;
+import zgoo.cpos.repository.company.CompanyRepository;
 import zgoo.cpos.repository.cp.CpMaintainRepository;
 import zgoo.cpos.repository.menu.MenuAuthorityRepository;
 import zgoo.cpos.repository.users.UsersRepository;
@@ -40,26 +41,39 @@ public class CpMaintainService {
     public final CpMaintainRepository cpMaintainRepository;
     public final UsersRepository usersRepository;
     public final MenuAuthorityRepository menuAuthorityRepository;
+    public final ComService comService;
+    public final CompanyRepository companyRepository;
 
     @Value("${file.img}")
     private String filepath;
 
     // 조회
-    public Page<CpMaintainListDto> findCpMaintainInfoWithPagination(Long companyId, String searchOp, String searchContent,
-            String processStatus, LocalDate startDate, LocalDate endDate, int page, int size) {
+    public Page<CpMaintainListDto> findCpMaintainInfoWithPagination(Long companyId, String searchOp,
+            String searchContent,
+            String processStatus, LocalDate startDate, LocalDate endDate, int page, int size, String userId) {
         Pageable pageable = PageRequest.of(page, size);
 
         try {
             Page<CpMaintainListDto> cpList;
 
-            if (companyId == null && (searchOp == null || searchOp.isEmpty()) && (searchContent == null || searchContent.isEmpty()) &&
-                     (processStatus == null || processStatus.isEmpty()) && startDate == null && endDate == null) {
+            boolean isSuperAdmin = comService.checkSuperAdmin(userId);
+            Long loginUserCompanyId = comService.getLoginUserCompanyId(userId);
+            String levelPath = companyRepository.findLevelPathByCompanyId(loginUserCompanyId);
+            log.info("== levelPath : {}", levelPath);
+            if (levelPath == null) {
+                // 관계정보가 없을경우 빈 리스트 전달
+                return Page.empty(pageable);
+            }
+
+            if (companyId == null && (searchOp == null || searchOp.isEmpty())
+                    && (searchContent == null || searchContent.isEmpty()) &&
+                    (processStatus == null || processStatus.isEmpty()) && startDate == null && endDate == null) {
                 log.info("Executing the [findCpMaintainWithPagination]");
-                cpList = this.cpMaintainRepository.findCpMaintainWithPagination(pageable);
+                cpList = this.cpMaintainRepository.findCpMaintainWithPagination(pageable, levelPath, isSuperAdmin);
             } else {
                 log.info("Executing the [searchCpMaintainWithPagination]");
                 cpList = this.cpMaintainRepository.searchCpMaintainWithPagination(companyId, searchOp, searchContent,
-                    processStatus, startDate, endDate, pageable);
+                        processStatus, startDate, endDate, pageable, levelPath, isSuperAdmin);
             }
 
             return cpList;
@@ -70,9 +84,17 @@ public class CpMaintainService {
     }
 
     // 충전소, 충전기 조회
-    public CpInfoDto searchCsCpInfo(String chargerId) {
+    public CpInfoDto searchCsCpInfo(String chargerId, String userId) {
         try {
-            CpInfoDto dto = this.cpMaintainRepository.searchCsCpInfoWithChargerId(chargerId);
+            boolean isSuperAdmin = comService.checkSuperAdmin(userId);
+            Long loginUserCompanyId = comService.getLoginUserCompanyId(userId);
+            String levelPath = companyRepository.findLevelPathByCompanyId(loginUserCompanyId);
+            log.info("== levelPath : {}", levelPath);
+            if (levelPath == null) {
+                // 관계정보가 없을경우 빈 리스트 전달
+                return null;
+            }
+            CpInfoDto dto = this.cpMaintainRepository.searchCsCpInfoWithChargerId(chargerId, levelPath, isSuperAdmin);
             if (dto == null) {
                 dto = new CpInfoDto();
                 dto.setCompanyId(null);
@@ -113,7 +135,6 @@ public class CpMaintainService {
                 System.out.println("pic3 (after): " + dto.getPictureLoc3());
             }
 
-
             return dto;
         } catch (Exception e) {
             log.error("[findMaintainOne] error: {}", e.getMessage());
@@ -124,7 +145,7 @@ public class CpMaintainService {
     // 충전기 장애정보 단건 조회(detail)
     public CpMaintainDetailDto findMaintainDetailOne(Long cpmaintainId) {
         CpMaintain cpMaintain = this.cpMaintainRepository.findById(cpmaintainId)
-            .orElseThrow(() -> new IllegalArgumentException("cpmaintain not found with id: " + cpmaintainId));
+                .orElseThrow(() -> new IllegalArgumentException("cpmaintain not found with id: " + cpmaintainId));
 
         try {
             CpMaintainDetailDto dto = this.cpMaintainRepository.findMaintainDetailOne(cpmaintainId);
@@ -156,7 +177,8 @@ public class CpMaintainService {
     }
 
     private String convertToWebPath(String path) {
-        if (path == null || !path.contains("/images/")) return null;
+        if (path == null || !path.contains("/images/"))
+            return null;
         String webPath = path.substring(path.indexOf("/images"));
         return webPath.replace("\\", "/");
     }
@@ -228,15 +250,17 @@ public class CpMaintainService {
     @Transactional
     public void updateMaintain(Long cpmaintainId, CpMaintainRegDto dto, String loginUserId) {
         CpMaintain cpMaintain = this.cpMaintainRepository.findById(cpmaintainId)
-            .orElseThrow(() -> new IllegalArgumentException("cpmaintain not found with id: " + cpmaintainId));
+                .orElseThrow(() -> new IllegalArgumentException("cpmaintain not found with id: " + cpmaintainId));
 
         try {
             if (loginUserId == null || loginUserId.isEmpty()) {
-                throw new IllegalArgumentException("User ID is missing. Cannot update cpmaintain info without login user ID."); 
+                throw new IllegalArgumentException(
+                        "User ID is missing. Cannot update cpmaintain info without login user ID.");
             }
 
             boolean isMod = checkUpdateAndDeleteAuthority(cpmaintainId, loginUserId);
-            if (!isMod || "FSTATFINISH".equals(cpMaintain.getProcessStatus())) return;  // 권한이 없거나 이미 처리된 건
+            if (!isMod || "FSTATFINISH".equals(cpMaintain.getProcessStatus()))
+                return; // 권한이 없거나 이미 처리된 건
 
             List<String> picturePaths = new ArrayList<>();
             String pictureLoc1 = saveImageFile(dto.getFileLoc1(), "picture1");
@@ -247,9 +271,12 @@ public class CpMaintainService {
             log.info("[updateMaintain] getExistingPictureLoc2 >> {}", dto.getExistingPictureLoc2());
             log.info("[updateMaintain] getExistingPictureLoc3 >> {}", dto.getExistingPictureLoc3());
 
-            handlePicture(cpMaintain.getPictureLoc1(), dto.getExistingPictureLoc1(), pictureLoc1, "pictureLoc1", picturePaths);
-            handlePicture(cpMaintain.getPictureLoc2(), dto.getExistingPictureLoc2(), pictureLoc2, "pictureLoc2", picturePaths);
-            handlePicture(cpMaintain.getPictureLoc3(), dto.getExistingPictureLoc3(), pictureLoc3, "pictureLoc3", picturePaths);
+            handlePicture(cpMaintain.getPictureLoc1(), dto.getExistingPictureLoc1(), pictureLoc1, "pictureLoc1",
+                    picturePaths);
+            handlePicture(cpMaintain.getPictureLoc2(), dto.getExistingPictureLoc2(), pictureLoc2, "pictureLoc2",
+                    picturePaths);
+            handlePicture(cpMaintain.getPictureLoc3(), dto.getExistingPictureLoc3(), pictureLoc3, "pictureLoc3",
+                    picturePaths);
 
             dto.setPictureLoc1(!picturePaths.isEmpty() ? picturePaths.get(0) : null);
             dto.setPictureLoc2(picturePaths.size() > 1 ? picturePaths.get(1) : null);
@@ -258,7 +285,6 @@ public class CpMaintainService {
             log.info("[updateMaintain] PictureLoc1 update>> {}", dto.getPictureLoc1());
             log.info("[updateMaintain] PictureLoc2 update>> {}", dto.getPictureLoc2());
             log.info("[updateMaintain] PictureLoc3 update>> {}", dto.getPictureLoc3());
-
 
             cpMaintain.updateCpMaintainInfo(dto);
             if ("FSTATFINISH".equals(dto.getProcessStatus())) {
@@ -274,16 +300,17 @@ public class CpMaintainService {
         }
     }
 
-    /* 
-    * 1) 기존 이미지가 저장되어 있는 상태일 때
-    *     1. 이미지 웹경로가 null 또는 empty가 아닐 경우 => 이미지 유지
-    *     2. 이미지 웹경로가 null 또는 empty이면 => 이미지 삭제
-    * 
-    * 2) 기존에 이미지가 저장되어 있지 않은 상태일 때
-    *     1. 새로운 이미지가 있는지 확인
-    *     2. null 아니면 새로운 이미지 경로 추가
-    */
-    private void handlePicture(String pictureLoc, String existingPictureLoc, String uploadFileLoc, String label, List<String> picturePaths) {
+    /*
+     * 1) 기존 이미지가 저장되어 있는 상태일 때
+     * 1. 이미지 웹경로가 null 또는 empty가 아닐 경우 => 이미지 유지
+     * 2. 이미지 웹경로가 null 또는 empty이면 => 이미지 삭제
+     * 
+     * 2) 기존에 이미지가 저장되어 있지 않은 상태일 때
+     * 1. 새로운 이미지가 있는지 확인
+     * 2. null 아니면 새로운 이미지 경로 추가
+     */
+    private void handlePicture(String pictureLoc, String existingPictureLoc, String uploadFileLoc, String label,
+            List<String> picturePaths) {
         if (pictureLoc != null) {
             log.info("[handlePicture] {} >> {}", label, pictureLoc);
 
@@ -305,15 +332,17 @@ public class CpMaintainService {
     @Transactional
     public void deleteMaintain(Long cpmaintainId, String loginUserId) {
         CpMaintain cpMaintain = this.cpMaintainRepository.findById(cpmaintainId)
-            .orElseThrow(() -> new IllegalArgumentException("cpmaintain not found with id: " + cpmaintainId));
+                .orElseThrow(() -> new IllegalArgumentException("cpmaintain not found with id: " + cpmaintainId));
 
         try {
             if (loginUserId == null || loginUserId.isEmpty()) {
-                throw new IllegalArgumentException("User ID is missing. Cannot delete cpmaintain info without login user ID."); 
+                throw new IllegalArgumentException(
+                        "User ID is missing. Cannot delete cpmaintain info without login user ID.");
             }
 
             boolean isMod = checkUpdateAndDeleteAuthority(cpmaintainId, loginUserId);
-            if (!isMod) return;
+            if (!isMod)
+                return;
 
             // image delete
             deleteImage(cpMaintain.getPictureLoc1());
@@ -343,13 +372,13 @@ public class CpMaintainService {
             } else {
                 log.warn("=== Image file not found at path: {}", imagePath);
             }
-        } 
+        }
     }
 
     // edit & delete button control
     public boolean buttonControl(Long cpmaintainId, String loginUserId) {
         CpMaintain cpMaintain = this.cpMaintainRepository.findById(cpmaintainId)
-            .orElseThrow(() -> new IllegalArgumentException("cpmaintain not found with id: " + cpmaintainId));
+                .orElseThrow(() -> new IllegalArgumentException("cpmaintain not found with id: " + cpmaintainId));
 
         try {
             String writer = cpMaintain.getRegUserId();
@@ -386,13 +415,13 @@ public class CpMaintainService {
         }
 
         CpMaintain cpMaintain = this.cpMaintainRepository.findById(cpmaintainId)
-            .orElseThrow(() -> new IllegalArgumentException("cpmaintain not found with id: " + cpmaintainId));
+                .orElseThrow(() -> new IllegalArgumentException("cpmaintain not found with id: " + cpmaintainId));
         String writer = cpMaintain.getRegUserId();
         Users user = this.usersRepository.findUserOne(writer);
         String userAuthority = user.getAuthority();
 
         MenuAuthorityBaseDto dto = this.menuAuthorityRepository.findUserMenuAuthority(loginUser.getCompany().getId(),
-            loginUserAuthority, MenuConstants.MAINTEN_ERR);
+                loginUserAuthority, MenuConstants.MAINTEN_ERR);
         String modYn = dto.getModYn();
 
         if (modYn.equals("Y")) {

@@ -38,14 +38,15 @@ public class CpMaintainController {
     private final ComService comService;
 
     @GetMapping("/search/{chargerId}")
-    public ResponseEntity<Map<String, Object>> searchCsCpInfo(@PathVariable("chargerId") String chargerId) {
+    public ResponseEntity<Map<String, Object>> searchCsCpInfo(@PathVariable("chargerId") String chargerId,
+            Principal principal) {
         log.info("=== search cs/cp info ===");
 
         Map<String, Object> response = new HashMap<>();
 
         try {
-            CpInfoDto cpInfo = this.cpMaintainService.searchCsCpInfo(chargerId);
-            
+            CpInfoDto cpInfo = this.cpMaintainService.searchCsCpInfo(chargerId, principal.getName());
+
             if (cpInfo.getChargerId() == null) {
                 response.put("message", "등록된 충전기ID 정보가 없습니다.");
             }
@@ -61,7 +62,8 @@ public class CpMaintainController {
 
     // 단건 조회
     @GetMapping("/get/{cpmaintainId}")
-    public ResponseEntity<Map<String, Object>> findMaintainOne(@PathVariable("cpmaintainId") Long cpmaintainId) {
+    public ResponseEntity<Map<String, Object>> findMaintainOne(@PathVariable("cpmaintainId") Long cpmaintainId,
+            Principal principal) {
         log.info("=== find maintain info ===");
 
         Map<String, Object> response = new HashMap<>();
@@ -73,8 +75,9 @@ public class CpMaintainController {
                 response.put("message", "등록된 충전기 장애 정보가 없습니다.");
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
             }
-            
-            CpInfoDto cpInfo = this.cpMaintainService.searchCsCpInfo(maintainFineOne.getChargerId());
+
+            CpInfoDto cpInfo = this.cpMaintainService.searchCsCpInfo(maintainFineOne.getChargerId(),
+                    principal.getName());
 
             if (cpInfo.getChargerId() == null) {
                 response.put("message", "등록된 충전기ID 정보가 없습니다.");
@@ -133,7 +136,8 @@ public class CpMaintainController {
         log.info("=== create maintain info ===");
 
         try {
-            ResponseEntity<String> permissionCheck = this.comService.checkUserPermissions(principal, MenuConstants.MAINTEN_ERR);
+            ResponseEntity<String> permissionCheck = this.comService.checkUserPermissions(principal,
+                    MenuConstants.MAINTEN_ERR);
             if (permissionCheck != null) {
                 return permissionCheck;
             }
@@ -143,7 +147,7 @@ public class CpMaintainController {
         } catch (Exception e) {
             log.error("[createMaintain] error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                    .body("충전기 장애 정보 등록 중 오류가 발생했습니다.");
+                    .body("충전기 장애 정보 등록 중 오류가 발생했습니다.");
         }
     }
 
@@ -157,10 +161,11 @@ public class CpMaintainController {
             if (cpmaintainId == null) {
                 log.error("cpmaintainId is null");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                                        .body("충전기 장애 정보ID가 없어 수정할 수 없습니다.");
+                        .body("충전기 장애 정보ID가 없어 수정할 수 없습니다.");
             }
 
-            ResponseEntity<String> permissionCheck = this.comService.checkUserPermissions(principal, MenuConstants.MAINTEN_ERR);
+            ResponseEntity<String> permissionCheck = this.comService.checkUserPermissions(principal,
+                    MenuConstants.MAINTEN_ERR);
             if (permissionCheck != null) {
                 return permissionCheck;
             }
@@ -171,7 +176,7 @@ public class CpMaintainController {
         } catch (Exception e) {
             log.error("[updateMaintain] error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                    .body("충전기 장애 정보 수정 중 오류가 발생했습니다.");
+                    .body("충전기 장애 정보 수정 중 오류가 발생했습니다.");
         }
     }
 
@@ -184,10 +189,11 @@ public class CpMaintainController {
             if (cpmaintainId == null) {
                 log.error("cpmaintainId id null");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                                        .body("충전기 장애 정보ID가 없어 삭제할 수 없습니다.");
+                        .body("충전기 장애 정보ID가 없어 삭제할 수 없습니다.");
             }
 
-            ResponseEntity<String> permissionCheck = this.comService.checkUserPermissions(principal, MenuConstants.MAINTEN_ERR);
+            ResponseEntity<String> permissionCheck = this.comService.checkUserPermissions(principal,
+                    MenuConstants.MAINTEN_ERR);
             if (permissionCheck != null) {
                 return permissionCheck;
             }
@@ -197,12 +203,13 @@ public class CpMaintainController {
         } catch (Exception e) {
             log.error("[deleteMaintain] error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                    .body("충전기 장애 정보 삭제 중 오류가 발생했습니다.");
+                    .body("충전기 장애 정보 삭제 중 오류가 발생했습니다.");
         }
     }
 
     @GetMapping("/btncontrol/{cpmaintainId}")
-    public ResponseEntity<Map<String, Object>> buttonControl(@PathVariable("cpmaintainId") Long cpmaintainId, Principal principal) {
+    public ResponseEntity<Map<String, Object>> buttonControl(@PathVariable("cpmaintainId") Long cpmaintainId,
+            Principal principal) {
         log.info("=== update & delete button authority info ===");
 
         Map<String, Object> response = new HashMap<>();

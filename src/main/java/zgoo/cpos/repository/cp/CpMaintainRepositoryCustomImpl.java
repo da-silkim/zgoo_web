@@ -16,12 +16,14 @@ import lombok.extern.slf4j.Slf4j;
 import zgoo.cpos.domain.charger.QCpInfo;
 import zgoo.cpos.domain.code.QCommonCode;
 import zgoo.cpos.domain.company.QCompany;
+import zgoo.cpos.domain.company.QCompanyRelationInfo;
 import zgoo.cpos.domain.cp.QCpMaintain;
 import zgoo.cpos.domain.cs.QCsInfo;
 import zgoo.cpos.dto.cp.CpMaintainDto.CpInfoDto;
 import zgoo.cpos.dto.cp.CpMaintainDto.CpMaintainDetailDto;
 import zgoo.cpos.dto.cp.CpMaintainDto.CpMaintainListDto;
 import zgoo.cpos.dto.cp.CpMaintainDto.CpMaintainRegDto;
+import zgoo.cpos.util.QueryUtils;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -29,56 +31,73 @@ public class CpMaintainRepositoryCustomImpl implements CpMaintainRepositoryCusto
     private final JPAQueryFactory queryFactory;
     QCpMaintain cpMaintain = QCpMaintain.cpMaintain;
     QCompany company = QCompany.company;
+    QCompanyRelationInfo relation = QCompanyRelationInfo.companyRelationInfo;
     QCpInfo cpInfo = QCpInfo.cpInfo;
     QCsInfo csInfo = QCsInfo.csInfo;
     QCommonCode errorTypeName = new QCommonCode("errorType");
     QCommonCode processStatusName = new QCommonCode("processStatus");
 
     @Override
-    public Page<CpMaintainListDto> findCpMaintainWithPagination(Pageable pageable) {
+    public Page<CpMaintainListDto> findCpMaintainWithPagination(Pageable pageable, String levelPath,
+            boolean isSuperAdmin) {
+        BooleanBuilder builder = new BooleanBuilder();
+
+        if (!isSuperAdmin && levelPath != null && !levelPath.isEmpty()) {
+            builder.and(QueryUtils.hasCompanyLevelAccess(relation, levelPath));
+        }
+
         List<CpMaintainListDto> cpList = queryFactory.select(Projections.fields(CpMaintainListDto.class,
-            cpMaintain.id.as("cpmaintainId"),
-            cpMaintain.chargerId.as("chargerId"),
-            cpMaintain.regDt.as("regDt"),
-            cpMaintain.errorType.as("errorType"),
-            cpMaintain.errorContent.as("errorContent"),
-            cpMaintain.processDate.as("processDate"),
-            cpMaintain.processStatus.as("processStatus"),
-            cpMaintain.regUserId.as("regUserId"),
-            company.companyName.as("companyName"),
-            csInfo.stationName.as("stationName"),
-            errorTypeName.name.as("errorTypeName"),
-            processStatusName.name.as("processStatusName")))
-            .from(cpMaintain)
-            .leftJoin(cpInfo).on(cpMaintain.chargerId.eq(cpInfo.id))
-            .leftJoin(csInfo).on(cpInfo.stationId.id.eq(csInfo.id))
-            .leftJoin(company).on(csInfo.company.id.eq(company.id))
-            .leftJoin(errorTypeName).on(cpMaintain.errorType.eq(errorTypeName.commonCode))
-            .leftJoin(processStatusName).on(cpMaintain.processStatus.eq(processStatusName.commonCode))
-            .orderBy(cpMaintain.regDt.desc())
-            .offset(pageable.getOffset())
-            .limit(pageable.getPageSize())
-            .fetch();
+                cpMaintain.id.as("cpmaintainId"),
+                cpMaintain.chargerId.as("chargerId"),
+                cpMaintain.regDt.as("regDt"),
+                cpMaintain.errorType.as("errorType"),
+                cpMaintain.errorContent.as("errorContent"),
+                cpMaintain.processDate.as("processDate"),
+                cpMaintain.processStatus.as("processStatus"),
+                cpMaintain.regUserId.as("regUserId"),
+                company.companyName.as("companyName"),
+                csInfo.stationName.as("stationName"),
+                errorTypeName.name.as("errorTypeName"),
+                processStatusName.name.as("processStatusName")))
+                .from(cpMaintain)
+                .leftJoin(cpInfo).on(cpMaintain.chargerId.eq(cpInfo.id))
+                .leftJoin(csInfo).on(cpInfo.stationId.id.eq(csInfo.id))
+                .leftJoin(company).on(csInfo.company.id.eq(company.id))
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
+                .leftJoin(errorTypeName).on(cpMaintain.errorType.eq(errorTypeName.commonCode))
+                .leftJoin(processStatusName).on(cpMaintain.processStatus.eq(processStatusName.commonCode))
+                .where(builder)
+                .orderBy(cpMaintain.regDt.desc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
 
         long totalCount = queryFactory
-            .select(cpMaintain.count())
-            .from(cpMaintain)
-            .fetchOne();
+                .select(cpMaintain.count())
+                .from(cpMaintain)
+                .leftJoin(cpInfo).on(cpMaintain.chargerId.eq(cpInfo.id))
+                .leftJoin(csInfo).on(cpInfo.stationId.id.eq(csInfo.id))
+                .leftJoin(company).on(csInfo.company.id.eq(company.id))
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
+                .leftJoin(errorTypeName).on(cpMaintain.errorType.eq(errorTypeName.commonCode))
+                .leftJoin(processStatusName).on(cpMaintain.processStatus.eq(processStatusName.commonCode))
+                .fetchOne();
 
         return new PageImpl<>(cpList, pageable, totalCount);
     }
 
     @Override
     public Page<CpMaintainListDto> searchCpMaintainWithPagination(Long companyId, String searchOp, String searchContent,
-            String processStatus, LocalDate startDate, LocalDate endDate, Pageable pageable) {
+            String processStatus, LocalDate startDate, LocalDate endDate, Pageable pageable, String levelPath,
+            boolean isSuperAdmin) {
         BooleanBuilder builder = new BooleanBuilder();
-        System.out.println("searchCpMaintainWithPagination >> " + companyId + ", " + searchOp + ", " + searchContent + ", " +
-            processStatus + ", " + startDate + ", " + endDate);
+        System.out.println(
+                "searchCpMaintainWithPagination >> " + companyId + ", " + searchOp + ", " + searchContent + ", " +
+                        processStatus + ", " + startDate + ", " + endDate);
 
         log.info("Executing the [searchCpMaintainWithPagination]");
         log.info("companyId: {}, saerchOp: {}, searchContent: {}, processStatus: {}, startDate: {}, endDate: {}",
-            companyId, searchOp, searchContent, processStatus, startDate, endDate);
-
+                companyId, searchOp, searchContent, processStatus, startDate, endDate);
 
         if (companyId != null) {
             System.out.println("companyId: " + companyId);
@@ -111,113 +130,127 @@ public class CpMaintainRepositoryCustomImpl implements CpMaintainRepositoryCusto
             builder.and(cpMaintain.regDt.loe(endDate.atTime(23, 59, 59)));
         }
 
+        if (!isSuperAdmin && levelPath != null && !levelPath.isEmpty()) {
+            builder.and(QueryUtils.hasCompanyLevelAccess(relation, levelPath));
+        }
+
         List<CpMaintainListDto> cpList = queryFactory.select(Projections.fields(CpMaintainListDto.class,
-            cpMaintain.id.as("cpmaintainId"),
-            cpMaintain.chargerId.as("chargerId"),
-            cpMaintain.regDt.as("regDt"),
-            cpMaintain.errorType.as("errorType"),
-            cpMaintain.errorContent.as("errorContent"),
-            cpMaintain.processDate.as("processDate"),
-            cpMaintain.processStatus.as("processStatus"),
-            cpMaintain.regUserId.as("regUserId"),
-            company.companyName.as("companyName"),
-            csInfo.stationName.as("stationName"),
-            errorTypeName.name.as("errorTypeName"),
-            processStatusName.name.as("processStatusName")))
-            .from(cpMaintain)
-            .leftJoin(cpInfo).on(cpMaintain.chargerId.eq(cpInfo.id))
-            .leftJoin(csInfo).on(cpInfo.stationId.id.eq(csInfo.id))
-            .leftJoin(company).on(csInfo.company.id.eq(company.id))
-            .leftJoin(errorTypeName).on(cpMaintain.errorType.eq(errorTypeName.commonCode))
-            .leftJoin(processStatusName).on(cpMaintain.processStatus.eq(processStatusName.commonCode))
-            .where(builder)
-            .orderBy(cpMaintain.regDt.desc())
-            .offset(pageable.getOffset())
-            .limit(pageable.getPageSize())
-            .fetch();
+                cpMaintain.id.as("cpmaintainId"),
+                cpMaintain.chargerId.as("chargerId"),
+                cpMaintain.regDt.as("regDt"),
+                cpMaintain.errorType.as("errorType"),
+                cpMaintain.errorContent.as("errorContent"),
+                cpMaintain.processDate.as("processDate"),
+                cpMaintain.processStatus.as("processStatus"),
+                cpMaintain.regUserId.as("regUserId"),
+                company.companyName.as("companyName"),
+                csInfo.stationName.as("stationName"),
+                errorTypeName.name.as("errorTypeName"),
+                processStatusName.name.as("processStatusName")))
+                .from(cpMaintain)
+                .leftJoin(cpInfo).on(cpMaintain.chargerId.eq(cpInfo.id))
+                .leftJoin(csInfo).on(cpInfo.stationId.id.eq(csInfo.id))
+                .leftJoin(company).on(csInfo.company.id.eq(company.id))
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
+                .leftJoin(errorTypeName).on(cpMaintain.errorType.eq(errorTypeName.commonCode))
+                .leftJoin(processStatusName).on(cpMaintain.processStatus.eq(processStatusName.commonCode))
+                .where(builder)
+                .orderBy(cpMaintain.regDt.desc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
 
         long totalCount = queryFactory
-            .select(cpMaintain.count())
-            .from(cpMaintain)
-            .leftJoin(cpInfo).on(cpMaintain.chargerId.eq(cpInfo.id))
-            .leftJoin(csInfo).on(cpInfo.stationId.id.eq(csInfo.id))
-            .leftJoin(company).on(csInfo.company.id.eq(company.id))
-            .leftJoin(errorTypeName).on(cpMaintain.errorType.eq(errorTypeName.commonCode))
-            .leftJoin(processStatusName).on(cpMaintain.processStatus.eq(processStatusName.commonCode))
-            .where(builder)
-            .fetchOne();
+                .select(cpMaintain.count())
+                .from(cpMaintain)
+                .leftJoin(cpInfo).on(cpMaintain.chargerId.eq(cpInfo.id))
+                .leftJoin(csInfo).on(cpInfo.stationId.id.eq(csInfo.id))
+                .leftJoin(company).on(csInfo.company.id.eq(company.id))
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
+                .leftJoin(errorTypeName).on(cpMaintain.errorType.eq(errorTypeName.commonCode))
+                .leftJoin(processStatusName).on(cpMaintain.processStatus.eq(processStatusName.commonCode))
+                .where(builder)
+                .fetchOne();
 
         return new PageImpl<>(cpList, pageable, totalCount);
     }
 
     @Override
-    public CpInfoDto searchCsCpInfoWithChargerId(String chargerId) {
+    public CpInfoDto searchCsCpInfoWithChargerId(String chargerId, String levelPath, boolean isSuperAdmin) {
+        BooleanBuilder builder = new BooleanBuilder();
+
+        if (!isSuperAdmin && levelPath != null && !levelPath.isEmpty()) {
+            builder.and(QueryUtils.hasCompanyLevelAccess(relation, levelPath));
+        }
+
         CpInfoDto dto = queryFactory.select(Projections.fields(CpInfoDto.class,
-            cpInfo.id.as("chargerId"),
-            csInfo.id.as("stationId"),
-            csInfo.stationName.as("stationName"),
-            csInfo.address.as("address"),
-            company.companyName.as("companyName")))
-            .from(cpInfo)
-            .leftJoin(csInfo).on(cpInfo.stationId.eq(csInfo))
-            .leftJoin(company).on(csInfo.company.id.eq(company.id))
-            .where(cpInfo.id.eq(chargerId))
-            .fetchOne();
+                cpInfo.id.as("chargerId"),
+                csInfo.id.as("stationId"),
+                csInfo.stationName.as("stationName"),
+                csInfo.address.as("address"),
+                company.companyName.as("companyName")))
+                .from(cpInfo)
+                .leftJoin(csInfo).on(cpInfo.stationId.eq(csInfo))
+                .leftJoin(company).on(csInfo.company.id.eq(company.id))
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
+                .where(cpInfo.id.eq(chargerId))
+                .where(builder)
+                .fetchOne();
         return dto;
     }
 
     @Override
     public CpMaintainRegDto findMaintainOne(Long cpmaintainId) {
         CpMaintainRegDto dto = queryFactory.select(Projections.fields(CpMaintainRegDto.class,
-            cpMaintain.id.as("cpmaintainId"),
-            cpMaintain.chargerId.as("chargerId"),
-            cpMaintain.regDt.as("regDt"),
-            cpMaintain.errorType.as("errorType"),
-            cpMaintain.errorContent.as("errorContent"),
-            cpMaintain.pictureLoc1.as("pictureLoc1"),
-            cpMaintain.pictureLoc2.as("pictureLoc2"),
-            cpMaintain.pictureLoc3.as("pictureLoc3"),
-            cpMaintain.processDate.as("processDate"),
-            cpMaintain.processStatus.as("processStatus"),
-            cpMaintain.processContent.as("processContent"),
-            cpMaintain.regUserId.as("regUserId")))
-            .from(cpMaintain)
-            .where(cpMaintain.id.eq(cpmaintainId))
-            .fetchOne();
+                cpMaintain.id.as("cpmaintainId"),
+                cpMaintain.chargerId.as("chargerId"),
+                cpMaintain.regDt.as("regDt"),
+                cpMaintain.errorType.as("errorType"),
+                cpMaintain.errorContent.as("errorContent"),
+                cpMaintain.pictureLoc1.as("pictureLoc1"),
+                cpMaintain.pictureLoc2.as("pictureLoc2"),
+                cpMaintain.pictureLoc3.as("pictureLoc3"),
+                cpMaintain.processDate.as("processDate"),
+                cpMaintain.processStatus.as("processStatus"),
+                cpMaintain.processContent.as("processContent"),
+                cpMaintain.regUserId.as("regUserId")))
+                .from(cpMaintain)
+                .where(cpMaintain.id.eq(cpmaintainId))
+                .fetchOne();
         return dto;
     }
 
     @Override
     public CpMaintainDetailDto findMaintainDetailOne(Long cpmaintainId) {
         CpMaintainDetailDto cpDetailOne = queryFactory.select(Projections.fields(CpMaintainDetailDto.class,
-            cpMaintain.id.as("cpmaintainId"),
-            cpMaintain.chargerId.as("chargerId"),
-            cpMaintain.regDt.as("regDt"),
-            cpMaintain.errorType.as("errorType"),
-            cpMaintain.errorContent.as("errorContent"),
-            cpMaintain.pictureLoc1.as("pictureLoc1"),
-            cpMaintain.pictureLoc2.as("pictureLoc2"),
-            cpMaintain.pictureLoc3.as("pictureLoc3"),
-            cpMaintain.processDate.as("processDate"),
-            cpMaintain.processStatus.as("processStatus"),
-            cpMaintain.processContent.as("processContent"),
-            cpMaintain.regUserId.as("regUserId"),
-            company.companyName.as("companyName"),
-            csInfo.id.as("stationId"),
-            csInfo.stationName.as("stationName"),
-            csInfo.zipcode.as("zipCode"),
-            csInfo.address.as("address"),
-            csInfo.addressDetail.as("addressDetail"),
-            errorTypeName.name.as("errorTypeName"),
-            processStatusName.name.as("processStatusName")))
-            .from(cpMaintain)
-            .leftJoin(cpInfo).on(cpMaintain.chargerId.eq(cpInfo.id))
-            .leftJoin(csInfo).on(cpInfo.stationId.id.eq(csInfo.id))
-            .leftJoin(company).on(csInfo.company.id.eq(company.id))
-            .leftJoin(errorTypeName).on(cpMaintain.errorType.eq(errorTypeName.commonCode))
-            .leftJoin(processStatusName).on(cpMaintain.processStatus.eq(processStatusName.commonCode))
-            .where(cpMaintain.id.eq(cpmaintainId))
-            .fetchOne();
+                cpMaintain.id.as("cpmaintainId"),
+                cpMaintain.chargerId.as("chargerId"),
+                cpMaintain.regDt.as("regDt"),
+                cpMaintain.errorType.as("errorType"),
+                cpMaintain.errorContent.as("errorContent"),
+                cpMaintain.pictureLoc1.as("pictureLoc1"),
+                cpMaintain.pictureLoc2.as("pictureLoc2"),
+                cpMaintain.pictureLoc3.as("pictureLoc3"),
+                cpMaintain.processDate.as("processDate"),
+                cpMaintain.processStatus.as("processStatus"),
+                cpMaintain.processContent.as("processContent"),
+                cpMaintain.regUserId.as("regUserId"),
+                company.companyName.as("companyName"),
+                csInfo.id.as("stationId"),
+                csInfo.stationName.as("stationName"),
+                csInfo.zipcode.as("zipCode"),
+                csInfo.address.as("address"),
+                csInfo.addressDetail.as("addressDetail"),
+                errorTypeName.name.as("errorTypeName"),
+                processStatusName.name.as("processStatusName")))
+                .from(cpMaintain)
+                .leftJoin(cpInfo).on(cpMaintain.chargerId.eq(cpInfo.id))
+                .leftJoin(csInfo).on(cpInfo.stationId.id.eq(csInfo.id))
+                .leftJoin(company).on(csInfo.company.id.eq(company.id))
+                .leftJoin(errorTypeName).on(cpMaintain.errorType.eq(errorTypeName.commonCode))
+                .leftJoin(processStatusName).on(cpMaintain.processStatus.eq(processStatusName.commonCode))
+                .where(cpMaintain.id.eq(cpmaintainId))
+                .fetchOne();
         return cpDetailOne;
     }
 }
