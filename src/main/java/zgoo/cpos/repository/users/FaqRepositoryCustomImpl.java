@@ -14,11 +14,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import zgoo.cpos.domain.code.QCommonCode;
 import zgoo.cpos.domain.company.QCompany;
+import zgoo.cpos.domain.company.QCompanyRelationInfo;
 import zgoo.cpos.domain.users.Faq;
 import zgoo.cpos.domain.users.QFaq;
 import zgoo.cpos.domain.users.QUsers;
 import zgoo.cpos.dto.users.FaqDto.FaqDetailDto;
 import zgoo.cpos.dto.users.FaqDto.FaqListDto;
+import zgoo.cpos.util.QueryUtils;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -27,111 +29,53 @@ public class FaqRepositoryCustomImpl implements FaqRepositoryCustom {
     QFaq faq = QFaq.faq;
     QUsers users = QUsers.users;
     QCompany company = QCompany.company;
+    QCompanyRelationInfo relation = QCompanyRelationInfo.companyRelationInfo;
     QCommonCode sectionCommonCode = new QCommonCode("section");
 
     @Override
-    public Page<FaqListDto> findFaqWithPagination(Pageable pageable) {
-        List<FaqListDto> faqList = queryFactory.select(Projections.fields(FaqListDto.class,
-            faq.id.as("id"),
-            faq.title.as("title"),
-            faq.content.as("content"),
-            faq.user.userId.as("userId"),
-            faq.section.as("section"),
-            faq.delYn.as("delYn"),
-            faq.regDt.as("regDt"),
-            users.name.as("userName"),
-            sectionCommonCode.name.as("sectionName")))
-            .from(faq)
-            .leftJoin(users).on(faq.user.userId.eq(users.userId))
-            .leftJoin(company).on(users.company.id.eq(company.id))
-            .leftJoin(sectionCommonCode).on(faq.section.eq(sectionCommonCode.commonCode))
-            .where(faq.delYn.eq("N"))
-            .orderBy(faq.regDt.desc(), faq.id.desc())
-            .offset(pageable.getOffset())
-            .limit(pageable.getPageSize())
-            .fetch();
-
-        long totalCount = queryFactory
-            .selectFrom(faq)
-            .where(faq.delYn.eq("N"))
-            .fetch().size();
-
-        return new PageImpl<>(faqList, pageable, totalCount);
-    }
-
-    @Override
-    public Page<FaqListDto> searchFaqListWithPagination(String section, Pageable pageable) {
+    public Page<FaqListDto> findFaqWithPagination(Pageable pageable, String levelPath, boolean isSuperAdmin) {
         BooleanBuilder builder = new BooleanBuilder();
         builder.and(faq.delYn.eq("N"));
 
-        if(section != null && !section.isEmpty()) {
-            builder.and(faq.section.eq(section));
+        if (!isSuperAdmin && levelPath != null && !levelPath.isEmpty()) {
+            builder.and(QueryUtils.hasCompanyLevelAccess(relation, levelPath));
         }
 
         List<FaqListDto> faqList = queryFactory.select(Projections.fields(FaqListDto.class,
-            faq.id.as("id"),
-            faq.title.as("title"),
-            faq.content.as("content"),
-            faq.user.userId.as("userId"),
-            faq.section.as("section"),
-            faq.delYn.as("delYn"),
-            faq.regDt.as("regDt"),
-            users.name.as("userName"),
-            sectionCommonCode.name.as("sectionName")))
-            .from(faq)
-            .leftJoin(users).on(faq.user.userId.eq(users.userId))
-            .leftJoin(company).on(users.company.id.eq(company.id))
-            .leftJoin(sectionCommonCode).on(faq.section.eq(sectionCommonCode.commonCode))
-            .where(builder)
-            .orderBy(faq.regDt.desc(), faq.id.desc())
-            .offset(pageable.getOffset())
-            .limit(pageable.getPageSize())
-            .fetch();
-
-        long totalCount = queryFactory
-            .selectFrom(faq)
-            .leftJoin(users).on(faq.user.userId.eq(users.userId))
-            .leftJoin(company).on(users.company.id.eq(company.id))
-            .where(builder)
-            .fetch().size();
-
-        return new PageImpl<>(faqList, pageable, totalCount);
-    }
-
-    @Override
-    public Faq findFaqOne(Long id) {
-        if (id == null) {
-            log.error("Faq id is null");
-            throw new IllegalArgumentException("FAQ ID는 null일 수 없습니다.");
-        }
-
-        return queryFactory
-        .selectFrom(faq)
-        .where(faq.id.eq(id))
-        .fetchOne();
-    }
-
-    @Override
-    public FaqDetailDto findFaqDetailOne(Long id) {
-        return queryFactory.select(Projections.fields(FaqDetailDto.class,
                 faq.id.as("id"),
                 faq.title.as("title"),
                 faq.content.as("content"),
                 faq.user.userId.as("userId"),
                 faq.section.as("section"),
+                faq.delYn.as("delYn"),
                 faq.regDt.as("regDt"),
                 users.name.as("userName"),
                 sectionCommonCode.name.as("sectionName")))
                 .from(faq)
                 .leftJoin(users).on(faq.user.userId.eq(users.userId))
                 .leftJoin(company).on(users.company.id.eq(company.id))
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
                 .leftJoin(sectionCommonCode).on(faq.section.eq(sectionCommonCode.commonCode))
-                .where(faq.id.eq(id))
-                .fetchOne();
+                .where(builder)
+                .orderBy(faq.regDt.desc(), faq.id.desc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        long totalCount = queryFactory
+                .selectFrom(faq)
+                .leftJoin(users).on(faq.user.userId.eq(users.userId))
+                .leftJoin(company).on(users.company.id.eq(company.id))
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
+                .where(builder)
+                .fetch().size();
+
+        return new PageImpl<>(faqList, pageable, totalCount);
     }
 
     @Override
-    public FaqDetailDto findPreviousFaq(Long id, String section, Faq currentFaq) {
+    public Page<FaqListDto> searchFaqListWithPagination(String section, Pageable pageable, String levelPath,
+            boolean isSuperAdmin) {
         BooleanBuilder builder = new BooleanBuilder();
         builder.and(faq.delYn.eq("N"));
 
@@ -139,12 +83,73 @@ public class FaqRepositoryCustomImpl implements FaqRepositoryCustom {
             builder.and(faq.section.eq(section));
         }
 
-        // builder.and(faq.id.lt(id));
-        // regDt, id 조건 추가
-        builder.and(
-            faq.regDt.lt(currentFaq.getRegDt())
-            .or(faq.regDt.eq(currentFaq.getRegDt()).and(faq.id.lt(id)))
-        );
+        if (!isSuperAdmin && levelPath != null && !levelPath.isEmpty()) {
+            builder.and(QueryUtils.hasCompanyLevelAccess(relation, levelPath));
+        }
+
+        List<FaqListDto> faqList = queryFactory.select(Projections.fields(FaqListDto.class,
+                faq.id.as("id"),
+                faq.title.as("title"),
+                faq.content.as("content"),
+                faq.user.userId.as("userId"),
+                faq.section.as("section"),
+                faq.delYn.as("delYn"),
+                faq.regDt.as("regDt"),
+                users.name.as("userName"),
+                sectionCommonCode.name.as("sectionName")))
+                .from(faq)
+                .leftJoin(users).on(faq.user.userId.eq(users.userId))
+                .leftJoin(company).on(users.company.id.eq(company.id))
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
+                .leftJoin(sectionCommonCode).on(faq.section.eq(sectionCommonCode.commonCode))
+                .where(builder)
+                .orderBy(faq.regDt.desc(), faq.id.desc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        long totalCount = queryFactory
+                .selectFrom(faq)
+                .leftJoin(users).on(faq.user.userId.eq(users.userId))
+                .leftJoin(company).on(users.company.id.eq(company.id))
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
+                .where(builder)
+                .fetch().size();
+
+        return new PageImpl<>(faqList, pageable, totalCount);
+    }
+
+    @Override
+    public Faq findFaqOne(Long id, String levelPath, boolean isSuperAdmin) {
+        if (id == null) {
+            log.error("Faq id is null");
+            throw new IllegalArgumentException("FAQ ID는 null일 수 없습니다.");
+        }
+
+        BooleanBuilder builder = new BooleanBuilder();
+        builder.and(faq.id.eq(id));
+
+        if (!isSuperAdmin && levelPath != null && !levelPath.isEmpty()) {
+            builder.and(QueryUtils.hasCompanyLevelAccess(relation, levelPath));
+        }
+
+        return queryFactory
+                .selectFrom(faq)
+                .leftJoin(users).on(faq.user.userId.eq(users.userId))
+                .leftJoin(company).on(users.company.id.eq(company.id))
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
+                .where(builder)
+                .fetchOne();
+    }
+
+    @Override
+    public FaqDetailDto findFaqDetailOne(Long id, String levelPath, boolean isSuperAdmin) {
+        BooleanBuilder builder = new BooleanBuilder();
+        builder.and(faq.id.eq(id));
+
+        if (!isSuperAdmin && levelPath != null && !levelPath.isEmpty()) {
+            builder.and(QueryUtils.hasCompanyLevelAccess(relation, levelPath));
+        }
 
         return queryFactory.select(Projections.fields(FaqDetailDto.class,
                 faq.id.as("id"),
@@ -158,6 +163,45 @@ public class FaqRepositoryCustomImpl implements FaqRepositoryCustom {
                 .from(faq)
                 .leftJoin(users).on(faq.user.userId.eq(users.userId))
                 .leftJoin(company).on(users.company.id.eq(company.id))
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
+                .leftJoin(sectionCommonCode).on(faq.section.eq(sectionCommonCode.commonCode))
+                .where(builder)
+                .fetchOne();
+    }
+
+    @Override
+    public FaqDetailDto findPreviousFaq(Long id, String section, Faq currentFaq, String levelPath,
+            boolean isSuperAdmin) {
+        BooleanBuilder builder = new BooleanBuilder();
+        builder.and(faq.delYn.eq("N"));
+
+        if (section != null && !section.isEmpty()) {
+            builder.and(faq.section.eq(section));
+        }
+
+        if (!isSuperAdmin && levelPath != null && !levelPath.isEmpty()) {
+            builder.and(QueryUtils.hasCompanyLevelAccess(relation, levelPath));
+        }
+
+        // builder.and(faq.id.lt(id));
+        // regDt, id 조건 추가
+        builder.and(
+                faq.regDt.lt(currentFaq.getRegDt())
+                        .or(faq.regDt.eq(currentFaq.getRegDt()).and(faq.id.lt(id))));
+
+        return queryFactory.select(Projections.fields(FaqDetailDto.class,
+                faq.id.as("id"),
+                faq.title.as("title"),
+                faq.content.as("content"),
+                faq.user.userId.as("userId"),
+                faq.section.as("section"),
+                faq.regDt.as("regDt"),
+                users.name.as("userName"),
+                sectionCommonCode.name.as("sectionName")))
+                .from(faq)
+                .leftJoin(users).on(faq.user.userId.eq(users.userId))
+                .leftJoin(company).on(users.company.id.eq(company.id))
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
                 .leftJoin(sectionCommonCode).on(faq.section.eq(sectionCommonCode.commonCode))
                 .where(builder)
                 .orderBy(faq.regDt.desc(), faq.id.desc())
@@ -165,7 +209,8 @@ public class FaqRepositoryCustomImpl implements FaqRepositoryCustom {
     }
 
     @Override
-    public FaqDetailDto findNextFaq(Long id, String section, Faq currentFaq) {
+    public FaqDetailDto findNextFaq(Long id, String section, Faq currentFaq, String levelPath,
+            boolean isSuperAdmin) {
         BooleanBuilder builder = new BooleanBuilder();
         builder.and(faq.delYn.eq("N"));
 
@@ -173,12 +218,15 @@ public class FaqRepositoryCustomImpl implements FaqRepositoryCustom {
             builder.and(faq.section.eq(section));
         }
 
+        if (!isSuperAdmin && levelPath != null && !levelPath.isEmpty()) {
+            builder.and(QueryUtils.hasCompanyLevelAccess(relation, levelPath));
+        }
+
         // builder.and(faq.id.gt(id));
         // regDt, id 조건 추가
         builder.and(
-            faq.regDt.gt(currentFaq.getRegDt())
-            .or(faq.regDt.eq(currentFaq.getRegDt()).and(faq.id.gt(id)))
-        );
+                faq.regDt.gt(currentFaq.getRegDt())
+                        .or(faq.regDt.eq(currentFaq.getRegDt()).and(faq.id.gt(id))));
 
         return queryFactory.select(Projections.fields(FaqDetailDto.class,
                 faq.id.as("id"),
@@ -192,6 +240,7 @@ public class FaqRepositoryCustomImpl implements FaqRepositoryCustom {
                 .from(faq)
                 .leftJoin(users).on(faq.user.userId.eq(users.userId))
                 .leftJoin(company).on(users.company.id.eq(company.id))
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
                 .leftJoin(sectionCommonCode).on(faq.section.eq(sectionCommonCode.commonCode))
                 .where(builder)
                 .orderBy(faq.regDt.asc(), faq.id.asc())
@@ -204,7 +253,7 @@ public class FaqRepositoryCustomImpl implements FaqRepositoryCustom {
                 .update(faq)
                 .set(faq.delYn, "Y")
                 .where(faq.id.eq(id)
-                    .and(faq.delYn.eq("N")))
+                        .and(faq.delYn.eq("N")))
                 .execute();
     }
 }

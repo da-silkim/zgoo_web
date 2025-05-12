@@ -67,7 +67,7 @@ public class VocController {
 
         try {
             ResponseEntity<String> permissionCheck = this.comService.checkUserPermissions(principal,
-                MenuConstants.VOC);
+                    MenuConstants.VOC);
             if (permissionCheck != null) {
                 return permissionCheck;
             }
@@ -77,7 +77,7 @@ public class VocController {
         } catch (Exception e) {
             log.error("[createVocCall] error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                    .body("문의 정보 등록 중 오류 발생");
+                    .body("문의 정보 등록 중 오류 발생");
         }
     }
 
@@ -89,7 +89,7 @@ public class VocController {
 
         try {
             ResponseEntity<String> permissionCheck = this.comService.checkUserPermissions(principal,
-                MenuConstants.VOC);
+                    MenuConstants.VOC);
             if (permissionCheck != null) {
                 return permissionCheck;
             }
@@ -97,27 +97,27 @@ public class VocController {
             Integer result = this.vocService.updateVocAnswer(vocId, dto, principal.getName());
             log.info("=== voc answer update complete ===");
             return switch (result) {
-                case -1-> ResponseEntity.status(HttpStatus.OK).body("답변이 빈 값으로 처리되지 않았습니다.");
+                case -1 -> ResponseEntity.status(HttpStatus.OK).body("답변이 빈 값으로 처리되지 않았습니다.");
                 case 1 -> ResponseEntity.status(HttpStatus.OK).body("답변이 정상적으로 처리되었습니다.");
                 default -> ResponseEntity.status(HttpStatus.OK).body("오류로 인해 답변이 처리되지 않았습니다.");
             };
         } catch (Exception e) {
             log.error("[updateVocAnswer] error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                    .body("답변 저장 중 오류 발생");
+                    .body("답변 저장 중 오류 발생");
         }
     }
 
     // 회원정보 검색
     @GetMapping("/search/member")
     public ResponseEntity<Map<String, Object>> searchMember(
-            @RequestParam("memName") String memName, @RequestParam("memPhone") String memPhone) {
+            @RequestParam("memName") String memName, @RequestParam("memPhone") String memPhone, Principal principal) {
         log.info("=== search member info ===");
 
         Map<String, Object> response = new HashMap<>();
 
         try {
-            List<MemberListDto> memberList = this.vocService.findMemberList(memName, memPhone);
+            List<MemberListDto> memberList = this.vocService.findMemberList(memName, memPhone, principal.getName());
 
             if (memberList == null) {
                 response.put("message", "조회된 데이터가 없습니다.");

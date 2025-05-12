@@ -18,6 +18,7 @@ import zgoo.cpos.dto.menu.MenuAuthorityDto.MenuAuthorityBaseDto;
 import zgoo.cpos.dto.users.FaqDto;
 import zgoo.cpos.dto.users.FaqDto.FaqListDto;
 import zgoo.cpos.mapper.FaqMapper;
+import zgoo.cpos.repository.company.CompanyRepository;
 import zgoo.cpos.repository.menu.MenuAuthorityRepository;
 import zgoo.cpos.repository.users.FaqRepository;
 import zgoo.cpos.repository.users.UsersRepository;
@@ -30,13 +31,25 @@ public class FaqService {
     private final FaqRepository faqRepository;
     private final UsersRepository usersRepository;
     private final MenuAuthorityRepository menuAuthorityRepository;
+    private final CompanyRepository companyRepository;
+    private final ComService comService;
 
     // FAQ 전체 조회
-    public Page<FaqDto.FaqListDto> findFaqAll(int page, int size) {
+    public Page<FaqDto.FaqListDto> findFaqAll(int page, int size, String userId) {
         Pageable pageable = PageRequest.of(page, size);
 
         try {
-            Page<FaqDto.FaqListDto> faqList = this.faqRepository.findFaqWithPagination(pageable);
+            boolean isSuperAdmin = comService.checkSuperAdmin(userId);
+            Long loginUserCompanyId = comService.getLoginUserCompanyId(userId);
+            String levelPath = companyRepository.findLevelPathByCompanyId(loginUserCompanyId);
+            log.info("== levelPath : {}", levelPath);
+            if (levelPath == null) {
+                // 관계정보가 없을경우 빈 리스트 전달
+                return Page.empty(pageable);
+            }
+
+            Page<FaqDto.FaqListDto> faqList = this.faqRepository.findFaqWithPagination(pageable, levelPath,
+                    isSuperAdmin);
             return faqList;
         } catch (DataAccessException dae) {
             log.error("[findFaqAll] database error : {}", dae.getMessage());
@@ -48,11 +61,21 @@ public class FaqService {
     }
 
     // FAQ 검색 조회
-    public Page<FaqDto.FaqListDto> searchFaqListWithPagination(String section, int page, int size) {
+    public Page<FaqDto.FaqListDto> searchFaqListWithPagination(String section, int page, int size, String userId) {
         Pageable pageable = PageRequest.of(page, size);
 
         try {
-            Page<FaqDto.FaqListDto> faqList = this.faqRepository.searchFaqListWithPagination(section, pageable);
+            boolean isSuperAdmin = comService.checkSuperAdmin(userId);
+            Long loginUserCompanyId = comService.getLoginUserCompanyId(userId);
+            String levelPath = companyRepository.findLevelPathByCompanyId(loginUserCompanyId);
+            log.info("== levelPath : {}", levelPath);
+            if (levelPath == null) {
+                // 관계정보가 없을경우 빈 리스트 전달
+                return Page.empty(pageable);
+            }
+
+            Page<FaqDto.FaqListDto> faqList = this.faqRepository.searchFaqListWithPagination(section, pageable,
+                    levelPath, isSuperAdmin);
             return faqList;
         } catch (DataAccessException dae) {
             log.error("[searchFaqListWithPagination] database error : {}", dae.getMessage());
@@ -64,18 +87,28 @@ public class FaqService {
     }
 
     // FAQ 조회
-    public Page<FaqListDto> findFaqWithPagination(String section, int page, int size) {
+    public Page<FaqListDto> findFaqWithPagination(String section, int page, int size, String userId) {
         Pageable pageable = PageRequest.of(page, size);
 
         try {
+
+            boolean isSuperAdmin = comService.checkSuperAdmin(userId);
+            Long loginUserCompanyId = comService.getLoginUserCompanyId(userId);
+            String levelPath = companyRepository.findLevelPathByCompanyId(loginUserCompanyId);
+            log.info("== levelPath : {}", levelPath);
+            if (levelPath == null) {
+                // 관계정보가 없을경우 빈 리스트 전달
+                return Page.empty(pageable);
+            }
+
             Page<FaqListDto> faqList;
 
             if (section == null || section.isEmpty()) {
                 log.info("Executing the [findFaqWithPagination]");
-                faqList = this.faqRepository.findFaqWithPagination(pageable);
+                faqList = this.faqRepository.findFaqWithPagination(pageable, levelPath, isSuperAdmin);
             } else {
                 log.info("Executing the [findFaqWithPagination]");
-                faqList = this.faqRepository.searchFaqListWithPagination(section, pageable);
+                faqList = this.faqRepository.searchFaqListWithPagination(section, pageable, levelPath, isSuperAdmin);
             }
 
             LocalDateTime now = LocalDateTime.now();
@@ -94,9 +127,18 @@ public class FaqService {
     }
 
     // FAQ 단건 조회
-    public FaqDto.FaqRegDto findFaqOne(Long id) {
+    public FaqDto.FaqRegDto findFaqOne(Long id, String userId) {
         try {
-            Faq faq = this.faqRepository.findFaqOne(id);
+            boolean isSuperAdmin = comService.checkSuperAdmin(userId);
+            Long loginUserCompanyId = comService.getLoginUserCompanyId(userId);
+            String levelPath = companyRepository.findLevelPathByCompanyId(loginUserCompanyId);
+            log.info("== levelPath : {}", levelPath);
+            if (levelPath == null) {
+                // 관계정보가 없을경우 빈 리스트 전달
+                return null;
+            }
+
+            Faq faq = this.faqRepository.findFaqOne(id, levelPath, isSuperAdmin);
             return FaqMapper.toDto(faq);
         } catch (Exception e) {
             log.error("[findFaqOne] error : {}", e.getMessage());
@@ -105,9 +147,18 @@ public class FaqService {
     }
 
     // FAQ 단건 조회(detail)
-    public FaqDto.FaqDetailDto findFaqDetailOne(Long id) {
+    public FaqDto.FaqDetailDto findFaqDetailOne(Long id, String userId) {
         try {
-            FaqDto.FaqDetailDto faq = this.faqRepository.findFaqDetailOne(id);
+            boolean isSuperAdmin = comService.checkSuperAdmin(userId);
+            Long loginUserCompanyId = comService.getLoginUserCompanyId(userId);
+            String levelPath = companyRepository.findLevelPathByCompanyId(loginUserCompanyId);
+            log.info("== levelPath : {}", levelPath);
+            if (levelPath == null) {
+                // 관계정보가 없을경우 빈 리스트 전달
+                return null;
+            }
+
+            FaqDto.FaqDetailDto faq = this.faqRepository.findFaqDetailOne(id, levelPath, isSuperAdmin);
             return faq;
         } catch (Exception e) {
             log.error("[findFaqDetailOne] error: {}", e.getMessage());
@@ -116,10 +167,20 @@ public class FaqService {
     }
 
     // 이전글 조회
-    public FaqDto.FaqDetailDto findPreviousFaq(Long id, String section) {
+    public FaqDto.FaqDetailDto findPreviousFaq(Long id, String section, String userId) {
         try {
-            Faq currentFaq = this.faqRepository.findFaqOne(id);
-            FaqDto.FaqDetailDto faq = this.faqRepository.findPreviousFaq(id, section, currentFaq);
+            boolean isSuperAdmin = comService.checkSuperAdmin(userId);
+            Long loginUserCompanyId = comService.getLoginUserCompanyId(userId);
+            String levelPath = companyRepository.findLevelPathByCompanyId(loginUserCompanyId);
+            log.info("== levelPath : {}", levelPath);
+            if (levelPath == null) {
+                // 관계정보가 없을경우 빈 리스트 전달
+                return null;
+            }
+
+            Faq currentFaq = this.faqRepository.findFaqOne(id, levelPath, isSuperAdmin);
+            FaqDto.FaqDetailDto faq = this.faqRepository.findPreviousFaq(id, section, currentFaq, levelPath,
+                    isSuperAdmin);
             return faq;
         } catch (Exception e) {
             log.error("[findPreviousFaq] error: {}", e.getMessage());
@@ -128,10 +189,19 @@ public class FaqService {
     }
 
     // 다음글 조회
-    public FaqDto.FaqDetailDto findNextFaq(Long id, String section) {
+    public FaqDto.FaqDetailDto findNextFaq(Long id, String section, String userId) {
         try {
-            Faq currentFaq = this.faqRepository.findFaqOne(id);
-            FaqDto.FaqDetailDto faq = this.faqRepository.findNextFaq(id, section, currentFaq);
+            boolean isSuperAdmin = comService.checkSuperAdmin(userId);
+            Long loginUserCompanyId = comService.getLoginUserCompanyId(userId);
+            String levelPath = companyRepository.findLevelPathByCompanyId(loginUserCompanyId);
+            log.info("== levelPath : {}", levelPath);
+            if (levelPath == null) {
+                // 관계정보가 없을경우 빈 리스트 전달
+                return null;
+            }
+
+            Faq currentFaq = this.faqRepository.findFaqOne(id, levelPath, isSuperAdmin);
+            FaqDto.FaqDetailDto faq = this.faqRepository.findNextFaq(id, section, currentFaq, levelPath, isSuperAdmin);
             return faq;
         } catch (Exception e) {
             log.error("[findNextFaq] error: {}", e.getMessage());
@@ -144,7 +214,7 @@ public class FaqService {
     public void saveFaq(FaqDto.FaqRegDto dto, String loginUserId) {
         try {
             if (loginUserId == null || loginUserId.isEmpty()) {
-                throw new IllegalArgumentException("User ID is missing. Cannot save faq without login user ID."); 
+                throw new IllegalArgumentException("User ID is missing. Cannot save faq without login user ID.");
             }
             dto.setUserId(loginUserId);
 
@@ -171,19 +241,28 @@ public class FaqService {
     public FaqDto.FaqRegDto updateFaq(FaqDto.FaqRegDto dto, String loginUserId) {
         try {
             if (loginUserId == null || loginUserId.isEmpty()) {
-                throw new IllegalArgumentException("User ID is missing. Cannot update faq without login user ID."); 
+                throw new IllegalArgumentException("User ID is missing. Cannot update faq without login user ID.");
             }
             boolean isMod = checkUpdateAndDeleteAuthority(dto.getId(), loginUserId);
 
+            boolean isSuperAdmin = comService.checkSuperAdmin(loginUserId);
+            Long loginUserCompanyId = comService.getLoginUserCompanyId(loginUserId);
+            String levelPath = companyRepository.findLevelPathByCompanyId(loginUserCompanyId);
+            log.info("== levelPath : {}", levelPath);
+            if (levelPath == null) {
+                // 관계정보가 없을경우 빈 리스트 전달
+                return null;
+            }
+
             if (isMod) {
-                Faq faq = this.faqRepository.findFaqOne(dto.getId());
+                Faq faq = this.faqRepository.findFaqOne(dto.getId(), levelPath, isSuperAdmin);
 
                 log.info("=== before update: {}", faq.toString());
-    
+
                 faq.updateFaqInfo(dto);
-    
+
                 log.info("=== after update: {}", faq.toString());
-    
+
                 return FaqMapper.toDto(faq);
             }
 
@@ -203,7 +282,7 @@ public class FaqService {
     public void deleteFaq(Long id, String loginUserId) {
         try {
             if (loginUserId == null || loginUserId.isEmpty()) {
-                throw new IllegalArgumentException("User ID is missing. Cannot delete faq without login user ID."); 
+                throw new IllegalArgumentException("User ID is missing. Cannot delete faq without login user ID.");
             }
 
             boolean isMod = checkUpdateAndDeleteAuthority(id, loginUserId);
@@ -227,7 +306,17 @@ public class FaqService {
     // edit & delete button control
     public boolean buttonControl(Long id, String loginUserId) {
         try {
-            Faq faq = this.faqRepository.findFaqOne(id);
+
+            boolean isSuperAdmin = comService.checkSuperAdmin(loginUserId);
+            Long loginUserCompanyId = comService.getLoginUserCompanyId(loginUserId);
+            String levelPath = companyRepository.findLevelPathByCompanyId(loginUserCompanyId);
+            log.info("== levelPath : {}", levelPath);
+            if (levelPath == null) {
+                // 관계정보가 없을경우 빈 리스트 전달
+                return false;
+            }
+
+            Faq faq = this.faqRepository.findFaqOne(id, levelPath, isSuperAdmin);
             String writer = faq.getUser().getUserId();
 
             Users user = this.usersRepository.findUserOne(writer);
@@ -262,7 +351,7 @@ public class FaqService {
         }
 
         MenuAuthorityBaseDto dto = this.menuAuthorityRepository.findUserMenuAuthority(loginUser.getCompany().getId(),
-            loginUserAuthority, MenuConstants.FAQ);
+                loginUserAuthority, MenuConstants.FAQ);
         return dto.getModYn().equals("Y");
     }
 
@@ -276,13 +365,22 @@ public class FaqService {
             return true;
         }
 
-        Faq faq = this.faqRepository.findFaqOne(id);
+        boolean isSuperAdmin = comService.checkSuperAdmin(loginUserId);
+        Long loginUserCompanyId = comService.getLoginUserCompanyId(loginUserId);
+        String levelPath = companyRepository.findLevelPathByCompanyId(loginUserCompanyId);
+        log.info("== levelPath : {}", levelPath);
+        if (levelPath == null) {
+            // 관계정보가 없을경우 빈 리스트 전달
+            return false;
+        }
+
+        Faq faq = this.faqRepository.findFaqOne(id, levelPath, isSuperAdmin);
         String writer = faq.getUser().getUserId();
         Users user = this.usersRepository.findUserOne(writer);
         String userAuthority = user.getAuthority();
 
         MenuAuthorityBaseDto dto = this.menuAuthorityRepository.findUserMenuAuthority(loginUser.getCompany().getId(),
-            loginUserAuthority, MenuConstants.FAQ);
+                loginUserAuthority, MenuConstants.FAQ);
         String modYn = dto.getModYn();
 
         if (modYn.equals("Y")) {

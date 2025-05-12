@@ -1185,7 +1185,8 @@ public class PageController {
         model.addAttribute("vocRegDto", new VocDto.VocRegDto());
 
         try {
-            Page<VocListDto> vocList = this.vocService.findVocInfoWithPagination(type, replyStat, name, page, size);
+            Page<VocListDto> vocList = this.vocService.findVocInfoWithPagination(type, replyStat, name, page, size,
+                    principal.getName());
 
             // 검색 조건 저장
             model.addAttribute("selectedType", type);
@@ -1241,7 +1242,8 @@ public class PageController {
         model.addAttribute("faqDto", new FaqDto.FaqRegDto());
 
         try {
-            Page<FaqDto.FaqListDto> faqList = this.faqService.findFaqWithPagination(section, page, size);
+            Page<FaqDto.FaqListDto> faqList = this.faqService.findFaqWithPagination(section, page, size,
+                    principal.getName());
 
             int totalPages = faqList.getTotalPages() == 0 ? 1 : faqList.getTotalPages();
 

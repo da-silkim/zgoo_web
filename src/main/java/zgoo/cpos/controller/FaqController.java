@@ -40,17 +40,17 @@ public class FaqController {
         } catch (Exception e) {
             log.error("[createFaq] error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                    .body("FAQ 등록 중 오류가 발생했습니다.");
+                    .body("FAQ 등록 중 오류가 발생했습니다.");
         }
     }
 
     // FAQ 단건 조회
     @GetMapping("/get/{id}")
-    public ResponseEntity<FaqDto.FaqRegDto> findFaqOne(@PathVariable("id") Long id) {
+    public ResponseEntity<FaqDto.FaqRegDto> findFaqOne(@PathVariable("id") Long id, Principal principal) {
         log.info("=== find faq info ===");
 
         try {
-            FaqDto.FaqRegDto faqFindOne = this.faqService.findFaqOne(id);
+            FaqDto.FaqRegDto faqFindOne = this.faqService.findFaqOne(id, principal.getName());
 
             if (faqFindOne != null) {
                 return ResponseEntity.ok(faqFindOne);
@@ -58,28 +58,29 @@ public class FaqController {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
             }
         } catch (Exception e) {
-                log.error("[findFaqOne] error: {}", e.getMessage());
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            log.error("[findFaqOne] error: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
     // FAQ 상세내용
     @GetMapping("/detail/{id}")
     public String detailFaq(Model model, @PathVariable("id") Long id,
-                    @RequestParam(value = "page", defaultValue = "0") int page,
-                    @RequestParam(value = "size", defaultValue = "10") int size,
-                    @RequestParam(value = "sectionSearch", required = false) String section) {
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size,
+            @RequestParam(value = "sectionSearch", required = false) String section,
+            Principal principal) {
         log.info("=== detail faq info ===");
 
         try {
-            FaqDto.FaqDetailDto faq = this.faqService.findFaqDetailOne(id);
+            FaqDto.FaqDetailDto faq = this.faqService.findFaqDetailOne(id, principal.getName());
             String content = faq.getContent().replace("\n", "<br>");
             model.addAttribute("faq", faq);
             model.addAttribute("content", content);
 
             // 이전글, 다음글 조회
-            FaqDto.FaqDetailDto previousFaq = this.faqService.findPreviousFaq(id, section);
-            FaqDto.FaqDetailDto nextFaq = this.faqService.findNextFaq(id, section);
+            FaqDto.FaqDetailDto previousFaq = this.faqService.findPreviousFaq(id, section, principal.getName());
+            FaqDto.FaqDetailDto nextFaq = this.faqService.findNextFaq(id, section, principal.getName());
             model.addAttribute("previousFaq", previousFaq);
             model.addAttribute("nextFaq", nextFaq);
 
@@ -104,7 +105,7 @@ public class FaqController {
             if (id == null) {
                 log.error("FAQ id is null");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                                        .body("FAQ ID값이 누락됐습니다.");
+                        .body("FAQ ID값이 누락됐습니다.");
             }
             dto.setId(id);
 
@@ -113,7 +114,7 @@ public class FaqController {
         } catch (Exception e) {
             log.error("[updateFaq] error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                    .body("FAQ 수정 중 오류가 발생했습니다.");
+                    .body("FAQ 수정 중 오류가 발생했습니다.");
         }
     }
 
@@ -126,14 +127,14 @@ public class FaqController {
             if (id == null) {
                 log.error("FAQ id is null");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                                    .body("FAQ ID값이 누락됐습니다.");
+                        .body("FAQ ID값이 누락됐습니다.");
             }
             this.faqService.deleteFaq(id, principal.getName());
-            return ResponseEntity.ok("FAQ가 정상적으로 삭제되었습니다."); 
+            return ResponseEntity.ok("FAQ가 정상적으로 삭제되었습니다.");
         } catch (Exception e) {
             log.error("[deleteFaq] error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                    .body("FAQ 삭제 중 오류가 발생했습니다.");
+                    .body("FAQ 삭제 중 오류가 발생했습니다.");
         }
     }
 

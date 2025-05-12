@@ -14,9 +14,10 @@ import lombok.extern.slf4j.Slf4j;
 import zgoo.cpos.domain.member.Member;
 import zgoo.cpos.domain.member.Voc;
 import zgoo.cpos.dto.member.MemberDto.MemberListDto;
+import zgoo.cpos.dto.member.VocDto.VocListDto;
 import zgoo.cpos.dto.member.VocDto.VocRegDto;
 import zgoo.cpos.mapper.VocMapper;
-import zgoo.cpos.dto.member.VocDto.VocListDto;
+import zgoo.cpos.repository.company.CompanyRepository;
 import zgoo.cpos.repository.member.MemberRepository;
 import zgoo.cpos.repository.member.VocRepository;
 
@@ -26,20 +27,34 @@ import zgoo.cpos.repository.member.VocRepository;
 public class VocService {
     private final VocRepository vocRepository;
     private final MemberRepository memberRepository;
+    private final CompanyRepository companyRepository;
+    private final ComService comService;
 
     // 1:1문의 조회
-    public Page<VocListDto> findVocInfoWithPagination(String type, String replyStat, String name, int page, int size) {
+    public Page<VocListDto> findVocInfoWithPagination(String type, String replyStat, String name, int page, int size,
+            String userId) {
         Pageable pageable = PageRequest.of(page, size);
 
         try {
             Page<VocListDto> vocList;
 
-            if ((type == null || type.isEmpty()) && (replyStat == null || replyStat.isEmpty()) && (name == null || name.isEmpty())) {
+            boolean isSuperAdmin = comService.checkSuperAdmin(userId);
+            Long loginUserCompanyId = comService.getLoginUserCompanyId(userId);
+            String levelPath = companyRepository.findLevelPathByCompanyId(loginUserCompanyId);
+            log.info("== levelPath : {}", levelPath);
+            if (levelPath == null) {
+                // 관계정보가 없을경우 빈 리스트 전달
+                return Page.empty(pageable);
+            }
+
+            if ((type == null || type.isEmpty()) && (replyStat == null || replyStat.isEmpty())
+                    && (name == null || name.isEmpty())) {
                 log.info("Executing the [findVocWithPagination]");
-                vocList = this.vocRepository.findVocWithPagination(pageable);
+                vocList = this.vocRepository.findVocWithPagination(pageable, levelPath, isSuperAdmin);
             } else {
                 log.info("Executing the [searchVocWithPagination]");
-                vocList = this.vocRepository.searchVocWithPagination(type, replyStat, name, pageable);
+                vocList = this.vocRepository.searchVocWithPagination(type, replyStat, name, pageable, levelPath,
+                        isSuperAdmin);
             }
 
             return vocList;
@@ -50,7 +65,7 @@ public class VocService {
     }
 
     // 1:1문의 단건 조회
-    public VocRegDto findVocOne(Long vocId) {       
+    public VocRegDto findVocOne(Long vocId) {
         try {
             VocRegDto voc = this.vocRepository.findVocOne(vocId);
             return voc;
@@ -64,15 +79,15 @@ public class VocService {
     public void saveVocCall(VocRegDto dto, String regUserId) {
         try {
             Member member = this.memberRepository.findById(dto.getMemberId())
-                .orElseThrow(() -> new IllegalArgumentException("member not found with id: " + dto.getMemberId()));
+                    .orElseThrow(() -> new IllegalArgumentException("member not found with id: " + dto.getMemberId()));
 
-            dto.setChannel("VOCTEL");   // 문의 경로(전화)
+            dto.setChannel("VOCTEL"); // 문의 경로(전화)
 
             if (dto.getReplyContent() == null || dto.getReplyContent().trim().isEmpty()) { // 답변X
                 dto.setReplyStat("STANDBY");
                 dto.setReplyDt(null);
                 dto.setRegUserId(regUserId);
-            } else {    // 답변O
+            } else { // 답변O
                 dto.setReplyStat("COMPLETE");
                 dto.setReplyDt(LocalDateTime.now());
                 dto.setRegUserId(regUserId);
@@ -90,7 +105,7 @@ public class VocService {
     @Transactional
     public Integer updateVocAnswer(Long vocId, VocRegDto dto, String replyUserId) {
         Voc voc = this.vocRepository.findById(vocId)
-            .orElseThrow(() -> new IllegalArgumentException("voc not found with id: " + vocId));
+                .orElseThrow(() -> new IllegalArgumentException("voc not found with id: " + vocId));
 
         try {
             if (dto.getReplyContent() != null && !dto.getReplyContent().isEmpty()) {
@@ -107,13 +122,23 @@ public class VocService {
     }
 
     // 회원정보 검색
-    public List<MemberListDto> findMemberList(String name, String phoneNo) {
+    public List<MemberListDto> findMemberList(String name, String phoneNo, String userId) {
         try {
-            List<MemberListDto> memberList = this.memberRepository.findMemberList(name, phoneNo);
+            boolean isSuperAdmin = comService.checkSuperAdmin(userId);
+            Long loginUserCompanyId = comService.getLoginUserCompanyId(userId);
+            String levelPath = companyRepository.findLevelPathByCompanyId(loginUserCompanyId);
+            log.info("== levelPath : {}", levelPath);
+            if (levelPath == null) {
+                // 관계정보가 없을경우 빈 리스트 전달
+                return null;
+            }
+
+            List<MemberListDto> memberList = this.memberRepository.findMemberList(name, phoneNo, levelPath,
+                    isSuperAdmin);
             return memberList;
         } catch (Exception e) {
             log.error("[findMemberList] error: {}", e.getMessage());
-                return null;
+            return null;
         }
     }
 }

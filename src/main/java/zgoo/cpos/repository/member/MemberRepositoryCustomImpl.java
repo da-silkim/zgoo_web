@@ -289,7 +289,7 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
     }
 
     @Override
-    public List<MemberListDto> findMemberList(String name, String phoneNo) {
+    public List<MemberListDto> findMemberList(String name, String phoneNo, String levelPath, boolean isSuperAdmin) {
         BooleanBuilder builder = new BooleanBuilder();
 
         if (name != null && !name.isEmpty()) {
@@ -298,6 +298,10 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
 
         if (phoneNo != null && !phoneNo.isEmpty()) {
             builder.and(member.phoneNo.contains(phoneNo));
+        }
+
+        if (!isSuperAdmin && levelPath != null && !levelPath.isEmpty()) {
+            builder.and(QueryUtils.hasCompanyLevelAccess(relation, levelPath));
         }
 
         List<MemberListDto> memberList = queryFactory.select(Projections.fields(MemberListDto.class,
@@ -318,6 +322,7 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
                 bizTypeName.name.as("bizTypeName")))
                 .from(member)
                 .leftJoin(company).on(member.company.eq(company))
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
                 .leftJoin(bizTypeName).on(member.bizType.eq(bizTypeName.commonCode))
                 .where(builder)
                 .fetch();
