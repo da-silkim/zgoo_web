@@ -57,6 +57,8 @@ import zgoo.cpos.dto.menu.MenuAuthorityDto.MenuAuthorityBaseDto;
 import zgoo.cpos.dto.menu.MenuDto;
 import zgoo.cpos.dto.payment.ChgPaymentInfoDto;
 import zgoo.cpos.dto.payment.ChgPaymentSummaryDto;
+import zgoo.cpos.dto.statistics.PurchaseSalesDto.PurchaseSalesBarDto;
+import zgoo.cpos.dto.statistics.PurchaseSalesDto.PurchaseSalesLineChartDto;
 import zgoo.cpos.dto.statistics.TotalkwDto.TotalkwBarDto;
 import zgoo.cpos.dto.statistics.TotalkwDto.TotalkwDashboardDto;
 import zgoo.cpos.dto.statistics.TotalkwDto.TotalkwLineChartDto;
@@ -1627,15 +1629,40 @@ public class PageController {
      * 통계 > 매입/매출통계
      */
     @GetMapping("/statistics/purchaseandsales")
-    public String showpurchaseandsales(Model model, Principal principal) {
+    public String showpurchaseandsales(
+            @RequestParam(value = "companyIdSearch", required = false) Long companyId,
+            @RequestParam(value = "opSearch", required = false) String searchOp,
+            @RequestParam(value = "contentSearch", required = false) String searchContent,
+            @RequestParam(value = "yearSearch", required = false) Integer year,
+            Model model, Principal principal) {
         log.info("=== Purchase and Sales Statistics Page ===");
-
+        log.info("companyId: {}, opSearch: {}, contentSearch: {}, yearSearch: {}", companyId, searchOp, searchContent,
+                year);
+        
         try {
+            model.addAttribute("selectedCompanyId", companyId);
+            model.addAttribute("selectedOpSearch", searchOp);
+            model.addAttribute("selectedContentSearch", searchContent);
+            model.addAttribute("selectedYear", year);
+
+            PurchaseSalesBarDto pursales = this.statisticsService.searchYearPurchaseSales(companyId, searchOp, searchContent,
+                    year);
+            model.addAttribute("pursales", pursales);
+            log.info("pursales >> {}", pursales.toString());
+
+            PurchaseSalesLineChartDto lineChart = this.statisticsService.searchMonthlyPurchaseSales(companyId, searchOp,
+                searchContent, year);
+            model.addAttribute("lineChart", lineChart);
+            log.info("lineChart >> {}", lineChart.toString());
+
             List<CompanyListDto> companyList = this.companyService.findCompanyListAll(principal.getName());
             model.addAttribute("companyList", companyList);
+            List<YearOptionDto> yearOption = this.comService.generateYearOptions();
+            model.addAttribute("yearOption", yearOption);
         } catch (Exception e) {
             e.getStackTrace();
             model.addAttribute("companyList", Collections.emptyList());
+            model.addAttribute("yearOption", Collections.emptyList());
         }
 
         return "pages/statistics/purchaseandsales_statistics";

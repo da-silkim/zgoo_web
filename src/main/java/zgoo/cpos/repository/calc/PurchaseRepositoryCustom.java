@@ -10,6 +10,7 @@ import zgoo.cpos.dto.calc.PurchaseDto.PurchaseAccountDto;
 import zgoo.cpos.dto.calc.PurchaseDto.PurchaseDetailDto;
 import zgoo.cpos.dto.calc.PurchaseDto.PurchaseListDto;
 import zgoo.cpos.dto.calc.PurchaseDto.PurchaseRegDto;
+import zgoo.cpos.dto.statistics.PurchaseSalesDto.PurchaseSalesLineChartBaseDto;
 
 public interface PurchaseRepositoryCustom {
 
@@ -36,4 +37,11 @@ public interface PurchaseRepositoryCustom {
 
     // 매입 상세 조회
     PurchaseDetailDto findPurchaseDetailOne(Long id);
+
+    // 연도별 매입 합계
+    Integer findTotalAmountByYear(Long companyId, String searchOp, String searchContent, Integer year);
+
+    // 월별 매입 합계
+    List<PurchaseSalesLineChartBaseDto> searchMonthlyTotalAmount(Long companyId, String searchOp, String searchContent,
+        Integer year);
 }

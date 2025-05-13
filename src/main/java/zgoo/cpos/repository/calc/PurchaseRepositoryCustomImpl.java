@@ -1,13 +1,19 @@
 package zgoo.cpos.repository.calc;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -22,6 +28,8 @@ import zgoo.cpos.dto.calc.PurchaseDto.PurchaseAccountDto;
 import zgoo.cpos.dto.calc.PurchaseDto.PurchaseDetailDto;
 import zgoo.cpos.dto.calc.PurchaseDto.PurchaseListDto;
 import zgoo.cpos.dto.calc.PurchaseDto.PurchaseRegDto;
+import zgoo.cpos.dto.statistics.PurchaseSalesDto.PurchaseSalesLineChartBaseDto;
+import zgoo.cpos.dto.statistics.PurchaseSalesDto.PurchaseSalesLineChartDto;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -272,5 +280,86 @@ public class PurchaseRepositoryCustomImpl implements PurchaseRepositoryCustom {
             .leftJoin(paymentName).on(purchase.paymentMethod.eq(paymentName.commonCode))
             .where(purchase.id.eq(id))
             .fetchOne();
+    }
+
+    @Override
+    public Integer findTotalAmountByYear(Long companyId, String searchOp, String searchContent, Integer year) {
+        BooleanBuilder builder = new BooleanBuilder();
+
+        if (companyId != null) {
+            builder.and(csInfo.company.id.eq(companyId));
+        }
+
+        if ((searchOp != null && !searchOp.isEmpty()) && (searchContent != null && !searchContent.isEmpty())) {
+            switch (searchOp) {
+                case "stationId" -> builder.and(csInfo.id.contains(searchContent));
+                case "stationName" -> {
+                    builder.and(csInfo.stationName.contains(searchContent));
+                }
+                default -> {
+                }
+            }
+        }
+
+        LocalDate startOfYear = LocalDate.of(year, 1, 1);
+        LocalDate endOfYear = LocalDate.of(year, 12, 31);
+        builder.and(purchase.purchaseDate.between(startOfYear, endOfYear));
+
+        return queryFactory
+            .select(purchase.totalAmount.sum())
+            .from(purchase)
+            .leftJoin(csInfo).on(csInfo.eq(purchase.station))
+            .where(builder)
+            .fetchOne();
+    }
+
+    @Override
+    public List<PurchaseSalesLineChartBaseDto> searchMonthlyTotalAmount(Long companyId, String searchOp, String searchContent,
+            Integer year) {
+        BooleanBuilder builder = new BooleanBuilder();
+
+        if (companyId != null) {
+            builder.and(csInfo.company.id.eq(companyId));
+        }
+
+        if ((searchOp != null && !searchOp.isEmpty()) && (searchContent != null && !searchContent.isEmpty())) {
+            switch (searchOp) {
+                case "stationId" -> builder.and(csInfo.id.contains(searchContent));
+                case "stationName" -> {
+                    builder.and(csInfo.stationName.contains(searchContent));
+                }
+                default -> {
+                }
+            }
+        }
+
+        builder.and(Expressions.numberTemplate(Integer.class, "YEAR({0})", purchase.purchaseDate).eq(year));
+
+        List<PurchaseSalesLineChartBaseDto> monthlyResults = IntStream.rangeClosed(1, 12)
+                .mapToObj(month -> PurchaseSalesLineChartBaseDto.builder()
+                        .month(month)
+                        .year(year)
+                        .totalPrice(BigDecimal.ZERO)
+                        .build())
+                .collect(Collectors.toList());
+        
+        List<Tuple> results = queryFactory
+                .select(
+                    Expressions.numberTemplate(Integer.class, "MONTH({0})", purchase.purchaseDate).as("month"),
+                    purchase.totalAmount.sum())
+                .from(purchase)
+                .leftJoin(csInfo).on(csInfo.eq(purchase.station))
+                .where(builder)
+                .groupBy(Expressions.numberTemplate(Integer.class, "MONTH({0})", purchase.purchaseDate))
+                .fetch();
+
+        for (Tuple tuple : results) {
+            Integer month = tuple.get(0, Integer.class);
+            Integer amount = tuple.get(1, Integer.class);
+            BigDecimal total = amount != null ? BigDecimal.valueOf(amount) : BigDecimal.ZERO;
+            monthlyResults.get(month - 1).setTotalPrice(total);
+        }
+
+        return monthlyResults;
     }
 }

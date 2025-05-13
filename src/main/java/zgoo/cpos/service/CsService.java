@@ -304,14 +304,19 @@ public class CsService {
             StationOpStatusDto dto = this.csRepository.getStationOpStatusCount(levelPath, isSuperAdmin);
             log.info("[getStationOpStatusCount] dto >> {}", dto.toString());
             Long total = dto.getOpStopCount() + dto.getOpTestCount() + dto.getOperatingCount();
-            dto.setOpTestPer((double) dto.getOpTestCount() / total * 100);
-            dto.setOpStopPer((double) dto.getOpStopCount() / total * 100);
-            dto.setOperatingPer((double) dto.getOperatingCount() / total * 100);
+            dto.setOpTestPer(formattedDouble((double)dto.getOpTestCount()/total*100));
+            dto.setOpStopPer(formattedDouble((double)dto.getOpStopCount()/total*100));
+            dto.setOperatingPer(formattedDouble((double)dto.getOperatingCount()/total*100));
             return dto;
         } catch (Exception e) {
             log.error("[getStationOpStatusCount] error: {}", e.getMessage());
             return null;
         }
+    }
+
+    private double formattedDouble(double percentage) {
+        String formatted = String.format("%.2f", percentage);
+        return Double.parseDouble(formatted);
     }
 
     public List<StationSearchDto> searchStationByOption(String searchOp, String searchContent, String userId) {
