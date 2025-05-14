@@ -26,6 +26,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import zgoo.cpos.domain.charger.QCpInfo;
 import zgoo.cpos.domain.company.QCompany;
+import zgoo.cpos.domain.company.QCompanyRelationInfo;
 import zgoo.cpos.domain.cs.QCsInfo;
 import zgoo.cpos.domain.history.QChargingHist;
 import zgoo.cpos.domain.payment.PgTrxRecon;
@@ -33,6 +34,7 @@ import zgoo.cpos.domain.payment.QChargerPaymentInfo;
 import zgoo.cpos.domain.payment.QPgTrxRecon;
 import zgoo.cpos.dto.payment.ChgPaymentInfoDto;
 import zgoo.cpos.dto.payment.ChgPaymentSummaryDto;
+import zgoo.cpos.util.QueryUtils;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -41,10 +43,11 @@ public class ChargerPaymentInfoRepositoryCustomImpl implements ChargerPaymentInf
 
     @Override
     public Page<ChgPaymentInfoDto> findChgPaymentInfo(String startMonthSearch, String endMonthSearch, String searchOp,
-            String searchContent, Long companyId, Pageable pageable) {
+            String searchContent, Long companyId, Pageable pageable, String levelPath, boolean isSuperAdmin) {
 
         QChargerPaymentInfo chgPaymentInfo = QChargerPaymentInfo.chargerPaymentInfo;
         QCompany company = QCompany.company;
+        QCompanyRelationInfo relation = QCompanyRelationInfo.companyRelationInfo;
         QCpInfo cpInfo = QCpInfo.cpInfo;
         QCsInfo csInfo = QCsInfo.csInfo;
         QChargingHist chargingHist = QChargingHist.chargingHist;
@@ -77,6 +80,10 @@ public class ChargerPaymentInfoRepositoryCustomImpl implements ChargerPaymentInf
         }
 
         BooleanBuilder builder = new BooleanBuilder();
+
+        if (!isSuperAdmin && levelPath != null && !levelPath.isEmpty()) {
+            builder.and(QueryUtils.hasCompanyLevelAccess(relation, levelPath));
+        }
 
         if (actualStartMonth != null && !actualStartMonth.isEmpty()) {
             try {
@@ -119,12 +126,11 @@ public class ChargerPaymentInfoRepositoryCustomImpl implements ChargerPaymentInf
                 if (endYearMonth.getYear() == currentDate.getYear() &&
                         endYearMonth.getMonthValue() == currentDate.getMonthValue()) {
 
-                    // 전일 날짜의 끝으로 설정 (어제 23:59:59)
-                    toDateTime = LocalDate.now().minusDays(1).atTime(23, 59, 59);
+                    // // 전일 날짜의 끝으로 설정 (어제 23:59:59) - real
+                    // toDateTime = LocalDate.now().minusDays(1).atTime(23, 59, 59);
 
-                    // // 오늘 날짜의 끝으로 설정 (오늘 23:59:59) - test
-                    // toDateTime = LocalDate.now()
-                    // .atTime(23, 59, 59);
+                    // 오늘 날짜의 끝으로 설정 (오늘 23:59:59) - test
+                    toDateTime = LocalDate.now().atTime(23, 59, 59);
 
                     log.info("Current month detected. Setting end date to yesterday: {}", toDateTime);
                 } else {
@@ -195,6 +201,7 @@ public class ChargerPaymentInfoRepositoryCustomImpl implements ChargerPaymentInf
                     .leftJoin(cpInfo).on(chgPaymentInfo.chargerId.eq(cpInfo.id))
                     .leftJoin(csInfo).on(cpInfo.stationId.eq(csInfo))
                     .leftJoin(company).on(csInfo.company.eq(company))
+                    .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
                     .leftJoin(chargingHist).on(chgPaymentInfo.transactionId.eq(chargingHist.transactionId))
                     .where(builder)
                     .orderBy(chgPaymentInfo.timestamp.desc())
@@ -221,6 +228,7 @@ public class ChargerPaymentInfoRepositoryCustomImpl implements ChargerPaymentInf
                     .leftJoin(cpInfo).on(chgPaymentInfo.chargerId.eq(cpInfo.id))
                     .leftJoin(csInfo).on(cpInfo.stationId.eq(csInfo))
                     .leftJoin(company).on(csInfo.company.eq(company))
+                    .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
                     .leftJoin(chargingHist).on(chgPaymentInfo.transactionId.eq(chargingHist.transactionId))
                     .where(builder)
                     .orderBy(chgPaymentInfo.timestamp.desc())
@@ -252,6 +260,7 @@ public class ChargerPaymentInfoRepositoryCustomImpl implements ChargerPaymentInf
                     .leftJoin(cpInfo).on(chgPaymentInfo.chargerId.eq(cpInfo.id))
                     .leftJoin(csInfo).on(cpInfo.stationId.eq(csInfo))
                     .leftJoin(company).on(csInfo.company.eq(company))
+                    .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
                     .where(builder)
                     .fetchOne();
 
@@ -586,6 +595,7 @@ public class ChargerPaymentInfoRepositoryCustomImpl implements ChargerPaymentInf
                 .leftJoin(cpInfo).on(chgPaymentInfo.chargerId.eq(cpInfo.id))
                 .leftJoin(csInfo).on(cpInfo.stationId.eq(csInfo))
                 .leftJoin(company).on(csInfo.company.eq(company))
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
                 .where(builder)
                 .fetchOne();
 
@@ -707,9 +717,10 @@ public class ChargerPaymentInfoRepositoryCustomImpl implements ChargerPaymentInf
 
     @Override
     public ChgPaymentSummaryDto calculatePaymentSummary(String startMonthSearch, String endMonthSearch, String searchOp,
-            String searchContent, Long companyId) {
+            String searchContent, Long companyId, String levelPath, boolean isSuperAdmin) {
         QChargerPaymentInfo chgPaymentInfo = QChargerPaymentInfo.chargerPaymentInfo;
         QCompany company = QCompany.company;
+        QCompanyRelationInfo relation = QCompanyRelationInfo.companyRelationInfo;
         QCpInfo cpInfo = QCpInfo.cpInfo;
         QCsInfo csInfo = QCsInfo.csInfo;
         QChargingHist chargingHist = QChargingHist.chargingHist;
@@ -737,6 +748,10 @@ public class ChargerPaymentInfoRepositoryCustomImpl implements ChargerPaymentInf
 
         // 검색 조건 빌더 생성 (기존 findChgPaymentInfo 메서드와 동일한 로직)
         BooleanBuilder builder = new BooleanBuilder();
+
+        if (!isSuperAdmin && levelPath != null && !levelPath.isEmpty()) {
+            builder.and(relation.levelPath.containsIgnoreCase(levelPath));
+        }
 
         // 시작 날짜 조건
         if (actualStartMonth != null && !actualStartMonth.isEmpty()) {
@@ -770,8 +785,11 @@ public class ChargerPaymentInfoRepositoryCustomImpl implements ChargerPaymentInf
 
                 if (endYearMonth.getYear() == currentDate.getYear() &&
                         endYearMonth.getMonthValue() == currentDate.getMonthValue()) {
-                    // 현재 날짜의 전일 23:59:59로 설정
-                    toDateTime = LocalDate.now().minusDays(1).atTime(23, 59, 59);
+                    // // 현재 날짜의 전일 23:59:59로 설정
+                    // toDateTime = LocalDate.now().minusDays(1).atTime(23, 59, 59);
+
+                    // 오늘 날짜의 끝으로 설정 (오늘 23:59:59) - test
+                    toDateTime = LocalDate.now().atTime(23, 59, 59);
                 } else {
                     toDateTime = endYearMonth.atEndOfMonth().atTime(23, 59, 59);
                 }
@@ -815,6 +833,7 @@ public class ChargerPaymentInfoRepositoryCustomImpl implements ChargerPaymentInf
                 .leftJoin(cpInfo).on(chgPaymentInfo.chargerId.eq(cpInfo.id))
                 .leftJoin(csInfo).on(cpInfo.stationId.eq(csInfo))
                 .leftJoin(company).on(csInfo.company.eq(company))
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
                 .where(builder)
                 .fetchOne();
 
@@ -825,6 +844,7 @@ public class ChargerPaymentInfoRepositoryCustomImpl implements ChargerPaymentInf
                 .leftJoin(cpInfo).on(chgPaymentInfo.chargerId.eq(cpInfo.id))
                 .leftJoin(csInfo).on(cpInfo.stationId.eq(csInfo))
                 .leftJoin(company).on(csInfo.company.eq(company))
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
                 .where(builder)
                 .fetchOne();
 
@@ -835,6 +855,7 @@ public class ChargerPaymentInfoRepositoryCustomImpl implements ChargerPaymentInf
                 .leftJoin(cpInfo).on(chgPaymentInfo.chargerId.eq(cpInfo.id))
                 .leftJoin(csInfo).on(cpInfo.stationId.eq(csInfo))
                 .leftJoin(company).on(csInfo.company.eq(company))
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
                 .where(builder)
                 .fetchOne();
 
@@ -846,6 +867,7 @@ public class ChargerPaymentInfoRepositoryCustomImpl implements ChargerPaymentInf
                 .leftJoin(cpInfo).on(chgPaymentInfo.chargerId.eq(cpInfo.id))
                 .leftJoin(csInfo).on(cpInfo.stationId.eq(csInfo))
                 .leftJoin(company).on(csInfo.company.eq(company))
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
                 .where(builder)
                 .fetch();
 
@@ -890,7 +912,7 @@ public class ChargerPaymentInfoRepositoryCustomImpl implements ChargerPaymentInf
         return ChgPaymentSummaryDto.builder()
                 .totalChgPrice(totalChgPrice != null ? totalChgPrice : 0)
                 .totalCancelCost(totalCancelCost != null ? totalCancelCost : 0)
-                .totalRealCost(totalRealCost)
+                .totalRealCost(totalRealCost != null ? totalRealCost : 0)
                 .totalPgAppAmount(totalPgAppAmount)
                 .totalPgCancelAmount(totalPgCancelAmount)
                 .totalPgPaymentAmount(totalPgPaymentAmount)
@@ -902,13 +924,14 @@ public class ChargerPaymentInfoRepositoryCustomImpl implements ChargerPaymentInf
      */
     @Override
     public List<ChgPaymentInfoDto> findAllChgPaymentInfoListWithoutPagination(String startMonthSearch,
-            String endMonthSearch, String searchOp, String searchContent, Long companyId) {
+            String endMonthSearch, String searchOp, String searchContent, Long companyId, String levelPath,
+            boolean isSuperAdmin) {
         // 페이징 없이 모든 데이터를 가져오기 위해 임시 Pageable 객체 생성
         Pageable unpaged = Pageable.unpaged();
 
         // 기존 페이징 메서드를 활용하여 데이터 조회
         Page<ChgPaymentInfoDto> page = findChgPaymentInfo(startMonthSearch, endMonthSearch,
-                searchOp, searchContent, companyId, unpaged);
+                searchOp, searchContent, companyId, unpaged, levelPath, isSuperAdmin);
 
         // Page 객체에서 List 추출하여 반환
         return page.getContent();

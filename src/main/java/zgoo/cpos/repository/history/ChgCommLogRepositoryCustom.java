@@ -6,8 +6,8 @@ import org.springframework.data.domain.Pageable;
 import zgoo.cpos.dto.history.ChgCommlogDto;
 
 public interface ChgCommLogRepositoryCustom {
-    Page<ChgCommlogDto> findAllChgCommlog(Pageable pageable);
+    Page<ChgCommlogDto> findAllChgCommlog(Pageable pageable, String levelPath, boolean isSuperAdmin);
 
     Page<ChgCommlogDto> findChgCommlog(String searchOp, String searchContent, String recvFrom,
-            String recvTo, Pageable pageable);
+            String recvTo, Pageable pageable, String levelPath, boolean isSuperAdmin);
 }

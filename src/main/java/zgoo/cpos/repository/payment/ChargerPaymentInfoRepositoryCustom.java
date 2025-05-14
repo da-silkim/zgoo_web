@@ -9,14 +9,16 @@ import zgoo.cpos.dto.payment.ChgPaymentInfoDto;
 import zgoo.cpos.dto.payment.ChgPaymentSummaryDto;
 
 public interface ChargerPaymentInfoRepositoryCustom {
-    Page<ChgPaymentInfoDto> findChgPaymentInfo(String startMonthSearch, String endMonthSearch, String searchOp,
-            String searchContent, Long companyId, Pageable pageable);
+        Page<ChgPaymentInfoDto> findChgPaymentInfo(String startMonthSearch, String endMonthSearch, String searchOp,
+                        String searchContent, Long companyId, Pageable pageable, String levelPath,
+                        boolean isSuperAdmin);
 
-    // 합계 조회 메서드 추가
-    ChgPaymentSummaryDto calculatePaymentSummary(String startMonthSearch, String endMonthSearch, String searchOp,
-            String searchContent, Long companyId);
+        // 합계 조회 메서드 추가
+        ChgPaymentSummaryDto calculatePaymentSummary(String startMonthSearch, String endMonthSearch, String searchOp,
+                        String searchContent, Long companyId, String levelPath, boolean isSuperAdmin);
 
-    // 충전기 결제이력 엑셀 다운로드
-    List<ChgPaymentInfoDto> findAllChgPaymentInfoListWithoutPagination(String startMonthSearch,
-            String endMonthSearch, String searchOp, String searchContent, Long companyId);
+        // 충전기 결제이력 엑셀 다운로드
+        List<ChgPaymentInfoDto> findAllChgPaymentInfoListWithoutPagination(String startMonthSearch,
+                        String endMonthSearch, String searchOp, String searchContent, Long companyId, String levelPath,
+                        boolean isSuperAdmin);
 }

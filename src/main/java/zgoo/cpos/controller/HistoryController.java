@@ -1,6 +1,7 @@
 package zgoo.cpos.controller;
 
 import java.io.IOException;
+import java.security.Principal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -44,7 +45,7 @@ public class HistoryController {
             @RequestParam(required = false, value = "chgStartTimeTo") String chgStartTimeTo,
             @RequestParam(required = false, value = "opSearch") String opSearch,
             @RequestParam(required = false, value = "contentSearch") String contentSearch,
-            HttpServletResponse response) {
+            HttpServletResponse response, Principal principal) {
 
         log.info(
                 "=== Excel download request: companyId={}, chgStartTimeFrom={}, chgStartTimeTo={}, opSearch={}, contentSearch={} ===",
@@ -55,7 +56,7 @@ public class HistoryController {
             List<ChargingHistDto> chargingHistList = chargingHistService
                     .findAllChargingHistListWithoutPagination(companyIdSearch, chgStartTimeFrom, chgStartTimeTo,
                             opSearch,
-                            contentSearch);
+                            contentSearch, principal.getName());
 
             log.info("=== Total records found: {} ===", chargingHistList.size());
 

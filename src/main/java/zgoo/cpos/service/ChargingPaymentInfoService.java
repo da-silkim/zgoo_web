@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import zgoo.cpos.dto.payment.ChgPaymentInfoDto;
 import zgoo.cpos.dto.payment.ChgPaymentSummaryDto;
+import zgoo.cpos.repository.company.CompanyRepository;
 import zgoo.cpos.repository.payment.ChargerPaymentInfoRepository;
 
 @Service
@@ -21,17 +22,28 @@ import zgoo.cpos.repository.payment.ChargerPaymentInfoRepository;
 public class ChargingPaymentInfoService {
 
     private final ChargerPaymentInfoRepository chargerPaymentInfoRepository;
+    private final CompanyRepository companyRepository;
+    private final ComService comService;
 
     /*
      * paging - 충전이력 조회 with 검색조건
      */
     public Page<ChgPaymentInfoDto> findChgPaymentInfo(String startMonthSearch, String endMonthSearch, String searchOp,
-            String searchContent, Long companyId, int page, int size) {
+            String searchContent, Long companyId, int page, int size, String userId) {
         Pageable pageable = PageRequest.of(page, size);
         try {
+            boolean isSuperAdmin = comService.checkSuperAdmin(userId);
+            Long loginUserCompanyId = comService.getLoginUserCompanyId(userId);
+            String levelPath = companyRepository.findLevelPathByCompanyId(loginUserCompanyId);
+            log.info("== levelPath : {}", levelPath);
+            if (levelPath == null) {
+                // 관계정보가 없을경우 빈 리스트 전달
+                return Page.empty(pageable);
+            }
+
             Page<ChgPaymentInfoDto> chgPaymentInfoList = chargerPaymentInfoRepository.findChgPaymentInfo(
                     startMonthSearch,
-                    endMonthSearch, searchOp, searchContent, companyId, pageable);
+                    endMonthSearch, searchOp, searchContent, companyId, pageable, levelPath, isSuperAdmin);
             return chgPaymentInfoList;
         } catch (DataAccessException dae) {
             log.error("Database error occurred while fetching charging history: {}", dae.getMessage(), dae);
@@ -46,11 +58,27 @@ public class ChargingPaymentInfoService {
      * 충전기 결제금액 합계 조회
      */
     public ChgPaymentSummaryDto calculatePaymentSummary(
-            String startMonthSearch, String endMonthSearch, String searchOp, String searchContent, Long companyId) {
+            String startMonthSearch, String endMonthSearch, String searchOp, String searchContent, Long companyId,
+            String userId) {
 
-        // 리포지토리의 집계 쿼리 메서드 호출
-        return chargerPaymentInfoRepository.calculatePaymentSummary(
-                startMonthSearch, endMonthSearch, searchOp, searchContent, companyId);
+        try {
+            boolean isSuperAdmin = comService.checkSuperAdmin(userId);
+            Long loginUserCompanyId = comService.getLoginUserCompanyId(userId);
+            String levelPath = companyRepository.findLevelPathByCompanyId(loginUserCompanyId);
+            log.info("== levelPath : {}", levelPath);
+            if (levelPath == null) {
+                // 관계정보가 없을경우 빈 리스트 전달
+                return null;
+            }
+
+            // 리포지토리의 집계 쿼리 메서드 호출
+            return chargerPaymentInfoRepository.calculatePaymentSummary(
+                    startMonthSearch, endMonthSearch, searchOp, searchContent, companyId, levelPath, isSuperAdmin);
+        } catch (Exception e) {
+            log.error("Error occurred while calculating payment summary: {}", e.getMessage(), e);
+            return null;
+        }
+
     }
 
     /**
@@ -58,12 +86,28 @@ public class ChargingPaymentInfoService {
      */
     @Transactional(readOnly = true)
     public List<ChgPaymentInfoDto> findAllChgPaymentInfoListWithoutPagination(String startMonthSearch,
-            String endMonthSearch, String searchOp, String searchContent, Long companyId) {
+            String endMonthSearch, String searchOp, String searchContent, Long companyId, String userId) {
         log.info(
                 "=== Finding all charging payment info list: companyId={}, startFrom={}, startTo={}, searchOp={}, searchContent={} ===",
                 companyId, startMonthSearch, endMonthSearch, searchOp, searchContent);
 
-        return chargerPaymentInfoRepository.findAllChgPaymentInfoListWithoutPagination(startMonthSearch, endMonthSearch,
-                searchOp, searchContent, companyId);
+        try {
+
+            boolean isSuperAdmin = comService.checkSuperAdmin(userId);
+            Long loginUserCompanyId = comService.getLoginUserCompanyId(userId);
+            String levelPath = companyRepository.findLevelPathByCompanyId(loginUserCompanyId);
+            log.info("== levelPath : {}", levelPath);
+            if (levelPath == null) {
+                // 관계정보가 없을경우 빈 리스트 전달
+                return null;
+            }
+
+            return chargerPaymentInfoRepository.findAllChgPaymentInfoListWithoutPagination(startMonthSearch,
+                    endMonthSearch, searchOp, searchContent, companyId, levelPath, isSuperAdmin);
+        } catch (Exception e) {
+            log.error("Error occurred while finding all charging payment info list: {}", e.getMessage(), e);
+            return null;
+        }
+
     }
 }

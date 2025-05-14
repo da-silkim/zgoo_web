@@ -14,21 +14,28 @@ import zgoo.cpos.dto.statistics.UsageDto.UsageBaseDto;
 import zgoo.cpos.dto.statistics.UsageDto.UsageLineChartBaseDto;
 
 public interface ChargingHistRepositoryCustom {
-    Page<ChargingHistDto> findAllChargingHist(Pageable pageable);
+        Page<ChargingHistDto> findAllChargingHist(Pageable pageable, String levelPath, boolean isSuperAdmin);
 
-    Page<ChargingHistDto> findChargingHist(Long companyId, String startTimeFrom, String startTimeTo, String searchOp,
-            String searchContent, Pageable pageable);
+        Page<ChargingHistDto> findChargingHist(Long companyId, String startTimeFrom, String startTimeTo,
+                        String searchOp,
+                        String searchContent, Pageable pageable, String levelPath, boolean isSuperAdmin);
 
-    List<ChargingHistDto> findAllChargingHistListWithoutPagination(Long companyId, String startTimeFrom,
-            String startTimeTo, String searchOp, String searchContent);
+        List<ChargingHistDto> findAllChargingHistListWithoutPagination(Long companyId, String startTimeFrom,
+                        String startTimeTo, String searchOp, String searchContent, String levelPath,
+                        boolean isSuperAdmin);
 
-    TotalkwBaseDto searchYearChargeAmount(Long companyId, String searchOp, String searchContent, Integer year);
+        TotalkwBaseDto searchYearChargeAmount(Long companyId, String searchOp, String searchContent, Integer year,
+                        String levelPath, boolean isSuperAdmin);
 
-    List<TotalkwLineChartBaseDto> searchMonthlyChargeAmount(Long companyId, String searchOp, String searchContent, Integer year, String cpType);
+        List<TotalkwLineChartBaseDto> searchMonthlyChargeAmount(Long companyId, String searchOp, String searchContent,
+                        Integer year, String cpType, String levelPath, boolean isSuperAdmin);
 
-    UsageBaseDto searchYearUsage(Long companyId, String searchOp, String searchContent, Integer year);
+        UsageBaseDto searchYearUsage(Long companyId, String searchOp, String searchContent, Integer year,
+                        String levelPath, boolean isSuperAdmin);
 
-    List<UsageLineChartBaseDto> searchMonthlyUsage(Long companyId, String searchOp, String searchContent, Integer year, String cpType);
+        List<UsageLineChartBaseDto> searchMonthlyUsage(Long companyId, String searchOp, String searchContent,
+                        Integer year, String cpType, String levelPath, boolean isSuperAdmin);
 
-    TotalkwDashboardDto findChargingHistByPeriod(LocalDateTime startDate, LocalDateTime endDate);
+        TotalkwDashboardDto findChargingHistByPeriod(LocalDateTime startDate, LocalDateTime endDate,
+                        String levelPath, boolean isSuperAdmin);
 }
