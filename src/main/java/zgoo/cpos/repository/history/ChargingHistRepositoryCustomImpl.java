@@ -23,6 +23,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import zgoo.cpos.domain.charger.QCpInfo;
 import zgoo.cpos.domain.code.QCommonCode;
+import zgoo.cpos.domain.company.QCompany;
+import zgoo.cpos.domain.company.QCompanyRelationInfo;
 import zgoo.cpos.domain.cp.QCpModel;
 import zgoo.cpos.domain.cs.QCsInfo;
 import zgoo.cpos.domain.history.QChargingHist;
@@ -33,6 +35,7 @@ import zgoo.cpos.dto.statistics.TotalkwDto.TotalkwDashboardDto;
 import zgoo.cpos.dto.statistics.TotalkwDto.TotalkwLineChartBaseDto;
 import zgoo.cpos.dto.statistics.UsageDto.UsageBaseDto;
 import zgoo.cpos.dto.statistics.UsageDto.UsageLineChartBaseDto;
+import zgoo.cpos.util.QueryUtils;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -44,11 +47,19 @@ public class ChargingHistRepositoryCustomImpl implements ChargingHistRepositoryC
     QCsInfo csInfo = QCsInfo.csInfo;
     QMember member = QMember.member;
     QCpModel model = QCpModel.cpModel;
+    QCompany company = QCompany.company;
+    QCompanyRelationInfo relation = QCompanyRelationInfo.companyRelationInfo;
     QCommonCode cpTypeName = new QCommonCode("cpType");
     QCommonCode memberTypeName = new QCommonCode("bizType");
 
     @Override
-    public Page<ChargingHistDto> findAllChargingHist(Pageable pageable) {
+    public Page<ChargingHistDto> findAllChargingHist(Pageable pageable, String levelPath, boolean isSuperAdmin) {
+        BooleanBuilder builder = new BooleanBuilder();
+
+        if (!isSuperAdmin && levelPath != null && !levelPath.isEmpty()) {
+            builder.and(QueryUtils.hasCompanyLevelAccess(relation, levelPath));
+        }
+
         List<ChargingHistDto> chargingHistList = queryFactory.select(Projections.fields(ChargingHistDto.class,
                 csInfo.company.companyName.as("companyName"),
                 csInfo.stationName.as("stationName"),
@@ -75,10 +86,13 @@ public class ChargingHistRepositoryCustomImpl implements ChargingHistRepositoryC
                 .from(hist)
                 .leftJoin(cpInfo).on(hist.chargerID.eq(cpInfo.id))
                 .leftJoin(csInfo).on(cpInfo.stationId.eq(csInfo))
+                .leftJoin(company).on(csInfo.company.id.eq(company.id))
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
                 .leftJoin(model).on(cpInfo.modelCode.eq(model.modelCode))
                 .leftJoin(cpTypeName).on(model.cpType.eq(cpTypeName.commonCode))
                 .leftJoin(member).on(hist.idTag.eq(member.idTag))
                 .leftJoin(memberTypeName).on(member.bizType.eq(memberTypeName.commonCode))
+                .where(builder)
                 .orderBy(hist.startTime.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -93,10 +107,13 @@ public class ChargingHistRepositoryCustomImpl implements ChargingHistRepositoryC
                 .from(hist)
                 .leftJoin(cpInfo).on(hist.chargerID.eq(cpInfo.id))
                 .leftJoin(csInfo).on(cpInfo.stationId.eq(csInfo))
+                .leftJoin(company).on(csInfo.company.id.eq(company.id))
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
                 .leftJoin(model).on(cpInfo.modelCode.eq(model.modelCode))
                 .leftJoin(cpTypeName).on(model.cpType.eq(cpTypeName.commonCode))
                 .leftJoin(member).on(hist.idTag.eq(member.idTag))
                 .leftJoin(memberTypeName).on(member.bizType.eq(memberTypeName.commonCode))
+                .where(builder)
                 .fetchOne();
 
         log.info("===ChargingHist Total Count: {}", totalCount);
@@ -106,13 +123,17 @@ public class ChargingHistRepositoryCustomImpl implements ChargingHistRepositoryC
 
     @Override
     public Page<ChargingHistDto> findChargingHist(Long companyId, String startTimeFrom, String startTimeTo,
-            String searchOp, String searchContent, Pageable pageable) {
+            String searchOp, String searchContent, Pageable pageable, String levelPath, boolean isSuperAdmin) {
 
         log.info(
                 "=== >> findChargingHist with search condition: companyId: {}, startTimeFrom: {}, startTimeTo: {}, searchOp: {}, searchContent: {}",
                 companyId, startTimeFrom, startTimeTo, searchOp, searchContent);
 
         BooleanBuilder builder = new BooleanBuilder();
+
+        if (!isSuperAdmin && levelPath != null && !levelPath.isEmpty()) {
+            builder.and(QueryUtils.hasCompanyLevelAccess(relation, levelPath));
+        }
 
         if (companyId != null) {
             builder.and(csInfo.company.id.eq(companyId));
@@ -189,6 +210,8 @@ public class ChargingHistRepositoryCustomImpl implements ChargingHistRepositoryC
                 .from(hist)
                 .leftJoin(cpInfo).on(hist.chargerID.eq(cpInfo.id))
                 .leftJoin(csInfo).on(cpInfo.stationId.eq(csInfo))
+                .leftJoin(company).on(csInfo.company.id.eq(company.id))
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
                 .leftJoin(model).on(cpInfo.modelCode.eq(model.modelCode))
                 .leftJoin(cpTypeName).on(model.cpType.eq(cpTypeName.commonCode))
                 .leftJoin(member).on(hist.idTag.eq(member.idTag))
@@ -208,6 +231,8 @@ public class ChargingHistRepositoryCustomImpl implements ChargingHistRepositoryC
                 .from(hist)
                 .leftJoin(cpInfo).on(hist.chargerID.eq(cpInfo.id))
                 .leftJoin(csInfo).on(cpInfo.stationId.eq(csInfo))
+                .leftJoin(company).on(csInfo.company.id.eq(company.id))
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
                 .leftJoin(model).on(cpInfo.modelCode.eq(model.modelCode))
                 .leftJoin(cpTypeName).on(model.cpType.eq(cpTypeName.commonCode))
                 .leftJoin(member).on(hist.idTag.eq(member.idTag))
@@ -222,12 +247,16 @@ public class ChargingHistRepositoryCustomImpl implements ChargingHistRepositoryC
 
     @Override
     public List<ChargingHistDto> findAllChargingHistListWithoutPagination(Long companyId, String startTimeFrom,
-            String startTimeTo, String searchOp, String searchContent) {
+            String startTimeTo, String searchOp, String searchContent, String levelPath, boolean isSuperAdmin) {
         log.info(
                 "=== >> exceldownload: companyId: {}, startTimeFrom: {}, startTimeTo: {}, searchOp: {}, searchContent: {}",
                 companyId, startTimeFrom, startTimeTo, searchOp, searchContent);
 
         BooleanBuilder builder = new BooleanBuilder();
+
+        if (!isSuperAdmin && levelPath != null && !levelPath.isEmpty()) {
+            builder.and(QueryUtils.hasCompanyLevelAccess(relation, levelPath));
+        }
 
         if (companyId != null) {
             builder.and(csInfo.company.id.eq(companyId));
@@ -304,6 +333,8 @@ public class ChargingHistRepositoryCustomImpl implements ChargingHistRepositoryC
                 .from(hist)
                 .leftJoin(cpInfo).on(hist.chargerID.eq(cpInfo.id))
                 .leftJoin(csInfo).on(cpInfo.stationId.eq(csInfo))
+                .leftJoin(company).on(csInfo.company.id.eq(company.id))
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
                 .leftJoin(model).on(cpInfo.modelCode.eq(model.modelCode))
                 .leftJoin(cpTypeName).on(model.cpType.eq(cpTypeName.commonCode))
                 .leftJoin(member).on(hist.idTag.eq(member.idTag))
@@ -314,8 +345,13 @@ public class ChargingHistRepositoryCustomImpl implements ChargingHistRepositoryC
     }
 
     @Override
-    public TotalkwBaseDto searchYearChargeAmount(Long companyId, String searchOp, String searchContent, Integer year) {
+    public TotalkwBaseDto searchYearChargeAmount(Long companyId, String searchOp, String searchContent, Integer year,
+            String levelPath, boolean isSuperAdmin) {
         BooleanBuilder builder = new BooleanBuilder();
+
+        if (!isSuperAdmin && levelPath != null && !levelPath.isEmpty()) {
+            builder.and(QueryUtils.hasCompanyLevelAccess(relation, levelPath));
+        }
 
         if (companyId != null) {
             builder.and(csInfo.company.id.eq(companyId));
@@ -359,6 +395,8 @@ public class ChargingHistRepositoryCustomImpl implements ChargingHistRepositoryC
                 .from(hist)
                 .leftJoin(cpInfo).on(hist.chargerID.eq(cpInfo.id))
                 .leftJoin(csInfo).on(csInfo.eq(cpInfo.stationId))
+                .leftJoin(company).on(csInfo.company.id.eq(company.id))
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
                 .leftJoin(model).on(cpInfo.modelCode.eq(model.modelCode))
                 .where(builder)
                 .fetchOne();
@@ -369,8 +407,12 @@ public class ChargingHistRepositoryCustomImpl implements ChargingHistRepositoryC
 
     @Override
     public List<TotalkwLineChartBaseDto> searchMonthlyChargeAmount(Long companyId, String searchOp,
-            String searchContent, Integer year, String cpType) {
+            String searchContent, Integer year, String cpType, String levelPath, boolean isSuperAdmin) {
         BooleanBuilder builder = new BooleanBuilder();
+
+        if (!isSuperAdmin && levelPath != null && !levelPath.isEmpty()) {
+            builder.and(QueryUtils.hasCompanyLevelAccess(relation, levelPath));
+        }
 
         if (companyId != null) {
             builder.and(csInfo.company.id.eq(companyId));
@@ -407,6 +449,8 @@ public class ChargingHistRepositoryCustomImpl implements ChargingHistRepositoryC
                 .from(hist)
                 .leftJoin(cpInfo).on(hist.chargerID.eq(cpInfo.id))
                 .leftJoin(csInfo).on(csInfo.eq(cpInfo.stationId))
+                .leftJoin(company).on(csInfo.company.id.eq(company.id))
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
                 .leftJoin(model).on(cpInfo.modelCode.eq(model.modelCode))
                 .where(builder)
                 .groupBy(Expressions.numberTemplate(Integer.class, "MONTH({0})", hist.startTime))
@@ -422,8 +466,13 @@ public class ChargingHistRepositoryCustomImpl implements ChargingHistRepositoryC
     }
 
     @Override
-    public UsageBaseDto searchYearUsage(Long companyId, String searchOp, String searchContent, Integer year) {
+    public UsageBaseDto searchYearUsage(Long companyId, String searchOp, String searchContent, Integer year,
+            String levelPath, boolean isSuperAdmin) {
         BooleanBuilder builder = new BooleanBuilder();
+
+        if (!isSuperAdmin && levelPath != null && !levelPath.isEmpty()) {
+            builder.and(QueryUtils.hasCompanyLevelAccess(relation, levelPath));
+        }
 
         if (companyId != null) {
             builder.and(csInfo.company.id.eq(companyId));
@@ -456,6 +505,8 @@ public class ChargingHistRepositoryCustomImpl implements ChargingHistRepositoryC
                 .from(hist)
                 .leftJoin(cpInfo).on(hist.chargerID.eq(cpInfo.id))
                 .leftJoin(csInfo).on(csInfo.eq(cpInfo.stationId))
+                .leftJoin(company).on(csInfo.company.id.eq(company.id))
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
                 .leftJoin(model).on(cpInfo.modelCode.eq(model.modelCode))
                 .where(builder)
                 .fetchOne();
@@ -466,8 +517,12 @@ public class ChargingHistRepositoryCustomImpl implements ChargingHistRepositoryC
 
     @Override
     public List<UsageLineChartBaseDto> searchMonthlyUsage(Long companyId, String searchOp, String searchContent,
-            Integer year, String cpType) {
+            Integer year, String cpType, String levelPath, boolean isSuperAdmin) {
         BooleanBuilder builder = new BooleanBuilder();
+
+        if (!isSuperAdmin && levelPath != null && !levelPath.isEmpty()) {
+            builder.and(QueryUtils.hasCompanyLevelAccess(relation, levelPath));
+        }
 
         if (companyId != null) {
             builder.and(csInfo.company.id.eq(companyId));
@@ -503,6 +558,8 @@ public class ChargingHistRepositoryCustomImpl implements ChargingHistRepositoryC
                 .from(hist)
                 .leftJoin(cpInfo).on(hist.chargerID.eq(cpInfo.id))
                 .leftJoin(csInfo).on(csInfo.eq(cpInfo.stationId))
+                .leftJoin(company).on(csInfo.company.id.eq(company.id))
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
                 .leftJoin(model).on(cpInfo.modelCode.eq(model.modelCode))
                 .where(builder)
                 .groupBy(Expressions.numberTemplate(Integer.class, "MONTH({0})", hist.startTime))
@@ -518,7 +575,16 @@ public class ChargingHistRepositoryCustomImpl implements ChargingHistRepositoryC
     }
 
     @Override
-    public TotalkwDashboardDto findChargingHistByPeriod(LocalDateTime startDate, LocalDateTime endDate) {
+    public TotalkwDashboardDto findChargingHistByPeriod(LocalDateTime startDate, LocalDateTime endDate,
+            String levelPath, boolean isSuperAdmin) {
+        BooleanBuilder builder = new BooleanBuilder();
+
+        builder.and(hist.startTime.between(startDate, endDate));
+
+        if (!isSuperAdmin && levelPath != null && !levelPath.isEmpty()) {
+            builder.and(QueryUtils.hasCompanyLevelAccess(relation, levelPath));
+        }
+
         TotalkwDashboardDto dto = queryFactory.select(Projections.fields(TotalkwDashboardDto.class,
                 Expressions.numberTemplate(BigDecimal.class,
                         "SUM(CASE WHEN {0} = 'SPEEDLOW' THEN {1} ELSE 0 END)", model.cpType, hist.chargeAmount)
@@ -531,8 +597,11 @@ public class ChargingHistRepositoryCustomImpl implements ChargingHistRepositoryC
                         .as("despnChgAmount")))
                 .from(hist)
                 .leftJoin(cpInfo).on(hist.chargerID.eq(cpInfo.id))
+                .leftJoin(csInfo).on(csInfo.eq(cpInfo.stationId))
+                .leftJoin(company).on(csInfo.company.id.eq(company.id))
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
                 .leftJoin(model).on(cpInfo.modelCode.eq(model.modelCode))
-                .where(hist.startTime.between(startDate, endDate))
+                .where(builder)
                 .fetchOne();
 
         if (dto == null) {
@@ -541,11 +610,14 @@ public class ChargingHistRepositoryCustomImpl implements ChargingHistRepositoryC
             dto.setLowChgAmount(BigDecimal.ZERO);
             dto.setDespnChgAmount(BigDecimal.ZERO);
         } else {
-            if (dto.getFastChgAmount() == null) dto.setFastChgAmount(BigDecimal.ZERO);
-            if (dto.getLowChgAmount() == null) dto.setLowChgAmount(BigDecimal.ZERO);
-            if (dto.getDespnChgAmount() == null) dto.setDespnChgAmount(BigDecimal.ZERO);
+            if (dto.getFastChgAmount() == null)
+                dto.setFastChgAmount(BigDecimal.ZERO);
+            if (dto.getLowChgAmount() == null)
+                dto.setLowChgAmount(BigDecimal.ZERO);
+            if (dto.getDespnChgAmount() == null)
+                dto.setDespnChgAmount(BigDecimal.ZERO);
         }
-        
+
         return dto;
     }
 }

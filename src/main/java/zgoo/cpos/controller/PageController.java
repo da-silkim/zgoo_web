@@ -144,7 +144,7 @@ public class PageController {
             StationOpStatusDto opStatus = this.csService.getStationOpStatusCount(principal.getName());
             model.addAttribute("opStatus", opStatus);
 
-            TotalkwDashboardDto chgStatus = this.chargingHistService.findChargingHistByPeriod();
+            TotalkwDashboardDto chgStatus = this.chargingHistService.findChargingHistByPeriod(principal.getName());
             model.addAttribute("chgStatus", chgStatus);
 
             List<ChargerCountBySidoDto> chargerCountList = this.chargerService
@@ -1311,11 +1311,11 @@ public class PageController {
             if (companyId == null && searchOp == null && searchContent == null && searchFrom == null
                     && searchTo == null) {
                 log.info("=== >> Start find all charging history");
-                chargingHistList = this.chargingHistService.findAllChargingHist(page, size);
+                chargingHistList = this.chargingHistService.findAllChargingHist(page, size, principal.getName());
             } else {
                 log.info("=== >> Start find charging history with search condition");
                 chargingHistList = this.chargingHistService.findChargingHist(companyId, searchFrom, searchTo,
-                        searchOp, searchContent, page, size);
+                        searchOp, searchContent, page, size, principal.getName());
             }
 
             // page 처리
@@ -1424,11 +1424,11 @@ public class PageController {
             Page<ChgCommlogDto> chgCommlogList;
             if (searchOp == null && searchContent == null && recvFrom == null && recvTo == null) {
                 log.info("=== >> Start find all communication history");
-                chgCommlogList = this.chgCommlogService.findAllChgCommlog(page, size);
+                chgCommlogList = this.chgCommlogService.findAllChgCommlog(page, size, principal.getName());
             } else {
                 log.info("=== >> Start find communication history with search condition");
                 chgCommlogList = this.chgCommlogService.findChgCommlog(searchOp, searchContent, recvFrom, recvTo,
-                        page, size);
+                        page, size, principal.getName());
             }
 
             // page 처리
@@ -1531,11 +1531,11 @@ public class PageController {
 
             // 충전 결제 정보 조회 (페이징)
             Page<ChgPaymentInfoDto> chgPaymentList = this.chargingPaymentInfoService.findChgPaymentInfo(
-                    searchFrom, searchTo, searchOp, searchContent, companyId, page, size);
+                    searchFrom, searchTo, searchOp, searchContent, companyId, page, size, principal.getName());
 
             // 전체 데이터에 대한 합계 계산 (집계 쿼리 사용)
             ChgPaymentSummaryDto summary = this.chargingPaymentInfoService.calculatePaymentSummary(
-                    searchFrom, searchTo, searchOp, searchContent, companyId);
+                    searchFrom, searchTo, searchOp, searchContent, companyId, principal.getName());
 
             // 모델에 합계 정보 추가
             model.addAttribute("summary", summary);
@@ -1688,12 +1688,13 @@ public class PageController {
             model.addAttribute("selectedContentSearch", searchContent);
             model.addAttribute("selectedYear", year);
 
-            UsageBarDto usage = this.statisticsService.searchYearUsage(companyId, searchOp, searchContent, year);
+            UsageBarDto usage = this.statisticsService.searchYearUsage(companyId, searchOp, searchContent, year,
+                    principal.getName());
             model.addAttribute("usage", usage);
             log.info("usage >> {}", usage.toString());
 
             UsageLineChartDto lineChart = this.statisticsService.searchMonthlyUsage(companyId, searchOp, searchContent,
-                    year);
+                    year, principal.getName());
             model.addAttribute("lineChart", lineChart);
             log.info("lineChart >> {}", lineChart.toString());
 
@@ -1732,12 +1733,12 @@ public class PageController {
             model.addAttribute("selectedYear", year);
 
             TotalkwBarDto totalkw = this.statisticsService.searchYearChargeAmount(companyId, searchOp, searchContent,
-                    year);
+                    year, principal.getName());
             model.addAttribute("totalkw", totalkw);
             log.info("totalkw >> {}", totalkw.toString());
 
             TotalkwLineChartDto lineChart = this.statisticsService.searchMonthlyChargeAmount(companyId, searchOp,
-                    searchContent, year);
+                    searchContent, year, principal.getName());
             model.addAttribute("lineChart", lineChart);
             log.info("lineChart >> {}", lineChart.toString());
 

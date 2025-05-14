@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.YearMonth;
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.dao.DataAccessException;
@@ -17,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import zgoo.cpos.dto.history.ChargingHistDto;
 import zgoo.cpos.dto.statistics.TotalkwDto.TotalkwDashboardDto;
+import zgoo.cpos.repository.company.CompanyRepository;
 import zgoo.cpos.repository.history.ChargingHistRepository;
 
 @Service
@@ -24,14 +26,27 @@ import zgoo.cpos.repository.history.ChargingHistRepository;
 @Slf4j
 public class ChargingHistService {
     private final ChargingHistRepository chargingHistRepository;
+    private final CompanyRepository companyRepository;
+    private final ComService comService;
 
     /*
      * paging - 전체 충전이력 조회
      */
-    public Page<ChargingHistDto> findAllChargingHist(int page, int size) {
+    public Page<ChargingHistDto> findAllChargingHist(int page, int size, String loginUserId) {
         Pageable pageable = PageRequest.of(page, size);
         try {
-            Page<ChargingHistDto> chargingHistList = chargingHistRepository.findAllChargingHist(pageable);
+
+            boolean isSuperAdmin = comService.checkSuperAdmin(loginUserId);
+            Long loginUserCompanyId = comService.getLoginUserCompanyId(loginUserId);
+            String levelPath = companyRepository.findLevelPathByCompanyId(loginUserCompanyId);
+            log.info("== levelPath : {}", levelPath);
+            if (levelPath == null) {
+                // 관계정보가 없을경우 빈 리스트 전달
+                return Page.empty(pageable);
+            }
+
+            Page<ChargingHistDto> chargingHistList = chargingHistRepository.findAllChargingHist(pageable, levelPath,
+                    isSuperAdmin);
             log.info("===ChargingHistory_PageInfo >> totalPages:{}, totalCount:{}", chargingHistList.getTotalPages(),
                     chargingHistList.getTotalElements());
 
@@ -57,12 +72,22 @@ public class ChargingHistService {
      * paging - 충전이력 조회 with 검색조건
      */
     public Page<ChargingHistDto> findChargingHist(Long companyId, String chgStartTimeFrom, String chgStartTimeTo,
-            String searchOp, String searchContent, int page, int size) {
+            String searchOp, String searchContent, int page, int size, String loginUserId) {
         Pageable pageable = PageRequest.of(page, size);
         try {
+
+            boolean isSuperAdmin = comService.checkSuperAdmin(loginUserId);
+            Long loginUserCompanyId = comService.getLoginUserCompanyId(loginUserId);
+            String levelPath = companyRepository.findLevelPathByCompanyId(loginUserCompanyId);
+            log.info("== levelPath : {}", levelPath);
+            if (levelPath == null) {
+                // 관계정보가 없을경우 빈 리스트 전달
+                return Page.empty(pageable);
+            }
+
             Page<ChargingHistDto> chargingHistList = chargingHistRepository.findChargingHist(companyId,
                     chgStartTimeFrom,
-                    chgStartTimeTo, searchOp, searchContent, pageable);
+                    chgStartTimeTo, searchOp, searchContent, pageable, levelPath, isSuperAdmin);
             return chargingHistList;
         } catch (DataAccessException dae) {
             log.error("Database error occurred while fetching charging history: {}", dae.getMessage(), dae);
@@ -78,20 +103,47 @@ public class ChargingHistService {
      */
     @Transactional(readOnly = true)
     public List<ChargingHistDto> findAllChargingHistListWithoutPagination(Long companyId, String chgStartTimeFrom,
-            String chgStartTimeTo, String searchOp, String searchContent) {
+            String chgStartTimeTo, String searchOp, String searchContent, String loginUserId) {
         log.info(
                 "=== Finding all charging history list: companyId={}, startFrom={}, startTo={}, searchOp={}, searchContent={} ===",
                 companyId, chgStartTimeFrom, chgStartTimeTo, searchOp, searchContent);
 
-        return chargingHistRepository.findAllChargingHistListWithoutPagination(companyId, chgStartTimeFrom,
-                chgStartTimeTo, searchOp, searchContent);
+        try {
+
+            boolean isSuperAdmin = comService.checkSuperAdmin(loginUserId);
+            Long loginUserCompanyId = comService.getLoginUserCompanyId(loginUserId);
+            String levelPath = companyRepository.findLevelPathByCompanyId(loginUserCompanyId);
+            log.info("== levelPath : {}", levelPath);
+            if (levelPath == null) {
+                // 관계정보가 없을경우 빈 리스트 전달
+                return Collections.emptyList();
+            }
+
+            return chargingHistRepository.findAllChargingHistListWithoutPagination(companyId, chgStartTimeFrom,
+                    chgStartTimeTo, searchOp, searchContent, levelPath, isSuperAdmin);
+
+        } catch (Exception e) {
+            log.error("Error occurred while fetching charging history: {}", e.getMessage(), e);
+            return Collections.emptyList();
+        }
+
     }
 
     /*
      * 대시보드 - 충전현황
      */
-    public TotalkwDashboardDto findChargingHistByPeriod() {
+    public TotalkwDashboardDto findChargingHistByPeriod(String loginUserId) {
         try {
+            boolean isSuperAdmin = comService.checkSuperAdmin(loginUserId);
+            Long loginUserCompanyId = comService.getLoginUserCompanyId(loginUserId);
+            String levelPath = companyRepository.findLevelPathByCompanyId(loginUserCompanyId);
+            log.info("== levelPath : {}", levelPath);
+            if (levelPath == null) {
+                TotalkwDashboardDto defaultDto = createEmptyTotalkwDashboardDto();
+                defaultDto.setPeriod(LocalDate.now().withDayOfMonth(1) + " ~ " + LocalDate.now());
+                return defaultDto;
+            }
+
             LocalDate today = LocalDate.now(); // 오늘 날짜
             LocalDate firstDayOfCurrentMonth = today.withDayOfMonth(1); // 당월의 첫 번째 날
             YearMonth lastMonth = YearMonth.from(today).minusMonths(1); // 전월 YearMonth
@@ -105,10 +157,10 @@ public class ChargingHistService {
 
             TotalkwDashboardDto lastMonthDto = chargingHistRepository.findChargingHistByPeriod(
                     firstDayOfLastMonth.atStartOfDay(),
-                    endDate.atTime(23, 59, 59));
+                    endDate.atTime(23, 59, 59), levelPath, isSuperAdmin);
             TotalkwDashboardDto currMonthDto = chargingHistRepository.findChargingHistByPeriod(
                     firstDayOfCurrentMonth.atStartOfDay(),
-                    today.atTime(23, 59, 59));
+                    today.atTime(23, 59, 59), levelPath, isSuperAdmin);
 
             // 데이터가 없는 경우 기본값 설정
             if (lastMonthDto == null) {

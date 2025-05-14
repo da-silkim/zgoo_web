@@ -15,16 +15,32 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import zgoo.cpos.domain.charger.QCpInfo;
+import zgoo.cpos.domain.company.QCompany;
+import zgoo.cpos.domain.company.QCompanyRelationInfo;
+import zgoo.cpos.domain.cs.QCsInfo;
 import zgoo.cpos.domain.history.QChgCommLog;
 import zgoo.cpos.dto.history.ChgCommlogDto;
+import zgoo.cpos.util.QueryUtils;
 
 @RequiredArgsConstructor
 @Slf4j
 public class ChgCommLogRepositoryCustomImpl implements ChgCommLogRepositoryCustom {
     private final JPAQueryFactory queryFactory;
+    private final QCpInfo cpInfo = QCpInfo.cpInfo;
+    private final QCompany company = QCompany.company;
+    private final QCsInfo csInfo = QCsInfo.csInfo;
+    private final QCompanyRelationInfo relation = QCompanyRelationInfo.companyRelationInfo;
 
     @Override
-    public Page<ChgCommlogDto> findAllChgCommlog(Pageable pageable) {
+    public Page<ChgCommlogDto> findAllChgCommlog(Pageable pageable, String levelPath, boolean isSuperAdmin) {
+
+        BooleanBuilder builder = new BooleanBuilder();
+
+        if (!isSuperAdmin && levelPath != null && !levelPath.isEmpty()) {
+            builder.and(QueryUtils.hasCompanyLevelAccess(relation, levelPath));
+        }
+
         QChgCommLog commLog = QChgCommLog.chgCommLog;
         List<ChgCommlogDto> logList = queryFactory.select(Projections.fields(ChgCommlogDto.class,
                 commLog.chargerId.as("chargerId"),
@@ -37,6 +53,11 @@ public class ChgCommLogRepositoryCustomImpl implements ChgCommLogRepositoryCusto
                 commLog.sendUuid.as("sendUuid"),
                 commLog.sendPayload.as("sendPayload")))
                 .from(commLog)
+                .innerJoin(cpInfo).on(commLog.chargerId.eq(cpInfo.id))
+                .innerJoin(csInfo).on(cpInfo.stationId.eq(csInfo))
+                .innerJoin(company).on(csInfo.company.id.eq(company.id))
+                .innerJoin(relation).on(company.companyRelationInfo.eq(relation))
+                .where(builder)
                 .orderBy(commLog.recvTime.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -44,6 +65,11 @@ public class ChgCommLogRepositoryCustomImpl implements ChgCommLogRepositoryCusto
 
         long totalCount = queryFactory.select(commLog.count())
                 .from(commLog)
+                .innerJoin(cpInfo).on(commLog.chargerId.eq(cpInfo.id))
+                .innerJoin(csInfo).on(cpInfo.stationId.eq(csInfo))
+                .innerJoin(company).on(csInfo.company.id.eq(company.id))
+                .innerJoin(relation).on(company.companyRelationInfo.eq(relation))
+                .where(builder)
                 .fetchOne();
 
         log.info("===ChgCommlog Total Count: {}", totalCount);
@@ -53,13 +79,17 @@ public class ChgCommLogRepositoryCustomImpl implements ChgCommLogRepositoryCusto
 
     @Override
     public Page<ChgCommlogDto> findChgCommlog(String searchOp, String searchContent, String recvFrom, String recvTo,
-            Pageable pageable) {
+            Pageable pageable, String levelPath, boolean isSuperAdmin) {
         QChgCommLog commLog = QChgCommLog.chgCommLog;
         log.info(
                 "=== >> findChgCommlog with search condition: searchOp: {}, searchContent: {}, recvFrom: {}, recvTo: {}",
                 searchOp, searchContent, recvFrom, recvTo);
 
         BooleanBuilder builder = new BooleanBuilder();
+
+        if (!isSuperAdmin && levelPath != null && !levelPath.isEmpty()) {
+            builder.and(QueryUtils.hasCompanyLevelAccess(relation, levelPath));
+        }
 
         if (recvFrom != null && !recvFrom.isEmpty()) {
             // 날짜 형식 확인 및 변환
@@ -116,6 +146,10 @@ public class ChgCommLogRepositoryCustomImpl implements ChgCommLogRepositoryCusto
                 commLog.sendUuid.as("sendUuid"),
                 commLog.sendPayload.as("sendPayload")))
                 .from(commLog)
+                .innerJoin(cpInfo).on(commLog.chargerId.eq(cpInfo.id))
+                .innerJoin(csInfo).on(cpInfo.stationId.eq(csInfo))
+                .innerJoin(company).on(csInfo.company.id.eq(company.id))
+                .innerJoin(relation).on(company.companyRelationInfo.eq(relation))
                 .where(builder)
                 .orderBy(commLog.recvTime.desc())
                 .offset(pageable.getOffset())
@@ -124,6 +158,10 @@ public class ChgCommLogRepositoryCustomImpl implements ChgCommLogRepositoryCusto
 
         long totalCount = queryFactory.select(commLog.count())
                 .from(commLog)
+                .innerJoin(cpInfo).on(commLog.chargerId.eq(cpInfo.id))
+                .innerJoin(csInfo).on(cpInfo.stationId.eq(csInfo))
+                .innerJoin(company).on(csInfo.company.id.eq(company.id))
+                .innerJoin(relation).on(company.companyRelationInfo.eq(relation))
                 .where(builder)
                 .fetchOne();
 

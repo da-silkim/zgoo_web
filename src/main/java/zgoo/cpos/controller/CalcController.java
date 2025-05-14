@@ -1,6 +1,7 @@
 package zgoo.cpos.controller;
 
 import java.io.IOException;
+import java.security.Principal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -45,7 +46,7 @@ public class CalcController {
             @RequestParam(required = false, value = "endMonthSearch") String reqEndMonth,
             @RequestParam(required = false, value = "opSearch") String reqOp,
             @RequestParam(required = false, value = "contentSearch") String reqContent,
-            HttpServletResponse response) {
+            HttpServletResponse response, Principal principal) {
 
         log.info(
                 "=== Excel download request: companyId={}, startMonthSearch={}, endMonthSearch={}, searchOp={}, searchContent={} ===",
@@ -55,13 +56,13 @@ public class CalcController {
             // 검색 조건에 따른 데이터 조회
             List<ChgPaymentInfoDto> chgPaymentInfoList = chargingPaymentInfoService
                     .findAllChgPaymentInfoListWithoutPagination(reqStartMonth, reqEndMonth, reqOp,
-                            reqContent, reqCompanyId);
+                            reqContent, reqCompanyId, principal.getName());
 
             log.info("=== Total records found: {} ===", chgPaymentInfoList.size());
 
             // 합계 데이터 조회
             ChgPaymentSummaryDto summary = chargingPaymentInfoService.calculatePaymentSummary(
-                    reqStartMonth, reqEndMonth, reqOp, reqContent, reqCompanyId);
+                    reqStartMonth, reqEndMonth, reqOp, reqContent, reqCompanyId, principal.getName());
 
             // 충전량 합계 계산
             double totalChgAmount = chgPaymentInfoList.stream()
