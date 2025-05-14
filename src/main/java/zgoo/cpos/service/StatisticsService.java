@@ -75,11 +75,12 @@ public class StatisticsService {
                     .build();
         } catch (Exception e) {
             log.error("[searchYearChargeAmount] error: {}", e.getMessage());
-            return TotalkwBarDto.builder()
-                    .preYear(getDefaultDto(yearSearch - 1))
-                    .curYear(getDefaultDto(yearSearch))
-                    .build();
         }
+
+        return TotalkwBarDto.builder()
+                .preYear(getDefaultDto(yearSearch - 1))
+                .curYear(getDefaultDto(yearSearch))
+                .build();
     }
 
     private TotalkwBaseDto getDefaultDto(Integer year) {
@@ -167,11 +168,12 @@ public class StatisticsService {
                     .build();
         } catch (Exception e) {
             log.error("[searchYearUsage] error: {}", e.getMessage());
-            return UsageBarDto.builder()
-                    .preYear(getDefaultUsageDto(yearSearch - 1))
-                    .curYear(getDefaultUsageDto(yearSearch))
-                    .build();
         }
+
+        return UsageBarDto.builder()
+                .preYear(getDefaultUsageDto(yearSearch - 1))
+                .curYear(getDefaultUsageDto(yearSearch))
+                .build();
     }
 
     private UsageBaseDto getDefaultUsageDto(Integer year) {
