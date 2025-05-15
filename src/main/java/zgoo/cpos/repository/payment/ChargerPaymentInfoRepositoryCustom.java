@@ -1,6 +1,7 @@
 package zgoo.cpos.repository.payment;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -9,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import zgoo.cpos.dto.payment.ChgPaymentInfoDto;
 import zgoo.cpos.dto.payment.ChgPaymentSummaryDto;
 import zgoo.cpos.dto.statistics.PurchaseSalesDto.PurchaseSalesLineChartBaseDto;
+import zgoo.cpos.dto.statistics.PurchaseSalesDto.SalesDashboardDto;
 
 public interface ChargerPaymentInfoRepositoryCustom {
     Page<ChgPaymentInfoDto> findChgPaymentInfo(String startMonthSearch, String endMonthSearch, String searchOp,
@@ -31,4 +33,7 @@ public interface ChargerPaymentInfoRepositoryCustom {
     List<PurchaseSalesLineChartBaseDto> searchMonthlyTotalSales(Long companyId, String searchOp,
             String searchContent,
             Integer year);
+
+    // 매출현황(대시보드)
+    SalesDashboardDto findPaymentByPeriod(LocalDateTime startDate, LocalDateTime endDate);
 }

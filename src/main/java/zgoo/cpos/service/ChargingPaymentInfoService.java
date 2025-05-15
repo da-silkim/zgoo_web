@@ -1,5 +1,9 @@
 package zgoo.cpos.service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.List;
 
 import org.springframework.dao.DataAccessException;
@@ -13,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import zgoo.cpos.dto.payment.ChgPaymentInfoDto;
 import zgoo.cpos.dto.payment.ChgPaymentSummaryDto;
+import zgoo.cpos.dto.statistics.PurchaseSalesDto.SalesDashboardDto;
 import zgoo.cpos.repository.company.CompanyRepository;
 import zgoo.cpos.repository.payment.ChargerPaymentInfoRepository;
 
@@ -109,5 +114,100 @@ public class ChargingPaymentInfoService {
             return null;
         }
 
+    }
+
+    /* *
+     * 매출현황(대시보드)
+     */
+    public SalesDashboardDto findPaymentByPeriod() {
+        try {
+            LocalDate today = LocalDate.now(); // 오늘 날짜
+            LocalDate firstDayOfCurrentMonth = today.withDayOfMonth(1); // 당월의 첫 번째 날
+            YearMonth lastMonth = YearMonth.from(today).minusMonths(1); // 전월 YearMonth
+            LocalDate sameDayLastMonth = today.minusMonths(1)
+                    .withDayOfMonth(Math.min(today.getDayOfMonth(), lastMonth.lengthOfMonth())); // 전월의 같은 일자
+            LocalDate firstDayOfLastMonth = lastMonth.atDay(1); // 전월의 첫 번째 날
+            LocalDate lastDayOfLastMonth = lastMonth.atEndOfMonth(); // 전월의 마지막 날
+
+            LocalDate endDate = today.getDayOfMonth() > lastDayOfLastMonth.getDayOfMonth() ? lastDayOfLastMonth
+                    : sameDayLastMonth;
+
+            SalesDashboardDto lastMonthDto = chargerPaymentInfoRepository.findPaymentByPeriod(
+                    firstDayOfLastMonth.atStartOfDay(),
+                    endDate.atTime(23, 59, 59));
+            SalesDashboardDto currMonthDto = chargerPaymentInfoRepository.findPaymentByPeriod(
+                    firstDayOfCurrentMonth.atStartOfDay(),
+                    today.atTime(23, 59, 59));
+
+            currMonthDto.setPeriod(firstDayOfCurrentMonth + " ~ " + today);
+
+            currMonthDto.setFastCheck(comparePaymentCheck(lastMonthDto.getFastSales(), currMonthDto.getFastSales(), "Fast"));
+            currMonthDto.setLowCheck(comparePaymentCheck(lastMonthDto.getLowSales(), currMonthDto.getLowSales(), "Low"));
+            currMonthDto.setDespnCheck(comparePaymentCheck(lastMonthDto.getDespnSales(), currMonthDto.getDespnSales(), "Despn"));
+
+            currMonthDto.setCompareFast(comparePayment(lastMonthDto.getFastSales(), currMonthDto.getFastSales()));
+            currMonthDto.setCompareLow(comparePayment(lastMonthDto.getLowSales(), currMonthDto.getLowSales()));
+            currMonthDto.setCompareDespn(comparePayment(lastMonthDto.getDespnSales(), currMonthDto.getDespnSales()));
+
+            log.info("lastMonthDto >> {}", lastMonthDto);
+            log.info("currMonthDto >> {}", currMonthDto);
+            return currMonthDto;
+        } catch (Exception e) {
+            log.error("[findPaymentByPeriod] error: {}", e.getMessage(), e);
+            return createEmptySalesDashboardDto();
+        }
+    }
+
+    /* *
+     * 빈 SalesDashboardDto 객체 생성
+     */
+    private SalesDashboardDto createEmptySalesDashboardDto() {
+        SalesDashboardDto dto = new SalesDashboardDto();
+        dto.setLowCheck(0);
+        dto.setFastCheck(0);
+        dto.setDespnCheck(0);
+        dto.setLowSales(BigDecimal.ZERO);
+        dto.setFastSales(BigDecimal.ZERO);
+        dto.setDespnSales(BigDecimal.ZERO);
+        dto.setCompareLow(BigDecimal.ZERO);
+        dto.setCompareFast(BigDecimal.ZERO);
+        dto.setCompareDespn(BigDecimal.ZERO);
+        dto.setPeriod(LocalDate.now().withDayOfMonth(1) + " ~ " + LocalDate.now());
+        return dto;
+    }
+
+    private int comparePaymentCheck(BigDecimal prev, BigDecimal curr, String label) {
+        if (prev == null)
+            prev = BigDecimal.ZERO;
+        if (curr == null)
+            curr = BigDecimal.ZERO;
+
+        int comparison = prev.compareTo(curr);
+        if (comparison > 0) {
+            log.info("전월의 {} 매출이 당월보다 큽니다.", label);
+            return -1;
+        } else if (comparison < 0) {
+            log.info("당월의 {} 매출이 전월보다 큽니다.", label);
+            return 1;
+        } else {
+            log.info("두 달의 {} 매출이 같습니다.", label);
+            return 0;
+        }
+    }
+
+    private BigDecimal comparePayment(BigDecimal prev, BigDecimal curr) {
+                if (prev == null)
+            prev = BigDecimal.ZERO;
+        if (curr == null)
+            curr = BigDecimal.ZERO;
+
+        int comparison = prev.compareTo(curr);
+        if (comparison > 0) {
+            return prev.subtract(curr).setScale(2, RoundingMode.HALF_UP);
+        } else if (comparison < 0) {
+            return curr.subtract(prev).setScale(2, RoundingMode.HALF_UP);
+        } else {
+            return BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP);
+        }
     }
 }
