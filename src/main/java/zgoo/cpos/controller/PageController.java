@@ -144,7 +144,7 @@ public class PageController {
 
             StationOpStatusDto opStatus = this.csService.getStationOpStatusCount(principal.getName());
             model.addAttribute("opStatus", opStatus);
-
+            
             SalesDashboardDto saleStatus = this.chargingPaymentInfoService.findPaymentByPeriod();
             model.addAttribute("saleStatus", saleStatus);
 
