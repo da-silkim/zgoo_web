@@ -29,6 +29,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import zgoo.cpos.domain.charger.QCpInfo;
 import zgoo.cpos.domain.company.QCompany;
+import zgoo.cpos.domain.cp.QCpModel;
 import zgoo.cpos.domain.cs.QCsInfo;
 import zgoo.cpos.domain.history.QChargingHist;
 import zgoo.cpos.domain.payment.PgTrxRecon;
@@ -37,6 +38,7 @@ import zgoo.cpos.domain.payment.QPgTrxRecon;
 import zgoo.cpos.dto.payment.ChgPaymentInfoDto;
 import zgoo.cpos.dto.payment.ChgPaymentSummaryDto;
 import zgoo.cpos.dto.statistics.PurchaseSalesDto.PurchaseSalesLineChartBaseDto;
+import zgoo.cpos.dto.statistics.PurchaseSalesDto.SalesDashboardDto;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -1096,5 +1098,96 @@ public class ChargerPaymentInfoRepositoryCustomImpl implements ChargerPaymentInf
             }
         }
         return monthlyResults;
+    }
+
+    @Override
+    public SalesDashboardDto findPaymentByPeriod(LocalDateTime startDate, LocalDateTime endDate) {
+        QChargerPaymentInfo chgPaymentInfo = QChargerPaymentInfo.chargerPaymentInfo;
+        QCompany company = QCompany.company;
+        QCpInfo cpInfo = QCpInfo.cpInfo;
+        QCsInfo csInfo = QCsInfo.csInfo;
+        QPgTrxRecon pgTrxRecon = QPgTrxRecon.pgTrxRecon;
+        QCpModel model = QCpModel.cpModel;
+
+        // 관제 결제 데이터의 TID 목록 추출
+        List<String> tids = queryFactory
+                .select(chgPaymentInfo.preTid)
+                .from(chgPaymentInfo)
+                .leftJoin(cpInfo).on(chgPaymentInfo.chargerId.eq(cpInfo.id))
+                .leftJoin(csInfo).on(cpInfo.stationId.eq(csInfo))
+                .leftJoin(company).on(csInfo.company.eq(company))
+                .where(chgPaymentInfo.timestamp.between(startDate, endDate))
+                .fetch();
+
+        /* 
+         * 결제금액 = 승인금액 (상태코드 0) - 취소금액 (상태코드 2)
+         * 상태코드 1은 승인금액과 취소금액 둘 다 변영되므로 제외
+         */
+        // 승인금액
+        SalesDashboardDto approved = queryFactory.select(Projections.fields(SalesDashboardDto.class,
+            Expressions.numberTemplate(BigDecimal.class,
+                    "SUM(CASE WHEN COALESCE({0}, '') = 'SPEEDLOW' THEN {1} ELSE 0 END)", model.cpType, pgTrxRecon.goodsAmt)
+                    .as("lowSales"),
+            Expressions.numberTemplate(BigDecimal.class,
+                    "SUM(CASE WHEN COALESCE({0}, '') = 'SPEEDFAST' THEN {1} ELSE 0 END)", model.cpType, pgTrxRecon.goodsAmt)
+                    .as("fastSales"),
+            Expressions.numberTemplate(BigDecimal.class,
+                    "SUM(CASE WHEN COALESCE({0}, '') = 'SPEEDDESPN' THEN {1} ELSE 0 END)", model.cpType, pgTrxRecon.goodsAmt)
+                    .as("despnSales")))
+            .from(pgTrxRecon)
+            .leftJoin(cpInfo).on(pgTrxRecon.goodsNm.eq(cpInfo.id))
+            .leftJoin(model).on(cpInfo.modelCode.eq(model.modelCode))
+            .where(pgTrxRecon.tid.in(tids).and(pgTrxRecon.stateCd.in("0")))
+            .fetchOne();
+
+        // 취소금액
+        SalesDashboardDto canceled = queryFactory.select(Projections.fields(SalesDashboardDto.class,
+            Expressions.numberTemplate(BigDecimal.class,
+                    "SUM(CASE WHEN COALESCE({0}, '') = 'SPEEDLOW' THEN {1} ELSE 0 END)", model.cpType, pgTrxRecon.goodsAmt)
+                    .as("lowSales"),
+            Expressions.numberTemplate(BigDecimal.class,
+                    "SUM(CASE WHEN COALESCE({0}, '') = 'SPEEDFAST' THEN {1} ELSE 0 END)", model.cpType, pgTrxRecon.goodsAmt)
+                    .as("fastSales"),
+            Expressions.numberTemplate(BigDecimal.class,
+                    "SUM(CASE WHEN COALESCE({0}, '') = 'SPEEDDESPN' THEN {1} ELSE 0 END)", model.cpType, pgTrxRecon.goodsAmt)
+                    .as("despnSales")))
+            .from(pgTrxRecon)
+            .leftJoin(cpInfo).on(pgTrxRecon.goodsNm.eq(cpInfo.id))
+            .leftJoin(model).on(cpInfo.modelCode.eq(model.modelCode))
+            .where(pgTrxRecon.tid.in(tids).and(pgTrxRecon.stateCd.in("2"))
+                    .or(pgTrxRecon.otid.in(tids).and(pgTrxRecon.stateCd.eq("2"))))
+            .fetchOne();
+
+        if (approved == null) {
+            approved = new SalesDashboardDto();
+            approved.setLowSales(BigDecimal.ZERO);
+            approved.setFastSales(BigDecimal.ZERO);
+            approved.setDespnSales(BigDecimal.ZERO);
+        } else {
+            if (approved.getLowSales() == null) approved.setLowSales(BigDecimal.ZERO);
+            if (approved.getFastSales() == null) approved.setFastSales(BigDecimal.ZERO);
+            if (approved.getDespnSales() == null) approved.setDespnSales(BigDecimal.ZERO);
+        }
+
+        if (canceled == null) {
+            canceled = new SalesDashboardDto();
+            canceled.setLowSales(BigDecimal.ZERO);
+            canceled.setFastSales(BigDecimal.ZERO);
+            canceled.setDespnSales(BigDecimal.ZERO);
+        } else {
+            if (canceled.getLowSales() == null) canceled.setLowSales(BigDecimal.ZERO);
+            if (canceled.getFastSales() == null) canceled.setFastSales(BigDecimal.ZERO);
+            if (canceled.getDespnSales() == null) canceled.setDespnSales(BigDecimal.ZERO);
+        }
+
+        log.info("approved >> {}", approved.toString());
+        log.info("canceled >> {}", canceled.toString());
+
+        SalesDashboardDto result = new SalesDashboardDto();
+        result.setLowSales(approved.getLowSales().subtract(canceled.getLowSales()));
+        result.setFastSales(approved.getFastSales().subtract(canceled.getFastSales()));
+        result.setDespnSales(approved.getDespnSales().subtract(canceled.getDespnSales()));
+        log.info("result >> {}", result.toString());
+        return result;
     }
 }

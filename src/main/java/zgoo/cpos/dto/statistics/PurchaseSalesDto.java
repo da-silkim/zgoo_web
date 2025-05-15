@@ -51,4 +51,21 @@ public class PurchaseSalesDto {
         private PurchaseSalesBaseDto curYear;
         private BigDecimal totalPrice;
     }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class SalesDashboardDto {
+        private Integer lowCheck;
+        private Integer fastCheck;
+        private Integer despnCheck;
+        private BigDecimal lowSales;
+        private BigDecimal fastSales;
+        private BigDecimal despnSales;
+        private BigDecimal compareLow;
+        private BigDecimal compareFast;
+        private BigDecimal compareDespn;
+        private String period;
+    } 
 }

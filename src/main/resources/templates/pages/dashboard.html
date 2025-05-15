@@ -25,21 +25,44 @@
                     <div class="card">
                         <div class="card-body">
                             <div class="card-title"><span class="card-title-bar"></span><span>매출 현황</span></div>
+                            <div class="dashboard-period">
+                                <i class="bi bi-clock-history me-1"></i>
+                                <span th:text="${saleStatus.period}"></span>
+                            </div>
                             <div class="sales-status">
                                 <div class="row">
                                     <div class="col-3">급속</div>
-                                    <div class="col-4 text-right price-format">1500000</div>
-                                    <div class="col-5 status-text font-color-brown">▲ 지난달 대비&nbsp;<span class="price-format">10000</span></div>
+                                    <div class="col-4 text-right" th:text="|${#numbers.formatDecimal(saleStatus.fastSales, 1, 'COMMA', 0, 'POINT')} 원|"></div>
+                                    <div class="col-5 status-text">
+                                        <span th:if="${saleStatus.fastCheck == 1}" class="font-color-brown"
+                                            th:text="|▲ 지난달 대비 ${#numbers.formatDecimal(saleStatus.compareFast, 1, 'COMMA', 0, 'POINT')} 원|"></span>
+                                        <span th:if="${saleStatus.fastCheck == -1}" class="font-color-blue"
+                                            th:text="|▼ 지난달 대비 ${#numbers.formatDecimal(saleStatus.compareFast, 1, 'COMMA', 0, 'POINT')} 원|"></span>
+                                        <span th:if="${saleStatus.fastCheck == 0}" th:text="|-|"></span>
+                                    </div>
                                 </div>
                                 <div class="row">
                                     <div class="col-3">완속</div>
-                                    <div class="col-4 text-right price-format">50000</div>
-                                    <div class="col-5 status-text font-color-blue">▼ 지난달 대비&nbsp;<span class="price-format">10000</span></div>
+                                    <div class="col-4 text-right" th:text="|${#numbers.formatDecimal(saleStatus.lowSales, 1, 'COMMA', 0, 'POINT')} 원|"></div>
+                                    <div class="col-5 status-text">
+                                        <span th:if="${saleStatus.lowCheck == 1}" class="font-color-brown"
+                                            th:text="|▲ 지난달 대비 ${#numbers.formatDecimal(saleStatus.compareLow, 1, 'COMMA', 0, 'POINT')} 원|"></span>
+                                        <span th:if="${saleStatus.lowCheck == -1}" class="font-color-blue"
+                                            th:text="|▼ 지난달 대비 ${#numbers.formatDecimal(saleStatus.compareLow, 1, 'COMMA', 0, 'POINT')} 원|"></span>
+                                        <span th:if="${saleStatus.lowCheck == 0}" th:text="|-|"></span>
+                                    </div>
                                 </div>
                                 <div class="row">
                                     <div class="col-3">디스펜서</div>
-                                    <div class="col-4 text-right price-format">50000</div>
-                                    <div class="col-5 status-text font-color-blue">▼ 지난달 대비&nbsp;<span class="price-format">10000</span></div>
+                                    <div class="col-4 text-right" th:text="|${#numbers.formatDecimal(saleStatus.despnSales, 1, 'COMMA', 0, 'POINT')} 원|"></div>
+                                    <div class="col-5 status-text">
+                                        <span th:if="${saleStatus.despnCheck == 1}" class="font-color-brown"
+                                            th:text="|▲ 지난달 대비 ${#numbers.formatDecimal(saleStatus.compareDespn, 1, 'COMMA', 0, 'POINT')} 원|"></span>
+                                        <span th:if="${saleStatus.despnCheck == -1}" class="font-color-blue"
+                                            th:text="|▼ 지난달 대비 ${#numbers.formatDecimal(saleStatus.compareDespn, 1, 'COMMA', 0, 'POINT')} 원|"></span>
+                                        <span th:if="${saleStatus.despnCheck == 0}" th:text="|-|"></span>
+                                    </div>
+
                                 </div>
                             </div>
                         </div>

@@ -59,6 +59,7 @@ import zgoo.cpos.dto.payment.ChgPaymentInfoDto;
 import zgoo.cpos.dto.payment.ChgPaymentSummaryDto;
 import zgoo.cpos.dto.statistics.PurchaseSalesDto.PurchaseSalesBarDto;
 import zgoo.cpos.dto.statistics.PurchaseSalesDto.PurchaseSalesLineChartDto;
+import zgoo.cpos.dto.statistics.PurchaseSalesDto.SalesDashboardDto;
 import zgoo.cpos.dto.statistics.TotalkwDto.TotalkwBarDto;
 import zgoo.cpos.dto.statistics.TotalkwDto.TotalkwDashboardDto;
 import zgoo.cpos.dto.statistics.TotalkwDto.TotalkwLineChartDto;
@@ -143,6 +144,9 @@ public class PageController {
 
             StationOpStatusDto opStatus = this.csService.getStationOpStatusCount(principal.getName());
             model.addAttribute("opStatus", opStatus);
+
+            SalesDashboardDto saleStatus = this.chargingPaymentInfoService.findPaymentByPeriod();
+            model.addAttribute("saleStatus", saleStatus);
 
             TotalkwDashboardDto chgStatus = this.chargingHistService.findChargingHistByPeriod();
             model.addAttribute("chgStatus", chgStatus);
