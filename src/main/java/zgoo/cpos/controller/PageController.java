@@ -45,6 +45,7 @@ import zgoo.cpos.dto.cs.CsInfoDto.CsInfoListDto;
 import zgoo.cpos.dto.cs.CsInfoDto.StationOpStatusDto;
 import zgoo.cpos.dto.history.ChargingHistDto;
 import zgoo.cpos.dto.history.ChgCommlogDto;
+import zgoo.cpos.dto.history.ErrorHistDto;
 import zgoo.cpos.dto.member.ConditionDto.ConditionCodeBaseDto;
 import zgoo.cpos.dto.member.ConditionDto.ConditionList;
 import zgoo.cpos.dto.member.MemberDto;
@@ -85,6 +86,7 @@ import zgoo.cpos.service.CpCurrentTxService;
 import zgoo.cpos.service.CpMaintainService;
 import zgoo.cpos.service.CpModelService;
 import zgoo.cpos.service.CsService;
+import zgoo.cpos.service.ErrorHistService;
 import zgoo.cpos.service.FaqService;
 import zgoo.cpos.service.MemberService;
 import zgoo.cpos.service.MenuAuthorityService;
@@ -126,6 +128,7 @@ public class PageController {
     private final ComService comService;
     private final ChargingPaymentInfoService chargingPaymentInfoService;
     private final PurchaseService purchaseService;
+    private final ErrorHistService errorHistService;
 
     /*
      * 대시보드
@@ -1462,21 +1465,63 @@ public class PageController {
      */
     @GetMapping("/history/error")
     public String showerrorhistory(
-            @RequestParam(value = "opSearch", required = false) String searchOp,
-            @RequestParam(value = "contentSearch", required = false) String searchContent,
-            @RequestParam(value = "startDate", required = false) LocalDate startDate,
-            @RequestParam(value = "endDate", required = false) LocalDate endDate,
+            @RequestParam(value = "companyIdSearch", required = false) Long reqCompanyId,
+            @RequestParam(value = "manfCodeSearch", required = false) String reqManfCd,
+            @RequestParam(value = "opSearch", required = false) String reqOpSearch,
+            @RequestParam(value = "contentSearch", required = false) String reqContentSearch,
+            @RequestParam(value = "chgStartTimeFrom", required = false) String reqStartDate,
+            @RequestParam(value = "chgStartTimeTo", required = false) String reqEndDate,
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "10") int size,
             Model model, Principal principal) {
         log.info("=== Error History Page ===");
+        log.info(
+                "== reqCompanyId: {}, reqManfCd: {}, reqOpSearch: {}, reqContentSearch: {}, reqStartDate: {}, reqEndDate: {}",
+                reqCompanyId, reqManfCd, reqOpSearch, reqContentSearch, reqStartDate, reqEndDate);
+        log.info("== page: {}, size: {}", page, size);
 
         try {
 
-            model.addAttribute("selectedOpSearch", searchOp);
-            model.addAttribute("selectedContentSearch", searchContent);
-            model.addAttribute("selectedStartDate", startDate);
-            model.addAttribute("selectedEndDate", endDate);
+            // 검색조건 옵션 저장
+            model.addAttribute("selectedCompanyId", reqCompanyId);
+            model.addAttribute("selectedManfCd", reqManfCd);
+            model.addAttribute("selectedOpSearch", reqOpSearch);
+            model.addAttribute("selectedContentSearch", reqContentSearch);
+            model.addAttribute("selectedTimeFrom", reqStartDate);
+            model.addAttribute("selectedTimeTo", reqEndDate);
+
+            // 에러 list 조회
+            Page<ErrorHistDto> errorHistList;
+            if (reqCompanyId == null && reqOpSearch == null && reqContentSearch == null && reqStartDate == null
+                    && reqEndDate == null) {
+                log.info("=== >> Start find all error history");
+                errorHistList = this.errorHistService.findAllErrorHist(page, size, principal.getName());
+            } else {
+                log.info("=== >> Start find error history with search condition");
+                errorHistList = this.errorHistService.findErrorHist(reqCompanyId, reqManfCd, reqStartDate, reqEndDate,
+                        reqOpSearch,
+                        reqContentSearch, page, size, principal.getName());
+            }
+
+            // Page처리
+            int totalpages = errorHistList.getTotalPages() == 0 ? 1 : errorHistList.getTotalPages();
+            int startNumber = page * size;
+            model.addAttribute("errorHistList", errorHistList.getContent());
+            model.addAttribute("size", String.valueOf(size));
+            model.addAttribute("currentPage", page);
+            model.addAttribute("totalPages", totalpages);
+            model.addAttribute("totalCount", errorHistList.getTotalElements());
+            model.addAttribute("startNumber", startNumber);
+            log.info("===ErrorHist_PageInfo >> totalPages:{}, totalCount:{}", totalpages,
+                    errorHistList.getTotalElements());
+
+            // 검색옵션 조회
+            List<CompanyListDto> companyList = this.companyService.findCompanyListAll(principal.getName());
+            model.addAttribute("companyList", companyList);
+
+            // 제조사 리스트
+            List<CommCdBaseDto> manfCd = codeService.commonCodeStringToNum("CGMANFCD");
+            model.addAttribute("manfCdList", manfCd);
 
             List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT"); // 그리드 row 수
             model.addAttribute("showListCnt", showListCnt);
@@ -1638,20 +1683,21 @@ public class PageController {
         log.info("=== Purchase and Sales Statistics Page ===");
         log.info("companyId: {}, opSearch: {}, contentSearch: {}, yearSearch: {}", companyId, searchOp, searchContent,
                 year);
-        
+
         try {
             model.addAttribute("selectedCompanyId", companyId);
             model.addAttribute("selectedOpSearch", searchOp);
             model.addAttribute("selectedContentSearch", searchContent);
             model.addAttribute("selectedYear", year);
 
-            PurchaseSalesBarDto pursales = this.statisticsService.searchYearPurchaseSales(companyId, searchOp, searchContent,
+            PurchaseSalesBarDto pursales = this.statisticsService.searchYearPurchaseSales(companyId, searchOp,
+                    searchContent,
                     year);
             model.addAttribute("pursales", pursales);
             log.info("pursales >> {}", pursales.toString());
 
             PurchaseSalesLineChartDto lineChart = this.statisticsService.searchMonthlyPurchaseSales(companyId, searchOp,
-                searchContent, year);
+                    searchContent, year);
             model.addAttribute("lineChart", lineChart);
             log.info("lineChart >> {}", lineChart.toString());
 
