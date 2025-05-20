@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -255,12 +256,8 @@ public class PurchaseRepositoryCustomImpl implements PurchaseRepositoryCustom {
                 .where(csInfo.id.eq(stationId))
                 .fetchOne();
 
-        // LocalDate today = LocalDate.now(); // 오늘 날짜
-        // LocalDate firstDayOfCurrentMonth = today.withDayOfMonth(1); // 당월의 첫 번째 날
-        // LocalDate ladtDayOfCurrentMonth = today.atEndOfMonth(); // 당월 마지막 날
-
         LocalDateTime startDate = LocalDate.now().withDayOfMonth(1).atStartOfDay();
-        LocalDateTime endDate = LocalDate.now().atTime(23, 59, 59);
+        LocalDateTime endDate = LocalDate.now().with(TemporalAdjusters.lastDayOfMonth()).atTime(23, 59, 59);
 
         // 관제 결제 데이터의 TID 목록 추출
         List<String> tids = queryFactory
@@ -292,7 +289,7 @@ public class PurchaseRepositoryCustomImpl implements PurchaseRepositoryCustom {
                 .select(pgTrxRecon.goodsAmt.sum())
                 .from(pgTrxRecon)
                 .where(pgTrxRecon.tid.in(tids).and(pgTrxRecon.stateCd.in("2"))
-                    .and(pgTrxRecon.otid.in(tids).and(pgTrxRecon.stateCd.eq("2"))))
+                    .or(pgTrxRecon.otid.in(tids).and(pgTrxRecon.stateCd.eq("2"))))
                 .fetchOne();
 
         if (canceled == null)
@@ -300,10 +297,16 @@ public class PurchaseRepositoryCustomImpl implements PurchaseRepositoryCustom {
 
         BigDecimal totalPrice = approved.subtract(canceled);
 
-        // totalPrice * rate * 0.01
+        /* 
+         * 단가, 공급가액
+         * totalPrice * rate * 0.01
+         */
         BigDecimal percentage = totalPrice.multiply(BigDecimal.valueOf(rate)).divide(BigDecimal.valueOf(100));
 
-        // vat = totalPrice * 0.1
+        /* 
+         * 부가세
+         * vat = totalPrice * 0.1
+         */
         BigDecimal vat = percentage.multiply(BigDecimal.valueOf(10).divide(BigDecimal.valueOf(100)));
 
         PurchaseAccountDto result = new PurchaseAccountDto();
