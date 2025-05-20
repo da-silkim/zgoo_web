@@ -1,39 +1,78 @@
 spring:
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
-    url: jdbc:mariadb://192.168.30.120:3306/zgoodb?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Seoul
-    username: zgoodb
-    password: zgoodb1q2w3e!!
+    url: jdbc:mariadb://192.168.30.120:3306/zgoodb_dev?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Seoul
+    username: zgoodb_dev
+    password: 1234
   thymeleaf:
     cache: false
     # prefix: classpath:/templates/
     # suffix: .html
+  hikari:
+    shutdown-timeout: 10000
 
 
   jpa:
     database-platform: org.hibernate.dialect.MySQLDialect
     open-in-view: false
-    show-sql: true
+    show-sql: false
     hibernate:
-      ddl-auto: validate
+      ddl-auto: update  # 애플리케이션 시작 시 스키마 새로 생성
     properties:
       hibernate:
         format_sql: true
-        # show_sql: true
+        show_sql: true
+    defer-datasource-initialization: false
   
   sql:
     init:
-      mode: always
+      mode: never  # SQL 초기화 스크립트 항상 실행
       platform: mariadb
       continue-on-error: true
       encoding: UTF-8
+      schema-locations: classpath:schema.sql
+      data-locations: classpath:data.sql
 
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+  mvc:
+    async:
+      request-timeout: 300000  # 5분 (밀리초)  
 
-logging.level:
-  org.hibernate.SQL: info
-  org.hibernate.type.descriptor.sql.BasicBinder: trace
-  org.hibernate.stat: info
-  org.springframework: WARN
+  devtools:
+    livereload:
+      enabled: true
+
+# server 설정은 최상위 레벨에 추가
+server:
+  port: 9080
+  tomcat:
+    max-http-form-post-size: 50MB
+    connection-timeout: 300000  # 5분 (밀리초)
+  servlet:
+    session:
+      timeout: 1800 # 30분 - 초 설정
+    context-path:
+
+# p6spy 설정
+decorator:
+  datasource:
+    p6spy:
+      enable-logging: true
+      multiline: true
+      logging: slf4j
+
+# 로그 설정
+logging:
+  level:
+    root: WARN
+    org.springframework: WARN
+    org.hibernate: WARN
+    p6spy: INFO  # p6spy 로그 레벨을 INFO로 설정
+    zgoo.cpos: INFO
+  
 
 
 # WEB - WAS Ajp 방화벽 (내장 톰캣 설정 시) - (짐작)
