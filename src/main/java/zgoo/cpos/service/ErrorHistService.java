@@ -1,5 +1,8 @@
 package zgoo.cpos.service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -78,6 +81,29 @@ public class ErrorHistService {
         } catch (Exception e) {
             log.error("Error occurred while fetching error history: {}", e.getMessage(), e);
             return Page.empty(pageable);
+        }
+    }
+
+    /* 
+     * 에러이력(대시보드)
+     */
+    public List<ErrorHistDto> findLatestErrorHist(String loginUserId) {
+        try {
+            boolean isSuperAdmin = comService.checkSuperAdmin(loginUserId);
+            Long loginUserCompanyId = comService.getLoginUserCompanyId(loginUserId);
+            String levelPath = companyRepository.findLevelPathByCompanyId(loginUserCompanyId);
+            log.info("== levelPath : {}", levelPath);
+            if (levelPath == null) {
+                // 관계정보가 없을경우 빈 리스트 전달
+                return new ArrayList<>();
+            }
+
+            List<ErrorHistDto> errorHistList = this.errorHistRepository.findLatestErrorHist(levelPath, isSuperAdmin);
+            log.info("[findLatestErrorHist] success");
+            return errorHistList;
+        } catch (Exception e) {
+            log.error("[findLatestErrorHist] error: {}", e.getMessage());
+            return new ArrayList<>();
         }
     }
 }

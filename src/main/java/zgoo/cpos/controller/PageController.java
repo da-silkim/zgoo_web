@@ -162,6 +162,9 @@ public class PageController {
                     principal.getName());
             model.addAttribute("facilityList", facilityList);
 
+            List<ErrorHistDto> errorHistList = this.errorHistService.findLatestErrorHist(principal.getName());
+            model.addAttribute("errorHistList", errorHistList);
+
             List<NoticeListDto> noticeList = this.noticeService.findLatestNoticeList(principal.getName());
             model.addAttribute("noticeList", noticeList);
         } catch (Exception e) {

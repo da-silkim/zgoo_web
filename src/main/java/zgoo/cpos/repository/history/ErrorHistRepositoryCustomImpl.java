@@ -194,4 +194,36 @@ public class ErrorHistRepositoryCustomImpl implements ErrorHistRepositoryCustom 
 
     }
 
+    @Override
+    public List<ErrorHistDto> findLatestErrorHist(String levelPath, boolean isSuperAdmin) {
+        QErrorHist errorHist = QErrorHist.errorHist;
+        QCompany company = QCompany.company;
+        QCpInfo cpInfo = QCpInfo.cpInfo;
+        QCpModel model = QCpModel.cpModel;
+        QCsInfo csInfo = QCsInfo.csInfo;
+        QCompanyRelationInfo relation = QCompanyRelationInfo.companyRelationInfo;
+        BooleanBuilder builder = new BooleanBuilder();
+
+        if (!isSuperAdmin && levelPath != null && !levelPath.isEmpty()) {
+            builder.and(QueryUtils.hasCompanyLevelAccess(relation, levelPath));
+        }
+
+        List<ErrorHistDto> errorHistList = queryFactory.select(Projections.fields(ErrorHistDto.class,
+                csInfo.stationName.as("stationName"),
+                errorHist.chargerId.as("chargerId"),
+                errorHist.connectorId.as("connectorId"),
+                errorHist.vendorErrorCode.as("errcd"),
+                errorHist.errorName.as("errName"),
+                errorHist.occurDate.as("occurDateTime")))
+                .from(errorHist)
+                .leftJoin(cpInfo).on(errorHist.chargerId.eq(cpInfo.id))
+                .leftJoin(model).on(cpInfo.modelCode.eq(model.modelCode))
+                .leftJoin(csInfo).on(cpInfo.stationId.eq(csInfo))
+                .leftJoin(company).on(csInfo.company.eq(company))
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
+                .orderBy(errorHist.occurDate.desc())
+                .limit(4)
+                .fetch();
+        return errorHistList;
+    }
 }

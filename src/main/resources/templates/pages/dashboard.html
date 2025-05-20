@@ -150,19 +150,29 @@
                             <span class="article-detail"><a th:href="@{/history/error}">더보기<i class="bi bi-plus-circle ms-1"></i></a>
                             </span>
                         </div>
-                        <div class="py-4 px-2">
+                        <div class="px-2">
                             <div class="table-responsive">
                                 <table class="table text-center error-status table-hover" style="min-width: 647px;">
                                     <thead>
                                         <tr class="table-border-top">
-                                            <th scope="col">충전소ID</th>
+                                            <th scope="col">충전소명</th>
                                             <th scope="col">충전기ID</th>
-                                            <th scope="col">장애코드</th>
-                                            <th scope="col">장애내용</th>
+                                            <th scope="col">커넥터ID</th>
+                                            <th scope="col">에러코드</th>
+                                            <th scope="col">에러명</th>
                                             <th scope="col">발생일시</th>
                                         </tr>
                                     </thead>
-                                    <tbody id="errorList"></tbody>
+                                    <tbody id="errorList">
+                                        <tr th:each="err : ${errorHistList}">
+                                            <td th:text="${err.stationName}"></td>
+                                            <td th:text="${err.chargerId}"></td>
+                                            <td th:text="${err.connectorId}"></td>
+                                            <td th:text="${err.errcd}"></td>
+                                            <td th:text="${err.errName}"></td>
+                                            <td th:text="${#temporals.format(err.occurDateTime, 'yyyy-MM-dd HH:mm:ss')}"></td>
+                                        </tr>
+                                    </tbody>
                                 </table>
                             </div>
                         </div>
