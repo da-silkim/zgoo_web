@@ -33,6 +33,7 @@ public interface PurchaseRepositoryCustom {
 
     // 계정과목 정보 조회
     PurchaseAccountDto searchAccountLand(String stationId);
+    PurchaseAccountDto searchAccountLandTypeRate(String stationId);
     PurchaseAccountDto searchAccountSafety(String stationId);
 
     // 매입 상세 조회

@@ -21,15 +21,18 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import zgoo.cpos.domain.calc.QPurchaseInfo;
+import zgoo.cpos.domain.charger.QCpInfo;
 import zgoo.cpos.domain.code.QCommonCode;
+import zgoo.cpos.domain.company.QCompany;
 import zgoo.cpos.domain.cs.QCsInfo;
 import zgoo.cpos.domain.cs.QCsLandInfo;
+import zgoo.cpos.domain.payment.QChargerPaymentInfo;
+import zgoo.cpos.domain.payment.QPgTrxRecon;
 import zgoo.cpos.dto.calc.PurchaseDto.PurchaseAccountDto;
 import zgoo.cpos.dto.calc.PurchaseDto.PurchaseDetailDto;
 import zgoo.cpos.dto.calc.PurchaseDto.PurchaseListDto;
 import zgoo.cpos.dto.calc.PurchaseDto.PurchaseRegDto;
 import zgoo.cpos.dto.statistics.PurchaseSalesDto.PurchaseSalesLineChartBaseDto;
-import zgoo.cpos.dto.statistics.PurchaseSalesDto.PurchaseSalesLineChartDto;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -37,8 +40,12 @@ public class PurchaseRepositoryCustomImpl implements PurchaseRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
     QCsInfo csInfo = QCsInfo.csInfo;
+    QCpInfo cpInfo = QCpInfo.cpInfo;
     QCsLandInfo land = QCsLandInfo.csLandInfo;
     QPurchaseInfo purchase = QPurchaseInfo.purchaseInfo;
+    QCompany company = QCompany.company;
+    QChargerPaymentInfo chgPaymentInfo = QChargerPaymentInfo.chargerPaymentInfo;
+    QPgTrxRecon pgTrxRecon = QPgTrxRecon.pgTrxRecon;
     QCommonCode accountCdName = new QCommonCode("accountCode");
     QCommonCode paymentName = new QCommonCode("paymentMethod");
 
@@ -236,6 +243,75 @@ public class PurchaseRepositoryCustomImpl implements PurchaseRepositoryCustom {
                 .leftJoin(land).on(csInfo.csLandInfo.eq(land))
                 .where(csInfo.id.eq(stationId))
                 .fetchOne();
+    }
+
+    @Override
+    public PurchaseAccountDto searchAccountLandTypeRate(String stationId) {
+        // 토지사용료(Type: RATE)
+        Integer rate = queryFactory
+                .select(land.landUseFee)
+                .from(csInfo)
+                .leftJoin(land).on(csInfo.csLandInfo.eq(land))
+                .where(csInfo.id.eq(stationId))
+                .fetchOne();
+
+        // LocalDate today = LocalDate.now(); // 오늘 날짜
+        // LocalDate firstDayOfCurrentMonth = today.withDayOfMonth(1); // 당월의 첫 번째 날
+        // LocalDate ladtDayOfCurrentMonth = today.atEndOfMonth(); // 당월 마지막 날
+
+        LocalDateTime startDate = LocalDate.now().withDayOfMonth(1).atStartOfDay();
+        LocalDateTime endDate = LocalDate.now().atTime(23, 59, 59);
+
+        // 관제 결제 데이터의 TID 목록 추출
+        List<String> tids = queryFactory
+                .select(chgPaymentInfo.preTid)
+                .from(chgPaymentInfo)
+                .leftJoin(cpInfo).on(chgPaymentInfo.chargerId.eq(cpInfo.id))
+                .leftJoin(csInfo).on(cpInfo.stationId.eq(csInfo))
+                .where(csInfo.id.eq(stationId)
+                    .and(chgPaymentInfo.timestamp.between(startDate, endDate)))
+                .fetch();
+
+        /* 
+         * 결제금액 = 승인금액 (상태코드 0) - 취소금액 (상태코드 2)
+         * 상태코드 1은 승인금액과 취소금액 둘 다 변영되므로 제외
+         */
+        // 승인금액
+        BigDecimal approved = queryFactory
+                .select(pgTrxRecon.goodsAmt.sum())
+                .from(pgTrxRecon)
+                .where(pgTrxRecon.tid.in(tids).and(pgTrxRecon.stateCd.in("0")))
+                .fetchOne();
+
+        if (approved == null)
+            approved = BigDecimal.ZERO;
+
+        
+        // 취소금액
+        BigDecimal canceled = queryFactory
+                .select(pgTrxRecon.goodsAmt.sum())
+                .from(pgTrxRecon)
+                .where(pgTrxRecon.tid.in(tids).and(pgTrxRecon.stateCd.in("2"))
+                    .and(pgTrxRecon.otid.in(tids).and(pgTrxRecon.stateCd.eq("2"))))
+                .fetchOne();
+
+        if (canceled == null)
+            canceled = BigDecimal.ZERO;
+
+        BigDecimal totalPrice = approved.subtract(canceled);
+
+        // totalPrice * rate * 0.01
+        BigDecimal percentage = totalPrice.multiply(BigDecimal.valueOf(rate)).divide(BigDecimal.valueOf(100));
+
+        // vat = totalPrice * 0.1
+        BigDecimal vat = percentage.multiply(BigDecimal.valueOf(10).divide(BigDecimal.valueOf(100)));
+
+        PurchaseAccountDto result = new PurchaseAccountDto();
+        result.setUnitPrice(percentage.intValue());
+        result.setSupplyPrice(percentage.intValue());
+        result.setVat(vat.intValue());
+        result.setTotalAmount(percentage.intValue() + vat.intValue());
+        return result;
     }
 
     @Override

@@ -68,36 +68,44 @@ public class PurchaseService {
 
     // 계정과목 정보 조회
     public PurchaseAccountDto searchPurchaseAccount(String accountCode, String stationId) {
+        log.info("[Purchaseservice >> searchPurchaseAccount]");
+        
         try {
 
             PurchaseAccountDto result = switch (accountCode) {
                 case "LANDFEE" -> {
                     PurchaseAccountDto landResult = this.purchaseRepository.searchAccountLand(stationId);
                     if ("RATE".equals(landResult.getLandUseType())) {
-                        yield this.purchaseRepository.searchAccountLand(stationId);
-                    } else {
+                        log.info("[searchPurchaseAccount] >> LANDFEE(RATE)");
+                        yield this.purchaseRepository.searchAccountLandTypeRate(stationId);
+                    } else if ("FIX".equals(landResult.getLandUseType())){
+                        log.info("[searchPurchaseAccount] >> LANDFEE(FIX)");
                         yield landResult;
+                    } else {
+                        yield createDefaultDto();
                     }
                 }
                 case "SMFEE" -> this.purchaseRepository.searchAccountSafety(stationId);
-                default -> PurchaseAccountDto.builder()
-                    .unitPrice(0)
-                    .supplyPrice(0)
-                    .vat(0)
-                    .totalAmount(0)
-                    .build();
+                default -> createDefaultDto();
             };
 
             return result;
         } catch (Exception e) {
             log.error("[searchPurchaseAccount] error: {}", e.getMessage());
-            return PurchaseAccountDto.builder()
+            return createDefaultDto();
+        }
+    }
+
+    /* 
+     * 빈 PurchaseAccountDto 객체 생성 
+     */
+    private PurchaseAccountDto createDefaultDto() {
+        return PurchaseAccountDto.builder()
                     .unitPrice(0)
                     .supplyPrice(0)
                     .vat(0)
                     .totalAmount(0)
                     .build();
-        }
     }
 
     // 매입 상세 조회
