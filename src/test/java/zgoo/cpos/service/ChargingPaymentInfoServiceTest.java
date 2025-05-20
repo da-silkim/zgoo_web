@@ -23,7 +23,7 @@ public class ChargingPaymentInfoServiceTest {
 
         // 페이지 번호를 0으로 시작하도록 수정 (또는 서비스에서 처리)
         Page<ChgPaymentInfoDto> chargingPaymentInfo = chargingPaymentInfoService.findChgPaymentInfo(
-                "", "", "", "", 1L, 0, 10);
+                "", "", "", "", 1L, 0, 10, "admin");
 
         log.info("Total elements: {}", chargingPaymentInfo.getTotalElements());
         log.info("Total pages: {}", chargingPaymentInfo.getTotalPages());
