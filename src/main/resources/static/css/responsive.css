@@ -1,0 +1,17 @@
+@media (min-width: 1200px) {
+    .privacy-container {
+        width: 1140px;
+    }
+}
+
+@media (min-width: 992px) {
+    .privacy-container {
+        width: 970px;
+    }
+}
+
+@media (min-width: 768px) {
+    .privacy-container {
+        width: 750px;
+    }
+}

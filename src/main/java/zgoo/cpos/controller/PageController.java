@@ -2087,4 +2087,14 @@ public class PageController {
     /*
      * 예약
      */
+
+    /* 
+    * 개인정보처리방침
+    */
+    @GetMapping("/policy/privacy")
+    public String showprivacy() {
+        log.info("=== Privacy Page ===");
+
+        return "fragments/privacy";
+    }
 }
