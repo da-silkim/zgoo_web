@@ -58,6 +58,9 @@ import zgoo.cpos.dto.menu.MenuAuthorityDto.MenuAuthorityBaseDto;
 import zgoo.cpos.dto.menu.MenuDto;
 import zgoo.cpos.dto.payment.ChgPaymentInfoDto;
 import zgoo.cpos.dto.payment.ChgPaymentSummaryDto;
+import zgoo.cpos.dto.statistics.ErrorDto.ErrorBarDto;
+import zgoo.cpos.dto.statistics.ErrorDto.ErrorLineChartBaseDto;
+import zgoo.cpos.dto.statistics.ErrorDto.ErrorLineChartDto;
 import zgoo.cpos.dto.statistics.PurchaseSalesDto.PurchaseSalesBarDto;
 import zgoo.cpos.dto.statistics.PurchaseSalesDto.PurchaseSalesLineChartDto;
 import zgoo.cpos.dto.statistics.PurchaseSalesDto.SalesDashboardDto;
@@ -1813,13 +1816,41 @@ public class PageController {
      * 통계 > 장애율통계
      */
     @GetMapping("/statistics/error")
-    public String showerror(Model model, Principal principal) {
+    public String showerror(
+            @RequestParam(value = "companyIdSearch", required = false) Long companyId,
+            @RequestParam(value = "opSearch", required = false) String searchOp,
+            @RequestParam(value = "contentSearch", required = false) String searchContent,
+            @RequestParam(value = "yearSearch", required = false) Integer year,
+            Model model, Principal principal) {
         log.info("=== Error Statistics Page ===");
+        log.info("companyId: {}, opSearch: {}, contentSearch: {}, yearSearch: {}", companyId, searchOp, searchContent,
+                year);
 
         try {
+            model.addAttribute("selectedCompanyId", companyId);
+            model.addAttribute("selectedOpSearch", searchOp);
+            model.addAttribute("selectedContentSearch", searchContent);
+            model.addAttribute("selectedYear", year);
 
+            ErrorBarDto errHist = this.statisticsService.searchYearError(companyId, searchOp, searchContent, year,
+                principal.getName());
+            model.addAttribute("errHist", errHist);
+            log.info("errHist >> {}", errHist.toString());
+
+            ErrorLineChartDto lineChart = this.statisticsService.searchMonthlyError(companyId, searchOp, searchContent,
+                year, principal.getName());
+            model.addAttribute("lineChart", lineChart);
+            log.info("lineChart >> {}", lineChart.toString());
+
+            List<CompanyListDto> companyList = this.companyService.findCompanyListAll(principal.getName());
+            model.addAttribute("companyList", companyList);
+
+            List<YearOptionDto> yearOption = this.comService.generateYearOptions();
+            model.addAttribute("yearOption", yearOption);
         } catch (Exception e) {
             e.getStackTrace();
+            model.addAttribute("companyList", Collections.emptyList());
+            model.addAttribute("yearOption", Collections.emptyList());
         }
 
         return "pages/statistics/error_statistics";

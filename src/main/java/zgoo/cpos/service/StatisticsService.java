@@ -9,6 +9,10 @@ import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import zgoo.cpos.dto.statistics.ErrorDto.ErrorBarDto;
+import zgoo.cpos.dto.statistics.ErrorDto.ErrorBaseDto;
+import zgoo.cpos.dto.statistics.ErrorDto.ErrorLineChartBaseDto;
+import zgoo.cpos.dto.statistics.ErrorDto.ErrorLineChartDto;
 import zgoo.cpos.dto.statistics.PurchaseSalesDto.PurchaseSalesBarDto;
 import zgoo.cpos.dto.statistics.PurchaseSalesDto.PurchaseSalesBaseDto;
 import zgoo.cpos.dto.statistics.PurchaseSalesDto.PurchaseSalesLineChartBaseDto;
@@ -24,6 +28,7 @@ import zgoo.cpos.dto.statistics.UsageDto.UsageLineChartDto;
 import zgoo.cpos.repository.calc.PurchaseRepository;
 import zgoo.cpos.repository.company.CompanyRepository;
 import zgoo.cpos.repository.history.ChargingHistRepository;
+import zgoo.cpos.repository.history.ErrorHistRepository;
 import zgoo.cpos.repository.payment.ChargerPaymentInfoRepository;
 
 @Service
@@ -37,6 +42,7 @@ public class StatisticsService {
 
     private final PurchaseRepository purchaseRepository;
     private final ChargerPaymentInfoRepository chargerPaymentInfoRepository;
+    private final ErrorHistRepository errorHistRepository;
 
     // totalkw >> bar chart
     public TotalkwBarDto searchYearChargeAmount(Long companyId, String searchOp, String searchContent,
@@ -313,6 +319,100 @@ public class StatisticsService {
 
         } catch (Exception e) {
             log.error("[searchMonthlyPurchaseSales] error: {}", e.getMessage(), e);
+            return null;
+        }
+    }
+
+    // error >> bar chart
+    public ErrorBarDto searchYearError(Long companyId, String searchOp, String searchContent,
+            Integer yearSearch, String loginUserId) {
+        if (yearSearch == null) {
+            yearSearch = LocalDate.now().getYear();
+        }
+
+        try {
+            boolean isSuperAdmin = comService.checkSuperAdmin(loginUserId);
+            Long loginUserCompanyId = comService.getLoginUserCompanyId(loginUserId);
+            String levelPath = companyRepository.findLevelPathByCompanyId(loginUserCompanyId);
+            log.info("== levelPath : {}", levelPath);
+            if (levelPath == null) {
+                // 관계정보가 없을경우 빈 리스트 전달
+                return null;
+            }
+
+            ErrorBaseDto preYear = this.errorHistRepository.findTotalErrorHistByYear(companyId, searchOp, searchContent,
+                yearSearch - 1, levelPath, isSuperAdmin);
+
+            ErrorBaseDto curYear = this.errorHistRepository.findTotalErrorHistByYear(companyId, searchOp, searchContent,
+                yearSearch, levelPath, isSuperAdmin);
+
+            if (preYear == null || preYear.getTotal() == null) {
+                preYear = getDefaultErrorDto(yearSearch - 1);
+            }
+
+            if (curYear == null || curYear.getTotal() == null ){
+                curYear = getDefaultErrorDto(yearSearch);
+            }
+
+            return ErrorBarDto.builder()
+                    .preYear(preYear)
+                    .curYear(curYear)
+                    .build();
+        } catch (Exception e) {
+            log.error("[searchYearError] error: {}", e.getMessage(), e);
+            return ErrorBarDto.builder()
+                    .preYear(getDefaultErrorDto(yearSearch - 1))
+                    .preYear(getDefaultErrorDto(yearSearch))
+                    .build();
+        }
+    }
+
+    /* 
+    * ErrorBarDto 빈 객체 생성
+    */
+    public ErrorBaseDto getDefaultErrorDto(Integer year) {
+        return ErrorBaseDto.builder()
+                .year(year)
+                .lowCount(0L)
+                .fastCount(0L)
+                .despnCount(0L)
+                .total(0L)
+                .build();
+    }
+
+    // error >> line chart
+    public ErrorLineChartDto searchMonthlyError(Long companyId, String searchOp, String searchContent,
+            Integer yearSearch, String loginUserId) {
+        if (yearSearch == null) {
+            yearSearch = LocalDate.now().getYear();
+        }
+
+        try {
+            boolean isSuperAdmin = comService.checkSuperAdmin(loginUserId);
+            Long loginUserCompanyId = comService.getLoginUserCompanyId(loginUserId);
+            String levelPath = companyRepository.findLevelPathByCompanyId(loginUserCompanyId);
+            log.info("== levelPath : {}", levelPath);
+            if (levelPath == null) {
+                // 관계정보가 없을경우 빈 리스트 전달
+                return null;
+            }
+
+            List<ErrorLineChartBaseDto> speedLowList = this.errorHistRepository.searchMonthlyTotalErrorHist(companyId,
+                searchOp, searchContent, yearSearch, "SPEEDLOW", levelPath, isSuperAdmin);
+
+            List<ErrorLineChartBaseDto> speedFastList = this.errorHistRepository.searchMonthlyTotalErrorHist(companyId,
+                searchOp, searchContent, yearSearch, "SPEEDFAST", levelPath, isSuperAdmin);
+
+            List<ErrorLineChartBaseDto> speedDespnList = this.errorHistRepository.searchMonthlyTotalErrorHist(companyId,
+                searchOp, searchContent, yearSearch, "SPEEDDESPN", levelPath, isSuperAdmin);
+
+            return ErrorLineChartDto.builder()
+                    .speedLowList(speedLowList)
+                    .speedFastList(speedFastList)
+                    .speedDespnList(speedDespnList)
+                    .build();
+        } catch (Exception e) {
+            log.error("[searchMonthlyError] error: {}", e.getMessage(), e);
             return null;
         }
     }
