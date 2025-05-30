@@ -11,6 +11,8 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -43,6 +45,7 @@ import zgoo.cpos.dto.cp.CurrentChargingListDto;
 import zgoo.cpos.dto.cs.CsInfoDto;
 import zgoo.cpos.dto.cs.CsInfoDto.CsInfoListDto;
 import zgoo.cpos.dto.cs.CsInfoDto.StationOpStatusDto;
+import zgoo.cpos.dto.fw.CpFwversionDto;
 import zgoo.cpos.dto.history.ChargingHistDto;
 import zgoo.cpos.dto.history.ChgCommlogDto;
 import zgoo.cpos.dto.history.ErrorHistDto;
@@ -92,6 +95,7 @@ import zgoo.cpos.service.CpModelService;
 import zgoo.cpos.service.CsService;
 import zgoo.cpos.service.ErrorHistService;
 import zgoo.cpos.service.FaqService;
+import zgoo.cpos.service.FwService;
 import zgoo.cpos.service.MemberService;
 import zgoo.cpos.service.MenuAuthorityService;
 import zgoo.cpos.service.MenuService;
@@ -133,6 +137,7 @@ public class PageController {
     private final ChargingPaymentInfoService chargingPaymentInfoService;
     private final PurchaseService purchaseService;
     private final ErrorHistService errorHistService;
+    private final FwService fwService;
 
     /*
      * 대시보드
@@ -150,7 +155,7 @@ public class PageController {
 
             StationOpStatusDto opStatus = this.csService.getStationOpStatusCount(principal.getName());
             model.addAttribute("opStatus", opStatus);
-            
+
             SalesDashboardDto saleStatus = this.chargingPaymentInfoService.findPaymentByPeriod();
             model.addAttribute("saleStatus", saleStatus);
 
@@ -2030,8 +2035,22 @@ public class PageController {
             @RequestParam(value = "size", defaultValue = "10") int size,
             Model model, Principal principal) {
         log.info("=== Firmware Version Page ===");
+        log.info("== page: {}, size: {}", page, size);
 
         try {
+
+            // 등록된 펌웨어 버전 정보 조회
+            Page<CpFwversionDto> fwVersionList = this.fwService.findFwVersionList(page, size, principal.getName());
+
+            int totalPages = fwVersionList.getTotalPages() == 0 ? 1 : fwVersionList.getTotalPages();
+            model.addAttribute("fwList", fwVersionList.getContent());
+            model.addAttribute("size", String.valueOf(size));
+            model.addAttribute("currentPage", page);
+            model.addAttribute("totalPages", totalPages);
+            model.addAttribute("totalCount", fwVersionList.getTotalElements());
+
+            // select options
+            // 사업자 리스트
             List<CompanyListDto> companyList = this.companyService.findCompanyListAll(principal.getName());
             model.addAttribute("companyList", companyList);
 
@@ -2063,7 +2082,17 @@ public class PageController {
         log.info("=== Firmware Update Page ===");
 
         try {
-            model.addAttribute("selectedCompanyId", companyId);
+            // model.addAttribute("selectedCompanyId", companyId);
+
+            Pageable pageable = PageRequest.of(page, size);
+            Page<ChargerListDto> cplist = Page.empty(pageable);
+
+            int totalpages = cplist.getTotalPages() == 0 ? 1 : cplist.getTotalPages();
+            model.addAttribute("cpList", cplist.getContent());
+            model.addAttribute("size", String.valueOf(size));
+            model.addAttribute("currentPage", page);
+            model.addAttribute("totalPages", totalpages);
+            model.addAttribute("totalCount", cplist.getTotalElements());
 
             List<CompanyListDto> companyList = this.companyService.findCompanyListAll(principal.getName());
             model.addAttribute("companyList", companyList);
@@ -2076,6 +2105,12 @@ public class PageController {
             model.addAttribute("menuAuthority", menuAuthority);
         } catch (Exception e) {
             e.getStackTrace();
+            model.addAttribute("cpList", Collections.emptyList());
+            model.addAttribute("size", String.valueOf(size));
+            model.addAttribute("currentPage", page);
+            model.addAttribute("totalPages", 1);
+            model.addAttribute("totalCount", 0L);
+
             model.addAttribute("companyList", Collections.emptyList());
             model.addAttribute("showListCnt", Collections.emptyList());
             model.addAttribute("menuAuthority", Collections.emptyList());

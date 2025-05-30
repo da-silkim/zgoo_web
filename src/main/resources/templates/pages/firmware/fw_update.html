@@ -5,17 +5,58 @@
         <!-- card body:1 start -->
         <div class="card-body">
             <div class="content-title"><i class="fa-solid fa-microchip font-ico me-2"></i>펌웨어 > 펌웨어 업데이트</div>
-            <!-- card:2 start -->
             <div class="card card-shadow">
+                <div class="card-body">
+                    <div class="card-title"><span class="card-title-bar"></span><span>펌웨어</span></div>
+                    <div class="row mb-3 row-cols-2 row-cols-lg-3 g-2">
+                        <div class="col search-table">
+                            <label for="companyIdFw" class="col-form-label">사업자<b>*</b></label>
+                            <select id="companyIdFw" class="mx-3 form-control" name="companyIdFw" required>
+                                <option th:value="*{null}" th:text="'(선택)'"></option>
+                                <option th:each="company : ${companyList}" th:value="${company.companyId}"
+                                    th:text="${company.companyName}"
+                                    th:selected="${company.companyId == selectedCompanyIdFw}"></option>
+                            </select>
+                        </div>
+                        <div class="col search-table">
+                            <label for="modelSearch" class="col-form-label">모델명<b>*</b></label>
+                            <select id="modelSearch" class="mx-3 form-control" name="modelSearch" required>
+                                <option th:value="*{null}" th:text="'(선택)'"
+                                    th:selected="${selectedModelSearch == null}"></option>
+                                <!-- 모델 목록이 있다면 선택된 값 유지 -->
+                                <option th:if="${selectedModelSearch != null}" th:value="${selectedModelSearch}"
+                                    th:text="${selectedModelSearch}" th:selected="true"></option>
+                            </select>
+                        </div>
+                        <div class="col search-table">
+                            <label for="versionSearch" class="col-form-label">버전<b>*</b></label>
+                            <select id="versionSearch" class="mx-3 form-control" name="versionSearch" required>
+                                <option th:value="*{null}" th:text="'(선택)'"
+                                    th:selected="${selectedVersionSearch == null}"></option>
+                                <!-- 버전 목록이 있다면 선택된 값 유지 -->
+                                <option th:if="${selectedVersionSearch != null}" th:value="${selectedVersionSearch}"
+                                    th:text="${selectedVersionSearch}" th:selected="true"></option>
+                            </select>
+                        </div>
+                        <div class="col search-table">
+                            <label for="urlSearch" class="col-form-label">URL<b>*</b></label>
+                            <input type="text" class="form-control" id="urlSearch" th:value="${selectedUrlSearch}"
+                                disabled>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- card:2 start -->
+            <div class="card card-shadow mt-4">
                 <!-- card body:2 start -->
                 <div class="card-body">
-                    <div class="card-title"><span class="card-title-bar"></span><span>검색조건</span></div>
+                    <div class="card-title"><span class="card-title-bar"></span><span>충전기 검색</span></div>
                     <!-- form start -->
-                    <form id="searchForm" class="firmware-update" th:action="@{/fw/update}" method="get">
+                    <form id="searchForm" class="firmware-update" th:action="@{/fw/update/get/cplist}" method="get">
                         <div class="row mb-3 row-cols-2 row-cols-lg-3 g-2">
                             <div class="col search-table">
-                                <label for="companyIdSearch"
-                                    class="col-form-label">사업자<b>*</b></label>
+                                <label for="companyIdSearch" class="col-form-label">사업자<b>*</b></label>
                                 <select id="companyIdSearch" class="mx-3 form-control" name="companyIdSearch" required>
                                     <option th:value="*{null}" th:text="'(없음)'"></option>
                                     <option th:each="company : ${companyList}" th:value="${company.companyId}"
@@ -24,39 +65,13 @@
                                 </select>
                             </div>
                             <div class="col search-table">
-                                <label for="modelSearch"
-                                    class="col-form-label">모델명<b>*</b></label>
-                                <select id="modelSearch" class="mx-3 form-control" name="modelSearch" required>
-                                    <option th:value="*{null}" th:text="'(없음)'"></option>
-                                    <!-- <option th:each="model : ${modelList}" th:value="${model.modelCode}"
-                                        th:text="${model.modelCode}"
-                                        th:selected="${model.modelCode == selectedModelCode}"></option> -->
-                                </select>
+                                <label for="stationIdSearch" class="col-form-label">충전소ID<b>*</b></label>
+                                <input type="text" name="stationIdSearch" id="stationIdSearch" class="form-control"
+                                    th:value="${selectedStationId}" autocomplete="off">
                             </div>
                             <div class="col search-table">
-                                <label for="stationIdSearch"
-                                    class="col-form-label">충전소ID<b>*</b></label>
-                                <input type="text" class="form-control" id="stationIdSearch">
-                            </div>
-                            <div class="col search-table">
-                                <label for="versionSearch"
-                                    class="col-form-label">version<b>*</b></label>
-                                <select id="versionSearch" class="mx-3 form-control" name="versionSearch" required>
-                                    <option th:value="*{null}" th:text="'(없음)'"></option>
-                                    <!-- <option th:each="ver : ${versionList}" th:value="${ver.version}"
-                                        th:text="${ver.version}"
-                                        th:selected="${ver.version == selectedVersion}"></option> -->
-                                </select>
-                            </div>
-                            <div class="col search-table">
-                                <label for="stationNameSearch"
-                                    class="col-form-label">충전소명<b>*</b></label>
+                                <label for="stationNameSearch" class="col-form-label">충전소명<b>*</b></label>
                                 <input type="text" class="form-control" id="stationNameSearch" disabled>
-                            </div>
-                            <div class="col search-table">
-                                <label for="urlSearch"
-                                    class="col-form-label">URL<b>*</b></label>
-                                <input type="text" class="form-control" id="urlSearch" disabled>
                             </div>
                         </div>
                         <div>
@@ -65,6 +80,12 @@
                             <button type="button" class="btn btn-outline-grey me-2" id="resetBtn">
                                 <i class="bi bi-arrow-repeat me-2"></i>초기화</button>
                         </div>
+
+                        <!-- 펌웨어 선택 값들을 hidden input으로 추가 -->
+                        <input type="hidden" name="companyIdFw" th:value="${selectedCompanyIdFw}">
+                        <input type="hidden" name="modelSearch" th:value="${selectedModelSearch}">
+                        <input type="hidden" name="versionSearch" th:value="${selectedVersionSearch}">
+                        <input type="hidden" name="urlSearch" th:value="${selectedUrlSearch}">
                     </form>
                     <!-- form end -->
                 </div>
@@ -77,13 +98,14 @@
                 <div class="card-body">
                     <div class="card-title"><span class="card-title-bar"></span><span>대상 충전기 목록</span></div>
                     <div class="mt-3 btn-page-area">
-                        <div th:if="${menuAuthority.authority == 'SU'}">
+                        <div th:if="${menuAuthority.authority == 'SU' or menuAuthority.authority == 'AD'}">
                             <button class="btn btn-outline-grey" id="updateBtn">
                                 <i class="bi bi-gear"></i>업데이트</button>
                         </div>
                         <span>
                             <span id="pageInfo">
-                                <!-- <span th:text="'Page ' + (${currentPage + 1}) + ' of ' + ${totalPages} + ' [총 ' + ${totalCount} + '건]'"></span> -->
+                                <span
+                                    th:text="'Page ' + (${currentPage + 1}) + ' of ' + ${totalPages} + ' [총 ' + ${totalCount} + '건]'"></span>
                             </span>
                             <select class="mx-3 page-select" id="size" name="size">
                                 <option th:each="data : ${showListCnt}" th:value="${data.commonCode}"
@@ -99,48 +121,83 @@
                                     <th scope="col">사업자</th>
                                     <th scope="col">제조사</th>
                                     <th scope="col">충전소명</th>
+                                    <th scope="col">충전소ID</th>
                                     <th scope="col">충전기ID</th>
-                                    <th scope="col">타입</th>
                                     <th scope="col">모델명</th>
                                     <th scope="col">펌웨어버전</th>
                                     <th scope="col">마지막업데이트일시</th>
                                 </tr>
                             </thead>
                             <tbody id="pageList">
+                                <tr th:each="data : ${cpList}">
+                                    <td th:id="${data.chargerId}"><input type="checkbox" /></td>
+                                    <td th:text="${data.companyName}"></td>
+                                    <td th:text="${data.manufCdName}"></td>
+                                    <td th:text="${data.stationName}"></td>
+                                    <td th:text="${data.stationId}"></td>
+                                    <td th:text="${data.chargerId}"></td>
+                                    <td th:text="${data.modelName}"></td>
+                                    <td th:text="${data.fwVersion}"></td>
+                                    <td th:text="${#temporals.format(data.lastUpdateDt, 'yyyy-MM-dd HH:mm:ss')}"></td>
+                                </tr>
+                                <tr th:if="${cpList.size() == 0}">
+                                    <td colspan="9" class="text-center">충전기 정보가 없습니다.</td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
                     <!-- paging navigation start -->
-                    <!-- <div th:if="${companyList.size() > 0}">
+                    <div th:if="${cpList.size() > 0}">
                         <ul class="pagination justify-content-center">
                             <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled' : ''">
-                                <a class="page-link" th:href="@{/fw/update(page=0, size=${size}, companyIdSearch=${selectedCompanyId},
-                                modelSearch=${selectedModel}, stationIdSearch=${selectedStationId}, versionSearch=${selectedVersion})}"><i
-                                        class="bi bi-chevron-double-left"></i></a>
+                                <a class="page-link" th:href="@{/fw/update/get/cplist(page=0, size=${size}, 
+                                    companyIdSearch=${selectedCompanyId}, 
+                                    stationIdSearch=${selectedStationId}, 
+                                    companyIdFw=${selectedCompanyIdFw},
+                                     modelSearch=${selectedModelSearch}, 
+                                     versionSearch=${selectedVersionSearch}, 
+                                     urlSearch=${selectedUrlSearch})}"><i class="bi bi-chevron-double-left"></i></a>
                             </li>
                             <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled' : ''">
-                                <a class="page-link" th:href="@{/fw/update(page=${currentPage-1}, size=${size}, companyIdSearch=${selectedCompanyId},
-                                modelSearch=${selectedModel}, stationIdSearch=${selectedStationId}, versionSearch=${selectedVersion})}"><i
-                                        class="bi bi-chevron-left"></i></a>
+                                <a class="page-link" th:href="@{/fw/update/get/cplist(page=${currentPage-1}, size=${size}, 
+                                    companyIdSearch=${selectedCompanyId}, 
+                                    stationIdSearch=${selectedStationId}, 
+                                    companyIdFw=${selectedCompanyIdFw}, 
+                                    modelSearch=${selectedModelSearch}, 
+                                    versionSearch=${selectedVersionSearch}, 
+                                    urlSearch=${selectedUrlSearch})}"><i class="bi bi-chevron-left"></i></a>
                             </li>
                             <li class="page-item" th:each="i : ${#numbers.sequence(currentPage - 2, currentPage + 2)}"
                                 th:if="${i >= 0 && i < totalPages}">
-                                <a class="page-link" th:href="@{/fw/update(page=${i}, size=${size}, companyIdSearch=${selectedCompanyId},
-                                modelSearch=${selectedModel}, stationIdSearch=${selectedStationId}, versionSearch=${selectedVersion})}"
-                                    th:text="${i+1}" th:classappend="${i == currentPage} ? 'active' : ''"></a>
+                                <a class="page-link" th:href="@{/fw/update/get/cplist(page=${i}, size=${size}, 
+                                    companyIdSearch=${selectedCompanyId}, 
+                                    stationIdSearch=${selectedStationId}, 
+                                    companyIdFw=${selectedCompanyIdFw}, 
+                                    modelSearch=${selectedModelSearch}, 
+                                    versionSearch=${selectedVersionSearch}, 
+                                    urlSearch=${selectedUrlSearch})}" th:text="${i+1}"
+                                    th:classappend="${i == currentPage} ? 'active' : ''"></a>
                             </li>
                             <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled' : ''">
-                                <a class="page-link" th:href="@{/fw/update(page=${currentPage+1}, size=${size}, companyIdSearch=${selectedCompanyId},
-                                modelSearch=${selectedModel}, stationIdSearch=${selectedStationId}, versionSearch=${selectedVersion})}"><i
-                                        class="bi bi-chevron-right"></i></a>
+                                <a class="page-link" th:href="@{/fw/update/get/cplist(page=${currentPage+1}, size=${size}, 
+                                    companyIdSearch=${selectedCompanyId}, 
+                                    stationIdSearch=${selectedStationId}, 
+                                    companyIdFw=${selectedCompanyIdFw}, 
+                                    modelSearch=${selectedModelSearch}, 
+                                    versionSearch=${selectedVersionSearch}, 
+                                    urlSearch=${selectedUrlSearch})}"><i class="bi bi-chevron-right"></i></a>
                             </li>
                             <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled' : ''">
-                                <a class="page-link" th:href="@{/fw/update(page=${totalPages - 1}, size=${size}, companyIdSearch=${selectedCompanyId},
-                                modelSearch=${selectedModel}, stationIdSearch=${selectedStationId}, versionSearch=${selectedVersion})}"><i
-                                        class="bi bi-chevron-double-right"></i></a>
+                                <a class="page-link" th:href="@{/fw/update/get/cplist(page=${totalPages - 1}, size=${size}, 
+                                    companyIdSearch=${selectedCompanyId}, 
+                                    stationIdSearch=${selectedStationId}, 
+                                    companyIdFw=${selectedCompanyIdFw}, 
+                                    modelSearch=${selectedModelSearch}, 
+                                    versionSearch=${selectedVersionSearch}, 
+                                    urlSearch=${selectedUrlSearch})}"><i class="bi bi-chevron-double-right"></i></a>
                             </li>
                         </ul>
-                    </div> -->
+                    </div>
                     <!-- paging navigation end -->
                 </div>
                 <!-- card body:3 end -->
@@ -150,6 +207,7 @@
         <!-- card body:1 end -->
     </div>
     <!-- card:1 end -->
-    <!-- <script type="text/javascript" th:src="@{/js/maintenance/error_management.js}"></script> -->
+    <script type="text/javascript" th:src="@{/js/fw/fw_update.js}"></script>
 </div>
+
 </html>

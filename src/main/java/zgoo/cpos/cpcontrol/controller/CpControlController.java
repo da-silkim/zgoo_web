@@ -17,15 +17,28 @@ import zgoo.cpos.cpcontrol.dto.CancelTestRsponseDto;
 import zgoo.cpos.cpcontrol.dto.PaymentTestRequestDto;
 import zgoo.cpos.cpcontrol.dto.PaymentTestResponseDto;
 import zgoo.cpos.cpcontrol.dto.TidSearchRequest;
+import zgoo.cpos.cpcontrol.dto.UpdateFirmwareDto;
+import zgoo.cpos.cpcontrol.message.firmware.UpdateFirmwareResponse;
 import zgoo.cpos.cpcontrol.service.CpControlService;
 
 @Controller
 @RequiredArgsConstructor
 @Slf4j
-@RequestMapping("/corp")
+@RequestMapping("/control")
 public class CpControlController {
 
     private final CpControlService cpControlService;
+
+    @PostMapping("/fwupdate")
+    public ResponseEntity<?> fwupdate(@RequestBody UpdateFirmwareDto request) {
+        log.info("Firmware Update Request(/fwupdate) : {}", request.toString());
+        try {
+            UpdateFirmwareResponse response = cpControlService.updateFirmware(request);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
+        }
+    }
 
     @PostMapping("/payment/test")
     public ResponseEntity<?> testPayment(@RequestBody PaymentTestRequestDto request) {
