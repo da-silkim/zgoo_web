@@ -8,6 +8,7 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
 
 import zgoo.cpos.common.properties.EtcProperties;
 
+// @SpringBootApplication(exclude = { KafkaAutoConfiguration.class })
 @SpringBootApplication
 @EnableConfigurationProperties({ EtcProperties.class })
 public class CposApplication extends SpringBootServletInitializer {
