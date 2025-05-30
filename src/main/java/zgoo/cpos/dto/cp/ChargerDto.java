@@ -35,6 +35,7 @@ public class ChargerDto {
     public static class ChargerListDto {
         private String companyName;
         private String stationName;
+        private String stationId;
         private String chargerName;
         private String chargerId;
         private String commonTypeCode;
@@ -45,6 +46,8 @@ public class ChargerDto {
         private LocalDate installDate;
         private String manufCd;
         private String manufCdName;
+        private String fwVersion;
+        private LocalDateTime lastUpdateDt;
 
     }
 
@@ -160,7 +163,7 @@ public class ChargerDto {
     @NoArgsConstructor
     @AllArgsConstructor
     @Builder
-    public static class ChargerCountBySidoDto  {
+    public static class ChargerCountBySidoDto {
         private String sido;
         private Long speedFastCount;
         private Long speedLowCount;

@@ -13,27 +13,31 @@ import zgoo.cpos.dto.cp.ChargerDto.ChargerSearchDto;
 import zgoo.cpos.dto.cp.ChargerDto.FacilityCountDto;
 
 public interface ChargerRepositoryCustom {
-        Page<ChargerListDto> findAllChargerListPaging(Pageable page, String levelPath, boolean isSuperAdmin);
+    Page<ChargerListDto> findAllChargerListPaging(Pageable page, String levelPath, boolean isSuperAdmin);
 
-        Page<ChargerListDto> findChargerListPaging(Long companyId, String manufCd, String searchOp,
-                        String searchContent,
-                        Pageable pageable, String levelPath, boolean isSuperAdmin);
+    Page<ChargerListDto> findChargerListPaging(Long companyId, String manufCd, String searchOp,
+            String searchContent,
+            Pageable pageable, String levelPath, boolean isSuperAdmin);
 
-        Optional<CpInfo> findCpByStationId(String stationId);
+    Optional<CpInfo> findCpByStationId(String stationId);
 
-        CpInfo findCpInfoByChargerId(String chargerId);
+    CpInfo findCpInfoByChargerId(String chargerId);
 
-        List<ChargerSearchDto> findChargerListByStationId(String stationId, String levelPath, boolean isSuperAdmin);
+    List<ChargerSearchDto> findChargerListByStationId(String stationId, String levelPath, boolean isSuperAdmin);
 
-        long countByStationId(String stationId, String levelPath, boolean isSuperAdmin);
+    long countByStationId(String stationId, String levelPath, boolean isSuperAdmin);
 
-        List<ChargerListDto> findAllChargerListWithoutPagination(Long companyId, String manufCd, String searchOp,
-                        String searchContent, String levelPath, boolean isSuperAdmin);
+    List<ChargerListDto> findAllChargerListWithoutPagination(Long companyId, String manufCd, String searchOp,
+            String searchContent, String levelPath, boolean isSuperAdmin);
 
-        long countCharger(String levelPath, boolean isSuperAdmin);
+    long countCharger(String levelPath, boolean isSuperAdmin);
 
-        List<ChargerCountBySidoDto> countChargerBySidoAndType(String levelPath, boolean isSuperAdmin);
+    List<ChargerCountBySidoDto> countChargerBySidoAndType(String levelPath, boolean isSuperAdmin);
 
-        List<FacilityCountDto> countFacilityBySidoAndType(String sido, String type, String levelPath,
-                        boolean isSuperAdmin);
+    List<FacilityCountDto> countFacilityBySidoAndType(String sido, String type, String levelPath,
+            boolean isSuperAdmin);
+
+    Page<ChargerListDto> findChargerListByCompanyAndStationFw(Pageable page, Long companyId, String stationId);
+
+    Page<ChargerListDto> findChargerListByCompanyFw(Pageable page, Long companyId);
 }

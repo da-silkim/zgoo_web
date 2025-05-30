@@ -379,4 +379,33 @@ public class CpModelRepositoryCustomImpl implements CpModelRepositoryCustom {
                 .orderBy(model.id.desc())
                 .fetchOne();
     }
+
+    @Override
+    public List<CpModelListDto> findCpModelListForSelectOpt(String levelPath, boolean isSuperAdmin) {
+        BooleanBuilder builder = new BooleanBuilder();
+
+        if (!isSuperAdmin && levelPath != null && !levelPath.isEmpty()) {
+            builder.and(QueryUtils.hasCompanyLevelAccess(relation, levelPath));
+        }
+
+        List<CpModelListDto> modelList = queryFactory.select(Projections.fields(CpModelListDto.class,
+                model.id.as("modelId"),
+                model.modelCode.as("modelCode"),
+                model.modelName.as("modelName"),
+                model.powerUnit.as("powerUnit"),
+                model.regDt.as("regDt"),
+                manufCdName.name.as("manufCdName"),
+                cpTypeName.name.as("cpTypeName"),
+                company.companyName.as("companyName")))
+                .from(model)
+                .leftJoin(company).on(model.company.eq(company))
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
+                .leftJoin(manufCdName).on(model.manufCd.eq(manufCdName.commonCode))
+                .leftJoin(cpTypeName).on(model.cpType.eq(cpTypeName.commonCode))
+                .where(builder)
+                .orderBy(model.id.desc())
+                .fetch();
+
+        return modelList;
+    }
 }

@@ -2,15 +2,14 @@ package zgoo.cpos;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 
 import zgoo.cpos.common.properties.EtcProperties;
 
-@SpringBootApplication(exclude = { KafkaAutoConfiguration.class })
-// @SpringBootApplication
+// @SpringBootApplication(exclude = { KafkaAutoConfiguration.class })
+@SpringBootApplication
 @EnableConfigurationProperties({ EtcProperties.class })
 public class CposApplication extends SpringBootServletInitializer {
 

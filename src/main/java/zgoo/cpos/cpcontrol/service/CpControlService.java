@@ -24,6 +24,9 @@ import zgoo.cpos.cpcontrol.dto.CancelTestRequestDto;
 import zgoo.cpos.cpcontrol.dto.CancelTestRsponseDto;
 import zgoo.cpos.cpcontrol.dto.PaymentTestRequestDto;
 import zgoo.cpos.cpcontrol.dto.PaymentTestResponseDto;
+import zgoo.cpos.cpcontrol.dto.UpdateFirmwareDto;
+import zgoo.cpos.cpcontrol.message.firmware.UpdateFirmwareRequest;
+import zgoo.cpos.cpcontrol.message.firmware.UpdateFirmwareResponse;
 
 @Service
 @Slf4j
@@ -40,11 +43,73 @@ public class CpControlService {
 
     @Value("${nicepay.billing.url}")
     private String billingUrl;
-    private final String paymentTestUrl = "http://192.168.30.120:9999/api/payment/test";
-    private final String cancelTestUrl = "http://192.168.30.120:9999/api/payment/cancel";
+
+    @Value("${gw.server.url}")
+    private String gwServerUrl;
+
+    private final String paymentTestUrl = gwServerUrl + "/api/payment/test";
+    private final String cancelTestUrl = gwServerUrl + "/api/payment/cancel";
     private final String tradeDataUrl = "https://data.nicepay.co.kr/recon/api";
     private final String transUrl = "https://data.nicepay.co.kr/trans/api";
 
+    public UpdateFirmwareResponse updateFirmware(UpdateFirmwareDto request) {
+        try {
+            // 요청 헤더 생성
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            // 요청 데이터 생성
+            UpdateFirmwareRequest updateFirmwareRequest = UpdateFirmwareRequest.builder()
+                    .location(request.getLocation())
+                    .retries(request.getRetires())
+                    .retrieveDate(request.getRetrieveDate())
+                    .retryInterval(request.getRetryInterval())
+                    .build();
+
+            // 요청 데이터 로깅
+            log.info("UpdateFirmwareRequest : {}", updateFirmwareRequest.toString());
+
+            // HTTP 요청 엔티티 생성
+            HttpEntity<UpdateFirmwareRequest> entity = new HttpEntity<>(updateFirmwareRequest, headers);
+
+            // 외부 서버로 POST 요청 전송
+            log.info("외부 서버({})로 POST 요청 전송", gwServerUrl + "/updateFirmware");
+            long startTime = System.currentTimeMillis();
+
+            // 외부 서버로 POST 요청 전송
+            ResponseEntity<UpdateFirmwareResponse> response = restTemplate.postForEntity(
+                    gwServerUrl + "/updateFirmware",
+                    entity,
+                    UpdateFirmwareResponse.class);
+
+            long endTime = System.currentTimeMillis();
+            log.info("외부 서버 응답 수신 - 소요시간: {}ms, 상태코드: {}",
+                    (endTime - startTime), response.getStatusCodeValue());
+
+            // 응답 처리
+            if (response.getStatusCode().is2xxSuccessful()) {
+                // 응답 데이터 로깅
+                log.info("외부 서버 응답 데이터: {}", response.getBody());
+
+                UpdateFirmwareResponse updateFirmwareResponse = response.getBody();
+
+                log.info("Firmware Update Request(/fwupdate) 성공 - 결과메시지: {}", updateFirmwareResponse);
+
+                return updateFirmwareResponse;
+            } else {
+                log.error("Firmware Update Request(/fwupdate) 실패 - 상태코드: {}, 응답: {}",
+                        response.getStatusCode(), response.getBody());
+                throw new RuntimeException(
+                        "Firmware Update Request(/fwupdate) 실패 - 상태코드: " + response.getStatusCode());
+            }
+
+        } catch (Exception e) {
+            log.error("Firmware Update Request(/fwupdate) 처리 중 예외 발생", e);
+            throw new RuntimeException("Firmware Update Request(/fwupdate) 처리 중 예외 발생", e);
+        }
+    }
+
+    // ========test=======
     public PaymentTestResponseDto processTestPayment(PaymentTestRequestDto request) {
         try {
             log.info("결제 테스트 요청 시작 : 금액:{}, orderId:{}", request.getAmount(), request.getOrderId());
@@ -440,7 +505,9 @@ public class CpControlService {
                 return errorResult;
             }
 
-        } catch (Exception e) {
+        } catch (
+
+        Exception e) {
             log.error("실시간 TID 조회 처리 중 예외 발생", e);
 
             // 예외 정보를 담은 결과 반환

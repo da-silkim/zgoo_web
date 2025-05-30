@@ -442,4 +442,29 @@ public class ChargerService {
             return new ArrayList<>();
         }
     }
+
+    /**
+     * 펌웨어업데이트 - 사업자, 충전소ID에 따른 충전기 List조회(페이징)
+     */
+    public Page<ChargerListDto> findChargerListForFwUpdate(Long companyId, String stationId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        log.info("findChargerListForFwUpdate - companyId: {}, stationId: {}", companyId, stationId);
+        try {
+            Page<ChargerListDto> chargerList;
+
+            if (companyId == null && (stationId == null || stationId.isEmpty())) {
+                log.error("companyId and stationId is null >> companyId: {}, stationId: {}", companyId, stationId);
+                return Page.empty(pageable);
+            } else if (companyId != null) {
+                chargerList = chargerRepository.findChargerListByCompanyFw(pageable, companyId);
+            } else {
+                chargerList = chargerRepository.findChargerListByCompanyAndStationFw(pageable, companyId, stationId);
+            }
+
+            return chargerList;
+        } catch (Exception e) {
+            log.error("[ChargerService >> findChargerListByCompanyAndStation] error:", e.getMessage(), e);
+            return Page.empty(Pageable.ofSize(size));
+        }
+    }
 }

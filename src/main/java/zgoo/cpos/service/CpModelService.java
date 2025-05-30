@@ -96,6 +96,26 @@ public class CpModelService {
         }
     }
 
+    public List<CpModelListDto> findCpModelListForSelectOpt(String userId) {
+        try {
+            boolean isSuperAdmin = comService.checkSuperAdmin(userId);
+
+            Long loginUserCompanyId = comService.getLoginUserCompanyId(userId);
+
+            String levelPath = companyRepository.findLevelPathByCompanyId(loginUserCompanyId);
+            log.info("== levelPath : {}", levelPath);
+            if (levelPath == null) {
+                return Collections.emptyList();
+            }
+
+            return this.cpModelRepository.findCpModelListForSelectOpt(levelPath, isSuperAdmin);
+
+        } catch (Exception e) {
+            log.error("[findCpModelListForSelectOpt] error : {}", e.getMessage());
+            return Collections.emptyList();
+        }
+    }
+
     // 충전기 모델 list 조회 by companyId
     public List<CpModelListDto> findCpModelListByCompany(Long companyId) {
         try {

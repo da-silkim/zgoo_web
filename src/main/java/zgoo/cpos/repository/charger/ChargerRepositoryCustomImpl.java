@@ -19,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import zgoo.cpos.domain.charger.CpInfo;
 import zgoo.cpos.domain.charger.QCpInfo;
 import zgoo.cpos.domain.charger.QCpModem;
+import zgoo.cpos.domain.charger.QCpStatus;
 import zgoo.cpos.domain.code.QCommonCode;
 import zgoo.cpos.domain.company.QCompany;
 import zgoo.cpos.domain.company.QCompanyRelationInfo;
@@ -38,9 +39,58 @@ public class ChargerRepositoryCustomImpl implements ChargerRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
     QCompany company = QCompany.company;
+
+    @Override
+    public Page<ChargerListDto> findChargerListByCompanyFw(Pageable page, Long companyId) {
+        BooleanBuilder builder = new BooleanBuilder();
+
+        builder.and(csInfo.company.id.eq(companyId));
+
+        List<ChargerListDto> chargerList = queryFactory.select(Projections.fields(ChargerListDto.class,
+                company.companyName.as("companyName"),
+                csInfo.stationName.as("stationName"),
+                csInfo.id.as("stationId"),
+                cpInfo.chargerName.as("chargerName"),
+                cpInfo.id.as("chargerId"),
+                commonTypeName.name.as("commonTypeName"),
+                model.modelName.as("modelName"),
+                cpplan.name.as("policyName"),
+                cpInfo.installDate.as("installDate"), // LocalDate 타입 그대로 사용
+                manufCdName.name.as("manufCdName"),
+                cpInfo.fwVersion.as("fwVersion"),
+                cpStatus.lastFwupdateTime.as("lastUpdateDt")))
+                .from(cpInfo)
+                .leftJoin(csInfo).on(cpInfo.stationId.eq(csInfo))
+                .leftJoin(cpStatus).on(cpInfo.id.eq(cpStatus.chargerId))
+                .leftJoin(company).on(csInfo.company.eq(company))
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
+                .leftJoin(commonTypeName).on(cpInfo.commonType.eq(commonTypeName.commonCode))
+                .leftJoin(model).on(cpInfo.modelCode.eq(model.modelCode))
+                .leftJoin(cpplan).on(cpInfo.planInfo.id.eq(cpplan.id))
+                .leftJoin(manufCdName).on(model.manufCd.eq(manufCdName.commonCode))
+                .where(builder)
+                .orderBy(cpInfo.regDt.desc())
+                .offset(page.getOffset())
+                .limit(page.getPageSize())
+                .fetch();
+
+        long totalCount = queryFactory
+                .select(cpInfo.count())
+                .from(cpInfo)
+                .leftJoin(csInfo).on(cpInfo.stationId.eq(csInfo))
+                .leftJoin(cpStatus).on(cpInfo.id.eq(cpStatus.chargerId))
+                .leftJoin(company).on(csInfo.company.eq(company))
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
+                .where(builder)
+                .fetchOne();
+
+        return new PageImpl<>(chargerList, page, totalCount);
+    }
+
     QCompanyRelationInfo relation = QCompanyRelationInfo.companyRelationInfo;
     QCsInfo csInfo = QCsInfo.csInfo;
     QCpInfo cpInfo = QCpInfo.cpInfo;
+    QCpStatus cpStatus = QCpStatus.cpStatus;
     QCpModel model = QCpModel.cpModel;
     // QConnectorStatus connector = QConnectorStatus.connectorStatus;
     QCpPlanPolicy cpplan = QCpPlanPolicy.cpPlanPolicy;
@@ -422,5 +472,54 @@ public class ChargerRepositoryCustomImpl implements ChargerRepositoryCustom {
                 .where(builder)
                 .groupBy(facilityTypeName.name)
                 .fetch();
+    }
+
+    @Override
+    public Page<ChargerListDto> findChargerListByCompanyAndStationFw(Pageable pageable, Long companyId,
+            String stationId) {
+        BooleanBuilder builder = new BooleanBuilder();
+
+        builder.and(csInfo.company.id.eq(companyId));
+        builder.and(csInfo.id.eq(stationId));
+
+        List<ChargerListDto> chargerList = queryFactory.select(Projections.fields(ChargerListDto.class,
+                company.companyName.as("companyName"),
+                csInfo.stationName.as("stationName"),
+                csInfo.id.as("stationId"),
+                cpInfo.chargerName.as("chargerName"),
+                cpInfo.id.as("chargerId"),
+                commonTypeName.name.as("commonTypeName"),
+                model.modelName.as("modelName"),
+                cpplan.name.as("policyName"),
+                cpInfo.installDate.as("installDate"), // LocalDate 타입 그대로 사용
+                manufCdName.name.as("manufCdName"),
+                cpInfo.fwVersion.as("fwVersion"),
+                cpStatus.lastFwupdateTime.as("lastUpdateDt")))
+                .from(cpInfo)
+                .leftJoin(csInfo).on(cpInfo.stationId.eq(csInfo))
+                .leftJoin(cpStatus).on(cpInfo.id.eq(cpStatus.chargerId))
+                .leftJoin(company).on(csInfo.company.eq(company))
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
+                .leftJoin(commonTypeName).on(cpInfo.commonType.eq(commonTypeName.commonCode))
+                .leftJoin(model).on(cpInfo.modelCode.eq(model.modelCode))
+                .leftJoin(cpplan).on(cpInfo.planInfo.id.eq(cpplan.id))
+                .leftJoin(manufCdName).on(model.manufCd.eq(manufCdName.commonCode))
+                .where(builder)
+                .orderBy(cpInfo.regDt.desc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        long totalCount = queryFactory
+                .select(cpInfo.count())
+                .from(cpInfo)
+                .leftJoin(csInfo).on(cpInfo.stationId.eq(csInfo))
+                .leftJoin(cpStatus).on(cpInfo.id.eq(cpStatus.chargerId))
+                .leftJoin(company).on(csInfo.company.eq(company))
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
+                .where(builder)
+                .fetchOne();
+
+        return new PageImpl<>(chargerList, pageable, totalCount);
     }
 }

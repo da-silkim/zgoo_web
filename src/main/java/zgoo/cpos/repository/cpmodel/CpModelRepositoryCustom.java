@@ -19,6 +19,8 @@ public interface CpModelRepositoryCustom {
     Page<CpModelListDto> searchCpModelWithPagination(Long companyId, String manuf, String chgSpeed, Pageable pageable,
             String levelPath, boolean isSuperAdmin);
 
+    List<CpModelListDto> findCpModelListForSelectOpt(String levelPath, boolean isSuperAdmin);
+
     // 충전기 모델 단건 조회
     CpModelRegDto findCpModelOne(Long modelId);
 
