@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import zgoo.cpos.dto.member.MemberDto.MemberBaseDto;
 import zgoo.cpos.dto.member.MemberDto.MemberCarDto;
 import zgoo.cpos.dto.member.MemberDto.MemberConditionDto;
 import zgoo.cpos.dto.member.MemberDto.MemberCreditCardDto;
@@ -42,4 +43,7 @@ public interface MemberRepositoryCustom {
         List<MemberListDto> findAllMemberListWithoutPagination(Long companyId, String idTag, String name,
                         String levelPath,
                         boolean isSuperAdmin);
+
+        // 이메일 정보가 있고, 이메일수신 동의를 한 회원 조회
+        List<MemberBaseDto> findAllMembersWithEmailAndMarketing();
 }

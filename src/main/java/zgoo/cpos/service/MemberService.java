@@ -1,6 +1,7 @@
 package zgoo.cpos.service;
 
 import java.io.FileInputStream;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
@@ -27,6 +28,7 @@ import zgoo.cpos.domain.member.MemberCar;
 import zgoo.cpos.domain.member.MemberCondition;
 import zgoo.cpos.domain.member.MemberCreditCard;
 import zgoo.cpos.dto.member.MemberDto.MemberAuthDto;
+import zgoo.cpos.dto.member.MemberDto.MemberBaseDto;
 import zgoo.cpos.dto.member.MemberDto.MemberCarDto;
 import zgoo.cpos.dto.member.MemberDto.MemberConditionDto;
 import zgoo.cpos.dto.member.MemberDto.MemberCreditCardDto;
@@ -681,5 +683,17 @@ public class MemberService {
         log.info("== levelPath : {}", levelPath);
 
         return this.memberAuthRepository.findAllMemberTagWithoutPagination(idTag, name, levelPath, isSuperAdmin);
+    }
+
+    // 이메일 정보가 있고, 이메일수신 동의한 회원 조회
+    public List<MemberBaseDto> findAllMembersWithEmailAndMarketing() {
+        try {
+            List<MemberBaseDto> memberList = this.memberRepository.findAllMembersWithEmailAndMarketing();
+            log.info("memberList >> {}", memberList.toString());
+            return memberList;
+        } catch (Exception e) {
+            log.error("[findAllMembersWithEmailAndMarketing] error: {}", e.getMessage(), e);
+            return new ArrayList<>();
+        }
     }
 }

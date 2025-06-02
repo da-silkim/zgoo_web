@@ -20,6 +20,7 @@ import zgoo.cpos.domain.member.QMember;
 import zgoo.cpos.domain.member.QMemberCar;
 import zgoo.cpos.domain.member.QMemberCondition;
 import zgoo.cpos.domain.member.QMemberCreditCard;
+import zgoo.cpos.dto.member.MemberDto.MemberBaseDto;
 import zgoo.cpos.dto.member.MemberDto.MemberCarDto;
 import zgoo.cpos.dto.member.MemberDto.MemberConditionDto;
 import zgoo.cpos.dto.member.MemberDto.MemberCreditCardDto;
@@ -368,6 +369,28 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
                 .leftJoin(bizTypeName).on(member.bizType.eq(bizTypeName.commonCode))
                 .where(builder)
                 .orderBy(member.joinedDt.desc())
+                .fetch();
+    }
+
+    @Override
+    public List<MemberBaseDto> findAllMembersWithEmailAndMarketing() {
+
+        // 이메일이 null 또는 빈문자열이 아닌 회원ID 추출
+        List<Long> memberIds = queryFactory
+                .select(member.id)
+                .from(member)
+                .where(member.email.isNotNull(), member.email.trim().ne(""))
+                .fetch();
+
+        return queryFactory.select(Projections.fields(MemberBaseDto.class,
+                condition.member.id.as("memberId"),
+                member.email.as("email"),
+                member.name.as("name")))
+                .from(condition)
+                .leftJoin(member).on(member.eq(condition.member))
+                .where(condition.agreeYn.eq("Y")
+                    .and(condition.condition.conditionCode.eq("ES"))
+                    .and(condition.member.id.in(memberIds)))
                 .fetch();
     }
 }

@@ -200,4 +200,14 @@ public class ConditionService {
             return new ArrayList<>();
         }
     }
+
+    // 적용 30일 전 개정약관 조회
+    public ConditionVersionHist findRevisionConditionByConditionCode(String conditionCode) {
+        try {
+            return this.conditionVersionHistRepository.findRevisionConditionByConditionCode(conditionCode);
+        } catch (Exception e) {
+            log.error("[findRevisionConditionByConditionCode] error: {}", e.getMessage(), e);
+            return null;
+        }
+    }
 }
