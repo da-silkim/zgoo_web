@@ -1,5 +1,6 @@
 package zgoo.cpos.repository.member;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -83,6 +84,17 @@ public class ConditionVersionHistRepositoryCustomImpl implements ConditionVersio
                         .selectFrom(conditionVersionHist)
                         .where(conditionVersionHist.conditionCode.conditionCode.eq(conditionCode)
                                 .and(conditionVersionHist.applyYn.eq("Y")))
+                        .fetchOne();
+        }
+
+        @Override
+        public ConditionVersionHist findRevisionConditionByConditionCode(String conditionCode) {
+                return queryFactory
+                        .selectFrom(conditionVersionHist)
+                        .where(conditionVersionHist.conditionCode.conditionCode.eq(conditionCode)
+                                .and(conditionVersionHist.applyYn.eq("N"))
+                                .and(conditionVersionHist.applyDt.gt(LocalDateTime.now()))
+                                .and(conditionVersionHist.applyDt.eq(LocalDate.now().atStartOfDay().plusDays(30))))
                         .fetchOne();
         }
 }

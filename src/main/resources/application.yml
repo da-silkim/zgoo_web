@@ -12,7 +12,19 @@ spring:
     # suffix: .html
   hikari:
     shutdown-timeout: 10000
-
+  mail:
+    host: smtp.naver.com
+    port: 465
+    username: aceopkm@naver.com
+    password: 43NXXLSZG37G
+    properties:
+      mail:
+        smtp:
+          auth: true
+          timeout: 5000
+          ssl:
+            enable: true
+    default-encoding: UTF-8
 
   jpa:
     database-platform: org.hibernate.dialect.MySQLDialect

@@ -51,6 +51,7 @@ dependencies {
 	implementation 'org.mariadb.jdbc:mariadb-java-client:3.1.4'
 	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 	implementation 'org.springframework.kafka:spring-kafka'
+	implementation 'org.springframework.boot:spring-boot-starter-mail'
     
 
 	// Apache POI - 엑셀 파일 처리를 위한 라이브러리

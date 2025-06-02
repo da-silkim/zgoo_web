@@ -5,10 +5,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 import zgoo.cpos.common.properties.EtcProperties;
 
 // @SpringBootApplication(exclude = { KafkaAutoConfiguration.class })
+@EnableScheduling
 @SpringBootApplication
 @EnableConfigurationProperties({ EtcProperties.class })
 public class CposApplication extends SpringBootServletInitializer {

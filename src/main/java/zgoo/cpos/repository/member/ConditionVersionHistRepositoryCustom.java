@@ -24,4 +24,7 @@ public interface ConditionVersionHistRepositoryCustom {
 
     // 약관 개정 적용여부가 Y인 것 조회
     ConditionVersionHist findApplyYesByConditionCode(String conditionCode);
+
+    // 현재일 이후, 적용이 안 되어있고, 적용일 30일 전 약관 조회
+    ConditionVersionHist findRevisionConditionByConditionCode(String conditionCode);
 }
