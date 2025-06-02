@@ -32,7 +32,9 @@
                             <div class="sales-status">
                                 <div class="row">
                                     <div class="col-3">급속</div>
-                                    <div class="col-4 text-right" th:text="|${#numbers.formatDecimal(saleStatus.fastSales, 1, 'COMMA', 0, 'POINT')} 원|"></div>
+                                    <div class="col-4 text-right"
+                                        th:text="|${#numbers.formatDecimal(saleStatus.fastSales, 1, 'COMMA', 0, 'POINT')} 원|">
+                                    </div>
                                     <div class="col-5 status-text">
                                         <span th:if="${saleStatus.fastCheck == 1}" class="font-color-brown"
                                             th:text="|▲ 지난달 대비 ${#numbers.formatDecimal(saleStatus.compareFast, 1, 'COMMA', 0, 'POINT')} 원|"></span>
@@ -43,7 +45,9 @@
                                 </div>
                                 <div class="row">
                                     <div class="col-3">완속</div>
-                                    <div class="col-4 text-right" th:text="|${#numbers.formatDecimal(saleStatus.lowSales, 1, 'COMMA', 0, 'POINT')} 원|"></div>
+                                    <div class="col-4 text-right"
+                                        th:text="|${#numbers.formatDecimal(saleStatus.lowSales, 1, 'COMMA', 0, 'POINT')} 원|">
+                                    </div>
                                     <div class="col-5 status-text">
                                         <span th:if="${saleStatus.lowCheck == 1}" class="font-color-brown"
                                             th:text="|▲ 지난달 대비 ${#numbers.formatDecimal(saleStatus.compareLow, 1, 'COMMA', 0, 'POINT')} 원|"></span>
@@ -54,7 +58,9 @@
                                 </div>
                                 <div class="row">
                                     <div class="col-3">디스펜서</div>
-                                    <div class="col-4 text-right" th:text="|${#numbers.formatDecimal(saleStatus.despnSales, 1, 'COMMA', 0, 'POINT')} 원|"></div>
+                                    <div class="col-4 text-right"
+                                        th:text="|${#numbers.formatDecimal(saleStatus.despnSales, 1, 'COMMA', 0, 'POINT')} 원|">
+                                    </div>
                                     <div class="col-5 status-text">
                                         <span th:if="${saleStatus.despnCheck == 1}" class="font-color-brown"
                                             th:text="|▲ 지난달 대비 ${#numbers.formatDecimal(saleStatus.compareDespn, 1, 'COMMA', 0, 'POINT')} 원|"></span>
@@ -79,7 +85,9 @@
                             <div class="charge-status">
                                 <div class="row">
                                     <div class="col-3">급속</div>
-                                    <div class="col-4 text-right" th:text="|${#numbers.formatDecimal(chgStatus.fastChgAmount, 1, 'COMMA', 2, 'POINT')} kWh|"></div>
+                                    <div class="col-4 text-right"
+                                        th:text="|${#numbers.formatDecimal(chgStatus.fastChgAmount, 1, 'COMMA', 2, 'POINT')} kWh|">
+                                    </div>
                                     <div class="col-5 status-text">
                                         <span th:if="${chgStatus.fastCheck == 1}" class="font-color-brown"
                                             th:text="|▲ 지난달 대비 ${#numbers.formatDecimal(chgStatus.compareFast, 1, 'COMMA', 2, 'POINT')} kWh|"></span>
@@ -90,7 +98,9 @@
                                 </div>
                                 <div class="row">
                                     <div class="col-3">완속</div>
-                                    <div class="col-4 text-right" th:text="|${#numbers.formatDecimal(chgStatus.lowChgAmount, 1, 'COMMA', 2, 'POINT')} kWh|"></div>
+                                    <div class="col-4 text-right"
+                                        th:text="|${#numbers.formatDecimal(chgStatus.lowChgAmount, 1, 'COMMA', 2, 'POINT')} kWh|">
+                                    </div>
                                     <div class="col-5 status-text">
                                         <span th:if="${chgStatus.lowCheck == 1}" class="font-color-brown"
                                             th:text="|▲ 지난달 대비 ${#numbers.formatDecimal(chgStatus.compareLow, 1, 'COMMA', 2, 'POINT')} kWh|"></span>
@@ -101,7 +111,9 @@
                                 </div>
                                 <div class="row">
                                     <div class="col-3">디스펜서</div>
-                                    <div class="col-4 text-right" th:text="|${#numbers.formatDecimal(chgStatus.despnChgAmount, 1, 'COMMA', 2, 'POINT')} kWh|"></div>
+                                    <div class="col-4 text-right"
+                                        th:text="|${#numbers.formatDecimal(chgStatus.despnChgAmount, 1, 'COMMA', 2, 'POINT')} kWh|">
+                                    </div>
                                     <div class="col-5 status-text">
                                         <span th:if="${chgStatus.despnCheck == 1}" class="font-color-brown"
                                             th:text="|▲ 지난달 대비 ${#numbers.formatDecimal(chgStatus.compareDespn, 1, 'COMMA', 2, 'POINT')} kWh|"></span>
@@ -135,7 +147,7 @@
                             <i class="bi bi-ev-station me-1"></i>
                             <span th:text="전체" id="facilityText"></span>
                         </div>
-                        <canvas  id="pieChart"></canvas>
+                        <canvas id="pieChart"></canvas>
                     </div>
                 </div>
             </div>
@@ -147,7 +159,8 @@
                 <div class="card">
                     <div class="card-body">
                         <div class="card-title"><span class="card-title-bar"></span><span>고장/장애 이력</span>
-                            <span class="article-detail"><a th:href="@{/history/error}">더보기<i class="bi bi-plus-circle ms-1"></i></a>
+                            <span class="article-detail"><a th:href="@{/history/error}">더보기<i
+                                        class="bi bi-plus-circle ms-1"></i></a>
                             </span>
                         </div>
                         <div class="px-2">
@@ -170,7 +183,9 @@
                                             <td th:text="${err.connectorId}"></td>
                                             <td th:text="${err.errcd}"></td>
                                             <td th:text="${err.errName}"></td>
-                                            <td th:text="${#temporals.format(err.occurDateTime, 'yyyy-MM-dd HH:mm:ss')}"></td>
+                                            <td
+                                                th:text="${#temporals.format(err.occurDateTime, 'yyyy-MM-dd HH:mm:ss')}">
+                                            </td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -193,11 +208,14 @@
                                 <tbody>
                                     <tr th:each="notice : ${noticeList}">
                                         <td>
-                                            <a th:href="@{/system/notice/detail/{id}(id=${notice.idx}, page=0, size=10)}" class="no-underline">
+                                            <a th:href="@{/system/notice/detail/{id}(id=${notice.idx}, page=0, size=10)}"
+                                                class="no-underline">
                                                 <div>
                                                     <span th:text="|[${notice.typeName}] ${notice.title}|"></span>
                                                     <span th:if="${notice.isNew}" class="new-article">NEW</span>
-                                                    <span th:text="${#temporals.format(notice.regDt, 'yyyy-MM-dd HH:mm:ss')}" class="float-right"></span>
+                                                    <span
+                                                        th:text="${#temporals.format(notice.regDt, 'yyyy-MM-dd HH:mm:ss')}"
+                                                        class="float-right"></span>
                                                 </div>
                                             </a>
                                         </td>
@@ -220,4 +238,5 @@
         var facilityList = /*[[${facilityList != null ? facilityList : '{}'}]]*/ {};
     </script>
 </div>
+
 </html>

@@ -41,60 +41,66 @@ public class ConnectorStatusService {
                         .data(statusDto));
             } catch (IOException e) {
                 deadEmitters.add(id);
-                if (e.getMessage().contains("Broken pipe")) {
-                    log.debug("클라이언트 연결 종료: {}", id);
-                } else {
-                    log.error("SSE 이벤트 전송 실패: {}", e.getMessage());
-                }
+                log.debug("Emitter 전송 실패: {}", id);
             }
         });
 
-        if (!deadEmitters.isEmpty()) {
-            deadEmitters.forEach(id -> {
-                emitters.remove(id);
-                log.debug("Dead emitter 제거: {}", id);
-            });
-            log.info("비활성 SSE 연결 {} 개 제거, 현재 활성 연결: {}", deadEmitters.size(), emitters.size());
-        }
+        deadEmitters.forEach(this::removeEmitter);
     }
 
     public SseEmitter createEmitter() {
-        SseEmitter emitter = new SseEmitter(Long.MAX_VALUE);
         String emitterId = UUID.randomUUID().toString();
+        SseEmitter emitter = new SseEmitter(180_000L); // 3분 타임아웃 설정
 
-        log.info("새 SSE Emitter 생성: {}", emitterId);
-        emitters.put(emitterId, emitter);
+        // 기존 emitter가 있다면 완료 처리
+        emitters.values().forEach(existingEmitter -> {
+            try {
+                existingEmitter.complete();
+            } catch (Exception e) {
+                log.warn("기존 emitter 정리 중 오류", e);
+            }
+        });
+        emitters.clear();
 
         emitter.onCompletion(() -> {
             log.debug("SSE 연결 완료: {}", emitterId);
-            emitters.remove(emitterId);
+            removeEmitter(emitterId);
         });
 
         emitter.onTimeout(() -> {
             log.debug("SSE 연결 타임아웃: {}", emitterId);
-            emitters.remove(emitterId);
+            removeEmitter(emitterId);
         });
 
         emitter.onError(e -> {
-            if (e instanceof IOException && e.getMessage().contains("Broken pipe")) {
-                log.debug("클라이언트 연결 종료: {}", emitterId);
-            } else {
-                log.error("SSE 연결 오류: {}", e.getMessage());
-            }
-            emitters.remove(emitterId);
+            log.debug("SSE 연결 오류: {}", emitterId);
+            removeEmitter(emitterId);
         });
 
-        // 초기 연결 확인 이벤트 전송
+        emitters.put(emitterId, emitter);
+
+        // 연결 즉시 초기 데이터 전송
         try {
             emitter.send(SseEmitter.event()
                     .name("connect")
                     .data("연결 성공"));
         } catch (IOException e) {
-            log.error("초기 SSE 이벤트 전송 실패: {}", e.getMessage());
-            emitters.remove(emitterId);
+            log.error("초기 이벤트 전송 실패", e);
+            removeEmitter(emitterId);
         }
 
         return emitter;
+    }
+
+    private void removeEmitter(String emitterId) {
+        SseEmitter emitter = emitters.remove(emitterId);
+        if (emitter != null) {
+            try {
+                emitter.complete();
+            } catch (Exception e) {
+                log.warn("Emitter 완료 처리 중 오류", e);
+            }
+        }
     }
 
     public int getActiveConnectionCount() {

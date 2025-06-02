@@ -1,14 +1,14 @@
-document.addEventListener('DOMContentLoaded', function(){
+document.addEventListener('DOMContentLoaded', function () {
     // doughnt chart
-    var ctx =  document.getElementById("doughnutChart").getContext('2d');
-    var doughnutChart =  new Chart(ctx, {
+    var ctx = document.getElementById("doughnutChart").getContext('2d');
+    var doughnutChart = new Chart(ctx, {
         type: 'doughnut',
         data: {
             labels: [`시운전(${opStatus.opTestPer}%)`, `운영중(${opStatus.operatingPer}%)`, `운영중지(${opStatus.opStopPer}%)`],
             datasets: [{
                 data: [opStatus.opTestCount, opStatus.operatingCount, opStatus.opStopCount],
                 backgroundColor: ['#EB5B00', '#144693', '#d9d9d9'],
-                hoverBackgroundColor: ['#EF9651', '#5073A8', '#E8EAEE'],                  
+                hoverBackgroundColor: ['#EF9651', '#5073A8', '#E8EAEE'],
                 borderWidth: 0,
             }]
         },
@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', function(){
                 legend: {
                     position: 'bottom', // 범례 위치 설정
                     align: 'center', // 범례 정렬
-                },                        
+                },
             },
             // layout: {
             //     padding: {
@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', function(){
         speedDespnCount.push(item.speedDespnCount);
     });
 
-    ctx =  document.getElementById("barChart").getContext('2d');
+    ctx = document.getElementById("barChart").getContext('2d');
     var barChart = new Chart(ctx, {
         type: 'bar',
         data: {
@@ -53,11 +53,11 @@ document.addEventListener('DOMContentLoaded', function(){
                 label: "급속",
                 data: speedFastCount,
                 backgroundColor: ['#144693']
-            },{
+            }, {
                 label: "완속",
                 data: speedLowCount,
                 backgroundColor: ['#26C59E']
-            },{
+            }, {
                 label: "디스펜서",
                 data: speedDespnCount,
                 backgroundColor: ['#FFD36E']
@@ -77,11 +77,11 @@ document.addEventListener('DOMContentLoaded', function(){
                             size: 14   // 범례 폰트 크기 조정
                         }
                     }
-                },                        
+                },
             },
             scales: {
                 x: {
-                    stacked:true,
+                    stacked: true,
                     ticks: {
                         color: '#000',
                         font: {
@@ -91,7 +91,7 @@ document.addEventListener('DOMContentLoaded', function(){
                 },
                 y: {
                     min: 0,
-                    stacked:true,
+                    stacked: true,
                     ticks: {
                         color: '#000',
                         font: {
@@ -119,12 +119,12 @@ document.addEventListener('DOMContentLoaded', function(){
         $.ajax({
             url: '/charger/get/facility',
             method: 'GET',
-            data: {sido: sido, type: type},
-            success: function(response) {
+            data: { sido: sido, type: type },
+            success: function (response) {
                 document.getElementById('facilityText').innerHTML = `${sido} / ${type}`;
                 drawPieChart(response);
             },
-            error: function(error) {
+            error: function (error) {
                 console.error(error);
             }
         });
@@ -132,18 +132,19 @@ document.addEventListener('DOMContentLoaded', function(){
 
     // treemap chart
     const treemapData = [
-        { what: "사용가능", value: connStatus.availableCount, color: '#28a745'},
-        { what: "준비중", value: connStatus.preparingCount, color: '#ffc107'},
-        { what: "충전중", value: connStatus.chargingCount, color: '#007bff'},
-        { what: "충전오류", value: connStatus.suspendedEvCount, color: '#A9A3A3'},
-        { what: "충전기오류", value: connStatus.suspendedEvseCount, color: '#DBDBDB'},
-        { what: "종료중", value: connStatus.finishingCount, color: '#EC5228'},
-        { what: "예약", value: connStatus.reservedCount, color: '#702EC3'},
-        { what: "사용불가능", value: connStatus.unavailableCount, color: '#BF3131'},
-        { what: "고장", value: connStatus.faultedCount, color: '#dc3545'},
+        { what: "사용가능", value: connStatus.availableCount, color: '#28a745' },
+        { what: "준비중", value: connStatus.preparingCount, color: '#ffc107' },
+        { what: "충전중", value: connStatus.chargingCount, color: '#007bff' },
+        { what: "충전오류", value: connStatus.suspendedEvCount, color: '#A9A3A3' },
+        { what: "충전기오류", value: connStatus.suspendedEvseCount, color: '#DBDBDB' },
+        { what: "종료중", value: connStatus.finishingCount, color: '#EC5228' },
+        { what: "예약", value: connStatus.reservedCount, color: '#702EC3' },
+        { what: "사용불가능", value: connStatus.unavailableCount, color: '#BF3131' },
+        { what: "고장", value: connStatus.faultedCount, color: '#dc3545' },
+        { what: "끊김", value: connStatus.disconnectedCount, color: '#A9A3A3' },
     ];
-    var ctx =  document.getElementById("treeChart").getContext('2d');
-    var treemapChart =  new Chart(ctx, {
+    var ctx = document.getElementById("treeChart").getContext('2d');
+    var treemapChart = new Chart(ctx, {
         type: 'treemap',
         data: {
             datasets: [{
@@ -164,12 +165,12 @@ document.addEventListener('DOMContentLoaded', function(){
                     display: true,
                     formatter(ctx) {
                         if (ctx.type !== 'data') {
-                        return;
+                            return;
                         }
                         return [ctx.raw.v, ctx.raw._data.what];
                     },
                     color: ['white', 'whiteSmoke'],
-                    font: [{size: 24, weight: 'bold'}, {size: 16}],
+                    font: [{ size: 24, weight: 'bold' }, { size: 16 }],
                     position: 'center'
                 },
             }]
@@ -184,7 +185,7 @@ document.addEventListener('DOMContentLoaded', function(){
                 },
                 tooltip: {
                     enabled: false,
-                }                 
+                }
             },
         }
     });
@@ -201,8 +202,8 @@ document.addEventListener('DOMContentLoaded', function(){
             facility.push(item.facility);
             faData.push(item.count);
         });
-    
-        var ctx =  document.getElementById("pieChart").getContext('2d');
+
+        var ctx = document.getElementById("pieChart").getContext('2d');
         const Utils = {
             PIE_CHART_COLORS: {
                 p1: 'rgb(54, 48, 98)',
@@ -218,7 +219,7 @@ document.addEventListener('DOMContentLoaded', function(){
             pieChart.destroy();
         }
 
-        pieChart =  new Chart(ctx, {
+        pieChart = new Chart(ctx, {
             type: 'pie',
             data: {
                 labels: facility,
@@ -240,7 +241,7 @@ document.addEventListener('DOMContentLoaded', function(){
                                 size: 14
                             }
                         }
-                    },                        
+                    },
                 },
             }
         });

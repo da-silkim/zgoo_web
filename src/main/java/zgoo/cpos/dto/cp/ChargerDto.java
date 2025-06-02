@@ -157,6 +157,7 @@ public class ChargerDto {
         private Long reservedCount;
         private Long unavailableCount;
         private Long faultedCount;
+        private Long disconnectedCount;
     }
 
     @Data

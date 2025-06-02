@@ -74,31 +74,45 @@ public class ConnectorStatusRepositoryCustomImpl implements ConnectorStatusRepos
             builder.and(QueryUtils.hasCompanyLevelAccess(relation, levelPath));
         }
 
+        // CpStatus 엔티티에 대한 별칭 추가
+        QCpStatus cpStatus = QCpStatus.cpStatus;
+
         // 기본 쿼리 구성
-        JPAQuery<ConnectorStatusCountDto> query = queryFactory.select(Projections.fields(ConnectorStatusCountDto.class,
-                Expressions.numberTemplate(Long.class, "COUNT(CASE WHEN {0} = 'Available' THEN 1 END)",
-                        conn.status).as("availableCount"),
-                Expressions.numberTemplate(Long.class, "COUNT(CASE WHEN {0} = 'Preparing' THEN 1 END)",
-                        conn.status).as("preparingCount"),
-                Expressions.numberTemplate(Long.class, "COUNT(CASE WHEN {0} = 'Charging' THEN 1 END)",
-                        conn.status).as("chargingCount"),
-                Expressions.numberTemplate(Long.class, "COUNT(CASE WHEN {0} = 'SuspendedEV' THEN 1 END)",
-                        conn.status).as("suspendedEvCount"),
-                Expressions.numberTemplate(Long.class, "COUNT(CASE WHEN {0} = 'SuspendedEVSE' THEN 1 END)",
-                        conn.status).as("suspendedEvseCount"),
-                Expressions.numberTemplate(Long.class, "COUNT(CASE WHEN {0} = 'Finishing' THEN 1 END)",
-                        conn.status).as("finishingCount"),
-                Expressions.numberTemplate(Long.class, "COUNT(CASE WHEN {0} = 'Reserved' THEN 1 END)",
-                        conn.status).as("reservedCount"),
-                Expressions.numberTemplate(Long.class, "COUNT(CASE WHEN {0} = 'Unavailable' THEN 1 END)",
-                        conn.status).as("unavailableCount"),
-                Expressions.numberTemplate(Long.class, "COUNT(CASE WHEN {0} = 'Faulted' THEN 1 END)",
-                        conn.status).as("faultedCount")))
-                .from(conn);
-
-        // 슈퍼 관리자가 아닌 경우 회사 레벨 경로에 따른 필터링 추가
-
-        query = query.join(cpInfo).on(conn.id.chargerId.eq(cpInfo.id))
+        JPAQuery<ConnectorStatusCountDto> query = queryFactory.select(Projections.fields(
+                ConnectorStatusCountDto.class,
+                Expressions.numberTemplate(Long.class,
+                        "COUNT(CASE WHEN {0} = 'N' THEN 1 END)",
+                        cpStatus.connectionYn).as("disconnectedCount"),
+                Expressions.numberTemplate(Long.class,
+                        "COUNT(CASE WHEN {0} = 'Y' AND {1} = 'Available' THEN 1 END)",
+                        cpStatus.connectionYn, conn.status).as("availableCount"),
+                Expressions.numberTemplate(Long.class,
+                        "COUNT(CASE WHEN {0} = 'Y' AND {1} = 'Preparing' THEN 1 END)",
+                        cpStatus.connectionYn, conn.status).as("preparingCount"),
+                Expressions.numberTemplate(Long.class,
+                        "COUNT(CASE WHEN {0} = 'Y' AND {1} = 'Charging' THEN 1 END)",
+                        cpStatus.connectionYn, conn.status).as("chargingCount"),
+                Expressions.numberTemplate(Long.class,
+                        "COUNT(CASE WHEN {0} = 'Y' AND {1} = 'SuspendedEV' THEN 1 END)",
+                        cpStatus.connectionYn, conn.status).as("suspendedEvCount"),
+                Expressions.numberTemplate(Long.class,
+                        "COUNT(CASE WHEN {0} = 'Y' AND {1} = 'SuspendedEVSE' THEN 1 END)",
+                        cpStatus.connectionYn, conn.status).as("suspendedEvseCount"),
+                Expressions.numberTemplate(Long.class,
+                        "COUNT(CASE WHEN {0} = 'Y' AND {1} = 'Finishing' THEN 1 END)",
+                        cpStatus.connectionYn, conn.status).as("finishingCount"),
+                Expressions.numberTemplate(Long.class,
+                        "COUNT(CASE WHEN {0} = 'Y' AND {1} = 'Reserved' THEN 1 END)",
+                        cpStatus.connectionYn, conn.status).as("reservedCount"),
+                Expressions.numberTemplate(Long.class,
+                        "COUNT(CASE WHEN {0} = 'Y' AND {1} = 'Unavailable' THEN 1 END)",
+                        cpStatus.connectionYn, conn.status).as("unavailableCount"),
+                Expressions.numberTemplate(Long.class,
+                        "COUNT(CASE WHEN {0} = 'Y' AND {1} = 'Faulted' THEN 1 END)",
+                        cpStatus.connectionYn, conn.status).as("faultedCount")))
+                .from(conn)
+                .join(cpStatus).on(conn.id.chargerId.eq(cpStatus.chargerId)) // CP_STATUS 테이블과 조인
+                .join(cpInfo).on(conn.id.chargerId.eq(cpInfo.id))
                 .join(csInfo).on(cpInfo.stationId.eq(csInfo))
                 .join(company).on(csInfo.company.eq(company))
                 .join(relation).on(company.companyRelationInfo.eq(relation))
