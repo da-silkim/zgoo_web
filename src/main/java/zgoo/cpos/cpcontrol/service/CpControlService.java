@@ -13,6 +13,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -25,8 +26,10 @@ import zgoo.cpos.cpcontrol.dto.CancelTestRsponseDto;
 import zgoo.cpos.cpcontrol.dto.PaymentTestRequestDto;
 import zgoo.cpos.cpcontrol.dto.PaymentTestResponseDto;
 import zgoo.cpos.cpcontrol.dto.UpdateFirmwareDto;
-import zgoo.cpos.cpcontrol.message.firmware.UpdateFirmwareRequest;
 import zgoo.cpos.cpcontrol.message.firmware.UpdateFirmwareResponse;
+import zgoo.cpos.domain.charger.CpStatus;
+import zgoo.cpos.repository.charger.CpStatusRepository;
+import zgoo.cpos.type.ocpp.UpdateFirmwareStatus;
 
 @Service
 @Slf4j
@@ -52,31 +55,31 @@ public class CpControlService {
     private final String tradeDataUrl = "https://data.nicepay.co.kr/recon/api";
     private final String transUrl = "https://data.nicepay.co.kr/trans/api";
 
+    private final CpStatusRepository cpStatusRepository;
+
+    @Transactional
     public UpdateFirmwareResponse updateFirmware(UpdateFirmwareDto request) {
         try {
-            // 요청 헤더 생성
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
 
-            // 요청 데이터 생성
-            UpdateFirmwareRequest updateFirmwareRequest = UpdateFirmwareRequest.builder()
-                    .location(request.getLocation())
-                    .retries(request.getRetires())
-                    .retrieveDate(request.getRetrieveDate())
-                    .retryInterval(request.getRetryInterval())
-                    .build();
+            // DTO 변환 - 외부 서버 형식에 맞게 수정
+            Map<String, Object> requestMap = new HashMap<>();
+            requestMap.put("chargePointId", request.getChargerId()); // chargerId를 chargePointId로 매핑
+            requestMap.put("location", request.getLocation());
+            requestMap.put("retries", request.getRetries());
+            requestMap.put("retrieveDate", request.getRetrieveDate());
+            requestMap.put("retryInterval", request.getRetryInterval());
 
             // 요청 데이터 로깅
-            log.info("UpdateFirmwareRequest : {}", updateFirmwareRequest.toString());
+            log.info("UpdateFirmwareRequest : {}", requestMap);
 
             // HTTP 요청 엔티티 생성
-            HttpEntity<UpdateFirmwareRequest> entity = new HttpEntity<>(updateFirmwareRequest, headers);
+            HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestMap, headers);
 
-            // 외부 서버로 POST 요청 전송
             log.info("외부 서버({})로 POST 요청 전송", gwServerUrl + "/updateFirmware");
             long startTime = System.currentTimeMillis();
 
-            // 외부 서버로 POST 요청 전송
             ResponseEntity<UpdateFirmwareResponse> response = restTemplate.postForEntity(
                     gwServerUrl + "/updateFirmware",
                     entity,
@@ -94,6 +97,17 @@ public class CpControlService {
                 UpdateFirmwareResponse updateFirmwareResponse = response.getBody();
 
                 log.info("Firmware Update Request(/fwupdate) 성공 - 결과메시지: {}", updateFirmwareResponse);
+
+                if (updateFirmwareResponse != null
+                        && updateFirmwareResponse.getStatus() == UpdateFirmwareStatus.Accepted) {
+                    // UpdateFirmware Accpeted수신시 충전기 마지막 업데이트 시간 업데이트z
+                    CpStatus cpStatus = cpStatusRepository.findByChargerId(request.getChargerId()).orElseThrow(
+                            () -> new RuntimeException("충전기 상태 조회 실패"));
+                    cpStatus.updateLastFwUpdateTime(LocalDateTime.now());
+                    cpStatusRepository.save(cpStatus);
+
+                    log.info("CP_STATUS last fw update time update success!");
+                }
 
                 return updateFirmwareResponse;
             } else {
