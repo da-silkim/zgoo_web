@@ -38,6 +38,9 @@ public class PgSettlmntDetail {
     @JoinColumn(name = "settlmnt_id", nullable = false, foreignKey = @ForeignKey(name = "fk_settlmnt_detail_total"))
     private PgSettlmntTotal total;
 
+    @Column(name = "charger_id", length = 10)
+    private String chargerId;
+
     @Column(name = "tr_dt")
     private LocalDate trDt;
 

@@ -39,4 +39,8 @@ public class CpStatus {
 
     @Column(name = "last_fwupdate_time")
     private LocalDateTime lastFwupdateTime;
+
+    public void updateLastFwUpdateTime(LocalDateTime updateTime) {
+        this.lastFwupdateTime = updateTime;
+    }
 }

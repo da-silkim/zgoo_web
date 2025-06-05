@@ -201,10 +201,16 @@ public class FirmwareController {
             @RequestParam(value = "modelSearch", required = false) String modelSearch,
             @RequestParam(value = "versionSearch", required = false) String versionSearch,
             @RequestParam(value = "urlSearch", required = false) String urlSearch,
+            @RequestParam(value = "retries", required = false) String retries,
+            @RequestParam(value = "retryInterval", required = false) String retryInterval,
+            @RequestParam(value = "retrieveDate", required = false) String retrieveDate,
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "10") int size,
             Model model, Principal principal) {
-        log.info("=== get fw update charger list ===");
+        log.info(
+                "=== get fw update charger list >> companyId : {}, stationId : {}, companyIdFw : {}, modelSearch : {}, versionSearch : {}, urlSearch : {}, retries : {}, retryInterval : {}, retrieveDate : {}, page : {}, size : {}",
+                companyId, stationId, companyIdFw, modelSearch, versionSearch, urlSearch, retries, retryInterval,
+                retrieveDate, page, size);
 
         try {
             // 검색조건 저장
@@ -216,6 +222,9 @@ public class FirmwareController {
             model.addAttribute("selectedModelSearch", modelSearch);
             model.addAttribute("selectedVersionSearch", versionSearch);
             model.addAttribute("selectedUrlSearch", urlSearch);
+            model.addAttribute("selectedRetries", retries);
+            model.addAttribute("selectedRetryInterval", retryInterval);
+            model.addAttribute("selectedRetrieveDate", retrieveDate);
 
             // 충전기 list 조회
             Page<ChargerListDto> cplist = chargerService.findChargerListForFwUpdate(companyId, stationId, page, size);

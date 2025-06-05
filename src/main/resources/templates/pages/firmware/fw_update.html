@@ -8,42 +8,78 @@
             <div class="card card-shadow">
                 <div class="card-body">
                     <div class="card-title"><span class="card-title-bar"></span><span>펌웨어</span></div>
-                    <div class="row mb-3 row-cols-2 row-cols-lg-3 g-2">
-                        <div class="col search-table">
-                            <label for="companyIdFw" class="col-form-label">사업자<b>*</b></label>
-                            <select id="companyIdFw" class="mx-3 form-control" name="companyIdFw" required>
-                                <option th:value="*{null}" th:text="'(선택)'"></option>
-                                <option th:each="company : ${companyList}" th:value="${company.companyId}"
-                                    th:text="${company.companyName}"
-                                    th:selected="${company.companyId == selectedCompanyIdFw}"></option>
-                            </select>
+                    <form id="fwconfigForm" class="position-relative">
+                        <div class="table-responsive">
+                            <table class="table table-bg-v align-middle mt-3">
+                                <tbody>
+                                    <tr class="table-border-top">
+                                        <th style="width: 16.66%" class="text-center">사업자<b class="required-data">*</b>
+                                        </th>
+                                        <td style="width: 16.66%">
+                                            <select id="companyIdFw" class="form-control" name="companyIdFw" required>
+                                                <option th:value="*{null}" th:text="'(선택)'"></option>
+                                                <option th:each="company : ${companyList}"
+                                                    th:value="${company.companyId}" th:text="${company.companyName}"
+                                                    th:selected="${company.companyId == selectedCompanyIdFw}"></option>
+                                            </select>
+                                        </td>
+                                        <th style="width: 16.66%" class="text-center">충전기모델<b
+                                                class="required-data">*</b></th>
+                                        <td style="width: 16.66%">
+                                            <select id="modelSearch" class="form-control" name="modelSearch" required>
+                                                <option th:value="*{null}" th:text="'(선택)'"
+                                                    th:selected="${selectedModelSearch == null}"></option>
+                                                <option th:if="${selectedModelSearch != null}"
+                                                    th:value="${selectedModelSearch}" th:text="${selectedModelSearch}"
+                                                    th:selected="true"></option>
+                                            </select>
+                                        </td>
+                                        <th style="width: 16.66%" class="text-center">version<b
+                                                class="required-data">*</b></th>
+                                        <td style="width: 16.66%">
+                                            <select id="versionSearch" class="form-control" name="versionSearch"
+                                                required>
+                                                <option th:value="*{null}" th:text="'(선택)'"
+                                                    th:selected="${selectedVersionSearch == null}"></option>
+                                                <option th:if="${selectedVersionSearch != null}"
+                                                    th:value="${selectedVersionSearch}"
+                                                    th:text="${selectedVersionSearch}" th:selected="true"></option>
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th style="width: 16.66%" class="text-center">Retrieve Date</th>
+                                        <td style="width: 16.66%">
+                                            <input type="datetime-local" class="form-control" id="retrieveDate"
+                                                th:value="${selectedRetrieveDate}">
+                                        </td>
+                                        <th style="width: 16.66%" class="text-center">Retries</th>
+                                        <td style="width: 16.66%">
+                                            <input type="number" class="form-control" id="retries" value="3"
+                                                th:value="${selectedRetries}">
+                                        </td>
+                                        <th style="width: 16.66%" class="text-center">Retry Interval</th>
+                                        <td style="width: 16.66%">
+                                            <input type="number" class="form-control" id="retryInterval" value="300"
+                                                th:value="${selectedRetryInterval}">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th style="width: 16.66%" class="text-center">URL<b class="required-data">*</b>
+                                        </th>
+                                        <td style="width: 16.66%" colspan="5">
+                                            <input type="text" class="form-control" id="urlSearch"
+                                                th:value="${selectedUrlSearch}" disabled>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div class="search-btn">
+                                <button type="button" class="btn btn-outline-grey me-2" id="fwconfigResetBtn">
+                                    <i class="bi bi-arrow-repeat me-2"></i>초기화</button>
+                            </div>
                         </div>
-                        <div class="col search-table">
-                            <label for="modelSearch" class="col-form-label">모델명<b>*</b></label>
-                            <select id="modelSearch" class="mx-3 form-control" name="modelSearch" required>
-                                <option th:value="*{null}" th:text="'(선택)'"
-                                    th:selected="${selectedModelSearch == null}"></option>
-                                <!-- 모델 목록이 있다면 선택된 값 유지 -->
-                                <option th:if="${selectedModelSearch != null}" th:value="${selectedModelSearch}"
-                                    th:text="${selectedModelSearch}" th:selected="true"></option>
-                            </select>
-                        </div>
-                        <div class="col search-table">
-                            <label for="versionSearch" class="col-form-label">버전<b>*</b></label>
-                            <select id="versionSearch" class="mx-3 form-control" name="versionSearch" required>
-                                <option th:value="*{null}" th:text="'(선택)'"
-                                    th:selected="${selectedVersionSearch == null}"></option>
-                                <!-- 버전 목록이 있다면 선택된 값 유지 -->
-                                <option th:if="${selectedVersionSearch != null}" th:value="${selectedVersionSearch}"
-                                    th:text="${selectedVersionSearch}" th:selected="true"></option>
-                            </select>
-                        </div>
-                        <div class="col search-table">
-                            <label for="urlSearch" class="col-form-label">URL<b>*</b></label>
-                            <input type="text" class="form-control" id="urlSearch" th:value="${selectedUrlSearch}"
-                                disabled>
-                        </div>
-                    </div>
+                    </form>
                 </div>
             </div>
 
@@ -86,6 +122,9 @@
                         <input type="hidden" name="modelSearch" th:value="${selectedModelSearch}">
                         <input type="hidden" name="versionSearch" th:value="${selectedVersionSearch}">
                         <input type="hidden" name="urlSearch" th:value="${selectedUrlSearch}">
+                        <input type="hidden" name="retries" th:value="${selectedRetries}">
+                        <input type="hidden" name="retryInterval" th:value="${selectedRetryInterval}">
+                        <input type="hidden" name="retrieveDate" th:value="${selectedRetrieveDate}">
                     </form>
                     <!-- form end -->
                 </div>
@@ -154,9 +193,13 @@
                                     companyIdSearch=${selectedCompanyId}, 
                                     stationIdSearch=${selectedStationId}, 
                                     companyIdFw=${selectedCompanyIdFw},
-                                     modelSearch=${selectedModelSearch}, 
-                                     versionSearch=${selectedVersionSearch}, 
-                                     urlSearch=${selectedUrlSearch})}"><i class="bi bi-chevron-double-left"></i></a>
+                                    modelSearch=${selectedModelSearch}, 
+                                    versionSearch=${selectedVersionSearch}, 
+                                    urlSearch=${selectedUrlSearch},
+                                    retries=${selectedRetries},
+                                    retryInterval=${selectedRetryInterval},
+                                    retrieveDate=${selectedRetrieveDate})}"><i
+                                        class="bi bi-chevron-double-left"></i></a>
                             </li>
                             <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled' : ''">
                                 <a class="page-link" th:href="@{/fw/update/get/cplist(page=${currentPage-1}, size=${size}, 
@@ -165,7 +208,10 @@
                                     companyIdFw=${selectedCompanyIdFw}, 
                                     modelSearch=${selectedModelSearch}, 
                                     versionSearch=${selectedVersionSearch}, 
-                                    urlSearch=${selectedUrlSearch})}"><i class="bi bi-chevron-left"></i></a>
+                                    urlSearch=${selectedUrlSearch},
+                                    retries=${selectedRetries},
+                                    retryInterval=${selectedRetryInterval},
+                                    retrieveDate=${selectedRetrieveDate})}"><i class="bi bi-chevron-left"></i></a>
                             </li>
                             <li class="page-item" th:each="i : ${#numbers.sequence(currentPage - 2, currentPage + 2)}"
                                 th:if="${i >= 0 && i < totalPages}">
@@ -175,7 +221,10 @@
                                     companyIdFw=${selectedCompanyIdFw}, 
                                     modelSearch=${selectedModelSearch}, 
                                     versionSearch=${selectedVersionSearch}, 
-                                    urlSearch=${selectedUrlSearch})}" th:text="${i+1}"
+                                    urlSearch=${selectedUrlSearch},
+                                    retries=${selectedRetries},
+                                    retryInterval=${selectedRetryInterval},
+                                    retrieveDate=${selectedRetrieveDate})}" th:text="${i+1}"
                                     th:classappend="${i == currentPage} ? 'active' : ''"></a>
                             </li>
                             <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled' : ''">
@@ -185,7 +234,10 @@
                                     companyIdFw=${selectedCompanyIdFw}, 
                                     modelSearch=${selectedModelSearch}, 
                                     versionSearch=${selectedVersionSearch}, 
-                                    urlSearch=${selectedUrlSearch})}"><i class="bi bi-chevron-right"></i></a>
+                                    urlSearch=${selectedUrlSearch},
+                                    retries=${selectedRetries},
+                                    retryInterval=${selectedRetryInterval},
+                                    retrieveDate=${selectedRetrieveDate})}"><i class="bi bi-chevron-right"></i></a>
                             </li>
                             <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled' : ''">
                                 <a class="page-link" th:href="@{/fw/update/get/cplist(page=${totalPages - 1}, size=${size}, 
@@ -194,7 +246,11 @@
                                     companyIdFw=${selectedCompanyIdFw}, 
                                     modelSearch=${selectedModelSearch}, 
                                     versionSearch=${selectedVersionSearch}, 
-                                    urlSearch=${selectedUrlSearch})}"><i class="bi bi-chevron-double-right"></i></a>
+                                    urlSearch=${selectedUrlSearch},
+                                    retries=${selectedRetries},
+                                    retryInterval=${selectedRetryInterval},
+                                    retrieveDate=${selectedRetrieveDate})}"><i
+                                        class="bi bi-chevron-double-right"></i></a>
                             </li>
                         </ul>
                     </div>

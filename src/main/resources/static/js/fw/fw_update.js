@@ -2,19 +2,35 @@ document.addEventListener("DOMContentLoaded", function () {
 
     let selectedRow; // 선택한 행, 열 저장
 
-
-
     // '검색' 버튼 클릭 이벤트 처리
     document.getElementById("serachBtn").addEventListener("click", function () {
+
         // 현재 선택된 펌웨어 값들을 hidden 필드에 설정
         document.querySelector('input[name="companyIdFw"]').value = document.getElementById('companyIdFw').value;
         document.querySelector('input[name="modelSearch"]').value = document.getElementById('modelSearch').value;
         document.querySelector('input[name="versionSearch"]').value = document.getElementById('versionSearch').value;
         document.querySelector('input[name="urlSearch"]').value = document.getElementById('urlSearch').value;
+        document.querySelector('input[name="retries"]').value = document.getElementById('retries').value;
+        document.querySelector('input[name="retryInterval"]').value = document.getElementById('retryInterval').value;
+        document.querySelector('input[name="retrieveDate"]').value = document.getElementById('retrieveDate').value;
 
+
+        // 폼 제출
         document.getElementById('searchForm').submit();
     });
 
+
+    // '펌웨어 설정 초기화' 버튼 클릭 이벤트 처리
+    document.getElementById("fwconfigResetBtn").addEventListener("click", function () {
+
+        document.getElementById('companyIdFw').value = '';
+        document.getElementById('modelSearch').value = '';
+        document.getElementById('versionSearch').value = '';
+        document.getElementById('urlSearch').value = '';
+        document.getElementById('retries').value = '';
+        document.getElementById('retryInterval').value = '';
+        document.getElementById('retrieveDate').value = '';
+    });
 
     // '초기화' 버튼 클릭 이벤트 처리
     document.getElementById("resetBtn").addEventListener("click", function () {
@@ -22,13 +38,13 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById('companyIdSearch').value = '';
         document.getElementById('stationIdSearch').value = '';
 
-        // 펌웨어 선택 값들은 현재 값으로 유지
-        document.querySelector('input[name="companyIdFw"]').value = document.getElementById('companyIdFw').value;
-        document.querySelector('input[name="modelSearch"]').value = document.getElementById('modelSearch').value;
-        document.querySelector('input[name="versionSearch"]').value = document.getElementById('versionSearch').value;
-        document.querySelector('input[name="urlSearch"]').value = document.getElementById('urlSearch').value;
+        // // 펌웨어 선택 값들은 현재 값으로 유지
+        // document.querySelector('input[name="companyIdFw"]').value = document.getElementById('companyIdFw').value;
+        // document.querySelector('input[name="modelSearch"]').value = document.getElementById('modelSearch').value;
+        // document.querySelector('input[name="versionSearch"]').value = document.getElementById('versionSearch').value;
+        // document.querySelector('input[name="urlSearch"]').value = document.getElementById('urlSearch').value;
 
-        document.getElementById('searchForm').submit();
+        // document.getElementById('searchForm').submit();
     });
 
     // 펌웨어선택 - 사업자 ID선택에 따른 모델명 리스트 조회요청
@@ -149,22 +165,33 @@ document.addEventListener("DOMContentLoaded", function () {
     if (updateBtn) {
         updateBtn.addEventListener("click", function () {
             const selectedUrl = document.getElementById('urlSearch').value;
+            const retries = document.getElementById('retries').value;
+            const retryInterval = document.getElementById('retryInterval').value;
+            const retrieveDate = document.getElementById('retrieveDate').value;
+
             if (!selectedUrl) {
                 alert("URL 정보가 없습니다.");
                 return;
             }
 
             if (selectedRow) {
-                const selectedChargerId = selectedRow.cells[4].id;
+                const selectedChargerId = selectedRow.cells[5].innerText;
                 console.log("selected chargerID : ", selectedChargerId);
+
+                if (retrieveDate == '') {
+                    retrieveDate = new Date().toISOString();
+                }
+
+                // // 현재 시간을 ISO 문자열로 변환
+                // const currentDate = new Date().toISOString();
 
                 //업덴이트 요청 데이터 생성
                 const updateData = {
                     chargerId: selectedChargerId,
-                    url: selectedUrl,
-                    retries: 3,
-                    retrieveDate: new Date().toISOString,
-                    retryInterval: 300
+                    location: selectedUrl,
+                    retries: retries,
+                    retrieveDate: retrieveDate,
+                    retryInterval: retryInterval
                 };
 
                 fetch('/control/fwupdate', {
@@ -176,7 +203,11 @@ document.addEventListener("DOMContentLoaded", function () {
                 })
                     .then(response => response.json())
                     .then(data => {
-                        alert('요청결과 : ' + data.status);
+                        if (data.status == 'Accepted') {
+                            alert('펌웨어 업데이트 요청이 정상적으로 처리되었습니다.');
+                        } else {
+                            alert('펌웨어 업데이트 요청 실패.(' + data.status + ')');
+                        }
                     })
                     .catch(error => {
                         alert('펌웨어 업데이트 요청 중 오류가 발생했습니다.');
