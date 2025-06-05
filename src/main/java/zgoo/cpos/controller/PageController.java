@@ -156,7 +156,7 @@ public class PageController {
             StationOpStatusDto opStatus = this.csService.getStationOpStatusCount(principal.getName());
             model.addAttribute("opStatus", opStatus);
 
-            SalesDashboardDto saleStatus = this.chargingPaymentInfoService.findPaymentByPeriod();
+            SalesDashboardDto saleStatus = this.chargingPaymentInfoService.findPaymentByPeriod(principal.getName());
             model.addAttribute("saleStatus", saleStatus);
 
             TotalkwDashboardDto chgStatus = this.chargingHistService.findChargingHistByPeriod(principal.getName());
@@ -1706,13 +1706,12 @@ public class PageController {
             model.addAttribute("selectedYear", year);
 
             PurchaseSalesBarDto pursales = this.statisticsService.searchYearPurchaseSales(companyId, searchOp,
-                    searchContent,
-                    year);
+                    searchContent, year, principal.getName());
             model.addAttribute("pursales", pursales);
             log.info("pursales >> {}", pursales.toString());
 
             PurchaseSalesLineChartDto lineChart = this.statisticsService.searchMonthlyPurchaseSales(companyId, searchOp,
-                    searchContent, year);
+                    searchContent, year, principal.getName());
             model.addAttribute("lineChart", lineChart);
             log.info("lineChart >> {}", lineChart.toString());
 

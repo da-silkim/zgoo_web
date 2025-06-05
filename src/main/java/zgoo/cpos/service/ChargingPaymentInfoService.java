@@ -119,8 +119,17 @@ public class ChargingPaymentInfoService {
     /* *
      * 매출현황(대시보드)
      */
-    public SalesDashboardDto findPaymentByPeriod() {
+    public SalesDashboardDto findPaymentByPeriod(String userId) {
         try {
+            boolean isSuperAdmin = comService.checkSuperAdmin(userId);
+            Long loginUserCompanyId = comService.getLoginUserCompanyId(userId);
+            String levelPath = companyRepository.findLevelPathByCompanyId(loginUserCompanyId);
+            log.info("== levelPath : {}", levelPath);
+            if (levelPath == null) {
+                // 관계정보가 없을경우 빈 리스트 전달
+                return null;
+            }
+
             LocalDate today = LocalDate.now(); // 오늘 날짜
             LocalDate firstDayOfCurrentMonth = today.withDayOfMonth(1); // 당월의 첫 번째 날
             YearMonth lastMonth = YearMonth.from(today).minusMonths(1); // 전월 YearMonth
@@ -133,11 +142,9 @@ public class ChargingPaymentInfoService {
                     : sameDayLastMonth;
 
             SalesDashboardDto lastMonthDto = chargerPaymentInfoRepository.findPaymentByPeriod(
-                    firstDayOfLastMonth.atStartOfDay(),
-                    endDate.atTime(23, 59, 59));
+                    firstDayOfLastMonth, endDate, levelPath, isSuperAdmin);
             SalesDashboardDto currMonthDto = chargerPaymentInfoRepository.findPaymentByPeriod(
-                    firstDayOfCurrentMonth.atStartOfDay(),
-                    today.atTime(23, 59, 59));
+                    firstDayOfCurrentMonth, today, levelPath, isSuperAdmin);
 
             currMonthDto.setPeriod(firstDayOfCurrentMonth + " ~ " + today);
 

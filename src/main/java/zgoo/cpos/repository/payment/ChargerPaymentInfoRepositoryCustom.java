@@ -1,7 +1,7 @@
 package zgoo.cpos.repository.payment;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -27,13 +27,14 @@ public interface ChargerPaymentInfoRepositoryCustom {
             boolean isSuperAdmin);
 
     // 연도별 매출 합계
-    BigDecimal findTotalSalesByYear(Long companyId, String searchOp, String searchContent, Integer year);
+    BigDecimal findTotalSalesByYear(Long companyId, String searchOp, String searchContent, Integer year,
+            String levelPath, boolean isSuperAdmin);
 
     // 월별 매출 합계
     List<PurchaseSalesLineChartBaseDto> searchMonthlyTotalSales(Long companyId, String searchOp,
-            String searchContent,
-            Integer year);
+            String searchContent, Integer year, String levelPath, boolean isSuperAdmin);
 
     // 매출현황(대시보드)
-    SalesDashboardDto findPaymentByPeriod(LocalDateTime startDate, LocalDateTime endDate);
+    SalesDashboardDto findPaymentByPeriod(LocalDate startDate, LocalDate endDate, String levelPath,
+            boolean isSuperAdmin);
 }

@@ -58,8 +58,11 @@ public class StatisticsService {
             String levelPath = companyRepository.findLevelPathByCompanyId(loginUserCompanyId);
             log.info("== levelPath : {}", levelPath);
             if (levelPath == null) {
-                // 관계정보가 없을경우 빈 리스트 전달
-                return null;
+                // 관계정보가 없을경우 기본값 설정
+                return TotalkwBarDto.builder()
+                        .preYear(getDefaultDto(yearSearch - 1))
+                        .curYear(getDefaultDto(yearSearch))
+                        .build();
             }
 
             TotalkwBaseDto preYear = this.chargingHistRepository.searchYearChargeAmount(companyId, searchOp,
@@ -81,12 +84,11 @@ public class StatisticsService {
                     .build();
         } catch (Exception e) {
             log.error("[searchYearChargeAmount] error: {}", e.getMessage());
-        }
-
-        return TotalkwBarDto.builder()
+            return TotalkwBarDto.builder()
                 .preYear(getDefaultDto(yearSearch - 1))
                 .curYear(getDefaultDto(yearSearch))
                 .build();
+        }
     }
 
     private TotalkwBaseDto getDefaultDto(Integer year) {
@@ -151,8 +153,11 @@ public class StatisticsService {
             String levelPath = companyRepository.findLevelPathByCompanyId(loginUserCompanyId);
             log.info("== levelPath : {}", levelPath);
             if (levelPath == null) {
-                // 관계정보가 없을경우 빈 리스트 전달
-                return null;
+                // 관계정보가 없을경우 기본값 설정
+                return UsageBarDto.builder()
+                        .preYear(getDefaultUsageDto(yearSearch - 1))
+                        .curYear(getDefaultUsageDto(yearSearch))
+                        .build();
             }
 
             UsageBaseDto preYear = this.chargingHistRepository.searchYearUsage(companyId, searchOp, searchContent,
@@ -174,12 +179,11 @@ public class StatisticsService {
                     .build();
         } catch (Exception e) {
             log.error("[searchYearUsage] error: {}", e.getMessage());
-        }
-
-        return UsageBarDto.builder()
+            return UsageBarDto.builder()
                 .preYear(getDefaultUsageDto(yearSearch - 1))
                 .curYear(getDefaultUsageDto(yearSearch))
                 .build();
+        }
     }
 
     private UsageBaseDto getDefaultUsageDto(Integer year) {
@@ -232,12 +236,25 @@ public class StatisticsService {
 
     // purchase & sales >> bar chart
     public PurchaseSalesBarDto searchYearPurchaseSales(Long companyId, String searchOp, String searchContent,
-            Integer yearSearch) {
+            Integer yearSearch, String loginUserId) {
         if (yearSearch == null) {
             yearSearch = LocalDate.now().getYear();
         }
 
         try {
+            boolean isSuperAdmin = comService.checkSuperAdmin(loginUserId);
+            Long loginUserCompanyId = comService.getLoginUserCompanyId(loginUserId);
+            String levelPath = companyRepository.findLevelPathByCompanyId(loginUserCompanyId);
+            log.info("== levelPath : {}", levelPath);
+            if (levelPath == null) {
+                // 관계정보가 없을경우 기본값 설정
+                return PurchaseSalesBarDto.builder()
+                        .preYear(getDefaultPurchaseSalesDto(yearSearch - 1))
+                        .curYear(getDefaultPurchaseSalesDto(yearSearch))
+                        .totalPrice(BigDecimal.ZERO)
+                        .build();
+            }
+
             Integer prePurchase = Optional.ofNullable(
                     this.purchaseRepository.findTotalAmountByYear(companyId, searchOp, searchContent, yearSearch - 1))
                     .orElse(0);
@@ -248,12 +265,12 @@ public class StatisticsService {
 
             BigDecimal preSales = Optional.ofNullable(
                     this.chargerPaymentInfoRepository.findTotalSalesByYear(companyId, searchOp, searchContent,
-                            yearSearch - 1))
+                            yearSearch - 1, levelPath, isSuperAdmin))
                     .orElse(BigDecimal.ZERO);
 
             BigDecimal curSales = Optional.ofNullable(
                     this.chargerPaymentInfoRepository.findTotalSalesByYear(companyId, searchOp, searchContent,
-                            yearSearch))
+                            yearSearch, levelPath, isSuperAdmin))
                     .orElse(BigDecimal.ZERO);
 
             PurchaseSalesBaseDto preYear = PurchaseSalesBaseDto.builder()
@@ -296,10 +313,19 @@ public class StatisticsService {
 
     // purchase & sales >> line chart
     public PurchaseSalesLineChartDto searchMonthlyPurchaseSales(Long companyId, String searchOp, String searchContent,
-            Integer yearSearch) {
+            Integer yearSearch, String loginUserId) {
         try {
             if (yearSearch == null) {
                 yearSearch = LocalDate.now().getYear();
+            }
+
+            boolean isSuperAdmin = comService.checkSuperAdmin(loginUserId);
+            Long loginUserCompanyId = comService.getLoginUserCompanyId(loginUserId);
+            String levelPath = companyRepository.findLevelPathByCompanyId(loginUserCompanyId);
+            log.info("== levelPath : {}", levelPath);
+            if (levelPath == null) {
+                // 관계정보가 없을경우 빈 리스트 전달
+                return null;
             }
 
             List<PurchaseSalesLineChartBaseDto> purList = this.purchaseRepository.searchMonthlyTotalAmount(companyId,
@@ -307,8 +333,8 @@ public class StatisticsService {
                     searchContent, yearSearch);
 
             List<PurchaseSalesLineChartBaseDto> salesList = this.chargerPaymentInfoRepository.searchMonthlyTotalSales(
-                    companyId, searchOp,
-                    searchContent, yearSearch);
+                    companyId, searchOp, searchContent, yearSearch,
+                    levelPath, isSuperAdmin);
 
             log.info("salesList >> {}", salesList.toString());
 
@@ -336,8 +362,11 @@ public class StatisticsService {
             String levelPath = companyRepository.findLevelPathByCompanyId(loginUserCompanyId);
             log.info("== levelPath : {}", levelPath);
             if (levelPath == null) {
-                // 관계정보가 없을경우 빈 리스트 전달
-                return null;
+                // 관계정보가 없을경우 기본값 설정
+                return ErrorBarDto.builder()
+                        .preYear(getDefaultErrorDto(yearSearch - 1))
+                        .preYear(getDefaultErrorDto(yearSearch))
+                        .build();
             }
 
             ErrorBaseDto preYear = this.errorHistRepository.findTotalErrorHistByYear(companyId, searchOp, searchContent,
