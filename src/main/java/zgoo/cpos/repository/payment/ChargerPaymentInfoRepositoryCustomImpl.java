@@ -23,6 +23,7 @@ import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.types.dsl.NumberTemplate;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
@@ -35,6 +36,8 @@ import zgoo.cpos.domain.cs.QCsInfo;
 import zgoo.cpos.domain.history.QChargingHist;
 import zgoo.cpos.domain.payment.PgTrxRecon;
 import zgoo.cpos.domain.payment.QChargerPaymentInfo;
+import zgoo.cpos.domain.payment.QPgSettlmntDetail;
+import zgoo.cpos.domain.payment.QPgSettlmntTotal;
 import zgoo.cpos.domain.payment.QPgTrxRecon;
 import zgoo.cpos.dto.payment.ChgPaymentInfoDto;
 import zgoo.cpos.dto.payment.ChgPaymentSummaryDto;
@@ -945,11 +948,10 @@ public class ChargerPaymentInfoRepositoryCustomImpl implements ChargerPaymentInf
 
     @Override
     public BigDecimal findTotalSalesByYear(Long companyId, String searchOp, String searchContent, Integer year) {
-        QChargerPaymentInfo chgPaymentInfo = QChargerPaymentInfo.chargerPaymentInfo;
         QCompany company = QCompany.company;
         QCpInfo cpInfo = QCpInfo.cpInfo;
         QCsInfo csInfo = QCsInfo.csInfo;
-        QPgTrxRecon pgTrxRecon = QPgTrxRecon.pgTrxRecon;
+        QPgSettlmntDetail pgSettlmntDetail = QPgSettlmntDetail.pgSettlmntDetail;
 
         BooleanBuilder builder = new BooleanBuilder();
 
@@ -968,64 +970,18 @@ public class ChargerPaymentInfoRepositoryCustomImpl implements ChargerPaymentInf
             }
         }
 
-        LocalDateTime startOfYear = LocalDate.of(year, 1, 1).atStartOfDay();
-        LocalDateTime endOfYear = LocalDate.of(year, 12, 31).atTime(LocalTime.MAX);
-        builder.and(chgPaymentInfo.timestamp.between(startOfYear, endOfYear));
+        LocalDate startOfYear = LocalDate.of(year, 1, 1);
+        LocalDate endOfYear = LocalDate.of(year, 12, 31);
+        builder.and(pgSettlmntDetail.settlmntDt.between(startOfYear, endOfYear));
 
-        // PG 거래 데이터 조회
-        // 1. 관제 결제 데이터의 TID 목록 추출
-        List<String> tids = queryFactory
-                .select(chgPaymentInfo.preTid)
-                .from(chgPaymentInfo)
-                .leftJoin(cpInfo).on(chgPaymentInfo.chargerId.eq(cpInfo.id))
+        return queryFactory
+                .select(pgSettlmntDetail.depositAmt.sum())
+                .from(pgSettlmntDetail)
+                .leftJoin(cpInfo).on(pgSettlmntDetail.chargerId.eq(cpInfo.id))
                 .leftJoin(csInfo).on(cpInfo.stationId.eq(csInfo))
                 .leftJoin(company).on(csInfo.company.eq(company))
                 .where(builder)
-                .fetch();
-
-        log.info("tids >> {}", tids.toString());
-
-        // 2. PG 승인금액 합계 (상태코드 0)
-        BigDecimal totalPgAppAmount = BigDecimal.ZERO;
-        if (!tids.isEmpty()) {
-            BigDecimal sum = queryFactory
-                    .select(pgTrxRecon.goodsAmt.sum())
-                    .from(pgTrxRecon)
-                    .where(pgTrxRecon.tid.in(tids).and(pgTrxRecon.stateCd.in("0", "1")))
-                    .fetchOne();
-
-            log.info("totalPgAppAmount sum >> {}", sum);
-
-            if (sum != null) {
-                totalPgAppAmount = sum;
-            }
-        }
-
-        // 3. PG 취소금액 합계 (상태코드 1 또는 2)
-        BigDecimal totalPgCancelAmount = BigDecimal.ZERO;
-        if (!tids.isEmpty()) {
-            BooleanExpression cancelCondition = pgTrxRecon.tid.in(tids).and(pgTrxRecon.stateCd.in("1", "2"))
-                    .or(pgTrxRecon.otid.in(tids).and(pgTrxRecon.stateCd.eq("2")));
-
-            BigDecimal sum = queryFactory
-                    .select(pgTrxRecon.goodsAmt.sum())
-                    .from(pgTrxRecon)
-                    .where(cancelCondition)
-                    .fetchOne();
-
-            log.info("totalPgCancelAmount sum >> {}", sum);
-
-            if (sum != null) {
-                totalPgCancelAmount = sum;
-            }
-        }
-
-        // 4. PG 결제금액 합계 (승인금액 - 취소금액)
-        BigDecimal totalPgPaymentAmount = totalPgAppAmount.subtract(totalPgCancelAmount);
-
-        log.info("승인금액: {}, 취소금액{}, 합계금액:{}", totalPgAppAmount, totalPgCancelAmount, totalPgPaymentAmount);
-
-        return totalPgPaymentAmount;
+                .fetchOne();
     }
 
     @Override
@@ -1034,11 +990,10 @@ public class ChargerPaymentInfoRepositoryCustomImpl implements ChargerPaymentInf
             Integer year) {
         log.info("companyId: {}, searchOp: {}, searchContent: {}, year: {}", companyId, searchOp, searchContent, year);
 
-        QChargerPaymentInfo chgPaymentInfo = QChargerPaymentInfo.chargerPaymentInfo;
         QCompany company = QCompany.company;
         QCpInfo cpInfo = QCpInfo.cpInfo;
         QCsInfo csInfo = QCsInfo.csInfo;
-        QPgTrxRecon pgTrxRecon = QPgTrxRecon.pgTrxRecon;
+        QPgSettlmntDetail pgSettlmntDetail = QPgSettlmntDetail.pgSettlmntDetail;
 
         BooleanBuilder builder = new BooleanBuilder();
 
@@ -1057,7 +1012,7 @@ public class ChargerPaymentInfoRepositoryCustomImpl implements ChargerPaymentInf
             }
         }
 
-        builder.and(Expressions.numberTemplate(Integer.class, "YEAR({0})", chgPaymentInfo.timestamp).eq(year));
+        builder.and(Expressions.numberTemplate(Integer.class, "YEAR({0})", pgSettlmntDetail.settlmntDt).eq(year));
 
         // 월별 결과 초기화
         List<PurchaseSalesLineChartBaseDto> monthlyResults = IntStream.rangeClosed(1, 12)
@@ -1068,58 +1023,26 @@ public class ChargerPaymentInfoRepositoryCustomImpl implements ChargerPaymentInf
                         .build())
                 .collect(Collectors.toList());
 
-        // 월별 TID 조회
-        List<Tuple> tidsByMonth = queryFactory
+        NumberTemplate<Integer> monthTemplate = Expressions.numberTemplate(Integer.class, "MONTH({0})", pgSettlmntDetail.settlmntDt);        
+        // 월별 매출액 조회
+        List<Tuple> results = queryFactory
                 .select(
-                        Expressions.numberTemplate(Integer.class, "MONTH({0})", chgPaymentInfo.timestamp).as("month"),
-                        chgPaymentInfo.preTid)
-                .from(chgPaymentInfo)
-                .leftJoin(cpInfo).on(chgPaymentInfo.chargerId.eq(cpInfo.id))
+                    monthTemplate.as("month"),
+                    pgSettlmntDetail.depositAmt.sum())
+                .from(pgSettlmntDetail)
+                .leftJoin(cpInfo).on(pgSettlmntDetail.chargerId.eq(cpInfo.id))
                 .leftJoin(csInfo).on(cpInfo.stationId.eq(csInfo))
                 .leftJoin(company).on(csInfo.company.eq(company))
                 .where(builder)
+                .groupBy(monthTemplate)
                 .fetch();
 
-        // 월별로 TID 그룹
-        Map<Integer, List<String>> monthToTidsMap = tidsByMonth.stream()
-                .collect(Collectors.groupingBy(
-                        tuple -> tuple.get(0, Integer.class),
-                        Collectors.mapping(tuple -> tuple.get(1, String.class), Collectors.toList())));
-
-        // 월별 PG 결제금액 합계 계산
-        for (Map.Entry<Integer, List<String>> entry : monthToTidsMap.entrySet()) {
-            Integer month = entry.getKey();
-            List<String> tids = entry.getValue();
-
-            if (!tids.isEmpty()) {
-                // 승인금액
-                BigDecimal approved = queryFactory
-                        .select(pgTrxRecon.goodsAmt.sum())
-                        .from(pgTrxRecon)
-                        .where(pgTrxRecon.tid.in(tids).and(pgTrxRecon.stateCd.in("0", "1")))
-                        .fetchOne();
-
-                if (approved == null)
-                    approved = BigDecimal.ZERO;
-
-                // 취소금액
-                BooleanExpression cancelCondition = pgTrxRecon.tid.in(tids).and(pgTrxRecon.stateCd.in("1", "2"))
-                        .or(pgTrxRecon.otid.in(tids).and(pgTrxRecon.stateCd.eq("2")));
-
-                BigDecimal canceled = queryFactory
-                        .select(pgTrxRecon.goodsAmt.sum())
-                        .from(pgTrxRecon)
-                        .where(cancelCondition)
-                        .fetchOne();
-
-                if (canceled == null)
-                    canceled = BigDecimal.ZERO;
-
-                // 결제금액 (승인금액 - 취소금액)
-                BigDecimal total = approved.subtract(canceled);
-                monthlyResults.get(month - 1).setTotalPrice(total);
-            }
+        for (Tuple tuple : results) {
+            Integer month = tuple.get(0, Integer.class);
+            BigDecimal total = tuple.get(1, BigDecimal.class);
+            monthlyResults.get(month - 1).setTotalPrice(total);
         }
+
         return monthlyResults;
     }
 
