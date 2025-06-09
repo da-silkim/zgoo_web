@@ -90,7 +90,7 @@
                     <div class="card-title"><span class="card-title-bar"></span><span>충전기 검색</span></div>
                     <!-- form start -->
                     <form id="searchForm" class="firmware-update" th:action="@{/fw/update/get/cplist}" method="get">
-                        <div class="row mb-3 row-cols-2 row-cols-lg-3 g-2">
+                        <div class="row mb-3 row-cols-2 row-cols-lg-2 g-2">
                             <div class="col search-table">
                                 <label for="companyIdSearch" class="col-form-label">사업자<b>*</b></label>
                                 <select id="companyIdSearch" class="mx-3 form-control" name="companyIdSearch" required>
@@ -105,10 +105,11 @@
                                 <input type="text" name="stationIdSearch" id="stationIdSearch" class="form-control"
                                     th:value="${selectedStationId}" autocomplete="off">
                             </div>
-                            <div class="col search-table">
+
+                            <!-- <div class="col search-table">
                                 <label for="stationNameSearch" class="col-form-label">충전소명<b>*</b></label>
                                 <input type="text" class="form-control" id="stationNameSearch" disabled>
-                            </div>
+                            </div> -->
                         </div>
                         <div>
                             <button type="button" class="btn btn-outline-grey me-2" id="serachBtn">
@@ -153,10 +154,10 @@
                         </span>
                     </div>
                     <div class="w-100 table-responsive position-relative">
-                        <table class="table text-center mt-3 table-bg table-hover">
+                        <table class="table text-center mt-3 table-bg table-hover fw-update-table">
                             <thead>
                                 <tr class="table-border-top">
-                                    <th scope="col"></th>
+                                    <th scope="col"><input type="checkbox" id="selectAll" /></th>
                                     <th scope="col">사업자</th>
                                     <th scope="col">제조사</th>
                                     <th scope="col">충전소명</th>
