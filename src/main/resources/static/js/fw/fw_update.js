@@ -5,6 +5,12 @@ document.addEventListener("DOMContentLoaded", function () {
     // '검색' 버튼 클릭 이벤트 처리
     document.getElementById("serachBtn").addEventListener("click", function () {
 
+        if (document.getElementById('companyIdSearch').value == '') {
+            alert("사업자를 선택해주세요.");
+            return;
+        }
+
+
         // 현재 선택된 펌웨어 값들을 hidden 필드에 설정
         document.querySelector('input[name="companyIdFw"]').value = document.getElementById('companyIdFw').value;
         document.querySelector('input[name="modelSearch"]').value = document.getElementById('modelSearch').value;
@@ -149,18 +155,86 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 
+    // 전체 선택 체크박스 이벤트 추가
+    const selectAllCheckbox = document.querySelector('#selectAll');
+    if (selectAllCheckbox) {
+        selectAllCheckbox.addEventListener('change', function () {
+            const checkboxes = document.querySelectorAll('#pageList input[type="checkbox"]');
 
-    //테이블 row 클릭시 처리 이벤트
-    document.querySelectorAll('#pageList tr').forEach(row => {
-        row.addEventListener('click', function () {
-            selectedRow = row;
-            console.log('selected row data:', selectedRow);
+            // 전체 체크박스 개수가 10개를 초과하는 경우
+            if (checkboxes.length > 10 && this.checked) {
+                alert("한 번에 최대 10개까지만 선택할 수 있습니다.");
+                this.checked = false;
+                return;
+            }
+
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = selectAllCheckbox.checked;
+                updateRowStyle(checkbox);
+            });
         });
-    });
+    }
 
-    /**
-     * 선택된 충전기 업데이트 요청
-     */
+    // 개별 체크박스 클릭 이벤트 처리
+    const pageList = document.getElementById('pageList');
+    if (pageList) {
+        pageList.addEventListener('click', function (event) {
+            const target = event.target;
+
+            // 링크 클릭 시 이벤트 전파 중지
+            if (target.tagName === 'A') {
+                event.stopPropagation();
+                return;
+            }
+
+            let checkbox;
+            if (target.type === 'checkbox') {
+                checkbox = target;
+            } else {
+                const row = target.closest('tr');
+                if (!row) return;
+
+                checkbox = row.querySelector('input[type="checkbox"]');
+                if (!checkbox) return;
+
+                checkbox.checked = !checkbox.checked;
+            }
+
+            // 체크된 체크박스 개수 확인
+            const checkedCount = document.querySelectorAll('#pageList input[type="checkbox"]:checked').length;
+
+            // 10개 초과 선택 시 체크 해제
+            if (checkedCount > 10) {
+                alert("한 번에 최대 10개까지만 선택할 수 있습니다.");
+                checkbox.checked = false;
+            }
+
+            updateRowStyle(checkbox);
+            updateSelectAllCheckboxState();
+        });
+    }
+
+    // 행 스타일 업데이트 함수
+    function updateRowStyle(checkbox) {
+        const row = checkbox.closest('tr');
+        if (checkbox.checked) {
+            row.classList.add('table-selected-active');
+        } else {
+            row.classList.remove('table-selected-active');
+        }
+    }
+
+    // 전체 선택 상태 업데이트 함수
+    function updateSelectAllCheckboxState() {
+        if (!selectAllCheckbox) return;
+
+        const allCheckboxes = document.querySelectorAll('#pageList input[type="checkbox"]');
+        const checkedCheckboxes = document.querySelectorAll('#pageList input[type="checkbox"]:checked');
+
+        selectAllCheckbox.checked = allCheckboxes.length === checkedCheckboxes.length && allCheckboxes.length > 0;
+    }
+
+    // 업데이트 버튼 이벤트
     const updateBtn = document.getElementById("updateBtn");
     if (updateBtn) {
         updateBtn.addEventListener("click", function () {
@@ -174,48 +248,65 @@ document.addEventListener("DOMContentLoaded", function () {
                 return;
             }
 
-            if (selectedRow) {
-                const selectedChargerId = selectedRow.cells[5].innerText;
-                console.log("selected chargerID : ", selectedChargerId);
+            // 선택된 충전기 수집
+            const selectedChargers = [];
+            document.querySelectorAll('#pageList input[type="checkbox"]:checked').forEach(checkbox => {
+                const row = checkbox.closest('tr');
+                const chargerId = row.cells[5].innerText;
+                selectedChargers.push(chargerId);
+            });
 
-                if (retrieveDate == '') {
-                    retrieveDate = new Date().toISOString();
-                }
+            if (selectedChargers.length === 0) {
+                alert("업데이트할 충전기를 선택해주세요.");
+                return;
+            }
 
-                // // 현재 시간을 ISO 문자열로 변환
-                // const currentDate = new Date().toISOString();
+            // 10개 초과 선택 체크 (추가 안전장치)
+            if (selectedChargers.length > 10) {
+                alert("한 번에 최대 10개까지만 선택할 수 있습니다.");
+                return;
+            }
 
-                //업덴이트 요청 데이터 생성
-                const updateData = {
-                    chargerId: selectedChargerId,
-                    location: selectedUrl,
-                    retries: retries,
-                    retrieveDate: retrieveDate,
-                    retryInterval: retryInterval
-                };
+            if (confirm(`선택한 ${selectedChargers.length}개의 충전기를 업데이트하시겠습니까?`)) {
+                // 벌크 업데이트 처리
+                const updatePromises = selectedChargers.map(chargerId => {
+                    const updateData = {
+                        chargerId: chargerId,
+                        location: selectedUrl,
+                        retries: retries,
+                        retrieveDate: retrieveDate || new Date().toISOString(),
+                        retryInterval: retryInterval
+                    };
 
-                fetch('/control/fwupdate', {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(updateData)
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.status == 'Accepted') {
-                            alert('펌웨어 업데이트 요청이 정상적으로 처리되었습니다.');
-                        } else {
-                            alert('펌웨어 업데이트 요청 실패.(' + data.status + ')');
+                    return fetch('/control/fwupdate', {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(updateData)
+                    }).then(response => response.json());
+                });
+
+                Promise.all(updatePromises)
+                    .then(results => {
+                        const successCount = results.filter(result => result.status === 'Accepted').length;
+                        const failCount = results.length - successCount;
+
+                        alert(`펌웨어 업데이트 요청 결과:\n성공: ${successCount}건\n실패: ${failCount}건`);
+
+                        // 체크박스 초기화
+                        if (selectAllCheckbox) {
+                            selectAllCheckbox.checked = false;
                         }
+                        document.querySelectorAll('#pageList input[type="checkbox"]').forEach(checkbox => {
+                            checkbox.checked = false;
+                            updateRowStyle(checkbox);
+                        });
                     })
                     .catch(error => {
                         alert('펌웨어 업데이트 요청 중 오류가 발생했습니다.');
                         console.error('업데이트 요청 오류:', error);
                     });
-            } else {
-                alert("업데이트할 충전기를 선택해주세요.");
-                return;
             }
         });
     }
