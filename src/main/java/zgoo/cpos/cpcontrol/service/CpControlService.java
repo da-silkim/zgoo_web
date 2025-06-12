@@ -4,6 +4,8 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,12 +25,21 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import zgoo.cpos.cpcontrol.dto.CancelTestRequestDto;
 import zgoo.cpos.cpcontrol.dto.CancelTestRsponseDto;
+import zgoo.cpos.cpcontrol.dto.ChangeConfigurationReqDto;
+import zgoo.cpos.cpcontrol.dto.GetConfigurationReqDto;
 import zgoo.cpos.cpcontrol.dto.PaymentTestRequestDto;
 import zgoo.cpos.cpcontrol.dto.PaymentTestResponseDto;
+import zgoo.cpos.cpcontrol.dto.ResetRequestDto;
+import zgoo.cpos.cpcontrol.dto.TriggerMessageReqDto;
 import zgoo.cpos.cpcontrol.dto.UpdateFirmwareDto;
+import zgoo.cpos.cpcontrol.message.changeconfiguration.ChangeConfigurationResponse;
 import zgoo.cpos.cpcontrol.message.firmware.UpdateFirmwareResponse;
+import zgoo.cpos.cpcontrol.message.getconfiguration.GetConfigurationResponse;
+import zgoo.cpos.cpcontrol.message.reset.ResetResponse;
+import zgoo.cpos.cpcontrol.message.trigger.TriggerMessageResponse;
 import zgoo.cpos.domain.charger.CpStatus;
 import zgoo.cpos.repository.charger.CpStatusRepository;
+import zgoo.cpos.type.ocpp.GetConfigSearchType;
 import zgoo.cpos.type.ocpp.UpdateFirmwareStatus;
 
 @Service
@@ -56,6 +67,197 @@ public class CpControlService {
     private final String transUrl = "https://data.nicepay.co.kr/trans/api";
 
     private final CpStatusRepository cpStatusRepository;
+
+    public GetConfigurationResponse getConfiguration(GetConfigurationReqDto request) {
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            Map<String, Object> requestMap = new HashMap<>();
+            if (request.getSearchOption() == GetConfigSearchType.ALL) {
+                requestMap.put("chargePointId", request.getChargerId());
+                requestMap.put("key", new ArrayList<>());
+            } else {
+                requestMap.put("chargePointId", request.getChargerId());
+                requestMap.put("key", Arrays.asList(request.getKey().toString()));
+            }
+
+            // 요청데이터 로깅
+            log.info("Get Configuration Request : {}", requestMap.toString());
+
+            HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestMap, headers);
+
+            // 외부 서버로 POST 요청 전송
+            log.info("외부 서버({})로 POST 요청 전송", gwServerUrl + "/getConfiguration");
+            long startTime = System.currentTimeMillis();
+
+            ResponseEntity<GetConfigurationResponse> response = restTemplate.postForEntity(
+                    gwServerUrl + "/getConfiguration",
+                    entity,
+                    GetConfigurationResponse.class);
+
+            long endTime = System.currentTimeMillis();
+            log.info("외부 서버 응답 수신 - 소요시간: {}ms, 상태코드: {}",
+                    (endTime - startTime), response.getStatusCodeValue());
+
+            if (response.getStatusCode().is2xxSuccessful()) {
+                log.info("외부 서버 응답 데이터: {}", response.getBody());
+                GetConfigurationResponse getConfigurationResponse = response.getBody();
+                log.info("Get Configuration Request(/getConfiguration) 성공 - 결과메시지: {}",
+                        getConfigurationResponse);
+                return getConfigurationResponse;
+            } else {
+                log.error("Get Configuration Request(/getConfiguration) 실패 - 상태코드: {}, 응답: {}",
+                        response.getStatusCode(), response.getBody());
+                throw new RuntimeException(
+                        "Get Configuration Request(/getConfiguration) 실패 - 상태코드: " + response.getStatusCode());
+            }
+        } catch (Exception e) {
+            log.error("Get Configuration Request(/getConfiguration) 처리 중 예외 발생", e);
+            throw new RuntimeException("Get Configuration Request(/getConfiguration) 처리 중 예외 발생", e);
+        }
+    }
+
+    public ChangeConfigurationResponse changeConfiguration(ChangeConfigurationReqDto request) {
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            Map<String, Object> requestMap = new HashMap<>();
+            requestMap.put("chargePointId", request.getChargerId());
+            requestMap.put("key", request.getKey());
+            requestMap.put("value", request.getValue());
+
+            // 요청데이터 로깅
+            log.info("ChangeConfiguration Request : {}", requestMap.toString());
+
+            // HTTP 요청 엔티티 생성
+            HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestMap, headers);
+
+            // 외부 서버로 POST 요청 전송
+            log.info("외부 서버({})로 POST 요청 전송", gwServerUrl + "/changeConfiguration");
+            long startTime = System.currentTimeMillis();
+
+            ResponseEntity<ChangeConfigurationResponse> response = restTemplate.postForEntity(
+                    gwServerUrl + "/changeConfiguration",
+                    entity,
+                    ChangeConfigurationResponse.class);
+
+            long endTime = System.currentTimeMillis();
+            log.info("외부 서버 응답 수신 - 소요시간: {}ms, 상태코드: {}",
+                    (endTime - startTime), response.getStatusCodeValue());
+
+            if (response.getStatusCode().is2xxSuccessful()) {
+                log.info("외부 서버 응답 데이터: {}", response.getBody());
+                ChangeConfigurationResponse changeConfigurationResponse = response.getBody();
+                log.info("ChangeConfiguration Request(/changeConfiguration) 성공 - 결과메시지: {}",
+                        changeConfigurationResponse);
+                return changeConfigurationResponse;
+            } else {
+                log.error("ChangeConfiguration Request(/changeConfiguration) 실패 - 상태코드: {}, 응답: {}",
+                        response.getStatusCode(), response.getBody());
+                throw new RuntimeException(
+                        "ChangeConfiguration Request(/changeConfiguration) 실패 - 상태코드: " + response.getStatusCode());
+            }
+        } catch (Exception e) {
+            log.error("ChangeConfiguration Request(/changeConfiguration) 처리 중 예외 발생", e);
+            throw new RuntimeException("ChangeConfiguration Request(/changeConfiguration) 처리 중 예외 발생", e);
+        }
+    }
+
+    public TriggerMessageResponse trigger(TriggerMessageReqDto request) {
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            Map<String, Object> requestMap = new HashMap<>();
+            requestMap.put("chargePointId", request.getChargerId());
+            requestMap.put("requestedMessage", request.getRequestedMessage());
+            requestMap.put("connectorId", request.getConnectorId());
+
+            // 요청데이터 로깅
+            log.info("Trigger Message Request : {}", requestMap.toString());
+
+            // HTTP 요청 엔티티 생성
+            HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestMap, headers);
+
+            // 외부 서버로 POST 요청 전송
+            log.info("외부 서버({})로 POST 요청 전송", gwServerUrl + "/triggerMessage");
+            long startTime = System.currentTimeMillis();
+
+            ResponseEntity<TriggerMessageResponse> response = restTemplate.postForEntity(
+                    gwServerUrl + "/triggerMessage",
+                    entity,
+                    TriggerMessageResponse.class);
+
+            long endTime = System.currentTimeMillis();
+            log.info("외부 서버 응답 수신 - 소요시간: {}ms, 상태코드: {}",
+                    (endTime - startTime), response.getStatusCodeValue());
+
+            if (response.getStatusCode().is2xxSuccessful()) {
+                log.info("외부 서버 응답 데이터: {}", response.getBody());
+                TriggerMessageResponse triggerMessageResponse = response.getBody();
+                log.info("Trigger Message Request(/trigger) 성공 - 결과메시지: {}", triggerMessageResponse);
+                return triggerMessageResponse;
+            } else {
+                log.error("Trigger Message Request(/trigger) 실패 - 상태코드: {}, 응답: {}",
+                        response.getStatusCode(), response.getBody());
+                throw new RuntimeException("Trigger Message Request(/trigger) 실패 - 상태코드: " + response.getStatusCode());
+            }
+        } catch (Exception e) {
+            log.error("Trigger Message Request(/trigger) 처리 중 예외 발생", e);
+            throw new RuntimeException("Trigger Message Request(/trigger) 처리 중 예외 발생", e);
+        }
+    }
+
+    public ResetResponse reset(ResetRequestDto request) {
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            // DTO 변환 - 외부 서버 형식에 맞게 수정
+            Map<String, Object> requestMap = new HashMap<>();
+            requestMap.put("chargePointId", request.getChargerId());
+            requestMap.put("type", request.getResetType());
+
+            // 요청 데이터 로깅
+            log.info("Reset Request : {}", requestMap);
+
+            // HTTP 요청 엔티티 생성
+            HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestMap, headers);
+
+            log.info("외부 서버({})로 POST 요청 전송", gwServerUrl + "/reset");
+            long startTime = System.currentTimeMillis();
+
+            ResponseEntity<ResetResponse> response = restTemplate.postForEntity(
+                    gwServerUrl + "/reset",
+                    entity,
+                    ResetResponse.class);
+
+            long endTime = System.currentTimeMillis();
+            log.info("외부 서버 응답 수신 - 소요시간: {}ms, 상태코드: {}",
+                    (endTime - startTime), response.getStatusCodeValue());
+
+            if (response.getStatusCode().is2xxSuccessful()) {
+                // 응답데이터 로깅
+                log.info("외부 서버 응답 데이터: {}", response.getBody());
+
+                ResetResponse resetResponse = response.getBody();
+
+                log.info("Reset Request(/reset) 성공 - 결과메시지: {}", resetResponse);
+
+                return resetResponse;
+            } else {
+                log.error("Reset Request(/reset) 실패 - 상태코드: {}, 응답: {}",
+                        response.getStatusCode(), response.getBody());
+                throw new RuntimeException("Reset Request(/reset) 실패 - 상태코드: " + response.getStatusCode());
+            }
+
+        } catch (Exception e) {
+            log.error("Reset Request(/reset) 처리 중 예외 발생", e);
+            throw new RuntimeException("Reset Request(/reset) 처리 중 예외 발생", e);
+        }
+    }
 
     @Transactional
     public UpdateFirmwareResponse updateFirmware(UpdateFirmwareDto request) {
@@ -519,9 +721,7 @@ public class CpControlService {
                 return errorResult;
             }
 
-        } catch (
-
-        Exception e) {
+        } catch (Exception e) {
             log.error("실시간 TID 조회 처리 중 예외 발생", e);
 
             // 예외 정보를 담은 결과 반환

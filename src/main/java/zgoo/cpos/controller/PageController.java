@@ -62,7 +62,6 @@ import zgoo.cpos.dto.menu.MenuDto;
 import zgoo.cpos.dto.payment.ChgPaymentInfoDto;
 import zgoo.cpos.dto.payment.ChgPaymentSummaryDto;
 import zgoo.cpos.dto.statistics.ErrorDto.ErrorBarDto;
-import zgoo.cpos.dto.statistics.ErrorDto.ErrorLineChartBaseDto;
 import zgoo.cpos.dto.statistics.ErrorDto.ErrorLineChartDto;
 import zgoo.cpos.dto.statistics.PurchaseSalesDto.PurchaseSalesBarDto;
 import zgoo.cpos.dto.statistics.PurchaseSalesDto.PurchaseSalesLineChartDto;
@@ -105,6 +104,9 @@ import zgoo.cpos.service.StatisticsService;
 import zgoo.cpos.service.TariffService;
 import zgoo.cpos.service.UsersService;
 import zgoo.cpos.service.VocService;
+import zgoo.cpos.type.ocpp.ConfigurationKey;
+import zgoo.cpos.type.ocpp.MessageTrigger;
+import zgoo.cpos.type.ocpp.ResetType;
 import zgoo.cpos.util.MenuConstants;
 
 @Controller
@@ -1185,8 +1187,74 @@ public class PageController {
      * 제어 > 충전기제어
      */
     @GetMapping("/control/charger/list")
-    public String showcontrollist(Model model) {
+    public String showcontrollist(
+            @RequestParam(value = "companyIdSearch", required = false) Long reqCompanyId,
+            @RequestParam(value = "opSearch", required = false) String reqOpSearch,
+            @RequestParam(value = "contentSearch", required = false) String reqContentSearch,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size,
+            Model model, Principal principal) {
         log.info("=== Charger Control List Page ===");
+        log.info("== companyId: {}, opSearch: {}, contentSearch: {}", reqCompanyId, reqOpSearch, reqContentSearch);
+        log.info("== page: {}, size: {}", page, size);
+
+        try {
+
+            // 검색조건 값 저장
+            model.addAttribute("selectedCompanyId", reqCompanyId);
+            model.addAttribute("selectedOpSearch", reqOpSearch);
+            model.addAttribute("selectedContentSearch", reqContentSearch);
+
+            Page<ChargerListDto> chargerList;
+            if (reqCompanyId == null && reqOpSearch == null && reqContentSearch == null) {
+                log.info("Search all charger list >>");
+                chargerList = chargerService.searchCpListPageAll(page, size, principal.getName());
+            } else {
+                log.info("Search charger list by options:companyid:{},op:{},content:{} >>",
+                        reqCompanyId, reqOpSearch, reqContentSearch);
+                chargerList = chargerService.searchCpListPage(reqCompanyId, null, reqOpSearch, reqContentSearch,
+                        page, size, principal.getName());
+            }
+
+            // Page 처리
+            int totalpages = chargerList.getTotalPages() == 0 ? 1 : chargerList.getTotalPages();
+            int startNumber = page * size;
+            model.addAttribute("chargerList", chargerList.getContent());
+            model.addAttribute("size", String.valueOf(size));
+            model.addAttribute("currentPage", page);
+            model.addAttribute("totalPages", totalpages);
+            model.addAttribute("totalCount", chargerList.getTotalElements());
+            model.addAttribute("startNumber", startNumber);
+            log.info("== ChargerControl_PageInfo >> totalPages:{}, totalCount:{}", totalpages,
+                    chargerList.getTotalElements());
+
+            // select option 조회
+            List<CompanyListDto> companyList = this.companyService.findCompanyListAll(principal.getName());
+            model.addAttribute("companyList", companyList);
+            List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT");
+            model.addAttribute("showListCnt", showListCnt);
+            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(),
+                    MenuConstants.CONTROL_CHARGER);
+            model.addAttribute("menuAuthority", menuAuthority);
+
+            // Reset type
+            model.addAttribute("resetTypes", ResetType.values());
+            // MessageTrigger
+            model.addAttribute("triggerMessages", MessageTrigger.values());
+            // ConfigurationKey
+            model.addAttribute("configurationKeys", ConfigurationKey.values());
+
+        } catch (Exception e) {
+            e.getStackTrace();
+            model.addAttribute("companyList", Collections.emptyList());
+            model.addAttribute("showListCnt", Collections.emptyList());
+            model.addAttribute("menuAuthority", Collections.emptyList());
+            model.addAttribute("chargerList", Collections.emptyList());
+            model.addAttribute("size", Collections.emptyList());
+            model.addAttribute("currentPage", Collections.emptyList());
+            model.addAttribute("totalPages", Collections.emptyList());
+            model.addAttribute("totalCount", Collections.emptyList());
+        }
         return "pages/control/cp_control";
     }
 
@@ -1338,11 +1406,13 @@ public class PageController {
 
             // page 처리
             int totalPages = chargingHistList.getTotalPages() == 0 ? 1 : chargingHistList.getTotalPages();
+            int startNumber = page * size;
             model.addAttribute("chargingHistList", chargingHistList.getContent());
             model.addAttribute("size", String.valueOf(size));
             model.addAttribute("currentPage", page);
             model.addAttribute("totalPages", totalPages);
             model.addAttribute("totalCount", chargingHistList.getTotalElements());
+            model.addAttribute("startNumber", startNumber);
             log.info("===ChargingHistory_PageInfo >> totalPages:{}, totalCount:{}", totalPages,
                     chargingHistList.getTotalElements());
             // 데이터 내용 확인을 위한 로그 추가
@@ -1451,11 +1521,13 @@ public class PageController {
 
             // page 처리
             int totalPages = chgCommlogList.getTotalPages() == 0 ? 1 : chgCommlogList.getTotalPages();
+            int startNumber = page * size;
             model.addAttribute("chgCommlogList", chgCommlogList.getContent());
             model.addAttribute("size", String.valueOf(size));
             model.addAttribute("currentPage", page);
             model.addAttribute("totalPages", totalPages);
             model.addAttribute("totalCount", chgCommlogList.getTotalElements());
+            model.addAttribute("startNumber", startNumber);
             log.info("===ChgCommlog_PageInfo >> totalPages:{}, totalCount:{}", totalPages,
                     chgCommlogList.getTotalElements());
 
@@ -1837,12 +1909,12 @@ public class PageController {
             model.addAttribute("selectedYear", year);
 
             ErrorBarDto errHist = this.statisticsService.searchYearError(companyId, searchOp, searchContent, year,
-                principal.getName());
+                    principal.getName());
             model.addAttribute("errHist", errHist);
             log.info("errHist >> {}", errHist.toString());
 
             ErrorLineChartDto lineChart = this.statisticsService.searchMonthlyError(companyId, searchOp, searchContent,
-                year, principal.getName());
+                    year, principal.getName());
             model.addAttribute("lineChart", lineChart);
             log.info("lineChart >> {}", lineChart.toString());
 
@@ -2122,9 +2194,9 @@ public class PageController {
      * 예약
      */
 
-    /* 
-    * 개인정보처리방침
-    */
+    /*
+     * 개인정보처리방침
+     */
     @GetMapping("/policy/privacy")
     public String showprivacy() {
         log.info("=== Privacy Page ===");

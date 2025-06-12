@@ -106,6 +106,7 @@
                             <table class="table text-center mt-3 table-bg table-hover">
                                 <thead>
                                     <tr class="table-border-top">
+                                        <th scope="col">No.</th>
                                         <th scope="col">사업자</th>
                                         <th scope="col">충전소명</th>
                                         <th scope="col">충전소ID</th>
@@ -131,7 +132,9 @@
                                     </tr>
                                 </thead>
                                 <tbody id="pageList">
-                                    <tr th:each="data : ${chargingHistList}">
+                                    <tr th:each="data, iterStat : ${chargingHistList}">
+                                        <td th:text="${startNumber + iterStat.count}">
+                                        </td>
                                         <td th:text="${data.companyName}"></td>
                                         <td th:text="${data.stationName}"></td>
                                         <td th:text="${data.stationId}"></td>

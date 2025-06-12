@@ -81,6 +81,7 @@
                                 style="overflow-x: auto; min-width: 1800px;">
                                 <thead>
                                     <tr class="table-border-top">
+                                        <th scope="col">No.</th>
                                         <th scope="col">충전기ID</th>
                                         <!-- <th scope="col">커넥터ID</th> -->
                                         <th scope="col">메시지</th>
@@ -92,7 +93,9 @@
                                     </tr>
                                 </thead>
                                 <tbody id="pageList">
-                                    <tr th:each="data : ${chgCommlogList}">
+                                    <tr th:each="data, iterStat : ${chgCommlogList}">
+                                        <td th:text="${startNumber + iterStat.count}">
+                                        </td>
                                         <td th:text="${data.chargerId}"></td>
                                         <!-- <td th:text="${data.connectorId}"></td> -->
                                         <td th:text="${data.action}"></td>

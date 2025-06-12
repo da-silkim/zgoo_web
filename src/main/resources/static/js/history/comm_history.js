@@ -1,4 +1,20 @@
 document.addEventListener("DOMContentLoaded", function () {
+    // content-truncate 클래스를 가진 셀에 스타일 적용
+    const style = document.createElement('style');
+    style.textContent = `
+        .content-truncate {
+            max-width: 300px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            cursor: pointer;
+        }
+        .table td.content-truncate {
+            max-width: 300px;
+            padding: 8px;
+        }
+    `;
+    document.head.appendChild(style);
 
     /**
      * 검색버튼 클릭 이벤트 처리

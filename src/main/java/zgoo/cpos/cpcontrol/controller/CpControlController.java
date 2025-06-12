@@ -14,11 +14,19 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import zgoo.cpos.cpcontrol.dto.CancelTestRequestDto;
 import zgoo.cpos.cpcontrol.dto.CancelTestRsponseDto;
+import zgoo.cpos.cpcontrol.dto.ChangeConfigurationReqDto;
+import zgoo.cpos.cpcontrol.dto.GetConfigurationReqDto;
 import zgoo.cpos.cpcontrol.dto.PaymentTestRequestDto;
 import zgoo.cpos.cpcontrol.dto.PaymentTestResponseDto;
+import zgoo.cpos.cpcontrol.dto.ResetRequestDto;
 import zgoo.cpos.cpcontrol.dto.TidSearchRequest;
+import zgoo.cpos.cpcontrol.dto.TriggerMessageReqDto;
 import zgoo.cpos.cpcontrol.dto.UpdateFirmwareDto;
+import zgoo.cpos.cpcontrol.message.changeconfiguration.ChangeConfigurationResponse;
 import zgoo.cpos.cpcontrol.message.firmware.UpdateFirmwareResponse;
+import zgoo.cpos.cpcontrol.message.getconfiguration.GetConfigurationResponse;
+import zgoo.cpos.cpcontrol.message.reset.ResetResponse;
+import zgoo.cpos.cpcontrol.message.trigger.TriggerMessageResponse;
 import zgoo.cpos.cpcontrol.service.CpControlService;
 
 @Controller
@@ -34,6 +42,50 @@ public class CpControlController {
         log.info("Firmware Update Request(/fwupdate) : {}", request.toString());
         try {
             UpdateFirmwareResponse response = cpControlService.updateFirmware(request);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
+        }
+    }
+
+    @PostMapping("/reset")
+    public ResponseEntity<?> reset(@RequestBody ResetRequestDto request) {
+        log.info("Reset Request(/reset) : {}", request.toString());
+        try {
+            ResetResponse response = cpControlService.reset(request);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
+        }
+    }
+
+    @PostMapping("/changeConfiguration")
+    public ResponseEntity<?> changeConfiguration(@RequestBody ChangeConfigurationReqDto request) {
+        log.info("ChangeConfiguration Request(/changeConfiguration) : {}", request.toString());
+        try {
+            ChangeConfigurationResponse response = cpControlService.changeConfiguration(request);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
+        }
+    }
+
+    @PostMapping("/getConfiguration")
+    public ResponseEntity<?> getConfiguration(@RequestBody GetConfigurationReqDto request) {
+        log.info("Get Configuration Request(/getConfiguration) : {}", request.toString());
+        try {
+            GetConfigurationResponse response = cpControlService.getConfiguration(request);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
+        }
+    }
+
+    @PostMapping("/trigger")
+    public ResponseEntity<?> trigger(@RequestBody TriggerMessageReqDto request) {
+        log.info("Trigger Request(/trigger) : {}", request.toString());
+        try {
+            TriggerMessageResponse response = cpControlService.trigger(request);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));

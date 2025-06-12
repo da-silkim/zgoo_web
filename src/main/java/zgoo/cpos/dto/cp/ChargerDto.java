@@ -46,6 +46,8 @@ public class ChargerDto {
         private LocalDate installDate;
         private String manufCd;
         private String manufCdName;
+        private String protocol;
+        private String modelCode;
         private String fwVersion;
         private LocalDateTime lastUpdateDt;
 

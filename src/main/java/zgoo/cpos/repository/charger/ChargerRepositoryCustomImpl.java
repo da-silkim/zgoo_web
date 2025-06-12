@@ -115,11 +115,14 @@ public class ChargerRepositoryCustomImpl implements ChargerRepositoryCustom {
                 csInfo.stationName.as("stationName"),
                 cpInfo.chargerName.as("chargerName"),
                 cpInfo.id.as("chargerId"),
+                csInfo.id.as("stationId"),
                 commonTypeName.name.as("commonTypeName"),
                 model.modelName.as("modelName"),
                 cpplan.name.as("policyName"),
                 cpInfo.installDate.as("installDate"), // LocalDate 타입 그대로 사용
-                manufCdName.name.as("manufCdName")))
+                manufCdName.name.as("manufCdName"),
+                cpInfo.modelCode.as("modelCode"),
+                cpInfo.protocol.as("protocol")))
                 .from(cpInfo)
                 .leftJoin(csInfo).on(cpInfo.stationId.eq(csInfo))
                 .leftJoin(company).on(csInfo.company.eq(company))
@@ -192,11 +195,14 @@ public class ChargerRepositoryCustomImpl implements ChargerRepositoryCustom {
                 csInfo.stationName.as("stationName"),
                 cpInfo.chargerName.as("chargerName"),
                 cpInfo.id.as("chargerId"),
+                csInfo.id.as("stationId"),
                 commonTypeName.name.as("commonTypeName"),
                 model.modelName.as("modelName"),
                 cpplan.name.as("policyName"),
                 cpInfo.installDate.as("installDate"),
-                manufCdName.name.as("manufCdName")))
+                manufCdName.name.as("manufCdName"),
+                cpInfo.modelCode.as("modelCode"),
+                cpInfo.protocol.as("protocol")))
                 .from(cpInfo)
                 .join(csInfo).on(cpInfo.stationId.eq(csInfo))
                 .join(company).on(csInfo.company.eq(company))
