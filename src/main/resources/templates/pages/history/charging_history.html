@@ -88,7 +88,8 @@
                         <span class="card-title-bar"></span><span>충전이력</span>
                     </div>
                     <div class="mt-3 btn-page-area">
-                        <button class="btn btn-excel" onclick="excelDownload()">
+                        <button class="btn btn-excel" onclick="excelDownload()"
+                            th:if="${menuAuthority.authority == 'SU' or menuAuthority.excelYn == 'Y'}">
                             <i class="bi bi-file-earmark-spreadsheet"></i>엑셀다운로드</button>
                         <span>
                             <span id="pageInfo">

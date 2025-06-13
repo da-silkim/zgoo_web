@@ -51,6 +51,7 @@ import zgoo.cpos.dto.history.ChgCommlogDto;
 import zgoo.cpos.dto.history.ErrorHistDto;
 import zgoo.cpos.dto.member.ConditionDto.ConditionCodeBaseDto;
 import zgoo.cpos.dto.member.ConditionDto.ConditionList;
+import zgoo.cpos.dto.member.MemberAuthHistDto;
 import zgoo.cpos.dto.member.MemberDto;
 import zgoo.cpos.dto.member.MemberDto.MemberAuthDto;
 import zgoo.cpos.dto.member.MemberDto.MemberListDto;
@@ -274,8 +275,73 @@ public class PageController {
      * 회원관리 > 회원인증내역
      */
     @GetMapping("/member/authentication/list")
-    public String showauthlist(Model model) {
+    public String showauthlist(
+            @RequestParam(value = "companyIdSearch", required = false) Long companyId,
+            @RequestParam(value = "opSearch", required = false) String searchOp,
+            @RequestParam(value = "contentSearch", required = false) String contentSearch,
+            @RequestParam(value = "fromDate", required = false) String fromDate,
+            @RequestParam(value = "toDate", required = false) String toDate,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size, Model model, Principal principal) {
         log.info("=== Member Authorization List Page ===");
+        log.info("companyId: {}, searchOp: {}, contentSearch: {}, fromDate: {}, toDate: {}", companyId, searchOp,
+                contentSearch, fromDate, toDate);
+        log.info("page: {}, size: {}", page, size);
+
+        // 검색조건 저장
+        model.addAttribute("selectedCompanyId", companyId);
+        model.addAttribute("selectedOpSearch", searchOp);
+        model.addAttribute("selectedContentSearch", contentSearch);
+        model.addAttribute("selectedTimeFrom", fromDate);
+        model.addAttribute("selectedTimeTo", toDate);
+
+        Page<MemberAuthHistDto> authList;
+        try {
+            if (companyId == null && (searchOp == null || searchOp.isEmpty())
+                    && (contentSearch == null || contentSearch.isEmpty())
+                    && (fromDate == null || fromDate.isEmpty())
+                    && (toDate == null || toDate.isEmpty())) {
+                authList = this.memberService.findAllMemberAuthHistWithPagination(page, size,
+                        principal.getName());
+            } else {
+
+                authList = this.memberService.findMemberAuthHistWithPagination(companyId, searchOp,
+                        contentSearch, fromDate, toDate, page, size, principal.getName());
+            }
+
+            // Page처리
+            int totalPages = authList.getTotalPages() == 0 ? 1 : authList.getTotalPages(); // 전체 페이지
+                                                                                           // 수
+            int startNumber = page * size;
+
+            model.addAttribute("authList", authList.getContent());
+            model.addAttribute("size", String.valueOf(size));
+            model.addAttribute("currentPage", page);
+            model.addAttribute("totalPages", totalPages);
+            model.addAttribute("totalCount", authList.getTotalElements());
+            model.addAttribute("startNumber", startNumber);
+            log.info("=== MemberAuthHistList_PageInfo >> totalPages:{}, totalCount:{}", totalPages,
+                    authList.getTotalElements());
+
+            // 검색옵션 model value 추가
+            List<CompanyListDto> companyList = this.companyService.findCompanyListAll(principal.getName());
+            model.addAttribute("companyList", companyList);
+            List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT");
+            model.addAttribute("showListCnt", showListCnt);
+            MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(),
+                    MenuConstants.MEMBER_AUTH);
+            model.addAttribute("menuAuthority", menuAuthority);
+
+        } catch (Exception e) {
+            e.getStackTrace();
+            model.addAttribute("companyList", Collections.emptyList());
+            model.addAttribute("showListCnt", Collections.emptyList());
+            model.addAttribute("authList", Collections.emptyList());
+            model.addAttribute("size", Collections.emptyList());
+            model.addAttribute("currentPage", Collections.emptyList());
+            model.addAttribute("totalPages", Collections.emptyList());
+            model.addAttribute("totalCount", Collections.emptyList());
+        }
         return "pages/member/member_authentication";
     }
 

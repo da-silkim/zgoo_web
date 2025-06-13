@@ -27,6 +27,7 @@ import zgoo.cpos.domain.member.MemberAuth;
 import zgoo.cpos.domain.member.MemberCar;
 import zgoo.cpos.domain.member.MemberCondition;
 import zgoo.cpos.domain.member.MemberCreditCard;
+import zgoo.cpos.dto.member.MemberAuthHistDto;
 import zgoo.cpos.dto.member.MemberDto.MemberAuthDto;
 import zgoo.cpos.dto.member.MemberDto.MemberBaseDto;
 import zgoo.cpos.dto.member.MemberDto.MemberCarDto;
@@ -41,6 +42,7 @@ import zgoo.cpos.repository.biz.BizRepository;
 import zgoo.cpos.repository.company.CompanyRepository;
 import zgoo.cpos.repository.member.ConditionCodeRepository;
 import zgoo.cpos.repository.member.ConditionVersionHistRepository;
+import zgoo.cpos.repository.member.MemberAuthHistRepository;
 import zgoo.cpos.repository.member.MemberAuthRepository;
 import zgoo.cpos.repository.member.MemberCarRepository;
 import zgoo.cpos.repository.member.MemberConditionRepository;
@@ -63,6 +65,7 @@ public class MemberService {
     public final ConditionCodeRepository conditionCodeRepository;
     public final MemberAuthRepository memberAuthRepository;
     public final ConditionVersionHistRepository conditionVersionHistRepository;
+    public final MemberAuthHistRepository memberAuthHistRepository;
     public final ComService comService;
 
     // 회원 조회
@@ -694,6 +697,47 @@ public class MemberService {
         } catch (Exception e) {
             log.error("[findAllMembersWithEmailAndMarketing] error: {}", e.getMessage(), e);
             return new ArrayList<>();
+        }
+    }
+
+    // 회원인증내역 조회(Paging)
+    public Page<MemberAuthHistDto> findAllMemberAuthHistWithPagination(int page, int size,
+            String userId) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        try {
+            boolean isSuperAdmin = comService.checkSuperAdmin(userId);
+            Long loginUserCompanyId = comService.getLoginUserCompanyId(userId);
+            String levelPath = companyRepository.findLevelPathByCompanyId(loginUserCompanyId);
+
+            Page<MemberAuthHistDto> memberAuthHistList = this.memberAuthHistRepository
+                    .findAllMemberAuthHistWithPagination(pageable, levelPath, isSuperAdmin);
+
+            return memberAuthHistList;
+
+        } catch (Exception e) {
+            log.error("[findAllMemberAuthHistWithPagination] error: {}", e.getMessage(), e);
+            return Page.empty(pageable);
+        }
+    }
+
+    public Page<MemberAuthHistDto> findMemberAuthHistWithPagination(Long companyId, String searchOp,
+            String contentSearch, String fromDate, String toDate, int page, int size, String userId) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        try {
+            boolean isSuperAdmin = comService.checkSuperAdmin(userId);
+            Long loginUserCompanyId = comService.getLoginUserCompanyId(userId);
+            String levelPath = companyRepository.findLevelPathByCompanyId(loginUserCompanyId);
+
+            Page<MemberAuthHistDto> memberAuthHistList = this.memberAuthHistRepository
+                    .findMemberAuthHistWithPagination(companyId, searchOp, contentSearch, fromDate, toDate, pageable,
+                            levelPath, isSuperAdmin);
+
+            return memberAuthHistList;
+        } catch (Exception e) {
+            log.error("[findMemberAuthHistWithPagination] error: {}", e.getMessage(), e);
+            return Page.empty(pageable);
         }
     }
 }
