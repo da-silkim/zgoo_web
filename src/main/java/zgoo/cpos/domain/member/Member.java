@@ -18,7 +18,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import zgoo.cpos.domain.biz.BizInfo;
-import zgoo.cpos.domain.company.Company;
 import zgoo.cpos.dto.member.MemberDto.MemberRegDto;
 
 @Table(name = "MEMBER")
@@ -83,9 +82,9 @@ public class Member {
     @Column(name = "login_dt")
     private LocalDateTime loginDt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "company_id")
-    private Company company;
+    // @ManyToOne(fetch = FetchType.LAZY)
+    // @JoinColumn(name = "company_id")
+    // private Company company;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "biz_id")

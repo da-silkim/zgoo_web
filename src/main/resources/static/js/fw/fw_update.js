@@ -2,30 +2,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     let selectedRow; // 선택한 행, 열 저장
 
-    // '검색' 버튼 클릭 이벤트 처리
-    document.getElementById("serachBtn").addEventListener("click", function () {
-
-        if (document.getElementById('companyIdSearch').value == '') {
-            alert("사업자를 선택해주세요.");
-            return;
-        }
-
-
-        // 현재 선택된 펌웨어 값들을 hidden 필드에 설정
-        document.querySelector('input[name="companyIdFw"]').value = document.getElementById('companyIdFw').value;
-        document.querySelector('input[name="modelSearch"]').value = document.getElementById('modelSearch').value;
-        document.querySelector('input[name="versionSearch"]').value = document.getElementById('versionSearch').value;
-        document.querySelector('input[name="urlSearch"]').value = document.getElementById('urlSearch').value;
-        document.querySelector('input[name="retries"]').value = document.getElementById('retries').value;
-        document.querySelector('input[name="retryInterval"]').value = document.getElementById('retryInterval').value;
-        document.querySelector('input[name="retrieveDate"]').value = document.getElementById('retrieveDate').value;
-
-
-        // 폼 제출
-        document.getElementById('searchForm').submit();
-    });
-
-
     // '펌웨어 설정 초기화' 버튼 클릭 이벤트 처리
     document.getElementById("fwconfigResetBtn").addEventListener("click", function () {
 
@@ -38,19 +14,42 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById('retrieveDate').value = '';
     });
 
+    $('#size').on('change', function () {
+        updatePageSize(this, "/fw/update/get/cplist", ["companyIdSearch", "stationIdSearch", "companyIdFw", "modelSearch", "versionSearch", "urlSearch", "retries", "retryInterval", "retrieveDate"]);
+    });
+
+    // // '검색' 버튼 클릭 이벤트 처리
+    // document.getElementById("serachBtn").addEventListener("click", function () {
+
+    //     if (document.getElementById('companyIdSearch').value == '') {
+    //         alert("사업자를 선택해주세요.");
+    //         return;
+    //     }
+
+
+    //     // 현재 선택된 펌웨어 값들을 hidden 필드에 설정
+    //     document.querySelector('input[name="companyIdFw"]').value = document.getElementById('companyIdFw').value;
+    //     document.querySelector('input[name="modelSearch"]').value = document.getElementById('modelSearch').value;
+    //     document.querySelector('input[name="versionSearch"]').value = document.getElementById('versionSearch').value;
+    //     document.querySelector('input[name="urlSearch"]').value = document.getElementById('urlSearch').value;
+    //     document.querySelector('input[name="retries"]').value = document.getElementById('retries').value;
+    //     document.querySelector('input[name="retryInterval"]').value = document.getElementById('retryInterval').value;
+    //     document.querySelector('input[name="retrieveDate"]').value = document.getElementById('retrieveDate').value;
+
+
+    //     // 폼 제출
+    //     document.getElementById('searchForm').submit();
+    // });
+
+
+
+
     // '초기화' 버튼 클릭 이벤트 처리
     document.getElementById("resetBtn").addEventListener("click", function () {
         // 검색 폼 필드만 초기화
         document.getElementById('companyIdSearch').value = '';
         document.getElementById('stationIdSearch').value = '';
 
-        // // 펌웨어 선택 값들은 현재 값으로 유지
-        // document.querySelector('input[name="companyIdFw"]').value = document.getElementById('companyIdFw').value;
-        // document.querySelector('input[name="modelSearch"]').value = document.getElementById('modelSearch').value;
-        // document.querySelector('input[name="versionSearch"]').value = document.getElementById('versionSearch').value;
-        // document.querySelector('input[name="urlSearch"]').value = document.getElementById('urlSearch').value;
-
-        // document.getElementById('searchForm').submit();
     });
 
     // 펌웨어선택 - 사업자 ID선택에 따른 모델명 리스트 조회요청

@@ -15,20 +15,24 @@
                         <!-- row:1 start -->
                         <div class="row mb-3 row-cols-2 row-cols-lg-3 g-2">
                             <div class="col d-flex align-items-center">
-                                <label for="companyIdSearch" class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">사업자</label>
+                                <label for="companyIdSearch"
+                                    class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">사업자</label>
                                 <select id="companyIdSearch" name="companyIdSearch" class="mx-3 form-control">
                                     <option th:value="null">선택</option>
                                     <option th:each="company : ${companyList}" th:value="${company.companyId}"
-                                                th:text="${company.companyName}"
-                                                th:selected="${company.companyId == selectedCompanyId}"></option>
+                                        th:text="${company.companyName}"
+                                        th:selected="${company.companyId == selectedCompanyId}"></option>
                                 </select>
                             </div>
                             <div class="col d-flex align-items-center">
-                                <label for="opSearch" class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">검색조건</label>
+                                <label for="opSearch"
+                                    class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">검색조건</label>
                                 <select id="opSearch" name="opSearch" class="ms-3 form-control w-40">
                                     <option th:value="null" th:selected="${selectedOpSearch == null}">(선택)</option>
-                                    <option th:value="'stationName'" th:text="충전소명" th:selected="${selectedOpSearch == 'stationName'}"></option>
-                                    <option th:value="'stationId'" th:text="충전소ID" th:selected="${selectedOpSearch == 'stationId'}"></option>
+                                    <option th:value="'stationName'" th:text="충전소명"
+                                        th:selected="${selectedOpSearch == 'stationName'}"></option>
+                                    <option th:value="'stationId'" th:text="충전소ID"
+                                        th:selected="${selectedOpSearch == 'stationId'}"></option>
                                 </select>
                                 <input type="text" name="contentSearch" id="contentSearch" class="mx-2 form-control"
                                     th:value="${selectedContentSearch}" autocomplete="off">
@@ -36,9 +40,11 @@
                         </div>
                         <!-- row:1 end -->
                         <div class="search-btn">
-                            <button type="button" class="btn btn-outline-grey me-2" id="searchBtn" onclick="searchOption()">
+                            <button type="button" class="btn btn-outline-grey me-2" id="searchBtn"
+                                onclick="searchOption()">
                                 <i class="bi bi-search me-2"></i>검색</button>
-                            <button type="button" class="btn btn-outline-grey me-2" id="resetBtn" onclick="replacePage('/station/list')">
+                            <button type="button" class="btn btn-outline-grey me-2" id="resetBtn"
+                                onclick="replacePage('/station/list')">
                                 <i class="bi bi-arrow-repeat me-2"></i>초기화</button>
                         </div>
                     </form>
@@ -57,9 +63,11 @@
                             th:if="${menuAuthority.authority == 'SU' or menuAuthority.excelYn == 'Y'}">
                             <i class="bi bi-file-earmark-spreadsheet"></i>엑셀다운로드</button>
                         <div class="btn-mod" th:if="${menuAuthority.authority == 'SU' or menuAuthority.modYn == 'Y'}">
-                            <button class="btn btn-data-add" id="addBtn" data-bs-toggle="modal" data-bs-target="#dataAddModal">
+                            <button class="btn btn-data-add" id="addBtn" data-bs-toggle="modal"
+                                data-bs-target="#dataAddModal">
                                 <i class="bi bi-plus-square"></i>등록</button>
-                            <button class="btn btn-data-edit" id="editBtn" data-bs-toggle="modal" data-bs-target="#dataAddModal" hidden>
+                            <button class="btn btn-data-edit" id="editBtn" data-bs-toggle="modal"
+                                data-bs-target="#dataAddModal" hidden>
                                 <i class="fa-regular fa-pen-to-square"></i>수정</button>
                             <button class="btn btn-data-delete" id="deleteBtn" hidden>
                                 <i class="bi bi-trash"></i>삭제</button>
@@ -67,14 +75,15 @@
                     </div>
                     <div class="page-container">
                         <span id="pageInfo">
-                            <span th:text="'Page ' + (${currentPage + 1}) + ' of ' + ${totalPages} + ' [총 ' + ${totalCount} + '건]'"></span>
+                            <span
+                                th:text="'Page ' + (${currentPage + 1}) + ' of ' + ${totalPages} + ' [총 ' + ${totalCount} + '건]'"></span>
                         </span>
                         <select class="mx-3 page-select" id="size" name="size">
                             <option th:each="data : ${showListCnt}" th:value="${data.commonCode}"
-                                    th:text="${data.commonCodeName}" th:selected="${data.commonCode == size}"></option>
+                                th:text="${data.commonCodeName}" th:selected="${data.commonCode == size}"></option>
                         </select>
                     </div>
-                    <div class="w-100 table-responsive" >
+                    <div class="w-100 table-responsive">
                         <table class="table text-center mt-3 table-bg table-hover" style="min-width: 1127px;">
                             <thead>
                                 <tr class="table-border-top">
@@ -97,7 +106,8 @@
                                         <a th:href="@{/station/list/detail/{stationId}(stationId=${cs.stationId}, page=${currentPage}, size=${size},
                                             companyIdSearch=${selectedCompanyId != null ? selectedCompanyId : ''}, 
                                             opSearch=${selectedOpSearch != null ? selectedOpSearch : ''}, 
-                                            contentSearch=${selectedContentSearch != null ? selectedContentSearch : ''})}" class="no-underline">
+                                            contentSearch=${selectedContentSearch != null ? selectedContentSearch : ''})}"
+                                            class="no-underline">
                                             <i class="bi bi-files detail-files"></i>
                                         </a>
                                     </td>
@@ -121,25 +131,29 @@
                         <ul class="pagination justify-content-center">
                             <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled' : ''">
                                 <a class="page-link" th:href="@{/station/list(page=0, size=${size}, companyIdSearch=${selectedCompanyId},
-                                opSearch=${selectedOpSearch}, contentSearch=${selectedContentSearch})}"><i class="bi bi-chevron-double-left"></i></a>
+                                opSearch=${selectedOpSearch}, contentSearch=${selectedContentSearch})}"><i
+                                        class="bi bi-chevron-double-left"></i></a>
                             </li>
                             <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled' : ''">
                                 <a class="page-link" th:href="@{/station/list(page=${currentPage-1}, size=${size}, companyIdSearch=${selectedCompanyId},
-                                opSearch=${selectedOpSearch}, contentSearch=${selectedContentSearch})}"><i class="bi bi-chevron-left"></i></a>
+                                opSearch=${selectedOpSearch}, contentSearch=${selectedContentSearch})}"><i
+                                        class="bi bi-chevron-left"></i></a>
                             </li>
                             <li class="page-item" th:each="i : ${#numbers.sequence(currentPage - 2, currentPage + 2)}"
                                 th:if="${i >= 0 && i < totalPages}">
                                 <a class="page-link" th:href="@{/station/list(page=${i}, size=${size}, companyIdSearch=${selectedCompanyId},
                                 opSearch=${selectedOpSearch}, contentSearch=${selectedContentSearch})}"
-                                th:text="${i+1}" th:classappend="${i == currentPage} ? 'active' : ''"></a>
+                                    th:text="${i+1}" th:classappend="${i == currentPage} ? 'active' : ''"></a>
                             </li>
                             <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled' : ''">
                                 <a class="page-link" th:href="@{/station/list(page=${currentPage+1}, size=${size}, companyIdSearch=${selectedCompanyId},
-                                opSearch=${selectedOpSearch}, contentSearch=${selectedContentSearch})}"><i class="bi bi-chevron-right"></i></a>
+                                opSearch=${selectedOpSearch}, contentSearch=${selectedContentSearch})}"><i
+                                        class="bi bi-chevron-right"></i></a>
                             </li>
                             <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled' : ''">
                                 <a class="page-link" th:href="@{/station/list(page=${totalPages - 1}, size=${size}, companyIdSearch=${selectedCompanyId},
-                                opSearch=${selectedOpSearch}, contentSearch=${selectedContentSearch})}"><i class="bi bi-chevron-double-right"></i></a>
+                                opSearch=${selectedOpSearch}, contentSearch=${selectedContentSearch})}"><i
+                                        class="bi bi-chevron-double-right"></i></a>
                             </li>
                         </ul>
                     </div>
@@ -169,9 +183,10 @@
                                 <tr class="table-border-top">
                                     <th class="w-20">사업자<b class="required-data">*</b></th>
                                     <td class="w-30">
-                                        <select id="companyId" name="companyId" class="form-control attr-control" required>
+                                        <select id="companyId" name="companyId" class="form-control attr-control"
+                                            required>
                                             <option th:each="company : ${companyList}" th:value="${company.companyId}"
-                                                    th:text="${company.companyName}" ></option>
+                                                th:text="${company.companyName}"></option>
                                         </select>
                                     </td>
                                     <td colspan="2"></td>
@@ -187,41 +202,48 @@
                                     <th class="w-20">충전소 이름<b class="required-data">*</b></th>
                                     <td class="w-30">
                                         <div class="display-input-btn">
-                                            <input type="text" name="stationName" id="stationName" class="form-control attr-control" required>
-                                            <button type="button" class="btn btn-outline-grey flex-btn attr-control" id="duplicateBtn">중복체크</button>
+                                            <input type="text" name="stationName" id="stationName"
+                                                class="form-control attr-control" required>
+                                            <button type="button" class="btn btn-outline-grey flex-btn attr-control"
+                                                id="duplicateBtn">중복체크</button>
                                         </div>
                                     </td>
                                     <th class="w-20">충전소ID<b class="required-data">*</b></th>
                                     <td class="w-30">
-                                        <input type="text" name="stationId" id="stationId" class="form-control" disabled>
+                                        <input type="text" name="stationId" id="stationId" class="form-control"
+                                            disabled>
                                     </td>
                                 </tr>
                                 <tr>
                                     <th class="w-20">충전소 유형<b class="required-data">*</b></th>
                                     <td class="w-30">
-                                        <select id="stationType" name="stationType" class="form-control attr-control" required>
+                                        <select id="stationType" name="stationType" class="form-control attr-control"
+                                            required>
                                             <option th:each="data : ${csFacility}" th:value="${data.commonCode}"
-                                                    th:text="${data.commonCodeName}" ></option>
+                                                th:text="${data.commonCodeName}"></option>
                                         </select>
                                     </td>
                                     <th class="w-20">충전소 시설 구분<b class="required-data">*</b></th>
                                     <td class="w-30">
-                                        <select id="facilityType" name="facilityType" class="form-control attr-control" required>
+                                        <select id="facilityType" name="facilityType" class="form-control attr-control"
+                                            required>
                                             <option th:each="data : ${csFSub}" th:value="${data.commonCode}"
-                                                    th:text="${data.commonCodeName}" ></option>
+                                                th:text="${data.commonCodeName}"></option>
                                         </select>
                                     </td>
                                 </tr>
                                 <tr>
                                     <th class="w-20">문의전화<b class="required-data">*</b></th>
                                     <td class="w-30">
-                                        <input type="number" name="asNum" id="asNum" class="form-control attr-control" autocomplete="off" required>
+                                        <input type="number" name="asNum" id="asNum" class="form-control attr-control"
+                                            autocomplete="off" required>
                                     </td>
                                     <th class="w-20">운영상태<b class="required-data">*</b></th>
                                     <td class="w-30">
-                                        <select id="opStatus" name="opStatus" class="form-control attr-control" required>
+                                        <select id="opStatus" name="opStatus" class="form-control attr-control"
+                                            required>
                                             <option th:each="data : ${opStepCd}" th:value="${data.commonCode}"
-                                                    th:text="${data.commonCodeName}"></option>
+                                                th:text="${data.commonCodeName}"></option>
                                         </select>
                                     </td>
                                 </tr>
@@ -229,31 +251,38 @@
                                     <th class="w-20">주소<b class="required-data">*</b></th>
                                     <td class="w-30" colspan="3">
                                         <div class="address-container mb-2 display-input-btn">
-                                            <input type="text" name="zipCode" id="zipCode" class="form-control w-25" disabled>
-                                            <button class="btn btn-outline-grey flex-btn attr-control" id="search-btn" onclick="postSearch()">주소 검색</button>
+                                            <input type="text" name="zipCode" id="zipCode" class="form-control w-25"
+                                                disabled>
+                                            <button class="btn btn-outline-grey flex-btn attr-control"
+                                                id="search-btn">주소 검색</button>
                                             <input type="text" name="sido" id="sido" hidden>
                                         </div>
-                                        <input type="text" name="address" id="address" class="form-control mb-2" autocomplete="off" disabled>
-                                        <input type="text" name="addressDetail" id="addressDetail" class="form-control attr-control"
-                                            placeholder="상세 주소" autocomplete="off">
+                                        <input type="text" name="address" id="address" class="form-control mb-2"
+                                            autocomplete="off" disabled>
+                                        <input type="text" name="addressDetail" id="addressDetail"
+                                            class="form-control attr-control" placeholder="상세 주소" autocomplete="off">
                                     </td>
                                 </tr>
                                 <tr>
                                     <th class="w-20">위도<b class="required-data">*</b></th>
                                     <td class="w-30">
-                                        <input type="text" name="latitude" id="latitude" class="form-control" autocomplete="off" required disabled>
+                                        <input type="text" name="latitude" id="latitude" class="form-control"
+                                            autocomplete="off" required disabled>
                                     </td>
                                     <th class="w-20">경도<b class="required-data">*</b></th>
                                     <td class="w-30">
-                                        <input type="text" name="longitude" id="longitude" class="form-control" autocomplete="off" required disabled>
+                                        <input type="text" name="longitude" id="longitude" class="form-control"
+                                            autocomplete="off" required disabled>
                                     </td>
                                 </tr>
                                 <tr>
                                     <th class="w-20" scope="row">운영시간<b class="required-data">*</b></th>
                                     <td class="" style="display: flex; align-items: center;">
-                                        <input type="time" name="openStartTime" id="openStartTime" class="form-control attr-control" placeholder="시작 시간">
+                                        <input type="time" name="openStartTime" id="openStartTime"
+                                            class="form-control attr-control" placeholder="시작 시간">
                                         <span class="flex-shrink-0 col-form-label font-weight-bold">~</span>
-                                        <input type="time" name="openEndTime" id="openEndTime" class="form-control attr-control" placeholder="종료 시간">
+                                        <input type="time" name="openEndTime" id="openEndTime"
+                                            class="form-control attr-control" placeholder="종료 시간">
                                     </td>
                                     <td colspan="2" class="text-left">
                                         <input type="checkbox" id="openingAllTime" class="attr-control">
@@ -264,9 +293,11 @@
                                     <th class="w-20" scope="row">주차요금 정보</th>
                                     <td>
                                         <div class="display-radio">
-                                            <input type="radio" name="parkingFeeYn" id="parkingFeeYes" class="attr-control" value="Y">
+                                            <input type="radio" name="parkingFeeYn" id="parkingFeeYes"
+                                                class="attr-control" value="Y">
                                             <label for="parkingFeeYes">유료</label>
-                                            <input type="radio" name="parkingFeeYn" id="parkingFeeNo" class="attr-control" value="N" checked>
+                                            <input type="radio" name="parkingFeeYn" id="parkingFeeNo"
+                                                class="attr-control" value="N" checked>
                                             <label for="parkingFeeNo">무료</label>
                                         </div>
                                     </td>
@@ -282,37 +313,41 @@
                                 <tr class="table-border-top">
                                     <th class="w-20">계약기관 명<b class="required-data">*</b></th>
                                     <td class="w-30">
-                                        <input type="text" name="institutionName" id="institutionName" class="form-control attr-control"
-                                            autocomplete="off" required>
+                                        <input type="text" name="institutionName" id="institutionName"
+                                            class="form-control attr-control" autocomplete="off" required>
                                     </td>
                                     <th class="w-20">계약 부지 구분<b class="required-data">*</b></th>
                                     <td class="w-30">
-                                        <select id="landType" name="landType" class="form-control attr-control" required>
+                                        <select id="landType" name="landType" class="form-control attr-control"
+                                            required>
                                             <option th:each="data : ${landType}" th:value="${data.commonCode}"
-                                                    th:text="${data.commonCodeName}" ></option>
+                                                th:text="${data.commonCodeName}"></option>
                                         </select>
                                     </td>
                                 </tr>
                                 <tr>
                                     <th class="w-20">담당자 명</th>
                                     <td class="d-flex align-items-center">
-                                        <input type="text" name="staffName" id="staffName" class="form-control attr-control" autocomplete="off">
+                                        <input type="text" name="staffName" id="staffName"
+                                            class="form-control attr-control" autocomplete="off">
                                     </td>
                                     <th class="w-20">담당자 연락처</th>
                                     <td class="w-30">
-                                        <input type="text" name="staffPhone" id="staffPhone" class="form-control attr-control" maxlength="13" oninput="phoneFormat(this)"
+                                        <input type="text" name="staffPhone" id="staffPhone"
+                                            class="form-control attr-control" maxlength="13" oninput="phoneFormat(this)"
                                             autocomplete="off">
                                     </td>
                                 </tr>
                                 <tr>
                                     <th class="w-20">계약일자</th>
                                     <td class="w-30">
-                                        <input type="date" min="1970-01-01" max="2199-12-31" name="contractDate" id="contractDate" class="form-control attr-control">
+                                        <input type="date" min="1970-01-01" max="2199-12-31" name="contractDate"
+                                            id="contractDate" class="form-control attr-control">
                                     </td>
                                     <th class="w-20">계약기간<b class="required-data">*</b></th>
                                     <td class="input-date-container">
-                                        <input type="date" min="1970-01-01" max="2199-12-31" name="startDate" id="startDate"
-                                            class="form-control attr-control" required>
+                                        <input type="date" min="1970-01-01" max="2199-12-31" name="startDate"
+                                            id="startDate" class="form-control attr-control" required>
                                         <span class="flex-shrink-0 col-form-label font-weight-bold">~</span>
                                         <input type="date" min="1970-01-01" max="2199-12-31" name="endDate" id="endDate"
                                             class="form-control attr-control" required>
@@ -322,17 +357,19 @@
                                     <th class="w-20">토지사용구분<b class="required-data">*</b></th>
                                     <td>
                                         <div class="display-radio">
-                                            <input type="radio" name="landUseType" id="FIX" class="attr-control" value="FIX" checked>
+                                            <input type="radio" name="landUseType" id="FIX" class="attr-control"
+                                                value="FIX" checked>
                                             <label for="FIX">고정형</label>
-                                            <input type="radio" name="landUseType" id="RATE" class="attr-control" value="RATE">
+                                            <input type="radio" name="landUseType" id="RATE" class="attr-control"
+                                                value="RATE">
                                             <label for="RATE">사용료율</label>
                                         </div>
                                     </td>
                                     <th class="w-20">토지사용료<b class="required-data">*</b></th>
                                     <td class="w-30">
                                         <div class="display-input-btn">
-                                            <input type="number" name="landUseFee" id="landUseFee"class="form-control attr-control"
-                                                autocomplete="off" required>
+                                            <input type="number" name="landUseFee" id="landUseFee"
+                                                class="form-control attr-control" autocomplete="off" required>
                                             <span id="unit">원</span>
                                         </div>
                                     </td>
@@ -341,8 +378,8 @@
                                     <th class="w-20">정산일</th>
                                     <td class="w-30">
                                         <div class="display-input-btn">
-                                            <input type="text" name="settlementDate" id="settlementDate" class="form-control attr-control"
-                                                autocomplete="off" required>
+                                            <input type="text" name="settlementDate" id="settlementDate"
+                                                class="form-control attr-control" autocomplete="off" required>
                                             <span>일</span>
                                         </div>
                                     </td>
@@ -358,7 +395,8 @@
                                 <tr class="table-border-top">
                                     <th class="w-20">한전 고객 번호<b class="required-data">*</b></th>
                                     <td class="w-30">
-                                        <input type="number" name="kepcoCustNo" id="kepcoCustNo" class="form-control attr-control" required>
+                                        <input type="number" name="kepcoCustNo" id="kepcoCustNo"
+                                            class="form-control attr-control" required>
                                     </td>
                                     <th class="w-20">개통일<b class="required-data">*</b></th>
                                     <td class="w-30">
@@ -369,28 +407,32 @@
                                 <tr>
                                     <th class="w-20">계약전력(kW)<b class="required-data">*</b></th>
                                     <td class="d-flex align-items-center">
-                                        <input type="number" name="contPower" id="contPower" class="form-control attr-control" required>
+                                        <input type="number" name="contPower" id="contPower"
+                                            class="form-control attr-control" required>
                                     </td>
                                     <th class="w-20">수전방식</th>
                                     <td class="w-30">
-                                        <select id="rcvCapacityMethod" name="rcvCapacityMethod" class="form-control attr-control" required>
+                                        <select id="rcvCapacityMethod" name="rcvCapacityMethod"
+                                            class="form-control attr-control" required>
                                             <option th:value="null">(선택)</option>
                                             <option th:each="data : ${faucetType}" th:value="${data.commonCode}"
-                                                    th:text="${data.commonCodeName}" ></option>
+                                                th:text="${data.commonCodeName}"></option>
                                         </select>
                                     </td>
                                 </tr>
                                 <tr>
                                     <th class="w-20">수전용량(kVA)</th>
                                     <td class="w-30">
-                                        <input type="number" name="rcvCapacity" id="rcvCapacity" class="form-control attr-control">
+                                        <input type="number" name="rcvCapacity" id="rcvCapacity"
+                                            class="form-control attr-control">
                                     </td>
                                     <th class="w-20">가입요금제</th>
                                     <td class="w-30">
-                                        <select id="voltageType" name="voltageType" class="form-control attr-control" required>
+                                        <select id="voltageType" name="voltageType" class="form-control attr-control"
+                                            required>
                                             <option th:value="null">(선택)</option>
                                             <option th:each="data : ${powerType}" th:value="${data.commonCode}"
-                                                    th:text="${data.commonCodeName}" ></option>
+                                                th:text="${data.commonCodeName}"></option>
                                         </select>
                                     </td>
                                 </tr>
@@ -415,8 +457,10 @@
                     </div>
                     <!-- modal body end -->
                     <div class="modal-footer justify-content-center border-top-none">
-                        <button type="button" id="modalCancel" class="btn btn-outline-grey me-2" data-bs-dismiss="modal">취소</button>
-                        <button type="button" id="modalClose" class="btn btn-outline-grey me-2" data-bs-dismiss="modal" hidden>닫기</button>
+                        <button type="button" id="modalCancel" class="btn btn-outline-grey me-2"
+                            data-bs-dismiss="modal">취소</button>
+                        <button type="button" id="modalClose" class="btn btn-outline-grey me-2" data-bs-dismiss="modal"
+                            hidden>닫기</button>
                         <button type="button" id="modalBtn" class="btn btn-data-add">등록</button>
                     </div>
                 </form>
@@ -429,4 +473,5 @@
     <!-- Add Modal end -->
     <script type="text/javascript" th:src="@{/js/charge/cs_list.js}"></script>
 </div>
+
 </html>

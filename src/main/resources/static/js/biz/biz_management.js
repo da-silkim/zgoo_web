@@ -3,22 +3,26 @@ document.addEventListener("DOMContentLoaded", function () {
     let companyModalCon = false;
     let selectedCompanyId;
 
-    // '검색' 버튼 클릭 이벤트 처리
-    document.getElementById("companySearchBtn").addEventListener("click", function () {
+    // // '검색' 버튼 클릭 이벤트 처리
+    // document.getElementById("companySearchBtn").addEventListener("click", function () {
 
-        document.getElementById('searchForm').submit();
-    });
+    //     document.getElementById('searchForm').submit();
+    // });
 
 
-    // '초기화' 버튼 클릭 이벤트 처리
-    document.getElementById("resetBtn").addEventListener("click", function () {
-        // 폼 필드 초기화
-        document.getElementById('companyIdSearch').value = '';
-        document.getElementById('companyTypeSearch').value = '';
-        document.getElementById('companyLvSearch').value = '';
+    // // '초기화' 버튼 클릭 이벤트 처리
+    // document.getElementById("resetBtn").addEventListener("click", function () {
+    //     // 폼 필드 초기화
+    //     document.getElementById('companyIdSearch').value = '';
+    //     document.getElementById('companyTypeSearch').value = '';
+    //     document.getElementById('companyLvSearch').value = '';
 
-        // 폼 제출 (초기화된 상태로)
-        document.getElementById('searchForm').submit();
+    //     // 폼 제출 (초기화된 상태로)
+    //     document.getElementById('searchForm').submit();
+    // });
+
+    $('#size').on('change', function () {
+        updatePageSize(this, "/biz/list", ["companyIdSearch", "companyTypeSearch", "companyLvSearch"]);
     });
 
     // 모달 취소 버튼 클릭 시 폼 초기화

@@ -14,16 +14,6 @@
                         <div class="card-title mb-2"><span class="card-title-bar"></span><span>회원 정보</span></div>
                         <table class="table table-bg-v table-fixed w-100 text-center align-middle">
                             <tbody>
-                                <tr class="table-border-top">
-                                    <th class="w-20">사업자명<b class="required-data">*</b></th>
-                                    <td class="w-30">
-                                        <span th:text="${member.companyName}"></span>
-                                    </td>
-                                    <th class="w-20">사업자구분<b class="required-data">*</b></th>
-                                    <td class="w-30">
-                                        <span th:text="${member.bizTypeName}"></span>
-                                    </td>
-                                </tr>
                                 <tr>
                                     <th>이름<b class="required-data">*</b></th>
                                     <td>
@@ -39,7 +29,10 @@
                                     <td>
                                         <span th:text="${member.memLoginId}"></span>
                                     </td>
-                                    <td colspan="2"></td>
+                                    <th>사업자구분<b class="required-data">*</b></th>
+                                    <td>
+                                        <span th:text="${member.bizTypeName}"></span>
+                                    </td>
                                 </tr>
                                 <tr>
                                     <th>회원카드번호<b class="required-data">*</b></th>
@@ -66,7 +59,9 @@
                                     <td colspan="3">
                                         <div class="address-detail-container">
                                             <span th:text="'[' + ${member.zipCode} + '] ' + ${member.address}"></span>
-                                            <span th:if="${member.addressDetail != null and !member.addressDetail.isEmpty()}" th:text="', ' + ${member.addressDetail}"></span>
+                                            <span
+                                                th:if="${member.addressDetail != null and !member.addressDetail.isEmpty()}"
+                                                th:text="', ' + ${member.addressDetail}"></span>
                                         </div>
                                     </td>
                                 </tr>
@@ -156,7 +151,9 @@
                                     <td><span th:text="${condition.section}"></span></td>
                                     <td><span th:text="${condition.conditionCodeName}"></span></td>
                                     <td><span th:text="${condition.agreeYnCheck}"></span></td>
-                                    <td><span th:text="${#temporals.format(condition.agreeDt, 'yyyy-MM-dd HH:mm:ss')}"></span></td>
+                                    <td><span
+                                            th:text="${#temporals.format(condition.agreeDt, 'yyyy-MM-dd HH:mm:ss')}"></span>
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
@@ -173,4 +170,5 @@
     </div>
     <!-- card:1 end -->
 </div>
+
 </html>

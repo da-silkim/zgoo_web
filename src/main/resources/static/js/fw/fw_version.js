@@ -26,6 +26,10 @@ document.addEventListener("DOMContentLoaded", function () {
     //     document.getElementById('searchForm').submit();
     // });
 
+    $('#size').on('change', function () {
+        updatePageSize(this, "/fw/version", []);
+    });
+
     //테이블 row 클릭시 처리 이벤트
     document.querySelectorAll('#pageList tr').forEach(row => {
         row.addEventListener('click', function () {

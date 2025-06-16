@@ -1,24 +1,24 @@
-$(document).ready(function() {
+$(document).ready(function () {
     let modalCon = false;
     let isDuplicateCheck = false;
     let selectRow, btnMsg = "등록";
     var stationId;
 
-    $('#size').on('change', function() {
+    $('#size').on('change', function () {
         updatePageSize(this, "/station/list", ["companyIdSearch", "opSearch", "contentSearch"]);
     });
 
-    $('#pageList').on('click', 'tr', function() {
+    $('#pageList').on('click', 'tr', function () {
         selectRow = $(this);
         stationId = selectRow.find('td').eq(0).attr('id');
     });
 
-    $('#modalClose').on('click', function() {
+    $('#modalClose').on('click', function () {
         $(".attr-control").removeAttr("disabled");
         window.location.reload();
     });
 
-    $('#openingAllTime').change(function() {
+    $('#openingAllTime').change(function () {
         if ($(this).prop('checked')) {
             $('#openStartTime').val('00:00').prop('disabled', true);
             $('#openEndTime').val('23:59').prop('disabled', true);
@@ -28,7 +28,7 @@ $(document).ready(function() {
         }
     });
 
-    $('#addBtn').on('click', function(event) {
+    $('#addBtn').on('click', function (event) {
         event.preventDefault();
         modalCon = false;
         btnMsg = "등록";
@@ -49,7 +49,7 @@ $(document).ready(function() {
         updateUnit();
     });
 
-    $('#editBtn').on('click', function(event) {
+    $('#editBtn').on('click', function (event) {
         event.preventDefault();
         isDuplicateCheck = true;
         modalCon = true;
@@ -67,7 +67,7 @@ $(document).ready(function() {
             url: `/station/list/get/${stationId}`,
             contentType: "application/json",
             dataType: 'json',
-            success: function(data) {
+            success: function (data) {
                 $('#companyId').val(data.companyId || '');
                 $('#stationName').val(data.stationName || '');
                 $('#stationId').val(data.stationId || '');
@@ -94,7 +94,7 @@ $(document).ready(function() {
                     $('#openingAllTime').prop('checked', false);
                 }
 
-                
+
                 if (data.parkingFeeYn === 'Y') {
                     $('#parkingFeeYes').prop('checked', true);
                 } else {
@@ -129,19 +129,19 @@ $(document).ready(function() {
         });
     });
 
-    $('#deleteBtn').on('click', function() {
+    $('#deleteBtn').on('click', function () {
         btnMsg = "삭제";
 
-        if(confirmSubmit(btnMsg)) {
+        if (confirmSubmit(btnMsg)) {
 
             $.ajax({
                 type: 'DELETE',
                 url: `/station/list/delete/${stationId}`,
-                success: function(response) {
+                success: function (response) {
                     alert(response);
                     window.location.reload();
                 },
-                error: function(xhr, status, error) {
+                error: function (xhr, status, error) {
                     var response = JSON.parse(xhr.responseText);
                     alert(response);
                 }
@@ -149,10 +149,10 @@ $(document).ready(function() {
         }
     });
 
-    $('#modalBtn').on('click', function(event) {
+    $('#modalBtn').on('click', function (event) {
         event.preventDefault();
 
-        if(!isDuplicateCheck) {
+        if (!isDuplicateCheck) {
             alert('충전소 이름 중복체크를 해주세요.');
             return;
         }
@@ -202,7 +202,7 @@ $(document).ready(function() {
                 method: TYPE,
                 contentType: 'application/json',
                 data: JSON.stringify(DATA),
-                success: function(response) {
+                success: function (response) {
                     if (!modalCon) {
                         if (response.stationId) {
                             // 등록성공
@@ -216,7 +216,7 @@ $(document).ready(function() {
                     alert(response.message);
                     window.location.reload();
                 },
-                error: function(xhr, status, error) {
+                error: function (xhr, status, error) {
                     var response = JSON.parse(xhr.responseText);
                     alert(response.message);
                 }
@@ -224,13 +224,13 @@ $(document).ready(function() {
         }
     });
 
-    $('#stationName').change(function() {
+    $('#stationName').change(function () {
         isDuplicateCheck = false;
     });
 
-    $('#duplicateBtn').on('click', function() {
+    $('#duplicateBtn').on('click', function () {
         var stationName = $('#stationName').val();
-        if(stationName.trim() === '') {
+        if (stationName.trim() === '') {
             alert('충전소 이름을 입력해주세요');
             return;
         }
@@ -238,8 +238,8 @@ $(document).ready(function() {
         $.ajax({
             url: '/station/list/checkStationName',
             type: 'GET',
-            data: {stationName: stationName},
-            success: function(isDuplicate) {
+            data: { stationName: stationName },
+            success: function (isDuplicate) {
                 if (isDuplicate) {
                     alert('이미 사용 중인 충전소 이름입니다.');
                     isDuplicateCheck = false;
@@ -248,10 +248,16 @@ $(document).ready(function() {
                     isDuplicateCheck = true;
                 }
             },
-            error: function() {
+            error: function () {
                 alert('충전소 이름 중복확인 중 오류가 발생으로 다시 시도해주세요');
             }
         });
+    });
+
+    $('#search-btn').on('click', function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        postSearch();
     });
 
     // 토지사용구분 제어

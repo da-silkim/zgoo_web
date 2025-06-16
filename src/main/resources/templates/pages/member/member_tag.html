@@ -15,21 +15,25 @@
                         <!-- row: start -->
                         <div class="row mb-3 row-cols-2 row-cols-lg-3 g-2">
                             <div class="col d-flex align-items-center">
-                                <label for="idTagSearch" class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">회원카드번호</label>
+                                <label for="idTagSearch"
+                                    class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">회원카드번호</label>
                                 <input type="text" name="idTagSearch" id="idTagSearch" class="mx-3 form-control"
                                     placeholder="회원카드번호를 입력해주세요." th:value="${selectedIdTag}" autocomplete="off">
                             </div>
                             <div class="col d-flex align-items-center">
-                                <label for="nameSearch" class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">회원명</label>
+                                <label for="nameSearch"
+                                    class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">회원명</label>
                                 <input type="text" name="nameSearch" id="nameSearch" class="mx-3 form-control"
                                     placeholder="사용자명을 입력해주세요." th:value="${selectedName}" autocomplete="off">
                             </div>
                         </div>
                         <!-- row: end -->
                         <div class="search-btn">
-                            <button type="button" class="btn btn-outline-grey me-2" id="searchBtn" onclick="searchOption()">
+                            <button type="button" class="btn btn-outline-grey me-2" id="searchBtn"
+                                onclick="searchOption()">
                                 <i class="bi bi-search me-2"></i>검색</button>
-                            <button type="button" class="btn btn-outline-grey me-2" id="resetBtn" onclick="replacePage('/member/tag/list')">
+                            <button type="button" class="btn btn-outline-grey me-2" id="resetBtn"
+                                onclick="replacePage('/member/tag/list')">
                                 <i class="bi bi-arrow-repeat me-2"></i>초기화</button>
                         </div>
                     </form>
@@ -42,11 +46,13 @@
                 <!-- card body:3 start -->
                 <div class="card-body btn-page-container">
                     <div class="btn-container">
-                        <button class="btn btn-excel" id="excelBtn" onclick="excelDownload('/excel/download/member_tag', ['idTagSearch', 'nameSearch'])"
+                        <button class="btn btn-excel" id="excelBtn"
+                            onclick="excelDownload('/excel/download/member_tag', ['idTagSearch', 'nameSearch'])"
                             th:if="${menuAuthority.authority == 'SU' or menuAuthority.excelYn == 'Y'}">
                             <i class="bi bi-file-earmark-spreadsheet"></i>엑셀다운로드</button>
                         <div class="btn-mod" th:if="${menuAuthority.authority == 'SU' or menuAuthority.modYn == 'Y'}">
-                            <button class="btn btn-data-edit" id="editBtn" data-bs-toggle="modal" data-bs-target="#dataAddModal" hidden>
+                            <button class="btn btn-data-edit" id="editBtn" data-bs-toggle="modal"
+                                data-bs-target="#dataAddModal" hidden>
                                 <i class="fa-regular fa-pen-to-square"></i>수정</button>
                             <button class="btn btn-data-delete" id="deleteBtn" hidden>
                                 <i class="bi bi-trash"></i>삭제</button>
@@ -54,11 +60,12 @@
                     </div>
                     <div class="page-container">
                         <span id="pageInfo">
-                            <span th:text="'Page ' + (${currentPage + 1}) + ' of ' + ${totalPages} + ' [총 ' + ${totalCount} + '건]'"></span>
+                            <span
+                                th:text="'Page ' + (${currentPage + 1}) + ' of ' + ${totalPages} + ' [총 ' + ${totalCount} + '건]'"></span>
                         </span>
                         <select class="mx-3 page-select" id="size" name="size">
                             <option th:each="data : ${showListCnt}" th:value="${data.commonCode}"
-                                    th:text="${data.commonCodeName}" th:selected="${data.commonCode == size}"></option>
+                                th:text="${data.commonCodeName}" th:selected="${data.commonCode == size}"></option>
                         </select>
                     </div>
                     <div class="w-100 table-responsive">
@@ -66,7 +73,6 @@
                             <thead>
                                 <tr class="table-border-top">
                                     <th scope="col"></th>
-                                    <th scope="col">사업자</th>
                                     <th scope="col">회원명</th>
                                     <th scope="col">휴대전화</th>
                                     <th scope="col">부모IDTAG</th>
@@ -81,47 +87,52 @@
                             <tbody id="pageList">
                                 <tr th:each="member : ${memberAuthList}">
                                     <td><input type="checkbox" th:id="${member.idTag}" /></td>
-                                    <td th:text="${member.companyName}"></td>
                                     <td th:text="${member.name}"></td>
                                     <td th:text="${member.phoneNo}"></td>
                                     <td th:text="${member.parentIdTag}"></td>
                                     <td th:text="${member.idTag}"></td>
                                     <td th:text="${member.expireDate}"></td>
                                     <td th:text="${member.useYn}"></td>
-                                    <td th:text="${#numbers.formatDecimal(member.totalChargingPower, 1, 'COMMA', 2, 'POINT')}"></td>
+                                    <td
+                                        th:text="${#numbers.formatDecimal(member.totalChargingPower, 1, 'COMMA', 2, 'POINT')}">
+                                    </td>
                                     <td th:text="${member.totalChargingPrice}"></td>
                                     <td th:text="${member.status}"></td>
                                 </tr>
                                 <tr th:if="${memberAuthList.size() == 0}">
-                                    <td colspan="11">조회된 데이터가 없습니다.</td>
+                                    <td colspan="10">조회된 데이터가 없습니다.</td>
                                 </tr>
                             </tbody>
-                        </table>                 
+                        </table>
                     </div>
                     <!-- paging navigation start -->
                     <div th:if="${memberAuthList.size() > 0}">
                         <ul class="pagination justify-content-center">
                             <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled' : ''">
                                 <a class="page-link" th:href="@{/member/tag/list(page=0, size=${size},
-                                idTagSearch=${selectedIdTag}, nameSearch=${selectedName})}"><i class="bi bi-chevron-double-left"></i></a>
+                                idTagSearch=${selectedIdTag}, nameSearch=${selectedName})}"><i
+                                        class="bi bi-chevron-double-left"></i></a>
                             </li>
                             <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled' : ''">
                                 <a class="page-link" th:href="@{/member/tag/list(page=${currentPage-1}, size=${size},
-                                idTagSearch=${selectedIdTag}, nameSearch=${selectedName})}"><i class="bi bi-chevron-left"></i></a>
+                                idTagSearch=${selectedIdTag}, nameSearch=${selectedName})}"><i
+                                        class="bi bi-chevron-left"></i></a>
                             </li>
                             <li class="page-item" th:each="i : ${#numbers.sequence(currentPage - 2, currentPage + 2)}"
                                 th:if="${i >= 0 && i < totalPages}">
                                 <a class="page-link" th:href="@{/member/tag/list(page=${i}, size=${size},
-                                idTagSearch=${selectedIdTag}, nameSearch=${selectedName})}"
-                                th:text="${i+1}" th:classappend="${i == currentPage} ? 'active' : ''"></a>
+                                idTagSearch=${selectedIdTag}, nameSearch=${selectedName})}" th:text="${i+1}"
+                                    th:classappend="${i == currentPage} ? 'active' : ''"></a>
                             </li>
                             <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled' : ''">
                                 <a class="page-link" th:href="@{/member/tag/list(page=${currentPage+1}, size=${size},
-                                idTagSearch=${selectedIdTag}, nameSearch=${selectedName})}"><i class="bi bi-chevron-right"></i></a>
+                                idTagSearch=${selectedIdTag}, nameSearch=${selectedName})}"><i
+                                        class="bi bi-chevron-right"></i></a>
                             </li>
                             <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled' : ''">
                                 <a class="page-link" th:href="@{/member/tag/list(page=${totalPages - 1}, size=${size},
-                                idTagSearch=${selectedIdTag}, nameSearch=${selectedName})}"><i class="bi bi-chevron-double-right"></i></a>
+                                idTagSearch=${selectedIdTag}, nameSearch=${selectedName})}"><i
+                                        class="bi bi-chevron-double-right"></i></a>
                             </li>
                         </ul>
                     </div>
@@ -153,27 +164,32 @@
                                 <tr class="table-border-top">
                                     <th class="w-15">회원명</th>
                                     <td class="w-35">
-                                        <input type="text" name="name" id="name" class="form-control" autocomplete="off" disabled>
+                                        <input type="text" name="name" id="name" class="form-control" autocomplete="off"
+                                            disabled>
                                     </td>
                                     <th class="w-15">상태<b class="required-data">*</b></th>
                                     <td class="w-35">
-                                        <input type="text" name="status" id="status" class="form-control" autocomplete="off" required>
+                                        <input type="text" name="status" id="status" class="form-control"
+                                            autocomplete="off" required>
                                     </td>
                                 </tr>
                                 <tr>
                                     <th>회원카드번호</th>
                                     <td>
-                                        <input type="number" name="idTag" id="idTag" class="form-control" autocomplete="off" disabled required>
+                                        <input type="number" name="idTag" id="idTag" class="form-control"
+                                            autocomplete="off" disabled required>
                                     </td>
                                     <th>유효기간<b class="required-data">*</b></th>
                                     <td>
-                                        <input type="date" name="expireDate" id="expireDate" class="form-control" autocomplete="off" required>
+                                        <input type="date" name="expireDate" id="expireDate" class="form-control"
+                                            autocomplete="off" required>
                                     </td>
                                 </tr>
                                 <tr>
                                     <th>부모IDTAG<b class="required-data">*</b></th>
                                     <td>
-                                        <input type="number" name="parentIdTag" id="parentIdTag" class="form-control" autocomplete="off" required>
+                                        <input type="number" name="parentIdTag" id="parentIdTag" class="form-control"
+                                            autocomplete="off" required>
                                     </td>
                                     <th>사용여부<b class="required-data">*</b></th>
                                     <td>
@@ -186,13 +202,13 @@
                                 <tr>
                                     <th>누적충전량(kWh)</th>
                                     <td>
-                                        <input type="text" name="totalChargingPower" id="totalChargingPower" class="form-control"
-                                                autocomplete="off" disabled>
+                                        <input type="text" name="totalChargingPower" id="totalChargingPower"
+                                            class="form-control" autocomplete="off" disabled>
                                     </td>
                                     <th>누적충전금액(원)</th>
                                     <td>
-                                        <input type="number" name="totalChargingPrice" id="totalChargingPrice" class="form-control"
-                                                autocomplete="off" disabled>
+                                        <input type="number" name="totalChargingPrice" id="totalChargingPrice"
+                                            class="form-control" autocomplete="off" disabled>
                                     </td>
                                 </tr>
                             </tbody>
@@ -214,4 +230,5 @@
 
     <script type="text/javascript" th:src="@{/js/member/member_tag.js}"></script>
 </div>
+
 </html>

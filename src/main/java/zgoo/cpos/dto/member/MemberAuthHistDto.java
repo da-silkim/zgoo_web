@@ -12,7 +12,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder(toBuilder = true)
 public class MemberAuthHistDto {
-    private String companyName;
     private String stationName;
     private String chargerId;
     private String cpType;

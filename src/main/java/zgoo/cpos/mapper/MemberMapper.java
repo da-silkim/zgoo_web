@@ -5,15 +5,14 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import zgoo.cpos.domain.biz.BizInfo;
-import zgoo.cpos.domain.company.Company;
-import zgoo.cpos.domain.member.MemberCondition;
 import zgoo.cpos.domain.member.ConditionCode;
 import zgoo.cpos.domain.member.Member;
 import zgoo.cpos.domain.member.MemberAuth;
 import zgoo.cpos.domain.member.MemberCar;
+import zgoo.cpos.domain.member.MemberCondition;
 import zgoo.cpos.domain.member.MemberCreditCard;
-import zgoo.cpos.dto.member.MemberDto.MemberConditionDto;
 import zgoo.cpos.dto.member.MemberDto.MemberCarDto;
+import zgoo.cpos.dto.member.MemberDto.MemberConditionDto;
 import zgoo.cpos.dto.member.MemberDto.MemberCreditCardDto;
 import zgoo.cpos.dto.member.MemberDto.MemberRegDto;
 
@@ -23,9 +22,8 @@ public class MemberMapper {
      * 법인회원
      * member(dto >> entity)
      */
-    public static Member toEntityMemberBiz(MemberRegDto dto, Company company, BizInfo biz) {
+    public static Member toEntityMemberBiz(MemberRegDto dto, BizInfo biz) {
         Member member = Member.builder()
-                .company(company)
                 .biz(biz)
                 .memLoginId(dto.getMemLoginId())
                 .password(dto.getPassword())
@@ -49,9 +47,8 @@ public class MemberMapper {
      * 개인회원
      * member(dto >> entity)
      */
-    public static Member toEntityMember(MemberRegDto dto, Company company) {
+    public static Member toEntityMember(MemberRegDto dto) {
         Member member = Member.builder()
-                .company(company)
                 .memLoginId(dto.getMemLoginId())
                 .password(dto.getPassword())
                 .name(dto.getName())
@@ -70,7 +67,7 @@ public class MemberMapper {
         return member;
     }
 
-    /* 
+    /*
      * member credit card(dto >> entity)
      */
     public static MemberCreditCard toEntityCard(MemberCreditCardDto dto, Member member) {
@@ -85,7 +82,7 @@ public class MemberMapper {
         return card;
     }
 
-    /* 
+    /*
      * member car(dto >> entity)
      */
     public static MemberCar toEntityCar(MemberCarDto dto, Member member) {
@@ -99,10 +96,11 @@ public class MemberMapper {
         return car;
     }
 
-    /* 
+    /*
      * condition(dto >> entity)
      */
-    public static MemberCondition toEntityCondition(MemberConditionDto dto, Member member, ConditionCode conditionCode) {
+    public static MemberCondition toEntityCondition(MemberConditionDto dto, Member member,
+            ConditionCode conditionCode) {
         MemberCondition condition = MemberCondition.builder()
                 .member(member)
                 .condition(conditionCode)
@@ -113,7 +111,7 @@ public class MemberMapper {
         return condition;
     }
 
-    /* 
+    /*
      * auth(dto >> entity)
      */
     public static MemberAuth toEntityAuth(Member member) {

@@ -14,7 +14,7 @@
                     <form id="searchForm" class="position-relative" th:action="@{/member/list}" method="get">
                         <!-- row: start -->
                         <div class="row mb-3 row-cols-2 row-cols-lg-3 g-2">
-                            <div class="col d-flex align-items-center">
+                            <!-- <div class="col d-flex align-items-center">
                                 <label for="companyIdSearch"
                                     class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">사업자</label>
                                 <select id="companyIdSearch" name="companyIdSearch" class="mx-3 form-control">
@@ -23,7 +23,7 @@
                                         th:text="${company.companyName}"
                                         th:selected="${company.companyId == selectedCompanyId}"></option>
                                 </select>
-                            </div>
+                            </div> -->
                             <div class="col d-flex align-items-center">
                                 <label for="idTagSearch"
                                     class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">회원카드번호</label>
@@ -39,9 +39,11 @@
                         </div>
                         <!-- row: end -->
                         <div class="search-btn">
-                            <button type="button" class="btn btn-outline-grey me-2" id="searchBtn" onclick="searchOption()">
+                            <button type="button" class="btn btn-outline-grey me-2" id="searchBtn"
+                                onclick="searchOption()">
                                 <i class="bi bi-search me-2"></i>검색</button>
-                            <button type="button" class="btn btn-outline-grey me-2" id="resetBtn" onclick="replacePage('/member/list')">
+                            <button type="button" class="btn btn-outline-grey me-2" id="resetBtn"
+                                onclick="replacePage('/member/list')">
                                 <i class="bi bi-arrow-repeat me-2"></i>초기화</button>
                         </div>
                     </form>
@@ -54,13 +56,16 @@
                 <!-- card body:3 start -->
                 <div class="card-body btn-page-container">
                     <div class="btn-container">
-                        <button class="btn btn-excel" id="excelBtn" onclick="excelDownload('/excel/download/member_list', ['companyIdSearch', 'idTagSearch', 'nameSearch'])"
+                        <button class="btn btn-excel" id="excelBtn"
+                            onclick="excelDownload('/excel/download/member_list', ['idTagSearch', 'nameSearch'])"
                             th:if="${menuAuthority.authority == 'SU' or menuAuthority.excelYn == 'Y'}">
                             <i class="bi bi-file-earmark-spreadsheet"></i>엑셀다운로드</button>
                         <div class="btn-mod" th:if="${menuAuthority.authority == 'SU' or menuAuthority.modYn == 'Y'}">
-                            <button class="btn btn-data-add" id="addBtn" data-bs-toggle="modal" data-bs-target="#dataAddModal">
+                            <button class="btn btn-data-add" id="addBtn" data-bs-toggle="modal"
+                                data-bs-target="#dataAddModal">
                                 <i class="bi bi-plus-square"></i>등록</button>
-                            <button class="btn btn-data-edit"id="editBtn" data-bs-toggle="modal" data-bs-target="#dataAddModal" hidden>
+                            <button class="btn btn-data-edit" id="editBtn" data-bs-toggle="modal"
+                                data-bs-target="#dataAddModal" hidden>
                                 <i class="fa-regular fa-pen-to-square"></i>수정</button>
                             <button class="btn btn-data-delete" id="deleteBtn" hidden>
                                 <i class="bi bi-trash"></i>삭제</button>
@@ -82,7 +87,6 @@
                                 <tr class="table-border-top">
                                     <th scope="col"></th>
                                     <th scope="col"></th>
-                                    <th scope="col">사업자</th>
                                     <th scope="col">사용자명</th>
                                     <th scope="col">사용자ID</th>
                                     <th scope="col">회원카드번호</th>
@@ -97,14 +101,12 @@
                                     <td th:id="${member.memberId}"><input type="checkbox" /></td>
                                     <td>
                                         <a th:href="@{/member/detail/{memberId}(memberId=${member.memberId}, page=${currentPage}, size=${size},
-                                            companyIdSearch=${selectedCompanyId != null ? selectedCompanyId : ''}, 
                                             idTagSearch=${selectedIdTag != null ? selectedIdTag : ''}, 
                                             nameSearch=${selectedName != null ? selectedName : ''})}"
                                             class="no-underline">
                                             <i class="bi bi-files detail-files"></i>
                                         </a>
                                     </td>
-                                    <td th:text="${member.companyName}"></td>
                                     <td th:text="${member.name}"></td>
                                     <td th:text="${member.memLoginId}"></td>
                                     <td th:text="${member.idTag}"></td>
@@ -114,7 +116,7 @@
                                     <td th:text="${#temporals.format(member.joinedDt, 'yyyy-MM-dd HH:mm:ss')}"></td>
                                 </tr>
                                 <tr th:if="${memberList.size() == 0}">
-                                    <td colspan="10">조회된 데이터가 없습니다.</td>
+                                    <td colspan="9">조회된 데이터가 없습니다.</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -123,28 +125,28 @@
                     <div th:if="${memberList.size() > 0}">
                         <ul class="pagination justify-content-center">
                             <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled' : ''">
-                                <a class="page-link" th:href="@{/member/list(page=0, size=${size}, companyIdSearch=${selectedCompanyId},
+                                <a class="page-link" th:href="@{/member/list(page=0, size=${size},
                                 idTagSearch=${selectedIdTag}, nameSearch=${selectedName})}"><i
                                         class="bi bi-chevron-double-left"></i></a>
                             </li>
                             <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled' : ''">
-                                <a class="page-link" th:href="@{/member/list(page=${currentPage-1}, size=${size}, companyIdSearch=${selectedCompanyId},
+                                <a class="page-link" th:href="@{/member/list(page=${currentPage-1}, size=${size},
                                 idTagSearch=${selectedIdTag}, nameSearch=${selectedName})}"><i
                                         class="bi bi-chevron-left"></i></a>
                             </li>
                             <li class="page-item" th:each="i : ${#numbers.sequence(currentPage - 2, currentPage + 2)}"
                                 th:if="${i >= 0 && i < totalPages}">
-                                <a class="page-link" th:href="@{/member/list(page=${i}, size=${size}, companyIdSearch=${selectedCompanyId},
+                                <a class="page-link" th:href="@{/member/list(page=${i}, size=${size},
                                 idTagSearch=${selectedIdTag}, nameSearch=${selectedName})}" th:text="${i+1}"
                                     th:classappend="${i == currentPage} ? 'active' : ''"></a>
                             </li>
                             <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled' : ''">
-                                <a class="page-link" th:href="@{/member/list(page=${currentPage+1}, size=${size}, companyIdSearch=${selectedCompanyId},
+                                <a class="page-link" th:href="@{/member/list(page=${currentPage+1}, size=${size},
                                 idTagSearch=${selectedIdTag}, nameSearch=${selectedName})}"><i
                                         class="bi bi-chevron-right"></i></a>
                             </li>
                             <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled' : ''">
-                                <a class="page-link" th:href="@{/member/list(page=${totalPages - 1}, size=${size}, companyIdSearch=${selectedCompanyId},
+                                <a class="page-link" th:href="@{/member/list(page=${totalPages - 1}, size=${size},
                                 idTagSearch=${selectedIdTag}, nameSearch=${selectedName})}"><i
                                         class="bi bi-chevron-double-right"></i></a>
                             </li>
@@ -183,13 +185,6 @@
                         <table class="table table-bg-v table-fixed w-100 text-center align-middle">
                             <tbody>
                                 <tr class="table-border-top">
-                                    <th class="w-15">사업자명<b class="required-data">*</b></th>
-                                    <td class="w-35">
-                                        <select id="companyId" class="form-control" th:field="*{companyId}" required>
-                                            <option th:each="company : ${companyList}" th:value="${company.companyId}"
-                                                th:text="${company.companyName}"></option>
-                                        </select>
-                                    </td>
                                     <th class="w-15">사업자구분<b class="required-data">*</b></th>
                                     <td class="w-35">
                                         <div class="display-input-btn">
@@ -203,6 +198,15 @@
                                             <input type="text" name="bizId" id="bizId" class="form-control" hidden>
                                             <button type="button" class="btn btn-outline-grey flex-btn ms-0"
                                                 id="bizSearchBtn">찾기</button>
+                                        </div>
+                                    </td>
+                                    <th>회원카드번호<b class="required-data">*</b></th>
+                                    <td>
+                                        <div class="display-input-btn">
+                                            <input type="number" name="idTag" id="idTag" th:field="*{idTag}"
+                                                class="form-control" autocomplete="off" disabled required>
+                                            <button type="button" class="btn btn-outline-grey flex-btn ms-0"
+                                                id="duplicateMemTagBtn" disabled hidden>중복체크</button>
                                         </div>
                                     </td>
                                 </tr>
@@ -240,24 +244,6 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th>회원카드번호<b class="required-data">*</b></th>
-                                    <td>
-                                        <div class="display-input-btn">
-                                            <input type="number" name="idTag" id="idTag" th:field="*{idTag}"
-                                                class="form-control" autocomplete="off" disabled required>
-                                            <button type="button" class="btn btn-outline-grey flex-btn ms-0"
-                                                id="duplicateMemTagBtn" disabled hidden>중복체크</button>
-                                        </div>
-                                    </td>
-                                    <th scope="row">회원상태<b class="required-data">*</b></th>
-                                    <td>
-                                        <select id="userState" class="form-control" th:field="*{userState}" required>
-                                            <option th:each="data : ${memStatList}" th:value="${data.commonCode}"
-                                                th:text="${data.commonCodeName}"></option>
-                                        </select>
-                                    </td>
-                                </tr>
-                                <tr>
                                     <th>이메일<b class="required-data">*</b></th>
                                     <td>
                                         <input type="email" name="email" id="email" class="form-control"
@@ -268,6 +254,17 @@
                                         <input type="date" min="1930-01-01" max="2199-12-31" name="birth" id="birth"
                                             class="form-control" required>
                                     </td>
+                                </tr>
+                                <tr>
+
+                                    <th scope="row">회원상태<b class="required-data">*</b></th>
+                                    <td>
+                                        <select id="userState" class="form-control" th:field="*{userState}" required>
+                                            <option th:each="data : ${memStatList}" th:value="${data.commonCode}"
+                                                th:text="${data.commonCodeName}"></option>
+                                        </select>
+                                    </td>
+                                    <td colspan="2"></td>
                                 </tr>
                                 <tr>
                                     <th>주소<b class="required-data">*</b></th>
@@ -392,14 +389,15 @@
                                         <span class="condition-detail-container">
                                             <a href="#" th:class="'condition-detail ' + ${con.conditionCode}">내용보기</a>
                                         </span>
-                                        <input th:id="'ver' + ${con.conditionCode}" th:value="${con.agreeVersion}" hidden>
+                                        <input th:id="'ver' + ${con.conditionCode}" th:value="${con.agreeVersion}"
+                                            hidden>
                                     </td>
                                     <td>
-                                        <input type="radio" th:name="${con.conditionCode + 'Check'}" th:id="${con.conditionCode + '-Y'}"
-                                            class="mx-3" value="Y" checked>
+                                        <input type="radio" th:name="${con.conditionCode + 'Check'}"
+                                            th:id="${con.conditionCode + '-Y'}" class="mx-3" value="Y" checked>
                                         <label th:for="${con.conditionCode + '-Y'}">동의</label>
-                                        <input type="radio" th:name="${con.conditionCode + 'Check'}" th:id="${con.conditionCode + '-N'}"
-                                            class="mx-3" value="N">
+                                        <input type="radio" th:name="${con.conditionCode + 'Check'}"
+                                            th:id="${con.conditionCode + '-N'}" class="mx-3" value="N">
                                         <label th:for="${con.conditionCode + '-N'}">미동의</label>
                                     </td>
                                 </tr>

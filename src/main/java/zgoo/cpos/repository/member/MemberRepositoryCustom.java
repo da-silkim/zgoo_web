@@ -16,11 +16,10 @@ import zgoo.cpos.dto.member.MemberDto.MemberRegDto;
 public interface MemberRepositoryCustom {
 
         // 회원 전체 조회
-        Page<MemberListDto> findMemberWithPagination(Pageable pageable, String levelPath, boolean isSuperAdmin);
+        Page<MemberListDto> findMemberWithPagination(Pageable pageable);
 
         // 회원 검색 조회
-        Page<MemberListDto> searchMemberWithPagination(Long companyId, String idTag, String name, Pageable pageable,
-                        String levelPath, boolean isSuperAdmin);
+        Page<MemberListDto> searchMemberWithPagination(String idTag, String name, Pageable pageable);
 
         // 회원 단건 조회
         MemberRegDto findMemberOne(Long memberId, List<MemberCreditCardDto> cardInfo, List<MemberCarDto> carInfo,
@@ -38,11 +37,9 @@ public interface MemberRepositoryCustom {
                         List<MemberConditionDto> conditionInfo);
 
         // 회원정보 검색(1:1문의에서 사용)
-        List<MemberListDto> findMemberList(String name, String phoneNo, String levelPath, boolean isSuperAdmin);
+        List<MemberListDto> findMemberList(String name, String phoneNo);
 
-        List<MemberListDto> findAllMemberListWithoutPagination(Long companyId, String idTag, String name,
-                        String levelPath,
-                        boolean isSuperAdmin);
+        List<MemberListDto> findAllMemberListWithoutPagination(String idTag, String name);
 
         // 이메일 정보가 있고, 이메일수신 동의를 한 회원 조회
         List<MemberBaseDto> findAllMembersWithEmailAndMarketing();

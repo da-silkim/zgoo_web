@@ -213,7 +213,6 @@ public class PageController {
      */
     @GetMapping("/member/list")
     public String showmemlist(
-            @RequestParam(value = "companyIdSearch", required = false) Long companyId,
             @RequestParam(value = "idTagSearch", required = false) String idTag,
             @RequestParam(value = "nameSearch", required = false) String name,
             @RequestParam(value = "page", defaultValue = "0") int page,
@@ -224,11 +223,10 @@ public class PageController {
 
         try {
             // 회원리스트
-            Page<MemberListDto> memberList = this.memberService.findMemberInfoWithPagination(companyId, idTag, name,
+            Page<MemberListDto> memberList = this.memberService.findMemberInfoWithPagination(idTag, name,
                     page, size, principal.getName());
 
             // 검색 조건 저장
-            model.addAttribute("selectedCompanyId", companyId);
             model.addAttribute("selectedIdTag", idTag);
             model.addAttribute("selectedName", name);
 
@@ -240,8 +238,6 @@ public class PageController {
             model.addAttribute("totalPages", totalPages); // 총 페이지 수
             model.addAttribute("totalCount", memberList.getTotalElements()); // 총 데이터
 
-            List<CompanyListDto> companyList = this.companyService.findCompanyListAll(principal.getName()); // 사업자 list
-            model.addAttribute("companyList", companyList);
             List<ConditionList> conList = this.conditionService.findAllConditionWithVersion();
             model.addAttribute("conList", conList);
             List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT"); // 그리드 row 수
@@ -260,7 +256,6 @@ public class PageController {
             model.addAttribute("memberList", Collections.emptyList());
             model.addAttribute("size", Collections.emptyList());
             model.addAttribute("currentPage", Collections.emptyList());
-            model.addAttribute("totalPages", Collections.emptyList());
             model.addAttribute("totalCount", Collections.emptyList());
             model.addAttribute("companyList", Collections.emptyList());
             model.addAttribute("showListCnt", Collections.emptyList());
@@ -276,7 +271,6 @@ public class PageController {
      */
     @GetMapping("/member/authentication/list")
     public String showauthlist(
-            @RequestParam(value = "companyIdSearch", required = false) Long companyId,
             @RequestParam(value = "opSearch", required = false) String searchOp,
             @RequestParam(value = "contentSearch", required = false) String contentSearch,
             @RequestParam(value = "fromDate", required = false) String fromDate,
@@ -284,12 +278,11 @@ public class PageController {
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "10") int size, Model model, Principal principal) {
         log.info("=== Member Authorization List Page ===");
-        log.info("companyId: {}, searchOp: {}, contentSearch: {}, fromDate: {}, toDate: {}", companyId, searchOp,
-                contentSearch, fromDate, toDate);
+        log.info("searchOp: {}, contentSearch: {}, fromDate: {}, toDate: {}", searchOp, contentSearch, fromDate,
+                toDate);
         log.info("page: {}, size: {}", page, size);
 
         // 검색조건 저장
-        model.addAttribute("selectedCompanyId", companyId);
         model.addAttribute("selectedOpSearch", searchOp);
         model.addAttribute("selectedContentSearch", contentSearch);
         model.addAttribute("selectedTimeFrom", fromDate);
@@ -297,16 +290,15 @@ public class PageController {
 
         Page<MemberAuthHistDto> authList;
         try {
-            if (companyId == null && (searchOp == null || searchOp.isEmpty())
-                    && (contentSearch == null || contentSearch.isEmpty())
-                    && (fromDate == null || fromDate.isEmpty())
-                    && (toDate == null || toDate.isEmpty())) {
-                authList = this.memberService.findAllMemberAuthHistWithPagination(page, size,
-                        principal.getName());
+            if ((searchOp == null || searchOp.isEmpty()) && (contentSearch == null || contentSearch.isEmpty())
+                    && (fromDate == null || fromDate.isEmpty()) && (toDate == null || toDate.isEmpty())) {
+                log.info("Search all member auth hist list >>");
+                authList = this.memberService.findAllMemberAuthHistWithPagination(page, size);
             } else {
-
-                authList = this.memberService.findMemberAuthHistWithPagination(companyId, searchOp,
-                        contentSearch, fromDate, toDate, page, size, principal.getName());
+                log.info("Search member auth hist list by options:op:{},content:{},fromDate:{},toDate:{} >>",
+                        searchOp, contentSearch, fromDate, toDate);
+                authList = this.memberService.findMemberAuthHistWithPagination(searchOp, contentSearch, fromDate,
+                        toDate, page, size);
             }
 
             // Page처리
@@ -324,8 +316,6 @@ public class PageController {
                     authList.getTotalElements());
 
             // 검색옵션 model value 추가
-            List<CompanyListDto> companyList = this.companyService.findCompanyListAll(principal.getName());
-            model.addAttribute("companyList", companyList);
             List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT");
             model.addAttribute("showListCnt", showListCnt);
             MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(),
@@ -334,7 +324,6 @@ public class PageController {
 
         } catch (Exception e) {
             e.getStackTrace();
-            model.addAttribute("companyList", Collections.emptyList());
             model.addAttribute("showListCnt", Collections.emptyList());
             model.addAttribute("authList", Collections.emptyList());
             model.addAttribute("size", Collections.emptyList());
@@ -374,8 +363,6 @@ public class PageController {
             model.addAttribute("totalPages", totalPages); // 총 페이지 수
             model.addAttribute("totalCount", memberAuthList.getTotalElements()); // 총 데이터
 
-            List<CompanyListDto> companyList = this.companyService.findCompanyListAll(principal.getName()); // 사업자 list
-            model.addAttribute("companyList", companyList);
             List<CommCdBaseDto> showListCnt = codeService.commonCodeStringToNum("SHOWLISTCNT"); // 그리드 row 수
             model.addAttribute("showListCnt", showListCnt);
             MenuAuthorityBaseDto menuAuthority = this.menuAuthorityService.searchUserAuthority(principal.getName(),
@@ -383,7 +370,6 @@ public class PageController {
             model.addAttribute("menuAuthority", menuAuthority);
         } catch (Exception e) {
             e.getStackTrace();
-            model.addAttribute("companyList", Collections.emptyList());
             model.addAttribute("showListCnt", Collections.emptyList());
         }
 
@@ -483,7 +469,7 @@ public class PageController {
         model.addAttribute("selectedManfCd", reqManfCd);
         model.addAttribute("selectedOpSearch", reqOpSearch);
         model.addAttribute("selectedContentSearch", reqSearchContent);
-        model.addAttribute("selectedSize", size);
+        // model.addAttribute("selectedSize", size);
 
         // 충전기 등록폼 전달
         model.addAttribute("chargerRegDto", new ChargerRegDto());
@@ -635,7 +621,7 @@ public class PageController {
         model.addAttribute("selectedTimeTo", reqChgStartTimeTo);
         model.addAttribute("selectedOpSearch", reqOpSearch);
         model.addAttribute("selectedContentSearch", reqSearchContent);
-        model.addAttribute("selectedSize", size);
+        // model.addAttribute("selectedSize", size);
 
         Page<CurrentChargingListDto> chargingList;
 
@@ -658,11 +644,13 @@ public class PageController {
 
             // page 처리
             int totalPages = chargingList.getTotalPages() == 0 ? 1 : chargingList.getTotalPages();
+            int startNumber = page * size;
             model.addAttribute("chargingList", chargingList.getContent());
             model.addAttribute("size", String.valueOf(size));
             model.addAttribute("currentPage", page);
             model.addAttribute("totalPages", totalPages);
             model.addAttribute("totalCount", chargingList.getTotalElements());
+            model.addAttribute("startNumber", startNumber);
             log.info("===CurrentChargingList_PageInfo >> totalPages:{}, totalCount:{}", totalPages,
                     chargingList.getTotalElements());
 
@@ -1100,7 +1088,7 @@ public class PageController {
 
         // 검색 조건을 모델에 추가
         model.addAttribute("selectedCompanyId", companyId);
-        model.addAttribute("selectedSize", size);
+        // model.addAttribute("selectedSize", size);
 
         // 요금제 등록폼 전달
         model.addAttribute("tariffRegDto", new TariffRegDto());
@@ -1339,8 +1327,7 @@ public class PageController {
         model.addAttribute("vocRegDto", new VocDto.VocRegDto());
 
         try {
-            Page<VocListDto> vocList = this.vocService.findVocInfoWithPagination(type, replyStat, name, page, size,
-                    principal.getName());
+            Page<VocListDto> vocList = this.vocService.findVocInfoWithPagination(type, replyStat, name, page, size);
 
             // 검색 조건 저장
             model.addAttribute("selectedType", type);

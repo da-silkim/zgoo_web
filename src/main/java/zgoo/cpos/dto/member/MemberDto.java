@@ -22,7 +22,7 @@ public class MemberDto {
     @EqualsAndHashCode
     @NoArgsConstructor
     public static class MemberBaseDto {
-        private Long companyId;
+
         private Long memberId;
         private Long bizId;
         private String bizType;
@@ -40,7 +40,6 @@ public class MemberDto {
     @EqualsAndHashCode(callSuper = true)
     @ToString(callSuper = true)
     public static class MemberListDto extends MemberBaseDto {
-        private String companyName;
         private LocalDateTime joinedDt;
         private String bizTypeName;
     }
@@ -64,7 +63,7 @@ public class MemberDto {
 
         // 차량 정보
         private List<MemberCarDto> car;
-    
+
         // 약관 정보
         private List<MemberConditionDto> condition;
     }
@@ -127,7 +126,7 @@ public class MemberDto {
         private String bizTypeName;
         private String cardRegYn;
         private String tidRegYn;
-        private String creditcardStatName;  // 회원상태 코드명
+        private String creditcardStatName; // 회원상태 코드명
         private String userStateName;
     }
 
@@ -154,7 +153,7 @@ public class MemberDto {
         private String status;
         private Long totalChargingPrice;
 
-        private String companyName;
+        // private String companyName;
         private String name;
         private String phoneNo;
     }

@@ -14,7 +14,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import zgoo.cpos.domain.biz.QBizInfo;
 import zgoo.cpos.domain.code.QCommonCode;
-import zgoo.cpos.domain.company.QCompany;
 import zgoo.cpos.domain.company.QCompanyRelationInfo;
 import zgoo.cpos.domain.member.QMember;
 import zgoo.cpos.domain.member.QMemberCar;
@@ -27,13 +26,12 @@ import zgoo.cpos.dto.member.MemberDto.MemberCreditCardDto;
 import zgoo.cpos.dto.member.MemberDto.MemberDetailDto;
 import zgoo.cpos.dto.member.MemberDto.MemberListDto;
 import zgoo.cpos.dto.member.MemberDto.MemberRegDto;
-import zgoo.cpos.util.QueryUtils;
 
 @Slf4j
 @RequiredArgsConstructor
 public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
     private final JPAQueryFactory queryFactory;
-    QCompany company = QCompany.company;
+
     QMember member = QMember.member;
     QMemberCar car = QMemberCar.memberCar;
     QMemberCreditCard card = QMemberCreditCard.memberCreditCard;
@@ -48,12 +46,7 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
     QCompanyRelationInfo relation = QCompanyRelationInfo.companyRelationInfo;
 
     @Override
-    public Page<MemberListDto> findMemberWithPagination(Pageable pageable, String levelPath, boolean isSuperAdmin) {
-        BooleanBuilder builder = new BooleanBuilder();
-
-        if (!isSuperAdmin && levelPath != null && !levelPath.isEmpty()) {
-            builder.and(QueryUtils.hasCompanyLevelAccess(relation, levelPath));
-        }
+    public Page<MemberListDto> findMemberWithPagination(Pageable pageable) {
 
         List<MemberListDto> memberList = queryFactory.select(Projections.fields(MemberListDto.class,
                 member.id.as("memberId"),
@@ -64,13 +57,9 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
                 member.idTag.as("idTag"),
                 member.email.as("email"),
                 member.joinedDt.as("joinedDt"),
-                company.companyName.as("companyName"),
                 bizTypeName.name.as("bizTypeName")))
                 .from(member)
-                .leftJoin(company).on(member.company.eq(company))
-                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
                 .leftJoin(bizTypeName).on(member.bizType.eq(bizTypeName.commonCode))
-                .where(builder)
                 .orderBy(member.joinedDt.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -79,23 +68,16 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
         long totalCount = queryFactory
                 .select(member.count())
                 .from(member)
-                .leftJoin(company).on(member.company.eq(company))
-                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
                 .leftJoin(bizTypeName).on(member.bizType.eq(bizTypeName.commonCode))
-                .where(builder)
                 .fetchOne();
 
         return new PageImpl<>(memberList, pageable, totalCount);
     }
 
     @Override
-    public Page<MemberListDto> searchMemberWithPagination(Long companyId, String idTag, String name,
-            Pageable pageable, String levelPath, boolean isSuperAdmin) {
+    public Page<MemberListDto> searchMemberWithPagination(String idTag, String name,
+            Pageable pageable) {
         BooleanBuilder builder = new BooleanBuilder();
-
-        if (companyId != null) {
-            builder.and(member.company.id.eq(companyId));
-        }
 
         if (idTag != null && !idTag.isEmpty()) {
             builder.and(member.idTag.contains(idTag));
@@ -105,10 +87,6 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
             builder.and(member.name.contains(name));
         }
 
-        if (!isSuperAdmin && levelPath != null && !levelPath.isEmpty()) {
-            builder.and(QueryUtils.hasCompanyLevelAccess(relation, levelPath));
-        }
-
         List<MemberListDto> memberList = queryFactory.select(Projections.fields(MemberListDto.class,
                 member.id.as("memberId"),
                 member.memLoginId.as("memLoginId"),
@@ -118,11 +96,8 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
                 member.idTag.as("idTag"),
                 member.email.as("email"),
                 member.joinedDt.as("joinedDt"),
-                company.companyName.as("companyName"),
                 bizTypeName.name.as("bizTypeName")))
                 .from(member)
-                .leftJoin(company).on(member.company.eq(company))
-                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
                 .leftJoin(bizTypeName).on(member.bizType.eq(bizTypeName.commonCode))
                 .where(builder)
                 .orderBy(member.joinedDt.desc())
@@ -133,8 +108,6 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
         long totalCount = queryFactory
                 .select(member.count())
                 .from(member)
-                .leftJoin(company).on(member.company.eq(company))
-                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
                 .leftJoin(bizTypeName).on(member.bizType.eq(bizTypeName.commonCode))
                 .where(builder)
                 .fetchOne();
@@ -160,11 +133,8 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
                 member.zipCode.as("zipCode"),
                 member.address.as("address"),
                 member.addressDetail.as("addressDetail"),
-                company.id.as("companyId"),
-                company.companyName.as("companyName"),
                 bizTypeName.name.as("bizTypeName")))
                 .from(member)
-                .leftJoin(company).on(member.company.eq(company))
                 .leftJoin(bizTypeName).on(member.bizType.eq(bizTypeName.commonCode))
                 .where(member.id.eq(memberId))
                 .fetchOne();
@@ -196,12 +166,9 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
                 member.zipCode.as("zipCode"),
                 member.address.as("address"),
                 member.addressDetail.as("addressDetail"),
-                company.id.as("companyId"),
-                company.companyName.as("companyName"),
                 biz.id.as("bizId"),
                 bizTypeName.name.as("bizTypeName")))
                 .from(member)
-                .leftJoin(company).on(member.company.eq(company))
                 .leftJoin(biz).on(member.biz.eq(biz))
                 .leftJoin(bizTypeName).on(member.bizType.eq(bizTypeName.commonCode))
                 .where(member.id.eq(memberId))
@@ -232,12 +199,9 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
                 member.zipCode.as("zipCode"),
                 member.address.as("address"),
                 member.addressDetail.as("addressDetail"),
-                company.id.as("companyId"),
-                company.companyName.as("companyName"),
                 bizTypeName.name.as("bizTypeName"),
                 userStateName.name.as("userStateName")))
                 .from(member)
-                .leftJoin(company).on(member.company.eq(company))
                 .leftJoin(bizTypeName).on(member.bizType.eq(bizTypeName.commonCode))
                 .leftJoin(userStateName).on(member.userState.eq(userStateName.commonCode))
                 .where(member.id.eq(memberId))
@@ -268,13 +232,10 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
                 member.zipCode.as("zipCode"),
                 member.address.as("address"),
                 member.addressDetail.as("addressDetail"),
-                company.id.as("companyId"),
-                company.companyName.as("companyName"),
                 biz.id.as("bizId"),
                 bizTypeName.name.as("bizTypeName"),
                 userStateName.name.as("userStateName")))
                 .from(member)
-                .leftJoin(company).on(member.company.eq(company))
                 .leftJoin(biz).on(member.biz.eq(biz))
                 .leftJoin(bizTypeName).on(member.bizType.eq(bizTypeName.commonCode))
                 .leftJoin(userStateName).on(member.userState.eq(userStateName.commonCode))
@@ -290,7 +251,7 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
     }
 
     @Override
-    public List<MemberListDto> findMemberList(String name, String phoneNo, String levelPath, boolean isSuperAdmin) {
+    public List<MemberListDto> findMemberList(String name, String phoneNo) {
         BooleanBuilder builder = new BooleanBuilder();
 
         if (name != null && !name.isEmpty()) {
@@ -299,10 +260,6 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
 
         if (phoneNo != null && !phoneNo.isEmpty()) {
             builder.and(member.phoneNo.contains(phoneNo));
-        }
-
-        if (!isSuperAdmin && levelPath != null && !levelPath.isEmpty()) {
-            builder.and(QueryUtils.hasCompanyLevelAccess(relation, levelPath));
         }
 
         List<MemberListDto> memberList = queryFactory.select(Projections.fields(MemberListDto.class,
@@ -318,12 +275,8 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
                 member.zipCode.as("zipCode"),
                 member.address.as("address"),
                 member.addressDetail.as("addressDetail"),
-                company.id.as("companyId"),
-                company.companyName.as("companyName"),
                 bizTypeName.name.as("bizTypeName")))
                 .from(member)
-                .leftJoin(company).on(member.company.eq(company))
-                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
                 .leftJoin(bizTypeName).on(member.bizType.eq(bizTypeName.commonCode))
                 .where(builder)
                 .fetch();
@@ -332,13 +285,8 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
     }
 
     @Override
-    public List<MemberListDto> findAllMemberListWithoutPagination(Long companyId, String idTag, String name,
-            String levelPath, boolean isSuperAdmin) {
+    public List<MemberListDto> findAllMemberListWithoutPagination(String idTag, String name) {
         BooleanBuilder builder = new BooleanBuilder();
-
-        if (companyId != null) {
-            builder.and(member.company.id.eq(companyId));
-        }
 
         if (idTag != null && !idTag.isEmpty()) {
             builder.and(member.idTag.contains(idTag));
@@ -346,10 +294,6 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
 
         if (name != null && !name.isEmpty()) {
             builder.and(member.name.contains(name));
-        }
-
-        if (!isSuperAdmin && levelPath != null && !levelPath.isEmpty()) {
-            builder.and(QueryUtils.hasCompanyLevelAccess(relation, levelPath));
         }
 
         return queryFactory.select(Projections.fields(MemberListDto.class,
@@ -361,11 +305,8 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
                 member.idTag.as("idTag"),
                 member.email.as("email"),
                 member.joinedDt.as("joinedDt"),
-                company.companyName.as("companyName"),
                 bizTypeName.name.as("bizTypeName")))
                 .from(member)
-                .leftJoin(company).on(member.company.eq(company))
-                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
                 .leftJoin(bizTypeName).on(member.bizType.eq(bizTypeName.commonCode))
                 .where(builder)
                 .orderBy(member.joinedDt.desc())
@@ -389,8 +330,8 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
                 .from(condition)
                 .leftJoin(member).on(member.eq(condition.member))
                 .where(condition.agreeYn.eq("Y")
-                    .and(condition.condition.conditionCode.eq("ES"))
-                    .and(condition.member.id.in(memberIds)))
+                        .and(condition.condition.conditionCode.eq("ES"))
+                        .and(condition.member.id.in(memberIds)))
                 .fetch();
     }
 }

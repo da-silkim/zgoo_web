@@ -31,30 +31,19 @@ public class VocService {
     private final ComService comService;
 
     // 1:1문의 조회
-    public Page<VocListDto> findVocInfoWithPagination(String type, String replyStat, String name, int page, int size,
-            String userId) {
+    public Page<VocListDto> findVocInfoWithPagination(String type, String replyStat, String name, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
 
         try {
             Page<VocListDto> vocList;
 
-            boolean isSuperAdmin = comService.checkSuperAdmin(userId);
-            Long loginUserCompanyId = comService.getLoginUserCompanyId(userId);
-            String levelPath = companyRepository.findLevelPathByCompanyId(loginUserCompanyId);
-            log.info("== levelPath : {}", levelPath);
-            if (levelPath == null) {
-                // 관계정보가 없을경우 빈 리스트 전달
-                return Page.empty(pageable);
-            }
-
             if ((type == null || type.isEmpty()) && (replyStat == null || replyStat.isEmpty())
                     && (name == null || name.isEmpty())) {
                 log.info("Executing the [findVocWithPagination]");
-                vocList = this.vocRepository.findVocWithPagination(pageable, levelPath, isSuperAdmin);
+                vocList = this.vocRepository.findVocWithPagination(pageable);
             } else {
                 log.info("Executing the [searchVocWithPagination]");
-                vocList = this.vocRepository.searchVocWithPagination(type, replyStat, name, pageable, levelPath,
-                        isSuperAdmin);
+                vocList = this.vocRepository.searchVocWithPagination(type, replyStat, name, pageable);
             }
 
             return vocList;
@@ -122,19 +111,9 @@ public class VocService {
     }
 
     // 회원정보 검색
-    public List<MemberListDto> findMemberList(String name, String phoneNo, String userId) {
+    public List<MemberListDto> findMemberList(String name, String phoneNo) {
         try {
-            boolean isSuperAdmin = comService.checkSuperAdmin(userId);
-            Long loginUserCompanyId = comService.getLoginUserCompanyId(userId);
-            String levelPath = companyRepository.findLevelPathByCompanyId(loginUserCompanyId);
-            log.info("== levelPath : {}", levelPath);
-            if (levelPath == null) {
-                // 관계정보가 없을경우 빈 리스트 전달
-                return null;
-            }
-
-            List<MemberListDto> memberList = this.memberRepository.findMemberList(name, phoneNo, levelPath,
-                    isSuperAdmin);
+            List<MemberListDto> memberList = this.memberRepository.findMemberList(name, phoneNo);
             return memberList;
         } catch (Exception e) {
             log.error("[findMemberList] error: {}", e.getMessage());

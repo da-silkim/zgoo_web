@@ -96,19 +96,19 @@ document.addEventListener('DOMContentLoaded', () => {
     $.ajax({
         url: '/api/nav/menu',
         method: 'GET',
-        success: function(menuList) {
+        success: function (menuList) {
             console.log("Fetched menu list: ", menuList);
             renderMenu(menuList);
             $(".nav-list-detail").hide();
         },
-        error: function(error) {
+        error: function (error) {
             console.log("error fetching menu: ", error);
         }
     });
 
     // 상위 메뉴 렌더링 함수
     function renderMenu(menuList) {
-        menuList.forEach(function(menu) {
+        menuList.forEach(function (menu) {
             if (menu.menuLv === '0' && menu.childCnt === 0 && menu.useYn === 'Y' && menu.readYn === 'Y' && menu.menuUrl.startsWith("/")) {
                 var parentMenuHtml = '';
                 if (menu.menuUrl === '/map') {
@@ -134,7 +134,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         </li>
                     `;
                 }
-                
+
                 $('#menuContainer').append(parentMenuHtml);
             } else if (menu.menuLv === '0' && menu.childCnt != 0 && menu.useYn === 'Y' && menu.readYn === 'Y' && !menu.menuUrl.startsWith("/")) {
                 const parentMenuHtml = `
@@ -156,17 +156,17 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderMenuLv1(parentMenu, menuList) {
         const subMenuHtml = `
             <ul class="nav-list-detail">
-                ${menuList.filter(function(menu) {
-                    return menu.parentCode === parentMenu.menuCode && menu.menuLv === '1' && menu.useYn === 'Y' && menu.readYn === 'Y';
-                }).map(function(menu) {
-                    if (menu.childCnt === 0) {
-                        return `
+                ${menuList.filter(function (menu) {
+            return menu.parentCode === parentMenu.menuCode && menu.menuLv === '1' && menu.useYn === 'Y' && menu.readYn === 'Y';
+        }).map(function (menu) {
+            if (menu.childCnt === 0) {
+                return `
                             <li class="nav-list list-hover">
                                 <a href="${menu.menuUrl}">${menu.menuName}</a>
                             </li>
                         `;
-                    } else {
-                        return `
+            } else {
+                return `
                             <span class="nav-menu-sub">
                                 <span class="nav-list">
                                     <span class="nav-list-txt">${menu.menuName}</span>
@@ -175,9 +175,9 @@ document.addEventListener('DOMContentLoaded', () => {
                                 ${renderMenuLv2(menu, menuList)}
                             </span>
                         `;
-                    }
+            }
 
-                }).join('')}
+        }).join('')}
             </ul>
         `;
         return subMenuHtml;
@@ -185,17 +185,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 하위 메뉴 렌더링 함수
     function renderMenuLv2(parentMenu, menuList) {
-        const menuLvHtml2 =  `
+        const menuLvHtml2 = `
             <ul class="nav-list-sub-detail">
-                ${menuList.filter(function(menu) {
-                    return menu.parentCode === parentMenu.menuCode && menu.menuLv === '2' && menu.useYn === 'Y' && menu.readYn === 'Y';
-                }).map(function(menu) {
-                    return `
+                ${menuList.filter(function (menu) {
+            return menu.parentCode === parentMenu.menuCode && menu.menuLv === '2' && menu.useYn === 'Y' && menu.readYn === 'Y';
+        }).map(function (menu) {
+            return `
                         <li class="nav-list list-hover">
                             <a href="${menu.menuUrl}">${menu.menuName}</a>
                         </li>
                     `;
-                }).join('')}
+        }).join('')}
             </ul>
         `;
         return menuLvHtml2;
@@ -274,9 +274,9 @@ function toAddress(lon, lat) {
         url: `https://dapi.kakao.com/v2/local/geo/coord2regioncode.json?x=${lon}&y=${lat}&input_coord=WGS84`,
         type: 'GET',
         headers: {
-            'Authorization' : 'KakaoAK 4fae289535008a0dea1eb592bc662462'
+            'Authorization': 'KakaoAK 4fae289535008a0dea1eb592bc662462'
         },
-        success: function(result) {
+        success: function (result) {
             console.log(result);
             let totalCount = result.meta.total_count;
             if (totalCount > 0) {
@@ -285,7 +285,7 @@ function toAddress(lon, lat) {
                 console.log('addr: ', addr);
             }
         },
-        error: function(e) {
+        error: function (e) {
             console.error(e);
         }
     });
@@ -306,7 +306,7 @@ function formatDate(date) {
 
 // input[type="number"] maxLength setting function
 function maxLengthCheck(object) {
-    if(object.value.length > object.maxLength) {
+    if (object.value.length > object.maxLength) {
         object.value = object.value.slice(0, object.maxLength);
     }
 }
@@ -355,19 +355,19 @@ function maxLengthNum(input, len) {
 // Regular expression
 // 1. email
 function isEmail(asValue) {
-	var regExp = /^[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*\.[a-zA-Z]{2,3}$/i;
+    var regExp = /^[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*\.[a-zA-Z]{2,3}$/i;
     var result = regExp.test(asValue);
 
     if (!result) {
         alert('유효하지 않은 이메일 형식입니다.');
     }
 
-	return result;
+    return result;
 }
 
 // 2. id(영문으로 시작, 영문+숫자 조합 6~20자)
 function isId(asValue) {
-	var regExp = /^[a-z][a-z0-9]{5,19}$/
+    var regExp = /^[a-z][a-z0-9]{5,19}$/
     var result = regExp.test(asValue);
 
     if (!result) {
@@ -379,12 +379,12 @@ function isId(asValue) {
 
 // 3. password(8~16자 영문, 숫자 조합)
 function isPassword(asValue) {
-	var regExp = /^(?=.*\d)(?=.*[a-zA-Z])[0-9a-zA-Z]{8,16}$/;
+    var regExp = /^(?=.*\d)(?=.*[a-zA-Z])[0-9a-zA-Z]{8,16}$/;
     var result = regExp.test(asValue);
 
-    if(!result) {
+    if (!result) {
         alert("비밀번호는 8~16자의 영문자와 숫자를 최소 하나씩 포함해야 합니다.");
-    }   
+    }
 
     return result;
 }
@@ -392,7 +392,7 @@ function isPassword(asValue) {
 // 4. password(8~16자 영문, 숫자, 특수문자 최소 한 가지씩 조합)
 function isPasswordSpecial(asValue) {
     // 사용가능 특수문자: $~!@%*^?&()-_=+
-	var regExp = /^(?=.*[a-zA-z])(?=.*[0-9])(?=.*[$`~!@$!%*#^?&\\(\\)\-_=+]).{8,16}$/;
+    var regExp = /^(?=.*[a-zA-z])(?=.*[0-9])(?=.*[$`~!@$!%*#^?&\\(\\)\-_=+]).{8,16}$/;
     // var regExp = /^(?=.*\d)(?=.*[a-zA-Z])[a-zA-Z0-9]{8,16}$/;
     var result = regExp.test(asValue);
 
@@ -400,7 +400,7 @@ function isPasswordSpecial(asValue) {
         alert("비밀번호는 8~16자의 영문자, 숫자, 특수문자를 최소 하나씩 포함해야 합니다.");
     }
 
-	return result;
+    return result;
 }
 
 function openMap(menuUrl) {
@@ -425,16 +425,18 @@ function searchOption() {
     form.submit();
 }
 
-function updatePageSize(selectElement, baseUrl, paramKeys) {
+function updatePageSize(selectElement, baseUrl, paramKeys = []) {
     const urlParams = new URLSearchParams(window.location.search);
     const selectedSize = selectElement.value;
 
     let newUrl = `${baseUrl}?page=0&size=${selectedSize}`;
 
-    paramKeys.forEach(key => {
-        const value = urlParams.get(key) || '';
-        newUrl += `&${key}=${encodeURIComponent(value)}`;
-    });
+    if (paramKeys && paramKeys.length > 0) {
+        paramKeys.forEach(key => {
+            const value = urlParams.get(key) || '';
+            newUrl += `&${key}=${encodeURIComponent(value)}`;
+        });
+    }
 
     window.location.href = newUrl;
 }
@@ -500,7 +502,7 @@ function buttonControl(row, url) {
         $.ajax({
             url: url,
             type: 'GET',
-            success: function(response) {
+            success: function (response) {
                 if (response.btnControl) {
                     $('#buttonContainer').html(`
                         <button class="btn btn-data-edit" id="editBtn"
@@ -515,7 +517,7 @@ function buttonControl(row, url) {
                     $('#buttonContainer').empty();
                 }
             },
-            error: function(error) {
+            error: function (error) {
                 console.error(error);
             }
         });

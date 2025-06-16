@@ -15,31 +15,24 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import zgoo.cpos.domain.company.QCompany;
 import zgoo.cpos.domain.company.QCompanyRelationInfo;
 import zgoo.cpos.domain.history.QChargingHist;
 import zgoo.cpos.domain.member.QMember;
 import zgoo.cpos.domain.member.QMemberAuth;
 import zgoo.cpos.dto.member.MemberDto.MemberAuthDto;
-import zgoo.cpos.util.QueryUtils;
 
 @Slf4j
 @RequiredArgsConstructor
 public class MemberAuthRepositoryCustomImpl implements MemberAuthRepositoryCustom {
     private final JPAQueryFactory queryFactory;
-    QCompany company = QCompany.company;
     QMember member = QMember.member;
     QMemberAuth memberAuth = QMemberAuth.memberAuth;
     QChargingHist hist = QChargingHist.chargingHist;
     QCompanyRelationInfo relation = QCompanyRelationInfo.companyRelationInfo;
 
     @Override
-    public Page<MemberAuthDto> findMemberAuthWithPagination(Pageable pageable, String levelPath, boolean isSuperAdmin) {
+    public Page<MemberAuthDto> findMemberAuthWithPagination(Pageable pageable) {
         BooleanBuilder builder = new BooleanBuilder();
-
-        if (!isSuperAdmin && levelPath != null && !levelPath.isEmpty()) {
-            builder.and(QueryUtils.hasCompanyLevelAccess(relation, levelPath));
-        }
 
         List<MemberAuthDto> memberAuthList = queryFactory.select(Projections.fields(MemberAuthDto.class,
                 memberAuth.idTag.as("idTag"),
@@ -48,7 +41,8 @@ public class MemberAuthRepositoryCustomImpl implements MemberAuthRepositoryCusto
                 memberAuth.parentIdTag.as("parentIdTag"),
                 ExpressionUtils.as(
                         JPAExpressions
-                                .select(hist.chargeAmount.sum().coalesce(BigDecimal.ZERO))
+                                .select(hist.chargeAmount.sum()
+                                        .coalesce(BigDecimal.ZERO))
                                 .from(hist)
                                 .where(hist.idTag.eq(memberAuth.idTag)),
                         "totalChargingPower"),
@@ -56,12 +50,10 @@ public class MemberAuthRepositoryCustomImpl implements MemberAuthRepositoryCusto
                 memberAuth.totalChargingPrice.as("totalChargingPrice"),
                 memberAuth.regDt.as("regDt"),
                 member.name.as("name"),
-                member.phoneNo.as("phoneNo"),
-                company.companyName.as("companyName")))
+                member.phoneNo.as("phoneNo")))
+                // company.companyName.as("companyName")))
                 .from(memberAuth)
                 .leftJoin(memberAuth.member, member)
-                .leftJoin(member.company, company)
-                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
                 .where(builder)
                 .orderBy(memberAuth.regDt.desc())
                 .offset(pageable.getOffset())
@@ -72,8 +64,6 @@ public class MemberAuthRepositoryCustomImpl implements MemberAuthRepositoryCusto
                 .select(memberAuth.count())
                 .from(memberAuth)
                 .leftJoin(memberAuth.member, member)
-                .leftJoin(member.company, company)
-                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
                 .where(builder)
                 .fetchOne();
 
@@ -81,8 +71,7 @@ public class MemberAuthRepositoryCustomImpl implements MemberAuthRepositoryCusto
     }
 
     @Override
-    public Page<MemberAuthDto> searchMemberAuthWithPagination(String idtag, String name, Pageable pageable,
-            String levelPath, boolean isSuperAdmin) {
+    public Page<MemberAuthDto> searchMemberAuthWithPagination(String idtag, String name, Pageable pageable) {
         BooleanBuilder builder = new BooleanBuilder();
 
         if (idtag != null && !idtag.isEmpty()) {
@@ -93,10 +82,6 @@ public class MemberAuthRepositoryCustomImpl implements MemberAuthRepositoryCusto
             builder.and(memberAuth.member.name.contains(name));
         }
 
-        if (!isSuperAdmin && levelPath != null && !levelPath.isEmpty()) {
-            builder.and(QueryUtils.hasCompanyLevelAccess(relation, levelPath));
-        }
-
         List<MemberAuthDto> memberAuthList = queryFactory.select(Projections.fields(MemberAuthDto.class,
                 memberAuth.idTag.as("idTag"),
                 memberAuth.expireDate.as("expireDate"),
@@ -104,7 +89,8 @@ public class MemberAuthRepositoryCustomImpl implements MemberAuthRepositoryCusto
                 memberAuth.parentIdTag.as("parentIdTag"),
                 ExpressionUtils.as(
                         JPAExpressions
-                                .select(hist.chargeAmount.sum().coalesce(BigDecimal.ZERO))
+                                .select(hist.chargeAmount.sum()
+                                        .coalesce(BigDecimal.ZERO))
                                 .from(hist)
                                 .where(hist.idTag.eq(memberAuth.idTag)),
                         "totalChargingPower"),
@@ -112,12 +98,9 @@ public class MemberAuthRepositoryCustomImpl implements MemberAuthRepositoryCusto
                 memberAuth.totalChargingPrice.as("totalChargingPrice"),
                 memberAuth.regDt.as("regDt"),
                 member.name.as("name"),
-                member.phoneNo.as("phoneNo"),
-                company.companyName.as("companyName")))
+                member.phoneNo.as("phoneNo")))
                 .from(memberAuth)
                 .leftJoin(memberAuth.member, member)
-                .leftJoin(member.company, company)
-                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
                 .where(builder)
                 .orderBy(memberAuth.regDt.desc())
                 .offset(pageable.getOffset())
@@ -128,8 +111,6 @@ public class MemberAuthRepositoryCustomImpl implements MemberAuthRepositoryCusto
                 .select(memberAuth.count())
                 .from(memberAuth)
                 .leftJoin(memberAuth.member, member)
-                .leftJoin(member.company, company)
-                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
                 .where(builder)
                 .fetchOne();
 
@@ -138,6 +119,8 @@ public class MemberAuthRepositoryCustomImpl implements MemberAuthRepositoryCusto
 
     @Override
     public MemberAuthDto findMemberAuthOne(String idtag) {
+        log.info("[MemberAuthRepositoryCustomImpl] findMemberAuthOne idtag: {}", idtag);
+
         MemberAuthDto memberAuthDto = queryFactory.select(Projections.fields(MemberAuthDto.class,
                 memberAuth.idTag.as("idTag"),
                 memberAuth.expireDate.as("expireDate"),
@@ -145,7 +128,8 @@ public class MemberAuthRepositoryCustomImpl implements MemberAuthRepositoryCusto
                 memberAuth.parentIdTag.as("parentIdTag"),
                 ExpressionUtils.as(
                         JPAExpressions
-                                .select(hist.chargeAmount.sum().coalesce(BigDecimal.ZERO))
+                                .select(hist.chargeAmount.sum()
+                                        .coalesce(BigDecimal.ZERO))
                                 .from(hist)
                                 .where(hist.idTag.eq(memberAuth.idTag)),
                         "totalChargingPower"),
@@ -153,19 +137,16 @@ public class MemberAuthRepositoryCustomImpl implements MemberAuthRepositoryCusto
                 memberAuth.totalChargingPrice.as("totalChargingPrice"),
                 memberAuth.regDt.as("regDt"),
                 member.name.as("name"),
-                member.phoneNo.as("phoneNo"),
-                company.companyName.as("companyName")))
+                member.phoneNo.as("phoneNo")))
                 .from(memberAuth)
                 .leftJoin(memberAuth.member, member)
-                .leftJoin(member.company, company)
                 .where(memberAuth.idTag.eq(idtag))
                 .fetchOne();
         return memberAuthDto;
     }
 
     @Override
-    public List<MemberAuthDto> findAllMemberTagWithoutPagination(String idTag, String name, String levelPath,
-            boolean isSuperAdmin) {
+    public List<MemberAuthDto> findAllMemberTagWithoutPagination(String idTag, String name) {
         BooleanBuilder builder = new BooleanBuilder();
 
         if (idTag != null && !idTag.isEmpty()) {
@@ -176,10 +157,6 @@ public class MemberAuthRepositoryCustomImpl implements MemberAuthRepositoryCusto
             builder.and(memberAuth.member.name.contains(name));
         }
 
-        if (!isSuperAdmin && levelPath != null && !levelPath.isEmpty()) {
-            builder.and(QueryUtils.hasCompanyLevelAccess(relation, levelPath));
-        }
-
         return queryFactory.select(Projections.fields(MemberAuthDto.class,
                 memberAuth.idTag.as("idTag"),
                 memberAuth.expireDate.as("expireDate"),
@@ -187,7 +164,8 @@ public class MemberAuthRepositoryCustomImpl implements MemberAuthRepositoryCusto
                 memberAuth.parentIdTag.as("parentIdTag"),
                 ExpressionUtils.as(
                         JPAExpressions
-                                .select(hist.chargeAmount.sum().coalesce(BigDecimal.ZERO))
+                                .select(hist.chargeAmount.sum()
+                                        .coalesce(BigDecimal.ZERO))
                                 .from(hist)
                                 .where(hist.idTag.eq(memberAuth.idTag)),
                         "totalChargingPower"),
@@ -195,12 +173,9 @@ public class MemberAuthRepositoryCustomImpl implements MemberAuthRepositoryCusto
                 memberAuth.totalChargingPrice.as("totalChargingPrice"),
                 memberAuth.regDt.as("regDt"),
                 member.name.as("name"),
-                member.phoneNo.as("phoneNo"),
-                company.companyName.as("companyName")))
+                member.phoneNo.as("phoneNo")))
                 .from(memberAuth)
                 .leftJoin(memberAuth.member, member)
-                .leftJoin(member.company, company)
-                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
                 .where(builder)
                 .orderBy(memberAuth.regDt.desc())
                 .fetch();

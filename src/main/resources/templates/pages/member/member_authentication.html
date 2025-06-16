@@ -16,17 +16,6 @@
                         <!-- row:1 start -->
                         <div class="row mb-3 row-cols-2 row-cols-lg-3 g-2">
                             <div class="col d-flex align-items-center">
-                                <label for="companyIdSearch"
-                                    class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">사업자</label>
-                                <select id="companyIdSearch" class="mx-3 form-control" name="companyIdSearch">
-                                    <option value="" th:text="'(없음)'" th:selected="${selectedCompanyId == null}">
-                                    </option>
-                                    <option th:each="company : ${companyList}" th:value="${company.companyId}"
-                                        th:text="${company.companyName}"
-                                        th:selected="${company.companyId == selectedCompanyId}"></option>
-                                </select>
-                            </div>
-                            <div class="col d-flex align-items-center">
                                 <label for="opSearch"
                                     class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">검색조건</label>
                                 <select id="opSearch" class="ms-3 form-control w-40" name="opSearch">
@@ -55,14 +44,13 @@
                                     name="toDate" id="toDate" class="mx-3 form-control">
                             </div>
                         </div>
-                        <!-- size 선택 상자 추가 (숨결진 필드로 유지) -->
-                        <input type="hidden" id="size" name="size"
-                            th:value="${selectedSize != null ? selectedSize : 10}">
 
                         <div class="search-btn">
-                            <button type="button" class="btn btn-outline-grey me-2" id="searchBtn">
+                            <button type="button" class="btn btn-outline-grey me-2" id="searchBtn"
+                                onclick="searchOption()">
                                 <i class="bi bi-search me-2"></i>검색</button>
-                            <button type="button" class="btn btn-outline-grey me-2" id="resetBtn">
+                            <button type="button" class="btn btn-outline-grey me-2" id="resetBtn"
+                                onclick="replacePage('/member/authentication/list')">
                                 <i class="bi bi-arrow-repeat me-2"></i>초기화</button>
                         </div>
                         <!-- row:1 end -->
@@ -81,7 +69,7 @@
                     </div>
                     <div class="mt-3 btn-page-area">
                         <button class="btn btn-excel" id="excelBtn"
-                            onclick="excelDownload('/excel/download/member_authentication', ['companyIdSearch', 'opSearch', 'contentSearch', 'fromDate', 'toDate'])"
+                            onclick="excelDownload('/excel/download/member_authentication', ['opSearch', 'contentSearch', 'fromDate', 'toDate'])"
                             th:if="${menuAuthority.authority == 'SU' or menuAuthority.excelYn == 'Y'}">
                             <i class="bi bi-file-earmark-spreadsheet"></i>엑셀다운로드</button>
                         <span>
@@ -101,7 +89,6 @@
                                 <thead>
                                     <tr class="table-border-top">
                                         <th scope="col">No.</th>
-                                        <th scope="col">사업자</th>
                                         <th scope="col">충전소명</th>
                                         <th scope="col">충전기ID</th>
                                         <th scope="col">충전기구분</th>
@@ -116,7 +103,6 @@
                                     <tr th:each="data, iterStat : ${authList}">
                                         <td th:text="${startNumber + iterStat.count}">
                                         </td>
-                                        <td th:text="${data.companyName}"></td>
                                         <td th:text="${data.stationName}"></td>
                                         <td th:text="${data.chargerId}"></td>
                                         <td th:text="${data.cpType}"></td>
@@ -127,7 +113,7 @@
                                         <td th:text="${#temporals.format(data.authTime,'yyyy-MM-dd HH:mm:ss')}"></td>
                                     </tr>
                                     <tr th:if="${authList.size() == 0}">
-                                        <td colspan="10" class="text-center">정보가 없습니다.</td>
+                                        <td colspan="9" class="text-center">정보가 없습니다.</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -138,32 +124,32 @@
                         <ul class="pagination justify-content-center">
                             <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled' : ''">
                                 <a class="page-link"
-                                    th:href="@{/member/authentication/list(page=0, size=${size}, companyIdSearch=${selectedCompanyId}, 
+                                    th:href="@{/member/authentication/list(page=0, size=${size}, 
                                 fromDate=${selectedTimeFrom}, toDate=${selectedTimeTo}, opSearch=${selectedOpSearch}, contentSearch=${selectedContentSearch})}"><i
                                         class="bi bi-chevron-double-left"></i></a>
                             </li>
                             <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled' : ''">
                                 <a class="page-link"
-                                    th:href="@{/member/authentication/list(page=${currentPage-1}, size=${size}, companyIdSearch=${selectedCompanyId}, 
+                                    th:href="@{/member/authentication/list(page=${currentPage-1}, size=${size}, 
                                 fromDate=${selectedTimeFrom}, toDate=${selectedTimeTo}, opSearch=${selectedOpSearch}, contentSearch=${selectedContentSearch})}"><i
                                         class="bi bi-chevron-left"></i></a>
                             </li>
                             <li class="page-item" th:each="i : ${#numbers.sequence(currentPage - 2, currentPage + 2)}"
                                 th:if="${i >= 0 && i < totalPages}">
                                 <a class="page-link"
-                                    th:href="@{/member/authentication/list(page=${i}, size=${size}, companyIdSearch=${selectedCompanyId}, 
+                                    th:href="@{/member/authentication/list(page=${i}, size=${size}, 
                                 fromDate=${selectedTimeFrom}, toDate=${selectedTimeTo}, opSearch=${selectedOpSearch}, contentSearch=${selectedContentSearch})}"
                                     th:text="${i+1}" th:classappend="${i == currentPage} ? 'active' : ''"></a>
                             </li>
                             <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled' : ''">
                                 <a class="page-link"
-                                    th:href="@{/member/authentication/list(page=${currentPage+1}, size=${size}, companyIdSearch=${selectedCompanyId}, 
+                                    th:href="@{/member/authentication/list(page=${currentPage+1}, size=${size}, 
                                 fromDate=${selectedTimeFrom}, toDate=${selectedTimeTo}, opSearch=${selectedOpSearch}, contentSearch=${selectedContentSearch})}"><i
                                         class="bi bi-chevron-right"></i></a>
                             </li>
                             <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled' : ''">
                                 <a class="page-link"
-                                    th:href="@{/member/authentication/list(page=${totalPages - 1}, size=${size}, companyIdSearch=${selectedCompanyId}, 
+                                    th:href="@{/member/authentication/list(page=${totalPages - 1}, size=${size}, 
                                 fromDate=${selectedTimeFrom}, toDate=${selectedTimeTo}, opSearch=${selectedOpSearch}, contentSearch=${selectedContentSearch})}"><i
                                         class="bi bi-chevron-double-right"></i></a>
                             </li>

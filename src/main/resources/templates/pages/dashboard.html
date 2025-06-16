@@ -32,6 +32,11 @@
                             <div class="sales-status">
                                 <div class="row">
                                     <div class="col-3">급속</div>
+                                    <!-- <div class="col-4 text-right" th:text="|1,350,000 원|">
+                                    </div>
+                                    <div class="col-5 status-text">
+                                        <span class="font-color-brown" th:text="|▲ 지난달 대비 100,000 원|"></span>
+                                    </div> -->
                                     <div class="col-4 text-right"
                                         th:text="|${#numbers.formatDecimal(saleStatus.fastSales, 1, 'COMMA', 0, 'POINT')} 원|">
                                     </div>
@@ -45,6 +50,11 @@
                                 </div>
                                 <div class="row">
                                     <div class="col-3">완속</div>
+                                    <!-- <div class="col-4 text-right" th:text="|250,000 원|">
+                                    </div>
+                                    <div class="col-5 status-text">
+                                        <span class="font-color-brown" th:text="|▲ 지난달 대비 50,000 원|"></span>
+                                    </div> -->
                                     <div class="col-4 text-right"
                                         th:text="|${#numbers.formatDecimal(saleStatus.lowSales, 1, 'COMMA', 0, 'POINT')} 원|">
                                     </div>

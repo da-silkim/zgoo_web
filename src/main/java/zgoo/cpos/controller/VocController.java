@@ -117,7 +117,7 @@ public class VocController {
         Map<String, Object> response = new HashMap<>();
 
         try {
-            List<MemberListDto> memberList = this.vocService.findMemberList(memName, memPhone, principal.getName());
+            List<MemberListDto> memberList = this.vocService.findMemberList(memName, memPhone);
 
             if (memberList == null) {
                 response.put("message", "조회된 데이터가 없습니다.");

@@ -54,32 +54,37 @@ document.addEventListener("DOMContentLoaded", function () {
     // 페이지 로드 시 초기 검증
     validateDateRange();
 
-    /**
-     * 검색버튼 클릭 이벤트 처리
-     */
-    document.getElementById("searchBtn").addEventListener("click", function () {
-        // 검색 전 날짜 유효성 검증
-        validateDateRange();
 
-        // 폼 제출 (size 값은 이미 hidden input에 있음)
-        document.getElementById('searchForm').submit();
+    $('#size').on('change', function () {
+        updatePageSize(this, "/calc/chgpayment", ["opSearch", "contentSearch", "startMonthSearch", "endMonthSearch", "companyIdSearch"]);
     });
 
-    /**
-     * 초기화 버튼 클릭 이벤트 처리
-     */
-    document.getElementById("resetBtn").addEventListener("click", function () {
-        // 모든 입력 필드 초기화
-        document.getElementById('opSearch').value = '';
-        document.getElementById('contentSearch').value = '';
+    // /**
+    //  * 검색버튼 클릭 이벤트 처리
+    //  */
+    // document.getElementById("searchBtn").addEventListener("click", function () {
+    //     // 검색 전 날짜 유효성 검증
+    //     validateDateRange();
 
-        // 현재 월을 기본값으로 설정
-        const currentYearMonthFormatted = `${currentYear}-${currentMonth.toString().padStart(2, '0')}`;
-        document.getElementById('startMonthSearch').value = currentYearMonthFormatted;
-        document.getElementById('endMonthSearch').value = currentYearMonthFormatted;
+    //     // 폼 제출 (size 값은 이미 hidden input에 있음)
+    //     document.getElementById('searchForm').submit();
+    // });
 
-        // 폼 제출 (초기화된 상태로)
-        document.getElementById('searchForm').submit();
-    });
+    // /**
+    //  * 초기화 버튼 클릭 이벤트 처리
+    //  */
+    // document.getElementById("resetBtn").addEventListener("click", function () {
+    //     // 모든 입력 필드 초기화
+    //     document.getElementById('opSearch').value = '';
+    //     document.getElementById('contentSearch').value = '';
+
+    //     // 현재 월을 기본값으로 설정
+    //     const currentYearMonthFormatted = `${currentYear}-${currentMonth.toString().padStart(2, '0')}`;
+    //     document.getElementById('startMonthSearch').value = currentYearMonthFormatted;
+    //     document.getElementById('endMonthSearch').value = currentYearMonthFormatted;
+
+    //     // 폼 제출 (초기화된 상태로)
+    //     document.getElementById('searchForm').submit();
+    // });
 
 });

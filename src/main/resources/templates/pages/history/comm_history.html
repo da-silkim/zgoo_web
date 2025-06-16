@@ -39,14 +39,12 @@
                                     name="recvToSearch" id="recvToSearch" class="mx-3 form-control">
                             </div>
                         </div>
-                        <!-- size 선택 상자 추가 (숨겨진 필드로 유지) -->
-                        <input type="hidden" id="size" name="size"
-                            th:value="${selectedSize != null ? selectedSize : 10}">
-
                         <div class="search-btn">
-                            <button type="button" class="btn btn-outline-grey me-2" id="searchBtn">
+                            <button type="button" class="btn btn-outline-grey me-2" id="searchBtn"
+                                onclick="searchOption()">
                                 <i class="bi bi-search me-2"></i>검색</button>
-                            <button type="button" class="btn btn-outline-grey me-2" id="resetBtn">
+                            <button type="button" class="btn btn-outline-grey me-2" id="resetBtn"
+                                onclick="replacePage('/history/comm')">
                                 <i class="bi bi-arrow-repeat me-2"></i>초기화</button>
                         </div>
                         <!-- row:1 end -->

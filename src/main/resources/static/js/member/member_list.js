@@ -1,4 +1,4 @@
-$(document).ready(function() {
+$(document).ready(function () {
     let modalCon = false, selectRow, btnMsg = "등록";
     let isDuplicateCheck = false, memLoginIdCheck = false, isTagDuplicateCheck = true;
     var memberId;
@@ -22,7 +22,7 @@ $(document).ready(function() {
             method: 'GET',
             contentType: 'application/json',
             dataType: 'json',
-            success: function(response) {
+            success: function (response) {
                 var bizSearchList = document.getElementById('bizSearchList');
                 bizSearchList.innerHTML = '';
                 if (response.bizList.length === 0) {
@@ -40,7 +40,7 @@ $(document).ready(function() {
                     bizSearchList.appendChild(row);
                 });
             },
-            error: function(xhr) {
+            error: function (xhr) {
                 var response = JSON.parse(xhr.responseText);
                 alert(response.message);
             }
@@ -51,24 +51,24 @@ $(document).ready(function() {
         if (e.target.classList.contains('select-biz-btn')) {
             var bizId = e.target.getAttribute('data-biz-id');
             var bizName = e.target.getAttribute('data-biz-name');
-    
+
             var bizNameInput = document.getElementById('bizNameInput');
             var bizIdInput = document.getElementById('bizId');
             bizNameInput.value = bizName;
             bizIdInput.value = bizId;
-    
+
             $.ajax({
                 url: `/corp/get/custom/${bizId}`,
                 method: 'GET',
                 contentType: 'application/json',
                 dataType: 'json',
-                success: function(data) {
+                success: function (data) {
                     $('#bizName').val(data.bizName || '');
                     $('#bizNo').val(data.bizNo || '');
                     $('#cardYn').val(data.cardYn || '');
                     $('#tidYn').val(data.tidYn || '');
                 },
-                error: function(xhr, status, error) {
+                error: function (xhr, status, error) {
                 }
             });
             var bizSearchModal = bootstrap.Modal.getInstance(document.getElementById('bizSearchModal'));
@@ -92,17 +92,17 @@ $(document).ready(function() {
         const newPasswordCheck = $('#newPasswordCheck').val();
 
         var form = document.getElementById('passwordForm');
-            if (!form.checkValidity()) { 
-                alert('값을 모두 입력해주세요.');
-                return;
-            }
+        if (!form.checkValidity()) {
+            alert('값을 모두 입력해주세요.');
+            return;
+        }
 
         const DATA = {
             existPassword: existPassword,
             newPassword: newPassword,
             newPasswordCheck: newPasswordCheck
         }
-        
+
         if (!isPasswordSpecial(newPassword)) { return; }
 
         $.ajax({
@@ -110,23 +110,23 @@ $(document).ready(function() {
             method: 'PATCH',
             contentType: 'application/json',
             data: JSON.stringify(DATA),
-            success: function(response) {
+            success: function (response) {
                 if (response.state === 1) {
                     editPasswordModal.hide();
                 }
                 alert(response.message);
             },
-            error: function(xhr, status, error) {
+            error: function (xhr, status, error) {
                 alert(JSON.parse(xhr.responseText).message);
             }
         });
     });
 
-    document.getElementById('memLoginId').addEventListener('input', function() {
+    document.getElementById('memLoginId').addEventListener('input', function () {
         isDuplicateCheck = false;
     });
 
-    document.getElementById('idTag').addEventListener('input', function() {
+    document.getElementById('idTag').addEventListener('input', function () {
         $('#duplicateMemTagBtn').prop('disabled', false);
         isTagDuplicateCheck = false;
     });
@@ -138,7 +138,7 @@ $(document).ready(function() {
         var bizSearchBtn = document.getElementById('bizSearchBtn');
         var bizInfoContainer = document.getElementById('bizInfoContainer');
         // var cardInfoContainer = document.getElementById('cardInfoContainer');
-    
+
         if (bizTypeValue === 'PB') {   // 개인
             bizNameInput.value = '';
             bizSearchBtn.disabled = true;
@@ -151,7 +151,7 @@ $(document).ready(function() {
         }
     }
 
-    $('#duplicateMemLoginIdBtn').on('click', function() {
+    $('#duplicateMemLoginIdBtn').on('click', function () {
         isDuplicateCheck = true;
 
         var memLoginId = $('#memLoginId').val();
@@ -161,7 +161,7 @@ $(document).ready(function() {
             return;
         }
 
-        if (!isId(memLoginId)) { 
+        if (!isId(memLoginId)) {
             memLoginIdCheck = false;
             return;
         }
@@ -170,7 +170,7 @@ $(document).ready(function() {
             url: '/member/memLoginId/dupcheck',
             type: 'GET',
             data: { memLoginId: memLoginId },
-            success: function(isDuplicate) {
+            success: function (isDuplicate) {
                 if (isDuplicate) {
                     alert('이미 사용 중인 ID입니다.');
                     memLoginIdCheck = false;
@@ -179,13 +179,13 @@ $(document).ready(function() {
                     memLoginIdCheck = true;
                 }
             },
-            error: function(error) {
+            error: function (error) {
                 console.error(error);
             }
         });
     });
 
-    $('#duplicateMemTagBtn').on('click', function() {
+    $('#duplicateMemTagBtn').on('click', function () {
         var idTag = $('#idTag').val();
         if (idTag.trim() === '') {
             alert('회원카드번호를 입력해주세요.');
@@ -196,7 +196,7 @@ $(document).ready(function() {
             url: `/member/memTag/dupcheck/${memberId}`,
             type: 'GET',
             data: { idTag: idTag },
-            success: function(response) {
+            success: function (response) {
                 if (response.state) {
                     isTagDuplicateCheck = true;
                 } else {
@@ -204,22 +204,22 @@ $(document).ready(function() {
                 }
                 alert(response.message);
             },
-            error: function(xhr, status, error) {
+            error: function (xhr, status, error) {
                 alert(JSON.parse(xhr.responseText).message);
             }
         });
     });
 
-    $('#size').on('change', function() {
-        updatePageSize(this, "/system/notice/list", ["companyIdSearch", "idTagSearch", "nameSearch"]);
+    $('#size').on('change', function () {
+        updatePageSize(this, "/member/list", ["companyIdSearch", "idTagSearch", "nameSearch"]);
     });
 
-    $('#pageList').on('click', 'tr', function() {
+    $('#pageList').on('click', 'tr', function () {
         selectRow = $(this);
         memberId = selectRow.find('td').eq(0).attr('id');
     });
 
-    $('#addBtn').on('click', function(event) {
+    $('#addBtn').on('click', function (event) {
         event.preventDefault();
         modalCon = false;
         btnMsg = "등록";
@@ -229,7 +229,7 @@ $(document).ready(function() {
         clearCarTable();
         // clearCardTable();
 
-        $('#companyId').prop('disabled', false);
+
         $('#bizType').prop('disabled', false);
         $('#bizSearchBtn').prop('disabled', false);
         $('#memLoginId').prop('disabled', false);
@@ -244,13 +244,12 @@ $(document).ready(function() {
         duplicateMemTagBtn.hidden = true;
     });
 
-    $('#editBtn').on('click', function(event) {
+    $('#editBtn').on('click', function (event) {
         event.preventDefault();
         modalCon = true;
         btnMsg = "수정";
         $('#modalBtn').text(btnMsg);
         $('#memberForm')[0].reset();
-        $('#companyId').prop('disabled', true);
         $('#bizType').prop('disabled', true);
         $('#memLoginId').prop('disabled', true);
         $('#idTag').prop('disabled', false);
@@ -266,8 +265,7 @@ $(document).ready(function() {
             url: `/member/get/${memberId}`,
             contentType: "application/json",
             dataType: 'json',
-            success: function(data) {
-                $('#companyId').val(data.memberInfo.companyId || '');
+            success: function (data) {
                 $('#bizType').val(data.memberInfo.bizType || '');
                 handleBizYnChange();
                 $('#bizSearchBtn').prop('disabled', true);
@@ -310,7 +308,7 @@ $(document).ready(function() {
                 //         <td><input type="text" class="input-add-row text-center tid" value="${card.tid ? card.tid : ''}"/></td>
                 //         <td><input type="radio" class="mx-3 representativeCard" value="${card.representativeCard}" ${card.representativeCard == "Y" ? "checked" : ""}/></td>
                 //         `;
-    
+
                 //         cardTableBody.appendChild(row);
                 //     });
                 // }
@@ -336,7 +334,7 @@ $(document).ready(function() {
                     row.innerHTML = `<td><input type="checkbox" class="single-checkbox"></td>`;
                     const selectElement = document.createElement('select');
                     selectElement.classList.add('form-control', 'carType');
-                    bizTypeList.forEach(function(data) {
+                    bizTypeList.forEach(function (data) {
                         const option = document.createElement('option');
                         option.value = data.commonCode;
                         option.textContent = data.commonCodeName;
@@ -368,26 +366,26 @@ $(document).ready(function() {
         });
     });
 
-    $('#deleteBtn').on('click', function() {
+    $('#deleteBtn').on('click', function () {
         btnMsg = "삭제";
 
-        if(confirmSubmit(btnMsg)) {
+        if (confirmSubmit(btnMsg)) {
             $.ajax({
                 type: 'DELETE',
                 url: `/member/delete/${memberId}`,
                 contentType: "application/json",
-                success: function(response) {
+                success: function (response) {
                     alert(response);
                     window.location.reload();
                 },
-                error: function(xhr, status, error) {
+                error: function (xhr, status, error) {
                     alert(xhr.responseText);
                 }
             });
         }
     });
-    
-    $('#modalBtn').on('click', function(event) {
+
+    $('#modalBtn').on('click', function (event) {
         event.preventDefault();
 
         const carInfoList = getCarList();
@@ -412,17 +410,17 @@ $(document).ready(function() {
             const email = $('#email').val();
 
             var form = document.getElementById('memberForm');
-            if (!form.checkValidity()) { 
+            if (!form.checkValidity()) {
                 alert('필수 입력 값이 누락되어 있습니다.');
                 return;
             }
 
-            if(!isDuplicateCheck) {
+            if (!isDuplicateCheck) {
                 alert('사용자ID 중복체크를 해주세요.');
                 return;
             }
 
-            if(!memLoginIdCheck) {
+            if (!memLoginIdCheck) {
                 alert('사용자ID를 다시 확인해주세요.');
                 return;
             }
@@ -433,14 +431,13 @@ $(document).ready(function() {
                 if (!isEmail(email)) { return; }
             }
         } else {
-            if(!isTagDuplicateCheck) {
+            if (!isTagDuplicateCheck) {
                 alert('회원카드번호 중복체크를 해주세요.');
                 return;
             }
         }
 
         const DATA = {
-            companyId: $('#companyId').val(),
             bizType: $('#bizType').val(),
             name: $('#name').val(),
             phoneNo: $('#phoneNo').val(),
@@ -479,17 +476,17 @@ $(document).ready(function() {
         if (confirmSubmit(btnMsg)) {
             const URL = modalCon ? `/member/update/${memberId}` : '/member/new';
             const TYPE = modalCon ? 'PATCH' : 'POST';
-    
+
             $.ajax({
                 url: URL,
                 method: TYPE,
                 contentType: 'application/json',
                 data: JSON.stringify(DATA),
-                success: function(response) {
+                success: function (response) {
                     alert(response);
                     window.location.reload();
                 },
-                error: function(xhr, status, error) {
+                error: function (xhr, status, error) {
                     alert(xhr.responseText);
                 }
             });
@@ -608,10 +605,10 @@ $(document).ready(function() {
         cardTableBody.innerHTML = '';
     }
 
-    $('.info-eyes').on('click', function() {
+    $('.info-eyes').on('click', function () {
         var inputGroup = $(this).parents('.input-info-group');
         var passwordField = inputGroup.find('#password');
-        
+
         inputGroup.toggleClass('active');
         if (inputGroup.hasClass('active')) {
             $(this).find('.bi-eye').attr('class', 'bi bi-eye-slash');
@@ -622,7 +619,7 @@ $(document).ready(function() {
         }
     });
 
-    $('.condition-detail').on('click', function(event) {
+    $('.condition-detail').on('click', function (event) {
         event.preventDefault();
 
         var classList = $(this).attr('class').split(/\s+/);
@@ -635,7 +632,7 @@ $(document).ready(function() {
         $.ajax({
             type: 'GET',
             url: `/member/file/${itemType}`,
-            success: function(data) {
+            success: function (data) {
                 $('#conditonText').html(data.fileContent);
                 $('#conditionName').html(data.conditionName);
                 console.log('data: ' + data.fileContent);
@@ -646,7 +643,7 @@ $(document).ready(function() {
                 });
                 conditionModal.show();
             },
-            error: function(xhr, status, error) {
+            error: function (xhr, status, error) {
                 alert(JSON.parse(xhr.responseText).message);
             }
         });

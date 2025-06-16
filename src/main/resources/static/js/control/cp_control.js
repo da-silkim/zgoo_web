@@ -3,27 +3,30 @@ document.addEventListener("DOMContentLoaded", function () {
     let selectedChargerId = '';
 
 
-    /**
-     * 검색버튼 클릭 이벤트 처리
-     */
-    document.getElementById("cpSearchBtn").addEventListener("click", function () {
-        // 폼 제출 (size 값은 이미 hidden input에 있음)
-        document.getElementById('searchForm').submit();
+    // /**
+    //  * 검색버튼 클릭 이벤트 처리
+    //  */
+    // document.getElementById("cpSearchBtn").addEventListener("click", function () {
+    //     // 폼 제출 (size 값은 이미 hidden input에 있음)
+    //     document.getElementById('searchForm').submit();
+    // });
+
+    // /**
+    //  * 초기화 버튼 클릭 이벤트 처리
+    //  */
+    // document.getElementById("resetBtn").addEventListener("click", function () {
+    //     // 모든 입력 필드 초기화
+    //     document.getElementById('companyIdSearch').value = '';
+    //     document.getElementById('opSearch').value = '';
+    //     document.getElementById('contentSearch').value = '';
+
+    //     // 폼 제출 (초기화된 상태로)
+    //     document.getElementById('searchForm').submit();
+    // });
+
+    $('#size').on('change', function () {
+        updatePageSize(this, "/control/charger/list", ["companyIdSearch", "opSearch", "contentSearch"]);
     });
-
-    /**
-     * 초기화 버튼 클릭 이벤트 처리
-     */
-    document.getElementById("resetBtn").addEventListener("click", function () {
-        // 모든 입력 필드 초기화
-        document.getElementById('companyIdSearch').value = '';
-        document.getElementById('opSearch').value = '';
-        document.getElementById('contentSearch').value = '';
-
-        // 폼 제출 (초기화된 상태로)
-        document.getElementById('searchForm').submit();
-    });
-
 
     // 테이블 row 더블클릭 이벤트 처리
     const tableRows = document.querySelectorAll("#dcTable tbody tr");

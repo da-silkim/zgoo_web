@@ -30,6 +30,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import zgoo.cpos.dto.calc.PurchaseDto.PurchaseListDto;
 import zgoo.cpos.dto.cs.CsInfoDto.CsInfoListDto;
+import zgoo.cpos.dto.member.MemberAuthHistDto;
 import zgoo.cpos.dto.member.MemberDto.MemberAuthDto;
 import zgoo.cpos.dto.member.MemberDto.MemberListDto;
 import zgoo.cpos.service.ComService;
@@ -50,11 +51,48 @@ public class ExcelDownloadController {
     private final ComService comService;
 
     /*
+     * member authentication history excel download
+     */
+    @GetMapping("/download/member_authentication")
+    public void downloadMemberAuthenticationHistory(
+            @RequestParam(required = false, value = "opSearch") String opSearch,
+            @RequestParam(required = false, value = "contentSearch") String contentSearch,
+            @RequestParam(required = false, value = "fromDate") String fromDate,
+            @RequestParam(required = false, value = "toDate") String toDate,
+            HttpServletResponse response, Principal principal) throws IOException {
+        log.info(
+                "=== member authentication history excel download info ===opSearch: {}, contentSearch: {}, fromDate: {}, toDate: {}",
+                opSearch, contentSearch, fromDate, toDate);
+
+        boolean isExcel = this.comService.checkExcelPermissions(principal, MenuConstants.MEMBER_AUTH);
+        if (!isExcel) {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN); // 403
+            response.setContentType("application/json;charset=UTF-8");
+            response.getWriter().write("{\"error\":\"An abnormal access has occurred.\"}");
+            return;
+        }
+
+        List<MemberAuthHistDto> memberAuthHistList = this.memberService.findMemberAuthHistList(opSearch, contentSearch,
+                fromDate, toDate);
+
+        String[] headers = { "충전소명", "충전기ID", "충전기구분", "회원명", "회원구분", "회원카드번호", "인증결과", "인증일시" };
+        Function<MemberAuthHistDto, Object[]> dataMapper = memberAuthHist -> new Object[] {
+                memberAuthHist.getStationName(), memberAuthHist.getChargerId(), memberAuthHist.getCpType(),
+                memberAuthHist.getMemberName(), memberAuthHist.getMemberType(), memberAuthHist.getIdTag(),
+                memberAuthHist.getResult(),
+                memberAuthHist.getAuthTime() != null
+                        ? memberAuthHist.getAuthTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+                        : "" };
+
+        Workbook workbook = createExcelFile(memberAuthHistList, "회원인증내역", headers, dataMapper);
+        writeExcelToResponse(response, workbook, "member_authentication");
+    }
+
+    /*
      * member list excel download
      */
     @GetMapping("/download/member_list")
     public void downloadMemberList(
-            @RequestParam(required = false, value = "companyIdSearch") Long companyIdSearch,
             @RequestParam(required = false, value = "idTagSearch") String idTagSearch,
             @RequestParam(required = false, value = "nameSearch") String nameSearch,
             HttpServletResponse response, Principal principal) throws IOException {
@@ -68,12 +106,11 @@ public class ExcelDownloadController {
             return;
         }
 
-        List<MemberListDto> memberList = this.memberService.findAllMemberListWithoutPagination(companyIdSearch,
-                idTagSearch, nameSearch, principal.getName());
+        List<MemberListDto> memberList = this.memberService.findAllMemberListWithoutPagination(idTagSearch, nameSearch);
 
-        String[] headers = { "사업자", "사용자명", "사용자ID", "회원카드번호", "휴대전화", "이메일", "개인/법인", "가입일자" };
+        String[] headers = { "사용자명", "사용자ID", "회원카드번호", "휴대전화", "이메일", "개인/법인", "가입일자" };
         Function<MemberListDto, Object[]> dataMapper = member -> new Object[] {
-                member.getCompanyName(), member.getName(), member.getMemLoginId(),
+                member.getName(), member.getMemLoginId(),
                 member.getIdTag(), member.getPhoneNo(), member.getEmail(),
                 member.getBizTypeName(),
                 member.getJoinedDt() != null ? member.getJoinedDt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
@@ -102,12 +139,11 @@ public class ExcelDownloadController {
             return;
         }
 
-        List<MemberAuthDto> memtagList = this.memberService.findAllMemberTagWithoutPagination(idTagSearch, nameSearch,
-                principal.getName());
+        List<MemberAuthDto> memtagList = this.memberService.findAllMemberTagWithoutPagination(idTagSearch, nameSearch);
 
-        String[] headers = { "사업자", "회원명", "휴대전화", "회원카드번호", "부모IDTAG", "사용여부", "누적충전량(kWh)", "누적충전금액(원)", "상태" };
+        String[] headers = { "회원명", "휴대전화", "회원카드번호", "부모IDTAG", "사용여부", "누적충전량(kWh)", "누적충전금액(원)", "상태" };
         Function<MemberAuthDto, Object[]> dataMapper = memtag -> new Object[] {
-                memtag.getCompanyName(), memtag.getName(), memtag.getPhoneNo(), memtag.getIdTag(),
+                memtag.getName(), memtag.getPhoneNo(), memtag.getIdTag(),
                 memtag.getParentIdTag(), memtag.getUseYn(), memtag.getTotalChargingPower(),
                 memtag.getTotalChargingPrice(), memtag.getStatus()
         };

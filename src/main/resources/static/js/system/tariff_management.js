@@ -12,19 +12,22 @@ document.addEventListener("DOMContentLoaded", function () {
     */
 
 
-    // '검색' 버튼 클릭 이벤트 처리
-    document.getElementById("tariffSearchBtn").addEventListener("click", function () {
+    // // '검색' 버튼 클릭 이벤트 처리
+    // document.getElementById("tariffSearchBtn").addEventListener("click", function () {
 
-        document.getElementById('searchForm').submit();
+    //     document.getElementById('searchForm').submit();
+    // });
+
+
+    // // '초기화' 버튼 클릭 이벤트 처리
+    // document.getElementById("resetBtn").addEventListener("click", function () {
+    //     document.getElementById('companyIdSearch').value = '';
+    //     document.getElementById('searchForm').submit();
+    // });
+
+    $('#size').on('change', function () {
+        updatePageSize(this, "/system/tariff/list", ["companyIdSearch"]);
     });
-
-
-    // '초기화' 버튼 클릭 이벤트 처리
-    document.getElementById("resetBtn").addEventListener("click", function () {
-        document.getElementById('companyIdSearch').value = '';
-        document.getElementById('searchForm').submit();
-    });
-
 
     /*
     * 요금제(cpplanpolicy) 처리=============================================================================

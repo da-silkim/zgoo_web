@@ -1,16 +1,16 @@
-$(document).ready(function() {
+$(document).ready(function () {
     let selectRow, idTag;
 
-    $('#size').on('change', function() {
+    $('#size').on('change', function () {
         updatePageSize(this, "/member/tag/list", ["idTagSearch", "nameSearch"]);
     });
 
-    $('#pageList').on('click', 'tr', function() {
+    $('#pageList').on('click', 'tr', function () {
         selectRow = $(this);
-        idTag = selectRow.find('td').eq(5).text();
+        idTag = selectRow.find('td').eq(4).text();
     });
 
-    $('#editBtn').on('click', function(event) {
+    $('#editBtn').on('click', function (event) {
         event.preventDefault();
         $('#memberAuthForm')[0].reset();
 
@@ -19,7 +19,7 @@ $(document).ready(function() {
             url: `/member/tag/get/${idTag}`,
             contentType: "application/json",
             dataType: 'json',
-            success: function(data) {
+            success: function (data) {
                 if (data.message) {
                     alert(data.message);
                 }
@@ -42,34 +42,34 @@ $(document).ready(function() {
                     maximumFractionDigits: 2
                 });
                 $('#totalChargingPower').val(formattedPower);
-                
+
                 const totalChargingPrice = parseInt(data.authInfo.totalChargingPrice) || 0;
                 $('#totalChargingPrice').val(totalChargingPrice);
             },
-            error: function(xhr, status, error) {
+            error: function (xhr, status, error) {
                 alert(JSON.parse(xhr.responseText).message);
             }
         });
     });
 
-    $('#deleteBtn').on('click', function() {
+    $('#deleteBtn').on('click', function () {
         if (confirmSubmit("삭제")) {
             $.ajax({
                 type: 'DELETE',
                 url: `/member/tag/delete/${idTag}`,
                 contentType: "application/json",
-                success: function(response) {
+                success: function (response) {
                     alert(response);
                     window.location.reload();
                 },
-                error: function(xhr, status, error) {
+                error: function (xhr, status, error) {
                     alert(xhr.responseText);
                 }
             });
         }
     });
 
-    $('#modalBtn').on('click', function(event){
+    $('#modalBtn').on('click', function (event) {
         event.preventDefault();
 
         if (confirmSubmit("수정")) {
@@ -86,11 +86,11 @@ $(document).ready(function() {
                 method: 'PATCH',
                 contentType: 'application/json',
                 data: JSON.stringify(DATA),
-                success: function(response) {
+                success: function (response) {
                     alert(response);
                     window.location.reload();
                 },
-                error: function(xhr, status, error) {
+                error: function (xhr, status, error) {
                     alert(xhr.responseText);
                 }
             });
