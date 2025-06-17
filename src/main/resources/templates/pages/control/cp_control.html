@@ -214,6 +214,46 @@
                             </table>
                         </form>
                         <!-- table:2 end -->
+                        <div class="modal-title mb-2"><span class="modal-title-bar"></span><span>원격 충전 제어</span></div>
+                        <form>
+                            <table class="table table-bg-v table-fixed w-100 text-center align-middle">
+                                <tbody>
+                                    <tr class="table-border-top">
+                                        <th class="w-20">메시지<b class="required-data">*</b></th>
+                                        <td class="w-30">
+                                            <select id="remoteAction" class="form-control" required>
+                                                <option value="RemoteStartTransaction">RemoteStartTransaction</option>
+                                                <option value="RemoteStopTransaction">RemoteStopTransaction</option>
+                                            </select>
+                                        </td>
+                                        <th class="w-20">TransactionID</th>
+                                        <td class="w-30">
+                                            <input type="text" name="transactionId" id="transactionId"
+                                                class="form-control" placeholder="" required disabled>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th class="w-20">ID Tag<b class="required-data">*</b></th>
+                                        <td class="w-30">
+                                            <input type="text" name="idTag" id="idTag" class="form-control"
+                                                placeholder="" required>
+                                        </td>
+                                        <th class="w-20">커넥터ID<b class="required-data">*</b></th>
+                                        <td class="w-30">
+                                            <div class="mb-2 display-input-btn">
+                                                <select id="remoteConnectorId" class="form-control" required>
+                                                    <option value='0'>0</option>
+                                                    <option value="1">1</option>
+                                                    <option value="2">2</option>
+                                                </select>
+                                                <button class="btn btn-outline-grey" id="sendRemoteControlBtn"
+                                                    style="flex: 0 0 auto; margin-left: 10px;">전송</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </form>
                         <!-- table:3 start -->
                         <div class="modal-title mb-2"><span class="modal-title-bar"></span><span>Trigger Message</span>
                         </div>
@@ -367,5 +407,6 @@
     <!-- Add Modal end -->
     <script type="text/javascript" th:src="@{/js/control/cp_control.js}"></script>
 </div>
+
 
 </html>

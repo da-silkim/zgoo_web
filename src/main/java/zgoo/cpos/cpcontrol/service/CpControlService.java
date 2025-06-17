@@ -29,12 +29,16 @@ import zgoo.cpos.cpcontrol.dto.ChangeConfigurationReqDto;
 import zgoo.cpos.cpcontrol.dto.GetConfigurationReqDto;
 import zgoo.cpos.cpcontrol.dto.PaymentTestRequestDto;
 import zgoo.cpos.cpcontrol.dto.PaymentTestResponseDto;
+import zgoo.cpos.cpcontrol.dto.RemoteStartTransactionDto;
+import zgoo.cpos.cpcontrol.dto.RemoteStopTransactionDto;
 import zgoo.cpos.cpcontrol.dto.ResetRequestDto;
 import zgoo.cpos.cpcontrol.dto.TriggerMessageReqDto;
 import zgoo.cpos.cpcontrol.dto.UpdateFirmwareDto;
 import zgoo.cpos.cpcontrol.message.changeconfiguration.ChangeConfigurationResponse;
 import zgoo.cpos.cpcontrol.message.firmware.UpdateFirmwareResponse;
 import zgoo.cpos.cpcontrol.message.getconfiguration.GetConfigurationResponse;
+import zgoo.cpos.cpcontrol.message.remotecharging.RemoteStartTransactionResponse;
+import zgoo.cpos.cpcontrol.message.remotecharging.RemoteStopTransactionResponse;
 import zgoo.cpos.cpcontrol.message.reset.ResetResponse;
 import zgoo.cpos.cpcontrol.message.trigger.TriggerMessageResponse;
 import zgoo.cpos.domain.charger.CpStatus;
@@ -207,6 +211,96 @@ public class CpControlService {
         } catch (Exception e) {
             log.error("Trigger Message Request(/trigger) 처리 중 예외 발생", e);
             throw new RuntimeException("Trigger Message Request(/trigger) 처리 중 예외 발생", e);
+        }
+    }
+
+    public RemoteStopTransactionResponse remoteStopTransaction(RemoteStopTransactionDto request) {
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            Map<String, Object> requestMap = new HashMap<>();
+            requestMap.put("chargePointId", request.getChargerId());
+            requestMap.put("transactionId", request.getTransactionId());
+
+            log.info("Remote Stop Transaction Request : {}", requestMap.toString());
+
+            HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestMap, headers);
+
+            log.info("외부 서버({})로 POST 요청 전송", gwServerUrl + "/remote-stop-transaction");
+
+            long startTime = System.currentTimeMillis();
+
+            ResponseEntity<RemoteStopTransactionResponse> response = restTemplate.postForEntity(
+                    gwServerUrl + "/remote-stop-transaction",
+                    entity,
+                    RemoteStopTransactionResponse.class);
+
+            long endTime = System.currentTimeMillis();
+            log.info("외부 서버 응답 수신 - 소요시간: {}ms, 상태코드: {}",
+                    (endTime - startTime), response.getStatusCodeValue());
+
+            if (response.getStatusCode().is2xxSuccessful()) {
+                log.info("외부 서버 응답 데이터: {}", response.getBody());
+                RemoteStopTransactionResponse remoteStopTransactionResponse = response.getBody();
+                log.info("Remote Stop Transaction Request(/remoteStopTransaction) 성공 - 결과메시지: {}",
+                        remoteStopTransactionResponse);
+                return remoteStopTransactionResponse;
+            } else {
+                log.error("Remote Stop Transaction Request(/remoteStopTransaction) 실패 - 상태코드: {}, 응답: {}",
+                        response.getStatusCode(), response.getBody());
+                throw new RuntimeException("Remote Stop Transaction Request(/remoteStopTransaction) 실패 - 상태코드: "
+                        + response.getStatusCode());
+            }
+        } catch (Exception e) {
+            log.error("Remote Stop Transaction Request(/remoteStopTransaction) 처리 중 예외 발생", e);
+            throw new RuntimeException("Remote Stop Transaction Request(/remoteStopTransaction) 처리 중 예외 발생", e);
+        }
+    }
+
+    public RemoteStartTransactionResponse remoteStartTransaction(RemoteStartTransactionDto request) {
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            Map<String, Object> requestMap = new HashMap<>();
+            requestMap.put("chargePointId", request.getChargerId());
+            requestMap.put("connectorId", request.getConnectorId());
+            requestMap.put("idTag", request.getIdTag());
+            requestMap.put("chargingProfileId", request.getChargingProfileId());
+
+            log.info("Remote Start Transaction Request : {}", requestMap.toString());
+
+            HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestMap, headers);
+
+            log.info("외부 서버({})로 POST 요청 전송", gwServerUrl + "/remote-start-transaction");
+            long startTime = System.currentTimeMillis();
+
+            ResponseEntity<RemoteStartTransactionResponse> response = restTemplate.postForEntity(
+                    gwServerUrl + "/remote-start-transaction",
+                    entity,
+                    RemoteStartTransactionResponse.class);
+
+            long endTime = System.currentTimeMillis();
+            log.info("외부 서버 응답 수신 - 소요시간: {}ms, 상태코드: {}",
+                    (endTime - startTime), response.getStatusCodeValue());
+
+            if (response.getStatusCode().is2xxSuccessful()) {
+                log.info("외부 서버 응답 데이터: {}", response.getBody());
+                RemoteStartTransactionResponse remoteStartTransactionResponse = response.getBody();
+                log.info("Remote Start Transaction Request(/remoteStartTransaction) 성공 - 결과메시지: {}",
+                        remoteStartTransactionResponse);
+                return remoteStartTransactionResponse;
+            } else {
+                log.error("Remote Start Transaction Request(/remoteStartTransaction) 실패 - 상태코드: {}, 응답: {}",
+                        response.getStatusCode(), response.getBody());
+                throw new RuntimeException("Remote Start Transaction Request(/remoteStartTransaction) 실패 - 상태코드: "
+                        + response.getStatusCode());
+            }
+
+        } catch (Exception e) {
+            log.error("Remote Start Transaction Request(/remoteStartTransaction) 처리 중 예외 발생", e);
+            throw new RuntimeException("Remote Start Transaction Request(/remoteStartTransaction) 처리 중 예외 발생", e);
         }
     }
 

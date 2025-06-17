@@ -18,6 +18,8 @@ import zgoo.cpos.cpcontrol.dto.ChangeConfigurationReqDto;
 import zgoo.cpos.cpcontrol.dto.GetConfigurationReqDto;
 import zgoo.cpos.cpcontrol.dto.PaymentTestRequestDto;
 import zgoo.cpos.cpcontrol.dto.PaymentTestResponseDto;
+import zgoo.cpos.cpcontrol.dto.RemoteStartTransactionDto;
+import zgoo.cpos.cpcontrol.dto.RemoteStopTransactionDto;
 import zgoo.cpos.cpcontrol.dto.ResetRequestDto;
 import zgoo.cpos.cpcontrol.dto.TidSearchRequest;
 import zgoo.cpos.cpcontrol.dto.TriggerMessageReqDto;
@@ -25,6 +27,8 @@ import zgoo.cpos.cpcontrol.dto.UpdateFirmwareDto;
 import zgoo.cpos.cpcontrol.message.changeconfiguration.ChangeConfigurationResponse;
 import zgoo.cpos.cpcontrol.message.firmware.UpdateFirmwareResponse;
 import zgoo.cpos.cpcontrol.message.getconfiguration.GetConfigurationResponse;
+import zgoo.cpos.cpcontrol.message.remotecharging.RemoteStartTransactionResponse;
+import zgoo.cpos.cpcontrol.message.remotecharging.RemoteStopTransactionResponse;
 import zgoo.cpos.cpcontrol.message.reset.ResetResponse;
 import zgoo.cpos.cpcontrol.message.trigger.TriggerMessageResponse;
 import zgoo.cpos.cpcontrol.service.CpControlService;
@@ -36,6 +40,28 @@ import zgoo.cpos.cpcontrol.service.CpControlService;
 public class CpControlController {
 
     private final CpControlService cpControlService;
+
+    @PostMapping("/remoteStartTransaction")
+    public ResponseEntity<?> remoteStartTransaction(@RequestBody RemoteStartTransactionDto request) {
+        log.info("Remote Start Transaction Request(/remoteStartTransaction) : {}", request.toString());
+        try {
+            RemoteStartTransactionResponse response = cpControlService.remoteStartTransaction(request);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
+        }
+    }
+
+    @PostMapping("/remoteStopTransaction")
+    public ResponseEntity<?> remoteStopTransaction(@RequestBody RemoteStopTransactionDto request) {
+        log.info("Remote Stop Transaction Request(/remoteStopTransaction) : {}", request.toString());
+        try {
+            RemoteStopTransactionResponse response = cpControlService.remoteStopTransaction(request);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
+        }
+    }
 
     @PostMapping("/fwupdate")
     public ResponseEntity<?> fwupdate(@RequestBody UpdateFirmwareDto request) {

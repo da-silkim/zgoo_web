@@ -100,6 +100,28 @@ document.addEventListener("DOMContentLoaded", function () {
                 configValue.value = '';
             }
 
+            // remote charging 관련 초기화
+            const remoteAction = document.getElementById('remoteAction');
+            const remoteConnectorId = document.getElementById('remoteConnectorId');
+            const idTag = document.getElementById('idTag');
+            const transactionId = document.getElementById('transactionId');
+            if (remoteAction) {
+                remoteAction.selectedIndex = 0;
+
+            }
+            if (remoteConnectorId) {
+                remoteConnectorId.selectedIndex = 0;
+                remoteConnectorId.disabled = false;
+            }
+            if (idTag) {
+                idTag.value = '';
+                idTag.disabled = false;
+            }
+            if (transactionId) {
+                transactionId.value = '';
+                transactionId.disabled = true;
+            }
+
             console.log("Selected Row Data:", rowData);
         });
     });
@@ -329,6 +351,76 @@ document.addEventListener("DOMContentLoaded", function () {
                         alert('리셋 요청 중 오류가 발생했습니다.');
                     });
             }
+        });
+    }
+
+    // 원격충전시작/종료 선택에 따른 이벤트 처리
+    const remoteAction = document.getElementById('remoteAction');
+    if (remoteAction) {
+        remoteAction.addEventListener('change', function () {
+
+            if (this.value === 'RemoteStartTransaction') {
+                document.getElementById('remoteConnectorId').disabled = false;
+                document.getElementById('idTag').disabled = false;
+                document.getElementById('transactionId').disabled = true;
+            } else {
+                document.getElementById('remoteConnectorId').disabled = true;
+                document.getElementById('idTag').disabled = true;
+                document.getElementById('transactionId').disabled = false;
+            }
+        });
+    }
+
+    // 원격 충전 제어 전송 버튼 이벤트
+    const sendRemoteControlBtn = document.getElementById('sendRemoteControlBtn');
+    if (sendRemoteControlBtn) {
+        sendRemoteControlBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+
+            const remoteAction = document.getElementById('remoteAction').value;
+            let data = {};
+
+            if (remoteAction === 'RemoteStartTransaction') {
+                data.chargerId = selectedChargerId;
+                data.connectorId = document.getElementById('remoteConnectorId').value;
+                data.idTag = document.getElementById('idTag').value;
+                data.chargingProfileId = null;
+            } else {
+                data.chargerId = selectedChargerId;
+                data.transactionId = document.getElementById('transactionId').value;
+            }
+
+            let fetchUrl = '';
+            if (remoteAction === 'RemoteStartTransaction') {
+                fetchUrl = '/control/remoteStartTransaction';
+            } else {
+                fetchUrl = '/control/remoteStopTransaction';
+            }
+
+            //확인 팝업
+            if (confirm(`선택한 충전기(${selectedChargerId})에 ${remoteAction} 요청을 전송하시겠습니까?`)) {
+                // API 호출 로직
+                fetch(fetchUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                })
+                    .then(response => response.json())
+                    .then(result => {
+                        if (result.status === 'Accepted') {
+                            alert('원격 충전 제어 요청이 성공적으로 처리되었습니다.');
+                        } else {
+                            alert('원격 충전 제어 요청 처리 중 오류가 발생했습니다: ' + (result.message || '알 수 없는 오류'));
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('원격 충전 제어 요청 중 오류가 발생했습니다.');
+                    });
+            }
+
         });
     }
 });
