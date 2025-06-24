@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
@@ -20,6 +21,7 @@ import zgoo.cpos.domain.company.QCompanyRelationInfo;
 import zgoo.cpos.dto.company.CompanyDto;
 import zgoo.cpos.dto.company.CompanyDto.BaseCompnayDto;
 import zgoo.cpos.dto.company.CompanyDto.CompanyListDto;
+import zgoo.cpos.util.QueryUtils;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -36,87 +38,12 @@ public class CompanyRepositoryCustomImpl implements CompanyRepositoryCustom {
 
     @Override
     public Page<CompanyListDto> findCompanyListPaging(Pageable pageable, String levelPath, boolean isSuperAdmin) {
-        // 슈퍼 관리자가 아니고 levelPath가 있는 경우 조건 추가
-        List<CompanyListDto> resultList;
-        if (!isSuperAdmin) {
-            resultList = queryFactory
-                    .select(Projections.fields(CompanyDto.CompanyListDto.class,
-                            company.id.as("companyId"),
-                            company.companyName.as("companyName"),
-                            company.companyLv.as("companyLv"),
-                            companyLevelCode.name.as("companyLvName"),
-                            company.companyType.as("companyType"),
-                            companyTypeCode.name.as("companyTypeName"),
-                            parentCompany.companyName.as("parentCompanyName"),
-                            contract.contractedAt.as("contractedAt"),
-                            contract.contractEnd.as("contractEnd"),
-                            contract.contractStatus.as("contractStatus"),
-                            contractStatusCode.name.as("contractStatName")))
-                    .from(company)
-                    .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
-                    .leftJoin(parentCompany).on(relation.parentCompany.eq(parentCompany))
-                    .leftJoin(contract).on(company.companyContract.eq(contract))
-                    .leftJoin(companyLevelCode).on(company.companyLv.eq(companyLevelCode.commonCode))
-                    .leftJoin(companyTypeCode).on(company.companyType.eq(companyTypeCode.commonCode))
-                    .leftJoin(contractStatusCode).on(contract.contractStatus.eq(contractStatusCode.commonCode))
-                    .where(
-                            relation.levelPath.eq(levelPath)
-                                    .or(relation.levelPath.startsWith(levelPath + ".")))
-                    .offset(pageable.getOffset())
-                    .limit(pageable.getPageSize())
-                    .orderBy(company.createdAt.desc())
-                    .fetch();
-        } else {
-            // 슈퍼 관리자이거나 levelPath가 없는 경우 모든 회사 조회
-            resultList = queryFactory
-                    .select(Projections.fields(CompanyDto.CompanyListDto.class,
-                            company.id.as("companyId"),
-                            company.companyName.as("companyName"),
-                            company.companyLv.as("companyLv"),
-                            companyLevelCode.name.as("companyLvName"),
-                            company.companyType.as("companyType"),
-                            companyTypeCode.name.as("companyTypeName"),
-                            parentCompany.companyName.as("parentCompanyName"),
-                            contract.contractedAt.as("contractedAt"),
-                            contract.contractEnd.as("contractEnd"),
-                            contract.contractStatus.as("contractStatus"),
-                            contractStatusCode.name.as("contractStatName")))
-                    .from(company)
-                    .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
-                    .leftJoin(parentCompany).on(relation.parentCompany.eq(parentCompany))
-                    .leftJoin(contract).on(company.companyContract.eq(contract))
-                    .leftJoin(companyLevelCode).on(company.companyLv.eq(companyLevelCode.commonCode))
-                    .leftJoin(companyTypeCode).on(company.companyType.eq(companyTypeCode.commonCode))
-                    .leftJoin(contractStatusCode).on(contract.contractStatus.eq(contractStatusCode.commonCode))
-                    .offset(pageable.getOffset())
-                    .limit(pageable.getPageSize())
-                    .orderBy(company.createdAt.desc())
-                    .fetch();
+        BooleanBuilder builder = new BooleanBuilder();
+
+        if (!isSuperAdmin && levelPath != null && !levelPath.isEmpty()) {
+            builder.and(QueryUtils.hasCompanyLevelAccess(relation, levelPath));
         }
 
-        /* data수 카운트 */
-        long total;
-        if (!isSuperAdmin) {
-            total = queryFactory
-                    .select(company.count())
-                    .from(company)
-                    .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
-                    .where(
-                            relation.levelPath.eq(levelPath)
-                                    .or(relation.levelPath.startsWith(levelPath + ".")))
-                    .fetchOne();
-        } else {
-            total = queryFactory
-                    .select(company.count())
-                    .from(company)
-                    .fetchOne();
-        }
-
-        return new PageImpl<>(resultList, pageable, total);
-    }
-
-    @Override
-    public Page<CompanyListDto> findCompanyListByIdPaging(Long id, Pageable pageable) {
         List<CompanyListDto> resultList = queryFactory
                 .select(Projections.fields(CompanyDto.CompanyListDto.class,
                         company.id.as("companyId"),
@@ -136,11 +63,10 @@ public class CompanyRepositoryCustomImpl implements CompanyRepositoryCustom {
                 .leftJoin(contract).on(company.companyContract.eq(contract))
                 .leftJoin(companyLevelCode).on(company.companyLv.eq(companyLevelCode.commonCode))
                 .leftJoin(companyTypeCode).on(company.companyType.eq(companyTypeCode.commonCode))
-                .leftJoin(contractStatusCode)
-                .on(contract.contractStatus.eq(contractStatusCode.commonCode))
+                .leftJoin(contractStatusCode).on(contract.contractStatus.eq(contractStatusCode.commonCode))
+                .where(builder)
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
-                .where(company.id.eq(id))
                 .orderBy(company.createdAt.desc())
                 .fetch();
 
@@ -148,237 +74,44 @@ public class CompanyRepositoryCustomImpl implements CompanyRepositoryCustom {
         long total = queryFactory
                 .select(company.count())
                 .from(company)
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
+                .where(builder)
                 .fetchOne();
 
         return new PageImpl<>(resultList, pageable, total);
     }
 
     @Override
-    public Page<CompanyListDto> findCompanyListByTypePaging(String type, String levelPath, Pageable pageable,
-            boolean isSuperAdmin) {
-
-        List<CompanyListDto> resultList;
-        if (!isSuperAdmin) {
-            resultList = queryFactory
-                    .select(Projections.fields(CompanyDto.CompanyListDto.class,
-                            company.id.as("companyId"),
-                            company.companyName.as("companyName"),
-                            company.companyLv.as("companyLv"),
-                            companyLevelCode.name.as("companyLvName"),
-                            company.companyType.as("companyType"),
-                            companyTypeCode.name.as("companyTypeName"),
-                            parentCompany.companyName.as("parentCompanyName"),
-                            contract.contractedAt.as("contractedAt"),
-                            contract.contractEnd.as("contractEnd"),
-                            contract.contractStatus.as("contractStatus"),
-                            contractStatusCode.name.as("contractStatName")))
-                    .from(company)
-                    .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
-                    .leftJoin(parentCompany).on(relation.parentCompany.eq(parentCompany))
-                    .leftJoin(contract).on(company.companyContract.eq(contract))
-                    .leftJoin(companyLevelCode).on(company.companyLv.eq(companyLevelCode.commonCode))
-                    .leftJoin(companyTypeCode).on(company.companyType.eq(companyTypeCode.commonCode))
-                    .leftJoin(contractStatusCode)
-                    .on(contract.contractStatus.eq(contractStatusCode.commonCode))
-                    .where(company.companyType.eq(type)
-                            .and(relation.levelPath.eq(levelPath).or(relation.levelPath.startsWith(levelPath + "."))))
-                    .offset(pageable.getOffset())
-                    .limit(pageable.getPageSize())
-                    .orderBy(company.createdAt.desc())
-                    .fetch();
-        } else {
-            resultList = queryFactory
-                    .select(Projections.fields(CompanyDto.CompanyListDto.class,
-                            company.id.as("companyId"),
-                            company.companyName.as("companyName"),
-                            company.companyLv.as("companyLv"),
-                            companyLevelCode.name.as("companyLvName"),
-                            company.companyType.as("companyType"),
-                            companyTypeCode.name.as("companyTypeName"),
-                            parentCompany.companyName.as("parentCompanyName"),
-                            contract.contractedAt.as("contractedAt"),
-                            contract.contractEnd.as("contractEnd"),
-                            contract.contractStatus.as("contractStatus"),
-                            contractStatusCode.name.as("contractStatName")))
-                    .from(company)
-                    .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
-                    .leftJoin(parentCompany).on(relation.parentCompany.eq(parentCompany))
-                    .leftJoin(contract).on(company.companyContract.eq(contract))
-                    .leftJoin(companyLevelCode).on(company.companyLv.eq(companyLevelCode.commonCode))
-                    .leftJoin(companyTypeCode).on(company.companyType.eq(companyTypeCode.commonCode))
-                    .leftJoin(contractStatusCode)
-                    .on(contract.contractStatus.eq(contractStatusCode.commonCode))
-                    .offset(pageable.getOffset())
-                    .limit(pageable.getPageSize())
-                    .where(company.companyType.eq(type))
-                    .orderBy(company.createdAt.desc())
-                    .fetch();
-        }
-
-        /* data수 카운트 */
-        long total;
-        if (!isSuperAdmin) {
-            total = queryFactory
-                    .select(company.count())
-                    .from(company)
-                    .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
-                    .where(
-                            company.companyType.eq(type)
-                                    .and(
-                                            relation.levelPath.eq(levelPath)
-                                                    .or(relation.levelPath.startsWith(levelPath + "."))))
-                    .fetchOne();
-        } else {
-            total = queryFactory
-                    .select(company.count())
-                    .from(company)
-                    .fetchOne();
-        }
-
-        return new PageImpl<>(resultList, pageable, total);
-    }
-
-    @Override
-    public Page<CompanyListDto> findCompanyListByLvPaging(String level, String levelPath, Pageable pageable,
-            boolean isSuperAdmin) {
-        List<CompanyListDto> resultList;
-        if (!isSuperAdmin) {
-            resultList = queryFactory
-                    .select(Projections.fields(CompanyDto.CompanyListDto.class,
-                            company.id.as("companyId"),
-                            company.companyName.as("companyName"),
-                            company.companyLv.as("companyLv"),
-                            companyLevelCode.name.as("companyLvName"),
-                            company.companyType.as("companyType"),
-                            companyTypeCode.name.as("companyTypeName"),
-                            parentCompany.companyName.as("parentCompanyName"),
-                            contract.contractedAt.as("contractedAt"),
-                            contract.contractEnd.as("contractEnd"),
-                            contract.contractStatus.as("contractStatus"),
-                            contractStatusCode.name.as("contractStatName")))
-                    .from(company)
-                    .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
-                    .leftJoin(parentCompany).on(relation.parentCompany.eq(parentCompany))
-                    .leftJoin(contract).on(company.companyContract.eq(contract))
-                    .leftJoin(companyLevelCode).on(company.companyLv.eq(companyLevelCode.commonCode))
-                    .leftJoin(companyTypeCode).on(company.companyType.eq(companyTypeCode.commonCode))
-                    .leftJoin(contractStatusCode)
-                    .on(contract.contractStatus.eq(contractStatusCode.commonCode))
-                    .where(
-                            company.companyLv.eq(level)
-                                    .and(
-                                            relation.levelPath.eq(levelPath)
-                                                    .or(relation.levelPath.startsWith(levelPath + "."))))
-                    .offset(pageable.getOffset())
-                    .limit(pageable.getPageSize())
-                    .orderBy(company.createdAt.desc())
-                    .fetch();
-        } else {
-            resultList = queryFactory
-                    .select(Projections.fields(CompanyDto.CompanyListDto.class,
-                            company.id.as("companyId"),
-                            company.companyName.as("companyName"),
-                            company.companyLv.as("companyLv"),
-                            companyLevelCode.name.as("companyLvName"),
-                            company.companyType.as("companyType"),
-                            companyTypeCode.name.as("companyTypeName"),
-                            parentCompany.companyName.as("parentCompanyName"),
-                            contract.contractedAt.as("contractedAt"),
-                            contract.contractEnd.as("contractEnd"),
-                            contract.contractStatus.as("contractStatus"),
-                            contractStatusCode.name.as("contractStatName")))
-                    .from(company)
-                    .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
-                    .leftJoin(parentCompany).on(relation.parentCompany.eq(parentCompany))
-                    .leftJoin(contract).on(company.companyContract.eq(contract))
-                    .leftJoin(companyLevelCode).on(company.companyLv.eq(companyLevelCode.commonCode))
-                    .leftJoin(companyTypeCode).on(company.companyType.eq(companyTypeCode.commonCode))
-                    .leftJoin(contractStatusCode).on(contract.contractStatus.eq(contractStatusCode.commonCode))
-                    .offset(pageable.getOffset())
-                    .limit(pageable.getPageSize())
-                    .where(company.companyLv.eq(level))
-                    .orderBy(company.createdAt.desc())
-                    .fetch();
-        }
-        /* data수 카운트 */
-        long total;
-        if (!isSuperAdmin) {
-            total = queryFactory
-                    .select(company.count())
-                    .from(company)
-                    .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
-                    .where(
-                            company.companyLv.eq(level)
-                                    .and(
-                                            relation.levelPath.eq(levelPath)
-                                                    .or(relation.levelPath.startsWith(levelPath + "."))))
-                    .fetchOne();
-        } else {
-            total = queryFactory
-                    .select(company.count())
-                    .from(company)
-                    .fetchOne();
-        }
-        return new PageImpl<>(resultList, pageable, total);
-    }
-
-    @Override
     public List<CompanyListDto> findCompanyListForSelectOptCl(String levelPath, boolean isSuperAdmin) {
-
-        List<CompanyListDto> companyList;
-
-        if (isSuperAdmin) {
-            companyList = queryFactory
-                    .select(Projections.fields(CompanyDto.CompanyListDto.class,
-                            company.id.as("companyId"),
-                            company.companyName.as("companyName"),
-                            company.companyLv.as("companyLv"),
-                            companyLevelCode.name.as("companyLvName"),
-                            company.companyType.as("companyType"),
-                            companyTypeCode.name.as("companyTypeName"),
-                            parentCompany.companyName.as("parentCompanyName"),
-                            contract.contractedAt.as("contractedAt"),
-                            contract.contractEnd.as("contractEnd"),
-                            contract.contractStatus.as("contractStatus"),
-                            contractStatusCode.name.as("contractStatName")))
-                    .from(company)
-                    .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
-                    .leftJoin(parentCompany).on(relation.parentCompany.eq(parentCompany))
-                    .leftJoin(contract).on(company.companyContract.eq(contract))
-                    .leftJoin(companyLevelCode).on(company.companyLv.eq(companyLevelCode.commonCode))
-                    .leftJoin(companyTypeCode).on(company.companyType.eq(companyTypeCode.commonCode))
-                    .leftJoin(contractStatusCode)
-                    .on(contract.contractStatus.eq(contractStatusCode.commonCode))
-                    .orderBy(company.createdAt.desc())
-                    .fetch();
-        } else {
-            companyList = queryFactory
-                    .select(Projections.fields(CompanyDto.CompanyListDto.class,
-                            company.id.as("companyId"),
-                            company.companyName.as("companyName"),
-                            company.companyLv.as("companyLv"),
-                            companyLevelCode.name.as("companyLvName"),
-                            company.companyType.as("companyType"),
-                            companyTypeCode.name.as("companyTypeName"),
-                            parentCompany.companyName.as("parentCompanyName"),
-                            contract.contractedAt.as("contractedAt"),
-                            contract.contractEnd.as("contractEnd"),
-                            contract.contractStatus.as("contractStatus"),
-                            contractStatusCode.name.as("contractStatName")))
-                    .from(company)
-                    .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
-                    .leftJoin(parentCompany).on(relation.parentCompany.eq(parentCompany))
-                    .leftJoin(contract).on(company.companyContract.eq(contract))
-                    .leftJoin(companyLevelCode).on(company.companyLv.eq(companyLevelCode.commonCode))
-                    .leftJoin(companyTypeCode).on(company.companyType.eq(companyTypeCode.commonCode))
-                    .leftJoin(contractStatusCode)
-                    .where(
-                            relation.levelPath.eq(levelPath)
-                                    .or(relation.levelPath.startsWith(levelPath + ".")))
-                    .on(contract.contractStatus.eq(contractStatusCode.commonCode))
-                    .orderBy(company.createdAt.desc())
-                    .fetch();
+        BooleanBuilder builder = new BooleanBuilder();
+        if (!isSuperAdmin && levelPath != null && !levelPath.isEmpty()) {
+            builder.and(QueryUtils.hasCompanyLevelAccess(relation, levelPath));
         }
+
+        List<CompanyListDto> companyList = queryFactory
+                .select(Projections.fields(CompanyDto.CompanyListDto.class,
+                        company.id.as("companyId"),
+                        company.companyName.as("companyName"),
+                        company.companyLv.as("companyLv"),
+                        companyLevelCode.name.as("companyLvName"),
+                        company.companyType.as("companyType"),
+                        companyTypeCode.name.as("companyTypeName"),
+                        parentCompany.companyName.as("parentCompanyName"),
+                        contract.contractedAt.as("contractedAt"),
+                        contract.contractEnd.as("contractEnd"),
+                        contract.contractStatus.as("contractStatus"),
+                        contractStatusCode.name.as("contractStatName")))
+                .from(company)
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
+                .leftJoin(parentCompany).on(relation.parentCompany.eq(parentCompany))
+                .leftJoin(contract).on(company.companyContract.eq(contract))
+                .leftJoin(companyLevelCode).on(company.companyLv.eq(companyLevelCode.commonCode))
+                .leftJoin(companyTypeCode).on(company.companyType.eq(companyTypeCode.commonCode))
+                .leftJoin(contractStatusCode)
+                .where(builder)
+                .on(contract.contractStatus.eq(contractStatusCode.commonCode))
+                .orderBy(company.createdAt.desc())
+                .fetch();
 
         return companyList;
     }
@@ -433,39 +166,85 @@ public class CompanyRepositoryCustomImpl implements CompanyRepositoryCustom {
 
     @Override
     public List<BaseCompnayDto> findCompanyListForSelectOptBc(String levelPath, boolean isSuperAdmin) {
-        List<BaseCompnayDto> resultList;
-        if (isSuperAdmin) {
-            resultList = queryFactory.select(Projections.fields(BaseCompnayDto.class,
-                    company.id.as("companyId"),
-                    company.companyName.as("companyName"),
-                    company.companyLv.as("companyLv"),
-                    companyLevelCode.name.as("companyLvName"),
-                    company.companyType.as("companyType"),
-                    companyTypeCode.name.as("companyTypeName")))
-                    .from(company)
-                    .leftJoin(companyLevelCode).on(company.companyLv.eq(companyLevelCode.commonCode))
-                    .leftJoin(companyTypeCode).on(company.companyType.eq(companyTypeCode.commonCode))
-                    .orderBy(company.createdAt.asc())
-                    .fetch();
-        } else {
-            resultList = queryFactory.select(Projections.fields(BaseCompnayDto.class,
-                    company.id.as("companyId"),
-                    company.companyName.as("companyName"),
-                    company.companyLv.as("companyLv"),
-                    companyLevelCode.name.as("companyLvName"),
-                    company.companyType.as("companyType"),
-                    companyTypeCode.name.as("companyTypeName")))
-                    .from(company)
-                    .leftJoin(companyLevelCode).on(company.companyLv.eq(companyLevelCode.commonCode))
-                    .leftJoin(companyTypeCode).on(company.companyType.eq(companyTypeCode.commonCode))
-                    .where(
-                            relation.levelPath.eq(levelPath)
-                                    .or(relation.levelPath.startsWith(levelPath + ".")))
-                    .orderBy(company.createdAt.asc())
-                    .fetch();
+        BooleanBuilder builder = new BooleanBuilder();
+        if (!isSuperAdmin && levelPath != null && !levelPath.isEmpty()) {
+            builder.and(QueryUtils.hasCompanyLevelAccess(relation, levelPath));
         }
 
+        List<BaseCompnayDto> resultList = queryFactory.select(Projections.fields(BaseCompnayDto.class,
+                company.id.as("companyId"),
+                company.companyName.as("companyName"),
+                company.companyLv.as("companyLv"),
+                companyLevelCode.name.as("companyLvName"),
+                company.companyType.as("companyType"),
+                companyTypeCode.name.as("companyTypeName")))
+                .from(company)
+                .leftJoin(companyLevelCode).on(company.companyLv.eq(companyLevelCode.commonCode))
+                .leftJoin(companyTypeCode).on(company.companyType.eq(companyTypeCode.commonCode))
+                .where(builder)
+                .orderBy(company.createdAt.asc())
+                .fetch();
+
         return resultList;
+    }
+
+    @Override
+    public Page<CompanyListDto> findCompanyListByConditionPaging(Long companyId, String companyType, String companyLv,
+            Pageable pageable, String levelPath, boolean isSuperAdmin) {
+
+        BooleanBuilder builder = new BooleanBuilder();
+        if (!isSuperAdmin && levelPath != null && !levelPath.isEmpty()) {
+            builder.and(QueryUtils.hasCompanyLevelAccess(relation, levelPath));
+        }
+
+        if (companyId != null) {
+            builder.and(company.id.eq(companyId));
+        }
+
+        if (companyType != null && !companyType.isEmpty()) {
+            builder.and(company.companyType.eq(companyType));
+        }
+
+        if (companyLv != null && !companyLv.isEmpty()) {
+            builder.and(company.companyLv.eq(companyLv));
+        }
+
+        List<CompanyListDto> resultList = queryFactory
+                .select(Projections.fields(CompanyDto.CompanyListDto.class,
+                        company.id.as("companyId"),
+                        company.companyName.as("companyName"),
+                        company.companyLv.as("companyLv"),
+                        companyLevelCode.name.as("companyLvName"),
+                        company.companyType.as("companyType"),
+                        companyTypeCode.name.as("companyTypeName"),
+                        parentCompany.companyName.as("parentCompanyName"),
+                        contract.contractedAt.as("contractedAt"),
+                        contract.contractEnd.as("contractEnd"),
+                        contract.contractStatus.as("contractStatus"),
+                        contractStatusCode.name.as("contractStatName")))
+                .from(company)
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
+                .leftJoin(parentCompany).on(relation.parentCompany.eq(parentCompany))
+                .leftJoin(contract).on(company.companyContract.eq(contract))
+                .leftJoin(companyLevelCode).on(company.companyLv.eq(companyLevelCode.commonCode))
+                .leftJoin(companyTypeCode).on(company.companyType.eq(companyTypeCode.commonCode))
+                .leftJoin(contractStatusCode).on(contract.contractStatus.eq(contractStatusCode.commonCode))
+                .where(builder)
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .orderBy(company.createdAt.desc())
+                .fetch();
+
+        /* data수 카운트 */
+        long total = queryFactory
+                .select(company.count())
+                .from(company)
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
+                .where(builder)
+                .fetchOne();
+
+        return new PageImpl<>(resultList, pageable, total);
+
     }
 
 }

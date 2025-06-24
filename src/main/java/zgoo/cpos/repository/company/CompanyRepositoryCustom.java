@@ -17,16 +17,9 @@ public interface CompanyRepositoryCustom {
     // 업체조회
     Page<CompanyListDto> findCompanyListPaging(Pageable pageable, String levelPath, boolean isSuperAdmin);
 
-    // 업체조회 - 검색창(조건 : 사업자id )
-    Page<CompanyDto.CompanyListDto> findCompanyListByIdPaging(Long id, Pageable pageable);
-
-    // 업체조회 - 검색창(조건 : 사업자유형 )
-    Page<CompanyDto.CompanyListDto> findCompanyListByTypePaging(String type, String levelPath, Pageable pageable,
-            boolean isSuperAdmin);
-
-    // 업체조회 - 검색창(조건 : 사업자레벨 )
-    Page<CompanyDto.CompanyListDto> findCompanyListByLvPaging(String level, String levelPath, Pageable pageable,
-            boolean isSuperAdmin);
+    // 업체조회 - 검색창(조건 : 사업자id, 사업자유형, 사업자레벨 )
+    Page<CompanyDto.CompanyListDto> findCompanyListByConditionPaging(Long companyId, String companyType,
+            String companyLv, Pageable pageable, String levelPath, boolean isSuperAdmin);
 
     // Not paging ================================================
     // 검색옵션 사업자 조회 (return type : CompanyListDto)

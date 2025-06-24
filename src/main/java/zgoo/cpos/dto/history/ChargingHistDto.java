@@ -37,6 +37,8 @@ public class ChargingHistDto {
     private Integer realCost;
     private String approvalNum; // 승인번호
     private UseYn paymentYn;
+    private String paymentFailReason;
+    private Integer transactionId;
 
     // to entity
 }

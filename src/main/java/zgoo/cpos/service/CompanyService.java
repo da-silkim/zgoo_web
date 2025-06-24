@@ -62,15 +62,9 @@ public class CompanyService {
         return companyRepository.findCompanyListPaging(pageable, levelPath, isSuperAdmin);
     }
 
-    public Page<CompanyListDto> searchCompanyById(Long companyId, int page, int size) {
+    public Page<CompanyListDto> searchCompanyList(String userId, Long companyId, String companyType, String companyLv,
+            int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        return companyRepository.findCompanyListByIdPaging(companyId, pageable);
-    }
-
-    @Transactional(readOnly = true)
-    public Page<CompanyListDto> searchCompanyByType(String userId, String companyType, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
-
         boolean isSuperAdmin = comService.checkSuperAdmin(userId);
         Long loginUserCompanyId = comService.getLoginUserCompanyId(userId);
         String levelPath = companyRepository.findLevelPathByCompanyId(loginUserCompanyId);
@@ -79,26 +73,8 @@ public class CompanyService {
             // 관계정보가 없을경우 빈 리스트 전달
             return new PageImpl<>(new ArrayList<>(), pageable, 0);
         }
-
-        return companyRepository.findCompanyListByTypePaging(companyType, levelPath, pageable, isSuperAdmin);
-
-    }
-
-    @Transactional(readOnly = true)
-    public Page<CompanyListDto> searchCompanyByLevel(String userId, String companyLevel, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
-
-        boolean isSuperAdmin = comService.checkSuperAdmin(userId);
-        Long loginUserCompanyId = comService.getLoginUserCompanyId(userId);
-        String levelPath = companyRepository.findLevelPathByCompanyId(loginUserCompanyId);
-        log.info("== levelPath : {}", levelPath);
-        if (levelPath == null) {
-            // 관계정보가 없을경우 빈 리스트 전달
-            return new PageImpl<>(new ArrayList<>(), pageable, 0);
-        }
-
-        return companyRepository.findCompanyListByLvPaging(companyLevel, levelPath, pageable, isSuperAdmin);
-
+        return companyRepository.findCompanyListByConditionPaging(companyId, companyType, companyLv, pageable,
+                levelPath, isSuperAdmin);
     }
 
     @Transactional(readOnly = true)

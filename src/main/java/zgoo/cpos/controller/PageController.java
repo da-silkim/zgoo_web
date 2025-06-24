@@ -49,6 +49,7 @@ import zgoo.cpos.dto.fw.CpFwversionDto;
 import zgoo.cpos.dto.history.ChargingHistDto;
 import zgoo.cpos.dto.history.ChgCommlogDto;
 import zgoo.cpos.dto.history.ErrorHistDto;
+import zgoo.cpos.dto.history.PaymentHistDto;
 import zgoo.cpos.dto.member.ConditionDto.ConditionCodeBaseDto;
 import zgoo.cpos.dto.member.ConditionDto.ConditionList;
 import zgoo.cpos.dto.member.MemberAuthHistDto;
@@ -100,6 +101,7 @@ import zgoo.cpos.service.MemberService;
 import zgoo.cpos.service.MenuAuthorityService;
 import zgoo.cpos.service.MenuService;
 import zgoo.cpos.service.NoticeService;
+import zgoo.cpos.service.PaymentHistService;
 import zgoo.cpos.service.PurchaseService;
 import zgoo.cpos.service.StatisticsService;
 import zgoo.cpos.service.TariffService;
@@ -141,6 +143,7 @@ public class PageController {
     private final PurchaseService purchaseService;
     private final ErrorHistService errorHistService;
     private final FwService fwService;
+    private final PaymentHistService paymentHistService;
 
     /*
      * 대시보드
@@ -1500,13 +1503,12 @@ public class PageController {
      */
     @GetMapping("/history/payment")
     public String showpaymenthistory(
+            @RequestParam(value = "companyIdSearch", required = false) Long companyId,
             @RequestParam(value = "opSearch", required = false) String searchOp,
             @RequestParam(value = "contentSearch", required = false) String searchContent,
-            @RequestParam(value = "processResult", required = false) String processResult,
-            @RequestParam(value = "approvalStart", required = false) LocalDate approvalStart,
-            @RequestParam(value = "approvalEnd", required = false) LocalDate approvalEnd,
-            @RequestParam(value = "cancelStart", required = false) LocalDate cancelStart,
-            @RequestParam(value = "cancelEnd", required = false) LocalDate cancelEnd,
+            @RequestParam(value = "stateCode", required = false) String stateCode,
+            @RequestParam(value = "transactionStart", required = false) String transactionStart,
+            @RequestParam(value = "transactionEnd", required = false) String transactionEnd,
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "10") int size,
             Model model, Principal principal) {
@@ -1514,13 +1516,27 @@ public class PageController {
 
         try {
 
+            model.addAttribute("selectedCompanyId", companyId);
             model.addAttribute("selectedOpSearch", searchOp);
             model.addAttribute("selectedContentSearch", searchContent);
-            model.addAttribute("selectedProcessResult", processResult);
-            model.addAttribute("selectedApprovalStart", approvalStart);
-            model.addAttribute("selectedApprovalEnd", approvalEnd);
-            model.addAttribute("selectedCancelStart", cancelStart);
-            model.addAttribute("selectedCancelEnd", cancelEnd);
+            model.addAttribute("selectedStateCode", stateCode);
+            model.addAttribute("selectedTransactionStart", transactionStart);
+            model.addAttribute("selectedTransactionEnd", transactionEnd);
+
+            Page<PaymentHistDto> paymentHistList = this.paymentHistService.findPaymentHist(companyId, searchOp,
+                    searchContent, stateCode,
+                    transactionStart, transactionEnd, page, size, principal.getName());
+
+            int totalPages = paymentHistList.getTotalPages() == 0 ? 1 : paymentHistList.getTotalPages();
+            int startNumber = page * size;
+            model.addAttribute("paymentHistList", paymentHistList.getContent());
+            model.addAttribute("size", String.valueOf(size));
+            model.addAttribute("currentPage", page);
+            model.addAttribute("totalPages", totalPages);
+            model.addAttribute("totalCount", paymentHistList.getTotalElements());
+            model.addAttribute("startNumber", startNumber);
+            log.info("===PaymentHist_PageInfo >> totalPages:{}, totalCount:{}", totalPages,
+                    paymentHistList.getTotalElements());
 
             List<CompanyListDto> companyList = this.companyService.findCompanyListAll(principal.getName());
             model.addAttribute("companyList", companyList);
@@ -2018,18 +2034,14 @@ public class PageController {
             log.info("=== Compnay DB search result >>>");
 
             // check null and call the approrpiate search method
-            if (companyId != null) {
-                log.info("Searching by companyId: {}", companyId);
-                companyList = companyService.searchCompanyById(companyId, page, size);
-            } else if (companyType != null && !companyType.isEmpty()) {
-                log.info("Searching by companyType: {}", companyType);
-                companyList = companyService.searchCompanyByType(longinId, companyType, page, size);
-            } else if (companyLv != null && !companyLv.isEmpty()) {
-                log.info("Searching by CompanyLevel", companyLv);
-                companyList = companyService.searchCompanyByLevel(longinId, companyLv, page, size);
-            } else {
+            if (companyId == null && (companyType == null || companyType.isEmpty())
+                    && (companyLv == null || companyLv.isEmpty())) {
                 log.info("Fetching all companies >> ");
                 companyList = companyService.searchCompanyAll(longinId, page, size);
+            } else {
+                log.info("Fetching company with condition >> companyId: {}, companyType: {}, companyLv: {}", companyId,
+                        companyType, companyLv);
+                companyList = companyService.searchCompanyList(longinId, companyId, companyType, companyLv, page, size);
             }
 
             log.info("=== companyListDto : {}", companyList.toString());

@@ -29,6 +29,7 @@ import zgoo.cpos.domain.cp.QCpModel;
 import zgoo.cpos.domain.cs.QCsInfo;
 import zgoo.cpos.domain.history.QChargingHist;
 import zgoo.cpos.domain.member.QMember;
+import zgoo.cpos.domain.payment.QPgDispayment;
 import zgoo.cpos.dto.history.ChargingHistDto;
 import zgoo.cpos.dto.statistics.TotalkwDto.TotalkwBaseDto;
 import zgoo.cpos.dto.statistics.TotalkwDto.TotalkwDashboardDto;
@@ -51,6 +52,7 @@ public class ChargingHistRepositoryCustomImpl implements ChargingHistRepositoryC
     QCompanyRelationInfo relation = QCompanyRelationInfo.companyRelationInfo;
     QCommonCode cpTypeName = new QCommonCode("cpType");
     QCommonCode memberTypeName = new QCommonCode("bizType");
+    QPgDispayment pgDispayment = QPgDispayment.pgDispayment;
 
     @Override
     public Page<ChargingHistDto> findAllChargingHist(Pageable pageable, String levelPath, boolean isSuperAdmin) {
@@ -82,7 +84,9 @@ public class ChargingHistRepositoryCustomImpl implements ChargingHistRepositoryC
                 hist.cancelAmount.as("cancelCost"),
                 hist.realAmount.as("realCost"),
                 hist.approvalNum.as("approvalNum"),
-                hist.paymentYn.as("paymentYn")))
+                hist.paymentYn.as("paymentYn"),
+                pgDispayment.resultMsg.as("paymentFailReason"),
+                hist.transactionId.as("transactionId")))
                 .from(hist)
                 .leftJoin(cpInfo).on(hist.chargerID.eq(cpInfo.id))
                 .leftJoin(csInfo).on(cpInfo.stationId.eq(csInfo))
@@ -92,6 +96,7 @@ public class ChargingHistRepositoryCustomImpl implements ChargingHistRepositoryC
                 .leftJoin(cpTypeName).on(model.cpType.eq(cpTypeName.commonCode))
                 .leftJoin(member).on(hist.idTag.eq(member.idTag))
                 .leftJoin(memberTypeName).on(member.bizType.eq(memberTypeName.commonCode))
+                .leftJoin(pgDispayment).on(hist.transactionId.eq(pgDispayment.transactionId))
                 .where(builder)
                 .orderBy(hist.startTime.desc())
                 .offset(pageable.getOffset())
@@ -113,6 +118,7 @@ public class ChargingHistRepositoryCustomImpl implements ChargingHistRepositoryC
                 .leftJoin(cpTypeName).on(model.cpType.eq(cpTypeName.commonCode))
                 .leftJoin(member).on(hist.idTag.eq(member.idTag))
                 .leftJoin(memberTypeName).on(member.bizType.eq(memberTypeName.commonCode))
+                .leftJoin(pgDispayment).on(hist.transactionId.eq(pgDispayment.transactionId))
                 .where(builder)
                 .fetchOne();
 
@@ -206,7 +212,9 @@ public class ChargingHistRepositoryCustomImpl implements ChargingHistRepositoryC
                 hist.cancelAmount.as("cancelCost"),
                 hist.realAmount.as("realCost"),
                 hist.approvalNum.as("approvalNum"),
-                hist.paymentYn.as("paymentYn")))
+                hist.paymentYn.as("paymentYn"),
+                pgDispayment.resultMsg.as("paymentFailReason"),
+                hist.transactionId.as("transactionId")))
                 .from(hist)
                 .leftJoin(cpInfo).on(hist.chargerID.eq(cpInfo.id))
                 .leftJoin(csInfo).on(cpInfo.stationId.eq(csInfo))
@@ -216,6 +224,7 @@ public class ChargingHistRepositoryCustomImpl implements ChargingHistRepositoryC
                 .leftJoin(cpTypeName).on(model.cpType.eq(cpTypeName.commonCode))
                 .leftJoin(member).on(hist.idTag.eq(member.idTag))
                 .leftJoin(memberTypeName).on(member.bizType.eq(memberTypeName.commonCode))
+                .leftJoin(pgDispayment).on(hist.transactionId.eq(pgDispayment.transactionId))
                 .where(builder)
                 .orderBy(hist.startTime.desc())
                 .offset(pageable.getOffset())
@@ -237,6 +246,7 @@ public class ChargingHistRepositoryCustomImpl implements ChargingHistRepositoryC
                 .leftJoin(cpTypeName).on(model.cpType.eq(cpTypeName.commonCode))
                 .leftJoin(member).on(hist.idTag.eq(member.idTag))
                 .leftJoin(memberTypeName).on(member.bizType.eq(memberTypeName.commonCode))
+                .leftJoin(pgDispayment).on(hist.transactionId.eq(pgDispayment.transactionId))
                 .where(builder)
                 .fetchOne();
 
