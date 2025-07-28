@@ -15,11 +15,11 @@ import zgoo.cpos.dto.statistics.PurchaseSalesDto.PurchaseSalesLineChartBaseDto;
 public interface PurchaseRepositoryCustom {
 
     // 매입 전체 조회(페이징)
-    Page<PurchaseListDto> findPurchaseWithPagination(Pageable pageable);
+    Page<PurchaseListDto> findPurchaseWithPagination(Pageable pageable, String levelPath, boolean isSuperAdmin);
 
     // 매입 검색 조회
     Page<PurchaseListDto> searchPurchaseWithPagination(String searchOp, String searchContent, LocalDate startDate,
-        LocalDate endDate, Pageable pageable);
+            LocalDate endDate, Pageable pageable, String levelPath, boolean isSuperAdmin);
 
     // 매입 삭제
     Long deletePurchaseOne(Long id);
@@ -27,22 +27,25 @@ public interface PurchaseRepositoryCustom {
     // 매입 전체 조회(리스트)
     List<PurchaseListDto> findAllPurchaseWithoutPagination(String searchOp, String searchContent,
             LocalDate startDate, LocalDate endDate);
-    
+
     // 매입 단건 조회
     PurchaseRegDto findPurchaseOne(Long id);
 
     // 계정과목 정보 조회
     PurchaseAccountDto searchAccountLand(String stationId);
+
     PurchaseAccountDto searchAccountLandTypeRate(String stationId);
+
     PurchaseAccountDto searchAccountSafety(String stationId);
 
     // 매입 상세 조회
     PurchaseDetailDto findPurchaseDetailOne(Long id);
 
     // 연도별 매입 합계
-    Integer findTotalAmountByYear(Long companyId, String searchOp, String searchContent, Integer year);
+    Integer findTotalAmountByYear(Long companyId, String searchOp, String searchContent, Integer year, String levelPath,
+            boolean isSuperAdmin);
 
     // 월별 매입 합계
     List<PurchaseSalesLineChartBaseDto> searchMonthlyTotalAmount(Long companyId, String searchOp, String searchContent,
-        Integer year);
+            Integer year, String levelPath, boolean isSuperAdmin);
 }

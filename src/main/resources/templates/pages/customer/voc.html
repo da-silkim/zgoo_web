@@ -15,33 +15,38 @@
                         <!-- row:1 start -->
                         <div class="row mb-3 row-cols-2 row-cols-lg-3 g-2">
                             <div class="col d-flex align-items-center">
-                                <label for="typeSearch" class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">문의유형</label>
+                                <label for="typeSearch"
+                                    class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">문의유형</label>
                                 <select id="typeSearch" name="typeSearch" class="mx-3 form-control">
                                     <option th:value="null">선택</option>
                                     <option th:each="data : ${vocTypeList}" th:value="${data.commonCode}"
-                                                th:text="${data.commonCodeName}"
-                                                th:selected="${data.commonCode == selectedType}"></option>
+                                        th:text="${data.commonCodeName}"
+                                        th:selected="${data.commonCode == selectedType}"></option>
                                 </select>
                             </div>
                             <div class="col d-flex align-items-center">
-                                <label for="replyStatSearch" class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">조치상태</label>
+                                <label for="replyStatSearch"
+                                    class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">조치상태</label>
                                 <select id="replyStatSearch" name="replyStatSearch" class="mx-3 form-control">
                                     <option th:value="null">선택</option>
                                     <option th:each="data : ${vocStatList}" th:value="${data.commonCode}"
-                                                th:text="${data.commonCodeName}"
-                                                th:selected="${data.commonCode == selectedReplyStat}"></option>
+                                        th:text="${data.commonCodeName}"
+                                        th:selected="${data.commonCode == selectedReplyStat}"></option>
                                 </select>
                             </div>
                             <div class="col d-flex align-items-center">
-                                <label for="nameSearch" class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">고객명</label>
+                                <label for="nameSearch"
+                                    class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">고객명</label>
                                 <input type="text" name="nameSearch" id="nameSearch" class="mx-3 form-control"
                                     placeholder="고객명을 입력해주세요." th:value="${selectedName}" autocomplete="off">
                             </div>
                         </div>
                         <div class="search-btn">
-                            <button type="button" class="btn btn-outline-grey me-2" id="searchBtn" onclick="searchOption()">
+                            <button type="button" class="btn btn-outline-grey me-2" id="searchBtn"
+                                onclick="searchOption()">
                                 <i class="bi bi-search me-2"></i>검색</button>
-                            <button type="button" class="btn btn-outline-grey me-2" id="resetBtn" onclick="replacePage('/voc')">
+                            <button type="button" class="btn btn-outline-grey me-2" id="resetBtn"
+                                onclick="replacePage('/voc')">
                                 <i class="bi bi-arrow-repeat me-2"></i>초기화</button>
                         </div>
                         <!-- row:1 end -->
@@ -59,16 +64,18 @@
                         <span class="card-title-bar"></span><span>1:1문의 리스트</span>
                     </div>
                     <div class="mt-3 btn-page-area">
-                        <button class="btn btn-data-add" id="addBtn" data-bs-toggle="modal" data-bs-target="#dataAddModal"
+                        <button class="btn btn-data-add" id="addBtn" data-bs-toggle="modal"
+                            data-bs-target="#dataAddModal"
                             th:if="${menuAuthority.authority == 'SU' or menuAuthority.modYn == 'Y'}">
                             <i class="bi bi-plus-square"></i>등록</button>
                         <span>
                             <span id="pageInfo">
-                                <span th:text="'Page ' + (${currentPage + 1}) + ' of ' + ${totalPages} + ' [총 ' + ${totalCount} + '건]'"></span>
+                                <span
+                                    th:text="'Page ' + (${currentPage + 1}) + ' of ' + ${totalPages} + ' [총 ' + ${totalCount} + '건]'"></span>
                             </span>
                             <select class="mx-3 page-select" id="size" name="size">
                                 <option th:each="data : ${showListCnt}" th:value="${data.commonCode}"
-                                        th:text="${data.commonCodeName}" th:selected="${data.commonCode == size}"></option>
+                                    th:text="${data.commonCodeName}" th:selected="${data.commonCode == size}"></option>
                             </select>
                         </span>
                     </div>
@@ -82,8 +89,10 @@
                                     <th scope="col" class="w-10">고객명</th>
                                     <th scope="col" class="w-12">전화번호</th>
                                     <th scope="col" class="w-8">조치상태</th>
-                                    <th scope="col" class="w-12">문의일시</th>
-                                    <th scope="col" class="w-12">답변일시</th>
+                                    <th scope="col" class="w-12">게시일자</th>
+                                    <th scope="col" class="w-12">게시자</th>
+                                    <th scope="col" class="w-12">답변일자</th>
+                                    <th scope="col" class="w-12">답변자</th>
                                 </tr>
                             </thead>
                             <tbody id="pageList">
@@ -95,7 +104,9 @@
                                     <td th:text="${voc.phoneNo}"></td>
                                     <td th:text="${voc.replyStatName}"></td>
                                     <td th:text="${#temporals.format(voc.regDt,'yyyy-MM-dd HH:mm:ss')}"></td>
+                                    <td th:text="${voc.regUserId}"></td>
                                     <td th:text="${#temporals.format(voc.replyDt,'yyyy-MM-dd HH:mm:ss')}"></td>
+                                    <td th:text="${voc.replyUserId}"></td>
                                 </tr>
                                 <tr th:if="${vocList.size() == 0}">
                                     <td colspan="8">조회된 데이터가 없습니다.</td>
@@ -119,8 +130,8 @@
                             <li class="page-item" th:each="i : ${#numbers.sequence(currentPage - 2, currentPage + 2)}"
                                 th:if="${i >= 0 && i < totalPages}">
                                 <a class="page-link" th:href="@{/voc(page=${i}, size=${size}, typeSearch=${selectedType},
-                                replyStatSearch=${selectedReplyStat}, nameSearch=${selectedName})}"
-                                    th:text="${i+1}" th:classappend="${i == currentPage} ? 'active' : ''"></a>
+                                replyStatSearch=${selectedReplyStat}, nameSearch=${selectedName})}" th:text="${i+1}"
+                                    th:classappend="${i == currentPage} ? 'active' : ''"></a>
                             </li>
                             <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled' : ''">
                                 <a class="page-link" th:href="@{/voc(page=${currentPage+1}, size=${size}, typeSearch=${selectedType},
@@ -145,7 +156,8 @@
     <!-- card:1 end -->
 
     <!-- Add Modal start -->
-    <div class="modal fade" id="dataAddModal" tabindex="-1" aria-labelledby="dataAddModalLabel" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal fade" id="dataAddModal" tabindex="-1" aria-labelledby="dataAddModalLabel"
+        data-bs-backdrop="static" data-bs-keyboard="false">
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width: 60vw; height: 90vh;">
             <div class="modal-content mh-100 overflow-y-auto scrollbar">
                 <form id="vocForm">
@@ -163,23 +175,26 @@
                                 <tr class="table-border-top">
                                     <th class="w-20">문의번호</th>
                                     <td class="w-30">
-                                        <input type="text" name="vocId" id="vocId" class="form-control" autocomplete="off" disabled>
+                                        <input type="text" name="vocId" id="vocId" class="form-control"
+                                            autocomplete="off" disabled>
                                     </td>
                                     <th class="w-20">문의경로</th>
                                     <td class="w-30">
-                                        <input type="text" name="channelName" id="channelName"  class="form-control"
+                                        <input type="text" name="channelName" id="channelName" class="form-control"
                                             value="전화" autocomplete="off" disabled>
                                     </td>
                                 </tr>
                                 <tr>
                                     <th class="w-20">문의자</th>
                                     <td class="w-30">
-                                        <input type="text" name="name" id="name" class="form-control" autocomplete="off" disabled>
+                                        <input type="text" name="name" id="name" class="form-control" autocomplete="off"
+                                            disabled>
                                         <input type="text" name="memberId" id="memberId" hidden>
                                     </td>
                                     <th class="w-20">문의자 전화번호</th>
                                     <td class="w-30">
-                                        <input type="text" name="phoneNo" id="phoneNo" class="form-control" autocomplete="off" disabled>
+                                        <input type="text" name="phoneNo" id="phoneNo" class="form-control"
+                                            autocomplete="off" disabled>
                                     </td>
                                 </tr>
                                 <tr>
@@ -187,18 +202,20 @@
                                     <td class="w-30">
                                         <select id="type" name="type" class="form-control" required>
                                             <option th:each="data : ${vocTypeList}" th:value="${data.commonCode}"
-                                                    th:text="${data.commonCodeName}" ></option>
+                                                th:text="${data.commonCodeName}"></option>
                                         </select>
                                     </td>
                                     <th class="w-20">문의일시</th>
                                     <td class="w-30">
-                                        <input type="text" name="regDt" id="regDt" class="form-control" autocomplete="off" disabled>
+                                        <input type="text" name="regDt" id="regDt" class="form-control"
+                                            autocomplete="off" disabled>
                                     </td>
                                 </tr>
                                 <tr>
                                     <th>문의제목<b class="required-data">*</b></th>
                                     <td colspan="3">
-                                        <input type="text" name="title" id="title" class="form-control" autocomplete="off" disabled required>
+                                        <input type="text" name="title" id="title" class="form-control"
+                                            autocomplete="off" disabled required>
                                     </td>
                                 </tr>
                                 <tr>
@@ -220,8 +237,8 @@
                                         <div class="small-font ">(최대 300자)</div>
                                     </th>
                                     <td colspan="3">
-                                        <textarea class="form-control resize-none" name="replyContent" id="replyContent" autocomplete="off"
-                                            rows="10" maxlength="300" required></textarea>
+                                        <textarea class="form-control resize-none" name="replyContent" id="replyContent"
+                                            autocomplete="off" rows="10" maxlength="300" required></textarea>
                                     </td>
                                 </tr>
                             </tbody>
@@ -230,11 +247,12 @@
                     </div>
                     <!-- modal body end -->
                     <div class="modal-footer justify-content-center border-top-none">
-                        <button type="button" id="modalCancelBtn" class="btn btn-outline-grey me-2" data-bs-dismiss="modal">취소</button>
+                        <button type="button" id="modalCancelBtn" class="btn btn-outline-grey me-2"
+                            data-bs-dismiss="modal">취소</button>
                         <button type="submit" id="modalBtn" class="btn btn-data-add"
                             th:if="${menuAuthority.authority == 'SU' or menuAuthority.modYn == 'Y'}">저장</button>
                     </div>
-                </form>              
+                </form>
             </div>
             <!-- modal content end -->
         </div>
@@ -243,8 +261,8 @@
     <!-- Add Modal end -->
 
     <!-- Member Search Modal start -->
-    <div class="modal fade" id="memSearchModal" tabindex="-1" aria-labelledby="memSearchModalLabel" style="z-index: 1056;"
-        data-bs-backdrop="static" data-bs-keyboard="false" role="dialog">
+    <div class="modal fade" id="memSearchModal" tabindex="-1" aria-labelledby="memSearchModalLabel"
+        style="z-index: 1056;" data-bs-backdrop="static" data-bs-keyboard="false" role="dialog">
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width: 60vw;">
             <div class="modal-content overflow-y-auto scrollbar mem-search-content min-76vh">
                 <div class="modal-body">
@@ -255,14 +273,16 @@
                     </div>
                     <div class="row mb-3 row-cols-2 row-cols-lg-2 g-2">
                         <div class="col d-flex align-items-center">
-                            <label for="memName" class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">회원명</label>
+                            <label for="memName"
+                                class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">회원명</label>
                             <input type="text" name="memName" id="memName" class="ms-3 form-control"
                                 placeholder="회원명을 입력해주세요." autocomplete="off">
                         </div>
                         <div class="col d-flex align-items-center">
-                            <label for="memPhone" class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">전화번호</label>
-                            <input type="text" name="memPhone" id="memPhone" class="ms-3 form-control" oninput="phoneFormat(this)"
-                                placeholder="전화번호를 입력해주세요." autocomplete="off">
+                            <label for="memPhone"
+                                class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">전화번호</label>
+                            <input type="text" name="memPhone" id="memPhone" class="ms-3 form-control"
+                                oninput="phoneFormat(this)" placeholder="전화번호를 입력해주세요." autocomplete="off">
                         </div>
                     </div>
                     <span class="font-sw-m">검색결과</span>
@@ -277,9 +297,11 @@
                                 </tr>
                             </thead>
                             <tbody id="memSearchList">
-                                <tr><td colspan="3">조회된 데이터가 없습니다.</td></tr>
+                                <tr>
+                                    <td colspan="3">조회된 데이터가 없습니다.</td>
+                                </tr>
                             </tbody>
-                        </table>                               
+                        </table>
                     </div>
                     <button type="button" class="btn btn-outline-grey close-modal-btn" id="memModalBtn"
                         data-bs-dismiss="modal">닫기</button>
@@ -290,4 +312,5 @@
     <!-- Member Search Modal end -->
     <script type="text/javascript" th:src="@{/js/customer/voc.js}"></script>
 </div>
+
 </html>

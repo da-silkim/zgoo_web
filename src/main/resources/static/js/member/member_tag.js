@@ -7,7 +7,7 @@ $(document).ready(function () {
 
     $('#pageList').on('click', 'tr', function () {
         selectRow = $(this);
-        idTag = selectRow.find('td').eq(4).text();
+        idTag = selectRow.find('td').eq(5).text();
     });
 
     $('#editBtn').on('click', function (event) {

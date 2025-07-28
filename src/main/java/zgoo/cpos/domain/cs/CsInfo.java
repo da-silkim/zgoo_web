@@ -7,9 +7,11 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,6 +22,11 @@ import zgoo.cpos.domain.company.Company;
 import zgoo.cpos.dto.cs.CsInfoDto.CsInfoRegDto;
 
 @Entity
+@Table(name = "CS_INFO", indexes = {
+        @Index(name = "idx_csinfo_company_id", columnList = "company_id"),
+        @Index(name = "idx_csinfo_sido", columnList = "sido"),
+        @Index(name = "idx_csinfo_location", columnList = "latitude,longitude")
+})
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @ToString
 @Getter
@@ -40,7 +47,7 @@ public class CsInfo {
     @Column(name = "facility_type")
     private String facilityType;
 
-    @Column(name = "asNum")
+    @Column(name = "as_num")
     private String asNum;
 
     @Column(name = "op_status")

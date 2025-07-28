@@ -21,8 +21,7 @@ import zgoo.cpos.type.ChargePointErrorCode;
 @Table(name = "ERROR_HIST", indexes = {
         @Index(name = "idx_error_hist_charger_id", columnList = "chargerId"),
         @Index(name = "idx_error_hist_err_code", columnList = "errCode"),
-        @Index(name = "idx_error_hist_occur_date", columnList = "occurDate"),
-        @Index(name = "idx_error_hist_composite", columnList = "chargerId, errCode, occurDate")
+        @Index(name = "idx_error_hist_occur_date", columnList = "occurDate")
 })
 @Getter
 @NoArgsConstructor

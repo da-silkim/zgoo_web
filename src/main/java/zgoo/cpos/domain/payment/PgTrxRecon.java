@@ -23,8 +23,7 @@ import lombok.ToString;
 @Entity
 @Table(name = "PG_TRX_RECON", indexes = {
         @Index(name = "IDX_PG_TRX_RECON_TID", columnList = "tid"),
-        @Index(name = "IDX_PG_TRX_RECON_OTID", columnList = "otid"),
-        @Index(name = "IDX_PG_TRX_RECON_MOID", columnList = "moid")
+        @Index(name = "IDX_PG_TRX_RECON_OTID", columnList = "otid")
 })
 @Getter
 @Setter

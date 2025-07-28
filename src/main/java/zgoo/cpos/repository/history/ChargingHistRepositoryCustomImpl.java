@@ -384,15 +384,15 @@ public class ChargingHistRepositoryCustomImpl implements ChargingHistRepositoryC
         builder.and(hist.startTime.between(startOfYear, endOfYear));
 
         TotalkwBaseDto dto = queryFactory.select(Projections.fields(TotalkwBaseDto.class,
-                Expressions.stringTemplate("MAX(CASE WHEN {0} = 'SPEEDFAST' THEN {0} END)", model.cpType)
+                Expressions.stringTemplate("MAX(CASE WHEN {0} = 'SPEEDLOW' THEN {0} END)", model.cpType)
                         .as("speedLow"),
                 Expressions.numberTemplate(BigDecimal.class,
-                        "SUM(CASE WHEN {0} = 'SPEEDFAST' THEN {1} ELSE 0 END)", model.cpType, hist.chargeAmount)
+                        "SUM(CASE WHEN {0} = 'SPEEDLOW' THEN {1} ELSE 0 END)", model.cpType, hist.chargeAmount)
                         .as("lowChgAmount"),
-                Expressions.stringTemplate("MAX(CASE WHEN {0} = 'SPEEDLOW' THEN {0} END)", model.cpType)
+                Expressions.stringTemplate("MAX(CASE WHEN {0} = 'SPEEDFAST' THEN {0} END)", model.cpType)
                         .as("speedFast"),
                 Expressions.numberTemplate(BigDecimal.class,
-                        "SUM(CASE WHEN {0} = 'SPEEDLOW' THEN {1} ELSE 0 END)", model.cpType, hist.chargeAmount)
+                        "SUM(CASE WHEN {0} = 'SPEEDFAST' THEN {1} ELSE 0 END)", model.cpType, hist.chargeAmount)
                         .as("fastChgAmount"),
                 Expressions.stringTemplate("MAX(CASE WHEN {0} = 'SPEEDDESPN' THEN {0} END)", model.cpType)
                         .as("speedDespn"),

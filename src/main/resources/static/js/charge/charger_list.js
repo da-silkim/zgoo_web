@@ -519,7 +519,7 @@ document.addEventListener("DOMContentLoaded", function () {
         $('#modalBtn').text(btnMsg);
 
         if (selectedRow) {
-            const selectedChargerId = selectedRow.cells[5].innerText;
+            const selectedChargerId = selectedRow.cells[6].innerText;
             console.log("[EDIT] selected ID : ", selectedChargerId);
 
             // 선택된 충전기 정보 가져오기
@@ -710,7 +710,7 @@ document.addEventListener("DOMContentLoaded", function () {
      */
     document.getElementById("deleteBtn").addEventListener("click", function () {
         if (selectedRow) {
-            const selectedChargerId = selectedRow.cells[5].innerText;
+            const selectedChargerId = selectedRow.cells[6].innerText;
             console.log("[DELETE] selected ID : ", selectedChargerId);
 
 

@@ -3,13 +3,13 @@ package zgoo.cpos.domain.code;
 import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.MapsId;
+import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,6 +19,9 @@ import lombok.ToString;
 import zgoo.cpos.dto.code.CodeDto.CommCodeDto;
 
 @Entity
+@Table(name = "COMMON_CODE", indexes = {
+        @Index(name = "idx_common_code_grp", columnList = "grp_code")
+})
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @ToString
 @Getter

@@ -33,7 +33,7 @@ public class CsKepcoContractInfo {
     @Column(name = "kepco_cust_no")
     private String KepcoCustNo;
 
-    @Column(name = "openingDate")
+    @Column(name = "opening_date")
     private LocalDate openingDate;
 
     @Column(name = "cont_power")

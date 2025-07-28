@@ -15,28 +15,34 @@
                         <!-- row:1 start -->
                         <div class="row mb-3 row-cols-2 row-cols-lg-3 g-2">
                             <div class="col d-flex align-items-center">
-                                <label for="opSearch" class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">검색조건</label>
+                                <label for="opSearch"
+                                    class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">검색조건</label>
                                 <select id="opSearch" name="opSearch" class="ms-3 form-control w-40">
                                     <option th:value="null" th:selected="${selectedOpSearch == null}">선택</option>
-                                    <option th:value="'bizName'" th:text="거래처명" th:selected="${selectedOpSearch == 'bizName'}"></option>
-                                    <option th:value="'approvalNo'" th:text="승인번호" th:selected="${selectedOpSearch == 'approvalNo'}"></option>
+                                    <option th:value="'bizName'" th:text="거래처명"
+                                        th:selected="${selectedOpSearch == 'bizName'}"></option>
+                                    <option th:value="'approvalNo'" th:text="승인번호"
+                                        th:selected="${selectedOpSearch == 'approvalNo'}"></option>
                                 </select>
                                 <input type="text" name="contentSearch" id="contentSearch" class="mx-2 form-control"
                                     th:value="${selectedContentSearch}" autocomplete="off">
                             </div>
                             <div class="col d-flex align-items-center">
-                                <span class="flex-shrink-0 col-form-label font-weight-bold mr-3p text-right w-25">매입일자</span>
-                                <input type="date" min="1970-01-01" max="2199-12-31" th:value="${selectedStartDate}" name="startDate"
-                                        id="startDate" class="mx-3 form-control">
+                                <span
+                                    class="flex-shrink-0 col-form-label font-weight-bold mr-3p text-right w-25">매입일자</span>
+                                <input type="date" min="1970-01-01" max="2199-12-31" th:value="${selectedStartDate}"
+                                    name="startDate" id="startDate" class="mx-3 form-control">
                                 <span class="flex-shrink-0 col-form-label font-weight-bold">~</span>
-                                <input type="date" min="1970-01-01" max="2199-12-31" th:value="${selectedEndDate}" name="endDate"
-                                        id="endDate" class="mx-3 form-control">
+                                <input type="date" min="1970-01-01" max="2199-12-31" th:value="${selectedEndDate}"
+                                    name="endDate" id="endDate" class="mx-3 form-control">
                             </div>
                         </div>
                         <div class="search-btn">
-                            <button type="button" class="btn btn-outline-grey me-2" id="searchBtn" onclick="searchOption()">
+                            <button type="button" class="btn btn-outline-grey me-2" id="searchBtn"
+                                onclick="searchOption()">
                                 <i class="bi bi-search me-2"></i>검색</button>
-                            <button type="button" class="btn btn-outline-grey me-2" id="resetBtn" onclick="replacePage('/calc/purchase')">
+                            <button type="button" class="btn btn-outline-grey me-2" id="resetBtn"
+                                onclick="replacePage('/calc/purchase')">
                                 <i class="bi bi-arrow-repeat me-2"></i>초기화</button>
                         </div>
                         <!-- row:1 end -->
@@ -56,23 +62,28 @@
                             onclick="excelDownload('/excel/download/purchase', ['opSearch', 'contentSearch', 'startDate', 'endDate'])"
                             th:if="${menuAuthority.authority == 'SU' or menuAuthority.excelYn == 'Y'}">
                             <i class="bi bi-file-earmark-spreadsheet"></i>엑셀다운로드</button>
-                        <div class="btn-mod display-inline-block" th:if="${menuAuthority.authority == 'SU' or menuAuthority.modYn == 'Y'}">
-                            <button class="btn btn-elec" id="elecBtn" data-bs-toggle="modal" data-bs-target="#elecModal">
+                        <div class="btn-mod display-inline-block"
+                            th:if="${menuAuthority.authority == 'SU' or menuAuthority.modYn == 'Y'}">
+                            <button class="btn btn-elec" id="elecBtn" data-bs-toggle="modal"
+                                data-bs-target="#elecModal">
                                 <i class="bi bi bi-file-earmark-arrow-up"></i>한전파일 업로드</button>
-                            <button class="btn btn-data-add" id="addBtn" data-bs-toggle="modal" data-bs-target="#dataAddModal">
+                            <button class="btn btn-data-add" id="addBtn" data-bs-toggle="modal"
+                                data-bs-target="#dataAddModal">
                                 <i class="bi bi-plus-square"></i>등록</button>
-                            <button class="btn btn-data-edit" id="editBtn" data-bs-toggle="modal" data-bs-target="#dataAddModal" hidden>
+                            <button class="btn btn-data-edit" id="editBtn" data-bs-toggle="modal"
+                                data-bs-target="#dataAddModal" hidden>
                                 <i class="fa-regular fa-pen-to-square"></i>수정</button>
                             <button class="btn btn-data-delete" id="deleteBtn" hidden>
                                 <i class="bi bi-trash"></i>삭제</button>
                         </div>
                         <span>
                             <span id="pageInfo">
-                                <span th:text="'Page ' + (${currentPage + 1}) + ' of ' + ${totalPages} + ' [총 ' + ${totalCount} + '건]'"></span>
+                                <span
+                                    th:text="'Page ' + (${currentPage + 1}) + ' of ' + ${totalPages} + ' [총 ' + ${totalCount} + '건]'"></span>
                             </span>
                             <select class="mx-3 page-select" id="size" name="size">
                                 <option th:each="data : ${showListCnt}" th:value="${data.commonCode}"
-                                        th:text="${data.commonCodeName}" th:selected="${data.commonCode == size}"></option>
+                                    th:text="${data.commonCodeName}" th:selected="${data.commonCode == size}"></option>
                             </select>
                         </span>
                     </div>
@@ -82,6 +93,7 @@
                                 <tr class="table-border-top">
                                     <th scope="col"></th>
                                     <th scope="col"></th>
+                                    <th scope="col">사업자</th>
                                     <th scope="col">충전소명</th>
                                     <th scope="col">거래처명</th>
                                     <th scope="col">계정과목</th>
@@ -106,6 +118,7 @@
                                             <i class="bi bi-files detail-files"></i>
                                         </a>
                                     </td>
+                                    <td th:text="${pur.companyName}"></td>
                                     <td th:text="${pur.stationName}"></td>
                                     <td th:text="${pur.bizName}"></td>
                                     <td th:text="${pur.accountCodeName}"></td>
@@ -120,36 +133,41 @@
                                     <td colspan="10">조회된 데이터가 없습니다.</td>
                                 </tr>
                             </tbody>
-                        </table>                                
+                        </table>
                     </div>
                     <!-- paging navigation start -->
                     <div th:if="${purList.size() > 0}">
                         <ul class="pagination justify-content-center">
                             <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled' : ''">
-                                <a class="page-link" th:href="@{/calc/purchase(page=0, size=${size}, opSearch=${selectedOpSearch},
+                                <a class="page-link"
+                                    th:href="@{/calc/purchase(page=0, size=${size}, opSearch=${selectedOpSearch},
                                 contentSearch=${selectedContentSearch}, startDate=${selectedStartDate}, endDate=${selectedEndDate})}">
-                                <i class="bi bi-chevron-double-left"></i></a>
+                                    <i class="bi bi-chevron-double-left"></i></a>
                             </li>
                             <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled' : ''">
-                                <a class="page-link" th:href="@{/calc/purchase(page=${currentPage-1}, size=${size}, opSearch=${selectedOpSearch},
+                                <a class="page-link"
+                                    th:href="@{/calc/purchase(page=${currentPage-1}, size=${size}, opSearch=${selectedOpSearch},
                                 contentSearch=${selectedContentSearch}, startDate=${selectedStartDate}, endDate=${selectedEndDate})}">
-                                <i class="bi bi-chevron-left"></i></a>
+                                    <i class="bi bi-chevron-left"></i></a>
                             </li>
                             <li class="page-item" th:each="i : ${#numbers.sequence(currentPage - 2, currentPage + 2)}"
                                 th:if="${i >= 0 && i < totalPages}">
-                                <a class="page-link" th:href="@{/calc/purchase(page=${i}, size=${size}, opSearch=${selectedOpSearch},
+                                <a class="page-link"
+                                    th:href="@{/calc/purchase(page=${i}, size=${size}, opSearch=${selectedOpSearch},
                                 contentSearch=${selectedContentSearch}, startDate=${selectedStartDate}, endDate=${selectedEndDate})}"
-                                th:text="${i+1}" th:classappend="${i == currentPage} ? 'active' : ''"></a>
+                                    th:text="${i+1}" th:classappend="${i == currentPage} ? 'active' : ''"></a>
                             </li>
                             <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled' : ''">
-                                <a class="page-link" th:href="@{/calc/purchase(page=${currentPage+1}, size=${size}, opSearch=${selectedOpSearch},
+                                <a class="page-link"
+                                    th:href="@{/calc/purchase(page=${currentPage+1}, size=${size}, opSearch=${selectedOpSearch},
                                 contentSearch=${selectedContentSearch}, startDate=${selectedStartDate}, endDate=${selectedEndDate})}">
-                                <i class="bi bi-chevron-right"></i></a>
+                                    <i class="bi bi-chevron-right"></i></a>
                             </li>
                             <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled' : ''">
-                                <a class="page-link" th:href="@{/calc/purchase(page=${totalPages - 1}, size=${size}, opSearch=${selectedOpSearch},
+                                <a class="page-link"
+                                    th:href="@{/calc/purchase(page=${totalPages - 1}, size=${size}, opSearch=${selectedOpSearch},
                                 contentSearch=${selectedContentSearch}, startDate=${selectedStartDate}, endDate=${selectedEndDate})}">
-                                <i class="bi bi-chevron-double-right"></i></a>
+                                    <i class="bi bi-chevron-double-right"></i></a>
                             </li>
                         </ul>
                     </div>
@@ -185,22 +203,25 @@
                                     <td class="w-30">
                                         <select id="accountCode" class="form-control" required>
                                             <option th:each="data : ${accList}" th:value="${data.commonCode}"
-                                                    th:text="${data.commonCodeName}"></option>
+                                                th:text="${data.commonCodeName}"></option>
                                         </select>
                                     </td>
                                     <th class="w-20">품목명</th>
                                     <td class="w-30">
-                                        <input type="text" name="item" id="item" class="form-control" autocomplete="off">
+                                        <input type="text" name="item" id="item" class="form-control"
+                                            autocomplete="off">
                                     </td>
                                 </tr>
                                 <tr>
                                     <th class="w-20">거래처명<b class="required-data">*</b></th>
                                     <td class="w-30">
-                                        <input type="text" name="bizName" id="bizName" class="form-control" autocomplete="off" required>
+                                        <input type="text" name="bizName" id="bizName" class="form-control"
+                                            autocomplete="off" required>
                                     </td>
                                     <th class="w-20">사업자등록번호<b class="required-data">*</b></th>
                                     <td class="w-30">
-                                        <input type="text" name="bizNum" id="bizNum" class="form-control" oninput="addHyphenBizNo(this)" autocomplete="off" required>
+                                        <input type="text" name="bizNum" id="bizNum" class="form-control"
+                                            oninput="addHyphenBizNo(this)" autocomplete="off" required>
                                     </td>
                                 </tr>
                                 <tr>
@@ -208,15 +229,15 @@
                                     <td class="w-30">
                                         <div class="display-input-btn">
                                             <input type="text" name="stationId" id="stationId" class="form-control"
-                                                    autocomplete="off" disabled required>
+                                                autocomplete="off" disabled required>
                                             <button type="button" class="btn btn-outline-grey flex-btn m-0"
-                                                    id="stationSearchBtn">조회</button>
+                                                id="stationSearchBtn">조회</button>
                                         </div>
                                     </td>
                                     <th class="w-20">매입거래일자<b class="required-data">*</b></th>
                                     <td class="w-30">
-                                        <input type="date" min="1930-01-01" max="2199-12-31" name="purchaseDate" id="purchaseDate"
-                                            class="form-control" required>
+                                        <input type="date" min="1930-01-01" max="2199-12-31" name="purchaseDate"
+                                            id="purchaseDate" class="form-control" required>
                                     </td>
                                 </tr>
                                 <tr>
@@ -224,44 +245,49 @@
                                     <td class="w-30">
                                         <select id="paymentMethod" class="form-control" required>
                                             <option th:each="data : ${purchaseList}" th:value="${data.commonCode}"
-                                                    th:text="${data.commonCodeName}"></option>
+                                                th:text="${data.commonCodeName}"></option>
                                         </select>
                                     </td>
                                     <th class="w-20">승인번호</th>
                                     <td class="w-30">
-                                        <input type="text" name="approvalNo" id="approvalNo" class="form-control" autocomplete="off">
+                                        <input type="text" name="approvalNo" id="approvalNo" class="form-control"
+                                            autocomplete="off">
                                     </td>
                                 </tr>
                                 <tr>
                                     <th class="w-20">단가<b class="required-data">*</b></th>
                                     <td class="w-30">
-                                        <input type="number" name="unitPrice" id="unitPrice" class="form-control" value="0"
-                                            autocomplete="off" required>
+                                        <input type="number" name="unitPrice" id="unitPrice" class="form-control"
+                                            value="0" autocomplete="off" required>
                                     </td>
                                     <th class="w-20">수량<b class="required-data">*</b></th>
                                     <td class="w-30">
-                                        <input type="number" name="amount" id="amount" class="form-control" autocomplete="off" value="1" required>
+                                        <input type="number" name="amount" id="amount" class="form-control"
+                                            autocomplete="off" value="1" required>
                                     </td>
                                 </tr>
                                 <tr>
                                     <th class="w-20">공급가액<b class="required-data">*</b></th>
                                     <td class="w-30">
-                                        <input type="number" name="supplyPrice" id="supplyPrice" class="form-control" value="0"
-                                                autocomplete="off" required>
+                                        <input type="number" name="supplyPrice" id="supplyPrice" class="form-control"
+                                            value="0" autocomplete="off" required>
                                     </td>
                                     <th class="w-20">부가세<b class="required-data">*</b></th>
                                     <td class="w-30">
-                                        <input type="number" name="vat" id="vat" class="form-control" autocomplete="off" value="0" required>
+                                        <input type="number" name="vat" id="vat" class="form-control" autocomplete="off"
+                                            value="0" required>
                                     </td>
                                 </tr>
                                 <tr id="elecContainer" class="elec-content" hidden>
                                     <th class="w-20">부담금<b class="required-data">*</b></th>
                                     <td class="w-30">
-                                        <input type="number" name="charge" id="charge" class="form-control" autocomplete="off" value="0" required>
+                                        <input type="number" name="charge" id="charge" class="form-control"
+                                            autocomplete="off" value="0" required>
                                     </td>
                                     <th class="w-20">가산금<b class="required-data">*</b></th>
                                     <td class="w-30">
-                                        <input type="number" name="surcharge" id="surcharge" class="form-control" autocomplete="off" value="0" required>
+                                        <input type="number" name="surcharge" id="surcharge" class="form-control"
+                                            autocomplete="off" value="0" required>
                                     </td>
                                 </tr>
                                 <tr id="elecContainerSec" hidden>
@@ -287,8 +313,8 @@
                                 <tr id="totalContainerSec" hidden>
                                     <th class="w-20">합계액<b class="required-data">*</b></th>
                                     <td class="w-30">
-                                        <input type="number" name="totalAmountSub" id="totalAmountSub" class="form-control"
-                                            autocomplete="off" value="0" required>
+                                        <input type="number" name="totalAmountSub" id="totalAmountSub"
+                                            class="form-control" autocomplete="off" value="0" required>
                                     </td>
                                     <th class="w-20">사용량(kWh)<b class="required-data">*</b></th>
                                     <td class="w-30">
@@ -302,10 +328,11 @@
                     </div>
                     <!-- modal body end -->
                     <div class="modal-footer justify-content-center border-top-none">
-                        <button type="button" id="cancelBtn" class="btn btn-outline-grey me-2" data-bs-dismiss="modal">취소</button>
+                        <button type="button" id="cancelBtn" class="btn btn-outline-grey me-2"
+                            data-bs-dismiss="modal">취소</button>
                         <button type="button" id="modalBtn" class="btn btn-data-add">등록</button>
                     </div>
-                </form>              
+                </form>
             </div>
             <!-- modal content end -->
         </div>
@@ -356,21 +383,23 @@
     <!-- Station Search Modal end -->
 
     <!-- File Upload Modal start -->
-    <div class="modal fade" id="elecModal" tabindex="-1" aria-labelledby="elecModalLabel"
-        style="z-index: 1056;" data-bs-backdrop="static" data-bs-keyboard="false" role="dialog">
+    <div class="modal fade" id="elecModal" tabindex="-1" aria-labelledby="elecModalLabel" style="z-index: 1056;"
+        data-bs-backdrop="static" data-bs-keyboard="false" role="dialog">
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width: 60vw;">
             <div class="modal-content overflow-y-auto scrollbar elec-file-content min-76vh">
                 <div class="modal-body" style="padding-bottom: 4rem !important;">
                     <form id="elecForm">
                         <div class="modal-title mb-2"><span class="modal-title-bar"></span><span>한전전기요금</span></div>
                         <input type="file" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                                name="excelFile" id="excelFile" class="form-control w-50 mt-2" onchange="excelRead(event)">
-                        <div class="mt-3" style="display: flex; justify-content: space-between; align-items: end; margin-bottom: 0.4rem !important;">
+                            name="excelFile" id="excelFile" class="form-control w-50 mt-2" onchange="excelRead(event)">
+                        <div class="mt-3"
+                            style="display: flex; justify-content: space-between; align-items: end; margin-bottom: 0.4rem !important;">
                             <span class="font-sw-m">업로드 데이터</span>
                             <button type="button" class="btn btn-outline-grey" id="elecSaveBtn" disabled></i>저장</button>
                         </div>
                         <div class="w-100 table-responsive scroll-table-container">
-                            <table class="table table-bg table-hover text-center" id="elecTable" style="min-width: 1260px;">
+                            <table class="table table-bg table-hover text-center" id="elecTable"
+                                style="min-width: 1260px;">
                                 <thead>
                                     <tr>
                                         <th scope="col">고객번호</th>
@@ -449,7 +478,7 @@
             tbody.innerHTML = "";
 
             const requiredFields = [
-                "고객번호", "사용량(KWH)", "공급가액", "부가세", "부담금", 
+                "고객번호", "사용량(KWH)", "공급가액", "부가세", "부담금",
                 "가산금", "절사액", "미납금액", "청구요금", "납부방법"
             ];
 
@@ -470,7 +499,7 @@
                 td.textContent = "업로드된 데이터가 없습니다.";
                 tr.appendChild(td);
                 tbody.appendChild(tr);
-                
+
                 return;
             }
 
@@ -494,16 +523,17 @@
                 const tr = document.createElement('tr');
                 [kepCustNo, power, supplyPrice, vat, charge, surcharge, cutoffAmount, unpaidAmount,
                     totalAmount, paymentMethod].forEach(cellData => {
-                    const td = document.createElement('td');
-                    td.textContent = cellData;
-                    tr.appendChild(td);
-                });
+                        const td = document.createElement('td');
+                        td.textContent = cellData;
+                        tr.appendChild(td);
+                    });
 
                 tbody.appendChild(tr);
             });
-            
+
             $elecSaveBtn.prop('disabled', false);
         }
     </script>
 </div>
+
 </html>

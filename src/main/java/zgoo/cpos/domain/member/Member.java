@@ -8,6 +8,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -20,7 +21,11 @@ import lombok.ToString;
 import zgoo.cpos.domain.biz.BizInfo;
 import zgoo.cpos.dto.member.MemberDto.MemberRegDto;
 
-@Table(name = "MEMBER")
+@Table(name = "MEMBER", indexes = {
+        @Index(name = "idx_member_login_id", columnList = "mem_login_id"),
+        @Index(name = "idx_member_id_tag", columnList = "id_tag"),
+        @Index(name = "idx_member_biz_id", columnList = "biz_id")
+})
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @ToString

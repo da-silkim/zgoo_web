@@ -82,44 +82,48 @@
                         </select>
                     </div>
                     <div class="w-100 table-responsive">
-                        <table class="table text-center mt-3 table-bg table-hover">
-                            <thead>
-                                <tr class="table-border-top">
-                                    <th scope="col"></th>
-                                    <th scope="col"></th>
-                                    <th scope="col">사용자명</th>
-                                    <th scope="col">사용자ID</th>
-                                    <th scope="col">회원카드번호</th>
-                                    <th scope="col">휴대전화</th>
-                                    <th scope="col">이메일</th>
-                                    <th scope="col">개인/법인</th>
-                                    <th scope="col">가입일자</th>
-                                </tr>
-                            </thead>
-                            <tbody id="pageList">
-                                <tr th:each="member : ${memberList}">
-                                    <td th:id="${member.memberId}"><input type="checkbox" /></td>
-                                    <td>
-                                        <a th:href="@{/member/detail/{memberId}(memberId=${member.memberId}, page=${currentPage}, size=${size},
-                                            idTagSearch=${selectedIdTag != null ? selectedIdTag : ''}, 
-                                            nameSearch=${selectedName != null ? selectedName : ''})}"
-                                            class="no-underline">
-                                            <i class="bi bi-files detail-files"></i>
-                                        </a>
-                                    </td>
-                                    <td th:text="${member.name}"></td>
-                                    <td th:text="${member.memLoginId}"></td>
-                                    <td th:text="${member.idTag}"></td>
-                                    <td th:text="${member.phoneNo}"></td>
-                                    <td th:text="${member.email}"></td>
-                                    <td th:text="${member.bizTypeName}"></td>
-                                    <td th:text="${#temporals.format(member.joinedDt, 'yyyy-MM-dd HH:mm:ss')}"></td>
-                                </tr>
-                                <tr th:if="${memberList.size() == 0}">
-                                    <td colspan="9">조회된 데이터가 없습니다.</td>
-                                </tr>
-                            </tbody>
-                        </table>
+                        <div style="overflow-x: auto; white-space: nowrap;">
+                            <table class="table text-center mt-3 table-bg table-hover">
+                                <thead>
+                                    <tr class="table-border-top">
+                                        <th scope="col"></th>
+                                        <th scope="col"></th>
+                                        <th scope="col">No</th>
+                                        <th scope="col">사용자명</th>
+                                        <th scope="col">사용자ID</th>
+                                        <th scope="col">회원카드번호</th>
+                                        <th scope="col">휴대전화</th>
+                                        <th scope="col">이메일</th>
+                                        <th scope="col">개인/법인</th>
+                                        <th scope="col">가입일자</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="pageList">
+                                    <tr th:each="member, iterStat : ${memberList}">
+                                        <td th:id="${member.memberId}"><input type="checkbox" /></td>
+                                        <td>
+                                            <a th:href="@{/member/detail/{memberId}(memberId=${member.memberId}, page=${currentPage}, size=${size},
+                                                idTagSearch=${selectedIdTag != null ? selectedIdTag : ''}, 
+                                                nameSearch=${selectedName != null ? selectedName : ''})}"
+                                                class="no-underline">
+                                                <i class="bi bi-files detail-files"></i>
+                                            </a>
+                                        </td>
+                                        <td th:text="${startNumber + iterStat.count}"></td>
+                                        <td th:text="${member.name}"></td>
+                                        <td th:text="${member.memLoginId}"></td>
+                                        <td th:text="${member.idTag}"></td>
+                                        <td th:text="${member.phoneNo}"></td>
+                                        <td th:text="${member.email}"></td>
+                                        <td th:text="${member.bizTypeName}"></td>
+                                        <td th:text="${#temporals.format(member.joinedDt, 'yyyy-MM-dd HH:mm:ss')}"></td>
+                                    </tr>
+                                    <tr th:if="${memberList.size() == 0}">
+                                        <td colspan="10">조회된 데이터가 없습니다.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                     <!-- paging navigation start -->
                     <div th:if="${memberList.size() > 0}">

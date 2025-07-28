@@ -14,8 +14,7 @@
                     <form id="searchForm" class="statistics-form" th:action="@{/statistics/usage}" method="get">
                         <div class="row">
                             <div class="col-12 search-table">
-                                <label for="companyIdSearch"
-                                    class="col-form-label">사업자<b>*</b></label>
+                                <label for="companyIdSearch" class="col-form-label">사업자<b>*</b></label>
                                 <select id="companyIdSearch" class="mx-3 form-control" name="companyIdSearch">
                                     <option th:value="*{null}" th:text="'선택'"></option>
                                     <option th:each="company : ${companyList}" th:value="${company.companyId}"
@@ -24,34 +23,32 @@
                                 </select>
                             </div>
                             <div class="col-12 search-table">
-                                <label for="opSearch"
-                                    class="col-form-label">검색조건<b>*</b></label>
+                                <label for="opSearch" class="col-form-label">검색조건<b>*</b></label>
                                 <select id="opSearch" class="ms-3 form-control" name="opSearch">
                                     <option th:value="*{null}" th:text="'선택'"></option>
-                                    <option th:value="'stationName'" th:text="충전소명" 
+                                    <option th:value="'stationName'" th:text="충전소명"
                                         th:selected="${selectedOpSearch == 'stationName'}"></option>
-                                    <option th:value="'stationId'" th:text="충전소ID" 
+                                    <option th:value="'stationId'" th:text="충전소ID"
                                         th:selected="${selectedOpSearch == 'stationId'}"></option>
-                                    <option th:value="'chargerId'" th:text="충전기ID" 
+                                    <option th:value="'chargerId'" th:text="충전기ID"
                                         th:selected="${selectedOpSearch == 'chargerId'}"></option>
                                 </select>
-                                <input type="text" id="contentSearch" name="contentSearch" class="form-control" 
+                                <input type="text" id="contentSearch" name="contentSearch" class="form-control"
                                     th:value="${selectedContentSearch}" autocomplete="off" />
                             </div>
                             <div class="col-12 search-table">
-                                <label for="yearSearch"
-                                    class="col-form-label">조회연도<b>*</b></label>
+                                <label for="yearSearch" class="col-form-label">조회연도<b>*</b></label>
                                 <select id="yearSearch" name="yearSearch" class="form-control mx-3">
                                     <option th:each="year : ${yearOption}" th:value="${year.value}"
-                                        th:text="${year.text}"
-                                        th:selected="${year.value == selectedYear}"></option>
+                                        th:text="${year.text}" th:selected="${year.value == selectedYear}"></option>
                                 </select>
                             </div>
                         </div>
                         <div>
                             <button type="submit" class="btn btn-outline-grey me-2" id="serachBtn">
                                 <i class="bi bi-search me-2"></i>검색</button>
-                            <button type="button" class="btn btn-outline-grey me-2" id="resetBtn" onclick="replacePage('/statistics/usage')">
+                            <button type="button" class="btn btn-outline-grey me-2" id="resetBtn"
+                                onclick="replacePage('/statistics/usage')">
                                 <i class="bi bi-arrow-repeat me-2"></i>초기화</button>
                         </div>
                     </form>
@@ -83,8 +80,8 @@
                             <tbody id="pageList">
                                 <tr>
                                     <th style="background-color: #f5f7f8;">전체 충전 횟수</th>
-                                    <td th:text="${usage.curYear.lowCount}"></td>
                                     <td th:text="${usage.curYear.fastCount}"></td>
+                                    <td th:text="${usage.curYear.lowCount}"></td>
                                     <td th:text="${usage.curYear.despnCount}"></td>
                                     <td th:text="${usage.curYear.totalUsage}"></td>
                                 </tr>
@@ -121,7 +118,7 @@
             { label: '완속', data: speedLowList, color: '#E58A10' },
             { label: '디스펜서', data: speedDespnList, color: '#EFEFEF' }
         ];
-        
+
         const lineDatasets = lineChartConfig.map(item => ({
             label: item.label,
             data: item.data,
@@ -129,7 +126,7 @@
             backgroundColor: [item.color],
             fill: false
         }));
-        
+
         const lineData = {
             labels: [...Array(12).keys()].map(i => `${i + 1}월`),
             datasets: lineDatasets
@@ -172,8 +169,8 @@
 
         // bar Chart
         const barCharConfig = [
-            { label: '급속', data: [usage.preYear.lowCount, usage.curYear.lowCount], color: '#379C6D' },
-            { label: '완속', data: [usage.preYear.fastCount, usage.curYear.fastCount], color: '#E58A10' },
+            { label: '급속', data: [usage.preYear.fastCount, usage.curYear.fastCount], color: '#379C6D' },
+            { label: '완속', data: [usage.preYear.lowCount, usage.curYear.lowCount], color: '#E58A10' },
             { label: '디스펜서', data: [usage.preYear.despnCount, usage.curYear.despnCount], color: '#EFEFEF' }
         ];
 
@@ -219,4 +216,5 @@
         });
     </script>
 </div>
+
 </html>

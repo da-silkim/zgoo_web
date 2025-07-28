@@ -1366,8 +1366,8 @@ table.table tbody tr.row-selected {
 
 .table-responsive table th:nth-child(3),
 .table-responsive table td:nth-child(3) {
-  max-width: 300px;
-  width: 300px;
+  max-width: 150px;
+  width: 150px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -1375,11 +1375,31 @@ table.table tbody tr.row-selected {
 
 .table-responsive table th:nth-child(5),
 .table-responsive table td:nth-child(5) {
-  max-width: 300px;
-  width: 300px;
+  max-width: 150px;
+  width: 150px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* 요금제 테이블 균등 배치 */
+.table-responsive table.tariff-table th,
+.table-responsive table.tariff-table td {
+  width: 20% !important;
+  max-width: none !important;
+  text-align: center !important;
+}
+
+/* 요금제 테이블에서 첫 번째 컬럼(시간)은 조금 더 좁게 */
+.table-responsive table.tariff-table th:first-child,
+.table-responsive table.tariff-table td:first-child {
+  width: 10% !important;
+}
+
+/* 요금제 테이블에서 나머지 컬럼들은 균등하게 */
+.table-responsive table.tariff-table th:not(:first-child),
+.table-responsive table.tariff-table td:not(:first-child) {
+  width: 18.75% !important;
 }
 
 .privacy-container {

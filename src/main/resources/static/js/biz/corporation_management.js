@@ -588,214 +588,214 @@ $(document).ready(function () {
         return cardNum1 + cardNum2 + cardNum3 + cardNum4;
     }
 
-    //=================== 결제 테스트 Code =====================
-    $('#testPaymentBtn').on('click', function () {
-        console.log('결제 테스트');
+    // //=================== 결제 테스트 Code =====================
+    // $('#testPaymentBtn').on('click', function () {
+    //     console.log('결제 테스트');
 
-        const testPaymentData = {
-            amount: 1004,
-            orderId: '1234'
-        };
+    //     const testPaymentData = {
+    //         amount: 1004,
+    //         orderId: '1234'
+    //     };
 
-        //로딩표시
-        const $btn = $(this);
-        const originalText = $btn.text();
-        $btn.prop('disabled', true).text('결제 처리중...');
+    //     //로딩표시
+    //     const $btn = $(this);
+    //     const originalText = $btn.text();
+    //     $btn.prop('disabled', true).text('결제 처리중...');
 
-        //내부컨트롤러로 요청
-        $.ajax({
-            url: '/corp/payment/test',  // 내부 컨트롤러 엔드포인트
-            method: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify(testPaymentData),
-            success: function (response) {
-                console.log('결제 테스트 성공:', response);
-                $('#otid').val(response.TID);
-                alert('결제 테스트가 성공했습니다.\n' + JSON.stringify(response, null, 2));
-            },
-            error: function (xhr, status, error) {
-                console.error('결제 테스트 실패:', xhr.status, error);
-                let errorMessage = '결제 테스트가 실패했습니다.';
+    //     //내부컨트롤러로 요청
+    //     $.ajax({
+    //         url: '/corp/payment/test',  // 내부 컨트롤러 엔드포인트
+    //         method: 'POST',
+    //         contentType: 'application/json',
+    //         data: JSON.stringify(testPaymentData),
+    //         success: function (response) {
+    //             console.log('결제 테스트 성공:', response);
+    //             $('#otid').val(response.TID);
+    //             alert('결제 테스트가 성공했습니다.\n' + JSON.stringify(response, null, 2));
+    //         },
+    //         error: function (xhr, status, error) {
+    //             console.error('결제 테스트 실패:', xhr.status, error);
+    //             let errorMessage = '결제 테스트가 실패했습니다.';
 
-                try {
-                    const errorResponse = JSON.parse(xhr.responseText);
-                    if (errorResponse && errorResponse.message) {
-                        errorMessage += '\n오류: ' + errorResponse.message;
-                    }
-                } catch (e) {
-                    errorMessage += '\n상태: ' + xhr.status + '\n오류: ' + error;
-                }
+    //             try {
+    //                 const errorResponse = JSON.parse(xhr.responseText);
+    //                 if (errorResponse && errorResponse.message) {
+    //                     errorMessage += '\n오류: ' + errorResponse.message;
+    //                 }
+    //             } catch (e) {
+    //                 errorMessage += '\n상태: ' + xhr.status + '\n오류: ' + error;
+    //             }
 
-                alert(errorMessage);
-            },
-            complete: function () {
-                // 버튼 상태 복원
-                $btn.prop('disabled', false).text(originalText);
-            }
-        });
-    });
+    //             alert(errorMessage);
+    //         },
+    //         complete: function () {
+    //             // 버튼 상태 복원
+    //             $btn.prop('disabled', false).text(originalText);
+    //         }
+    //     });
+    // });
 
-    $('#testCancelBtn').on('click', function () {
-        console.log('결제 취소');
+    // $('#testCancelBtn').on('click', function () {
+    //     console.log('결제 취소');
 
-        const testCancelData = {
-            amount: 1004,
-            orderId: '1234',
-            tid: $('#otid').val()
-        };
+    //     const testCancelData = {
+    //         amount: 1004,
+    //         orderId: '1234',
+    //         tid: $('#otid').val()
+    //     };
 
-        //로딩표시
-        const $btn = $(this);
-        const originalText = $btn.text();
-        $btn.prop('disabled', true).text('취소 처리중...');
+    //     //로딩표시
+    //     const $btn = $(this);
+    //     const originalText = $btn.text();
+    //     $btn.prop('disabled', true).text('취소 처리중...');
 
-        //내부 컨트롤러 요청
-        $.ajax({
-            url: '/corp/payment/test/cancel',
-            method: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify(testCancelData),
-            success: function (response) {
-                console.log('결제 취소 성공:', response);
-                alert('결제 취소가 성공했습니다.\n' + JSON.stringify(response, null, 2));
-            },
-            error: function (xhr, status, error) {
-                console.error('결제 취소 실패:', xhr.status, error);
-                let errorMessage = '결제 취소가 실패했습니다.';
+    //     //내부 컨트롤러 요청
+    //     $.ajax({
+    //         url: '/corp/payment/test/cancel',
+    //         method: 'POST',
+    //         contentType: 'application/json',
+    //         data: JSON.stringify(testCancelData),
+    //         success: function (response) {
+    //             console.log('결제 취소 성공:', response);
+    //             alert('결제 취소가 성공했습니다.\n' + JSON.stringify(response, null, 2));
+    //         },
+    //         error: function (xhr, status, error) {
+    //             console.error('결제 취소 실패:', xhr.status, error);
+    //             let errorMessage = '결제 취소가 실패했습니다.';
 
-                try {
-                    const errorResponse = JSON.parse(xhr.responseText);
-                    if (errorResponse && errorResponse.message) {
-                        errorMessage += '\n오류: ' + errorResponse.message;
-                    }
-                } catch (e) {
-                    errorMessage += '\n상태: ' + xhr.status + '\n오류: ' + error;
-                }
+    //             try {
+    //                 const errorResponse = JSON.parse(xhr.responseText);
+    //                 if (errorResponse && errorResponse.message) {
+    //                     errorMessage += '\n오류: ' + errorResponse.message;
+    //                 }
+    //             } catch (e) {
+    //                 errorMessage += '\n상태: ' + xhr.status + '\n오류: ' + error;
+    //             }
 
-                alert(errorMessage);
-            },
-            complete: function () {
-                //버튼 상태 복원
-                $btn.prop('disabled', false).text(originalText);
-            }
-        });
+    //             alert(errorMessage);
+    //         },
+    //         complete: function () {
+    //             //버튼 상태 복원
+    //             $btn.prop('disabled', false).text(originalText);
+    //         }
+    //     });
 
-    });
+    // });
 
-    $('#tidData').on('click', function () {
-        console.log('TID 조회');
+    // $('#tidData').on('click', function () {
+    //     console.log('TID 조회');
 
-        // 입력값 가져오기
-        const tid = $('#tid').val().trim();
-        const approvalDate = $('#approvalDate').val().trim();
+    //     // 입력값 가져오기
+    //     const tid = $('#tid').val().trim();
+    //     const approvalDate = $('#approvalDate').val().trim();
 
-        // 입력값 검증
-        if (!tid) {
-            alert('TID를 입력해주세요.');
-            $('#tid').focus();
-            return;
-        }
+    //     // 입력값 검증
+    //     if (!tid) {
+    //         alert('TID를 입력해주세요.');
+    //         $('#tid').focus();
+    //         return;
+    //     }
 
-        if (!approvalDate) {
-            alert('승인일자를 입력해주세요.');
-            $('#approvalDate').focus();
-            return;
-        }
+    //     if (!approvalDate) {
+    //         alert('승인일자를 입력해주세요.');
+    //         $('#approvalDate').focus();
+    //         return;
+    //     }
 
-        // 승인일자 형식 검증 (YYYYMMDD)
-        if (!/^\d{8}$/.test(approvalDate)) {
-            alert('승인일자는 YYYYMMDD 형식으로 입력해주세요. (예: 20250423)');
-            $('#approvalDate').focus();
-            return;
-        }
+    //     // 승인일자 형식 검증 (YYYYMMDD)
+    //     if (!/^\d{8}$/.test(approvalDate)) {
+    //         alert('승인일자는 YYYYMMDD 형식으로 입력해주세요. (예: 20250423)');
+    //         $('#approvalDate').focus();
+    //         return;
+    //     }
 
-        // POST 요청 데이터
-        const requestData = {
-            tid: tid,
-            approvalDate: approvalDate
-        };
+    //     // POST 요청 데이터
+    //     const requestData = {
+    //         tid: tid,
+    //         approvalDate: approvalDate
+    //     };
 
-        $.ajax({
-            url: '/corp/payment/tid',
-            method: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify(requestData),
-            success: function (response) {
-                console.log('TID 조회 성공:', response);
+    //     $.ajax({
+    //         url: '/corp/payment/tid',
+    //         method: 'POST',
+    //         contentType: 'application/json',
+    //         data: JSON.stringify(requestData),
+    //         success: function (response) {
+    //             console.log('TID 조회 성공:', response);
 
-                // 성공 시 결과 표시 (예시)
-                if (response) {
-                    // 결과를 화면에 표시하는 로직 추가
-                    showTidSearchResult(response);
-                } else {
-                    alert('조회된 결과가 없습니다.');
-                }
-            },
-            error: function (xhr, status, error) {
-                console.error('TID 조회 실패:', xhr.status, error);
-                alert('TID 조회에 실패했습니다.\n상태: ' + xhr.status + '\n오류: ' + error);
-            }
-        });
-    });
+    //             // 성공 시 결과 표시 (예시)
+    //             if (response) {
+    //                 // 결과를 화면에 표시하는 로직 추가
+    //                 showTidSearchResult(response);
+    //             } else {
+    //                 alert('조회된 결과가 없습니다.');
+    //             }
+    //         },
+    //         error: function (xhr, status, error) {
+    //             console.error('TID 조회 실패:', xhr.status, error);
+    //             alert('TID 조회에 실패했습니다.\n상태: ' + xhr.status + '\n오류: ' + error);
+    //         }
+    //     });
+    // });
 
-    // 결과 표시 함수 (필요에 따라 구현)
-    function showTidSearchResult(data) {
-        // 결과를 모달이나 테이블 등에 표시
-        // 예시:
-        let resultHtml = '<div class="alert alert-success mt-3">';
-        resultHtml += '<h5>조회 결과</h5>';
-        resultHtml += '<p>TID: ' + data.tid + '</p>';
-        resultHtml += '<p>승인금액: ' + (data.amount ? data.amount.toLocaleString() + '원' : '정보 없음') + '</p>';
-        resultHtml += '<p>승인일시: ' + (data.approvalDateTime || '정보 없음') + '</p>';
-        resultHtml += '<p>상태: ' + (data.status || '정보 없음') + '</p>';
-        resultHtml += '</div>';
+    // // 결과 표시 함수 (필요에 따라 구현)
+    // function showTidSearchResult(data) {
+    //     // 결과를 모달이나 테이블 등에 표시
+    //     // 예시:
+    //     let resultHtml = '<div class="alert alert-success mt-3">';
+    //     resultHtml += '<h5>조회 결과</h5>';
+    //     resultHtml += '<p>TID: ' + data.tid + '</p>';
+    //     resultHtml += '<p>승인금액: ' + (data.amount ? data.amount.toLocaleString() + '원' : '정보 없음') + '</p>';
+    //     resultHtml += '<p>승인일시: ' + (data.approvalDateTime || '정보 없음') + '</p>';
+    //     resultHtml += '<p>상태: ' + (data.status || '정보 없음') + '</p>';
+    //     resultHtml += '</div>';
 
-        // 결과 표시 영역이 있다면 해당 영역에 결과 추가
-        if ($('#tidSearchResult').length) {
-            $('#tidSearchResult').html(resultHtml);
-        } else {
-            // 결과 표시 영역이 없으면 생성
-            $('<div id="tidSearchResult"></div>').insertAfter($('#tidData').closest('.d-flex')).html(resultHtml);
-        }
-    }
+    //     // 결과 표시 영역이 있다면 해당 영역에 결과 추가
+    //     if ($('#tidSearchResult').length) {
+    //         $('#tidSearchResult').html(resultHtml);
+    //     } else {
+    //         // 결과 표시 영역이 없으면 생성
+    //         $('<div id="tidSearchResult"></div>').insertAfter($('#tidData').closest('.d-flex')).html(resultHtml);
+    //     }
+    // }
 
-    // 승인일자 입력 필드에 날짜 형식 자동 검증
-    $('#approvalDate').on('input', function () {
-        const value = $(this).val().replace(/[^0-9]/g, '');
-        $(this).val(value);
-    });
-
-
-    $('#tradeData').on('click', function () {
-        console.log('거래대사조회');
-
-        $.ajax({
-            url: '/corp/payment/trade/data',
-            method: 'GET',
-            success: function (response) {
-                console.log('거래대사조회 성공:', response);
-            },
-            error: function (xhr, status, error) {
-                console.error('거래대사조회 실패:', xhr.status, error);
-                alert('거래대사 조회에 실패했습니다.\n상태: ' + xhr.status + '\n오류: ' + error);
-            }
-        });
-    });
+    // // 승인일자 입력 필드에 날짜 형식 자동 검증
+    // $('#approvalDate').on('input', function () {
+    //     const value = $(this).val().replace(/[^0-9]/g, '');
+    //     $(this).val(value);
+    // });
 
 
-    $('#settlementData').on('click', function () {
-        console.log('정산대사조회');
+    // $('#tradeData').on('click', function () {
+    //     console.log('거래대사조회');
 
-        $.ajax({
-            url: '/corp/payment/settlement/data',
-            method: 'GET',
-            success: function (response) {
-                console.log('정산대사조회 성공:', response);
-            },
-            error: function (xhr, status, error) {
-                console.error('정산대사조회 실패:', xhr.status, error);
-                alert('정산대사 조회에 실패했습니다.\n상태: ' + xhr.status + '\n오류: ' + error);
-            }
-        });
-    });
+    //     $.ajax({
+    //         url: '/corp/payment/trade/data',
+    //         method: 'GET',
+    //         success: function (response) {
+    //             console.log('거래대사조회 성공:', response);
+    //         },
+    //         error: function (xhr, status, error) {
+    //             console.error('거래대사조회 실패:', xhr.status, error);
+    //             alert('거래대사 조회에 실패했습니다.\n상태: ' + xhr.status + '\n오류: ' + error);
+    //         }
+    //     });
+    // });
+
+
+    // $('#settlementData').on('click', function () {
+    //     console.log('정산대사조회');
+
+    //     $.ajax({
+    //         url: '/corp/payment/settlement/data',
+    //         method: 'GET',
+    //         success: function (response) {
+    //             console.log('정산대사조회 성공:', response);
+    //         },
+    //         error: function (xhr, status, error) {
+    //             console.error('정산대사조회 실패:', xhr.status, error);
+    //             alert('정산대사 조회에 실패했습니다.\n상태: ' + xhr.status + '\n오류: ' + error);
+    //         }
+    //     });
+    // });
 });

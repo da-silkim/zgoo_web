@@ -7,6 +7,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -20,7 +21,10 @@ import lombok.ToString;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
-@Table(name = "CHG_COMMLOG")
+@Table(name = "CHG_COMMLOG", indexes = {
+        @Index(name = "idx_chg_commlog_charger_id", columnList = "charger_id"),
+        @Index(name = "idx_chg_commlog_action", columnList = "action")
+})
 @ToString
 public class ChgCommLog {
     @Id

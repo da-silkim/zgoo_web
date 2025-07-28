@@ -50,7 +50,7 @@ public class TariffPolicy {
     @Column(name = "apply_code")
     private String apply_code;
 
-    @Column(name = "regDt")
+    @Column(name = "reg_dt")
     private LocalDateTime regDt;
 
     /**

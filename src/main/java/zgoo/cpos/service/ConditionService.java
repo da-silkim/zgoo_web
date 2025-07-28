@@ -51,7 +51,8 @@ public class ConditionService {
     public List<ConditionVersionHistBaseDto> findHistAllByConditionCode(String conditionCode) {
 
         try {
-            List<ConditionVersionHistBaseDto> conList = this.conditionVersionHistRepository.findAllByConditionCode(conditionCode);
+            List<ConditionVersionHistBaseDto> conList = this.conditionVersionHistRepository
+                    .findAllByConditionCode(conditionCode);
             return conList;
         } catch (Exception e) {
             log.error("[findHistByConditionCode] error : {}", e.getMessage());
@@ -104,7 +105,7 @@ public class ConditionService {
             }
 
             // 파일 업로드
-            if(!dto.getFile().isEmpty()) {
+            if (!dto.getFile().isEmpty()) {
                 try {
                     String originalFileName = dto.getFile().getOriginalFilename();
                     String saveFileName = FileNameUtils.fileNameConver(originalFileName);
@@ -133,19 +134,26 @@ public class ConditionService {
     // 적용일시에 따른 약관 적용여부 업데이트
     public void updateApplyYn(String conditionCode) {
         try {
-            ConditionVersionHist condition = this.conditionVersionHistRepository.findApplyYesByConditionCode(conditionCode);
+            ConditionVersionHist condition = this.conditionVersionHistRepository
+                    .findApplyYesByConditionCode(conditionCode);
 
             if (condition != null) {
                 condition.updateConditionVersionHistInfo("N");
             }
 
             LocalDateTime applyDt = LocalDate.now().atStartOfDay();
-            ConditionVersionHist conHist = this.conditionVersionHistRepository.findRecentHistByConditionCode(conditionCode, applyDt);
+            ConditionVersionHist conHist = this.conditionVersionHistRepository
+                    .findRecentHistByConditionCode(conditionCode, applyDt);
+            if (conHist == null) {
+                log.error("[updateApplyYn] No recent condition version hist to update.");
+                return;
+            }
+
             log.info("=== before update: {}", conHist.toString());
             conHist.updateConditionVersionHistInfo("Y");
             log.info("=== after update: {}", conHist.toString());
-            
-        } catch (Exception e)      {
+
+        } catch (Exception e) {
             log.error("[updateApplyYn] error: {}", e.getMessage());
         }
     }
@@ -156,7 +164,7 @@ public class ConditionService {
 
         try {
             ConditionCode condition = this.conditionCodeRepository.findByConditionCode(conditionCode);
-            
+
             if (condition == null) {
                 log.error("[deleteConditionCode] error");
                 return;

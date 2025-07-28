@@ -9,6 +9,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
@@ -22,7 +23,10 @@ import lombok.Setter;
 import zgoo.cpos.dto.company.CompanyDto.CompanyRegDto;
 
 @Entity
-@Table(name = "COMPANY", uniqueConstraints = {
+@Table(name = "COMPANY", indexes = {
+        @Index(name = "idx_company_name", columnList = "company_name"),
+        @Index(name = "idx_company_code", columnList = "company_code")
+}, uniqueConstraints = {
         @UniqueConstraint(columnNames = "company_name")
 })
 @Getter
@@ -97,7 +101,7 @@ public class Company {
     @Column(name = "logo_url")
     private String logoUrl;
 
-    @Column(name = "company_code", length = 4, unique = true)
+    @Column(name = "company_code", length = 4, unique = true, nullable = false)
     private String companyCode;
 
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)

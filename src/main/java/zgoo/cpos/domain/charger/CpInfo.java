@@ -8,9 +8,11 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,6 +24,9 @@ import zgoo.cpos.domain.cs.CsInfo;
 import zgoo.cpos.dto.cp.ChargerDto.ChargerRegDto;
 
 @Entity
+@Table(name = "CP_INFO", indexes = {
+        @Index(name = "idx_cpinfo_cs_id", columnList = "station_id")
+})
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @ToString
 @Getter

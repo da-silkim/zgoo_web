@@ -40,6 +40,8 @@ public class VocDto {
     public static class VocListDto extends VocBaseDto {
         private String typeName;
         private String replyStatName;
+        private String regUserId;
+        private String replyUserId;
     }
 
     @Data

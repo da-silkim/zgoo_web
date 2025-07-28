@@ -89,6 +89,7 @@
                                 <tr class="table-border-top">
                                     <th scope="col"></th>
                                     <th scope="col"></th>
+                                    <th scope="col">No</th>
                                     <th scope="col">사업자</th>
                                     <th scope="col">충전소명</th>
                                     <th scope="col">충전소ID</th>
@@ -100,7 +101,7 @@
                                 </tr>
                             </thead>
                             <tbody id="pageList">
-                                <tr th:each="cs : ${csList}">
+                                <tr th:each="cs, iterStat : ${csList}">
                                     <td th:id="${cs.stationId}"><input type="checkbox" /></td>
                                     <td>
                                         <a th:href="@{/station/list/detail/{stationId}(stationId=${cs.stationId}, page=${currentPage}, size=${size},
@@ -110,6 +111,8 @@
                                             class="no-underline">
                                             <i class="bi bi-files detail-files"></i>
                                         </a>
+                                    </td>
+                                    <td th:text="${startNumber + iterStat.count}">
                                     </td>
                                     <td th:text="${cs.companyName}"></td>
                                     <td th:text="${cs.stationName}"></td>

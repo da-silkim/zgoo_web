@@ -5,6 +5,8 @@ import java.time.LocalDateTime;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
+import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,6 +16,10 @@ import lombok.ToString;
 import zgoo.cpos.dto.menu.MenuDto;
 
 @Entity
+@Table(name = "MENU", indexes = {
+        @Index(name = "idx_menu_parent_code", columnList = "parent_code"),
+        @Index(name = "idx_menu_use_yn", columnList = "use_yn")
+})
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @ToString
 @Getter
@@ -42,7 +48,7 @@ public class Menu {
 
     @Column(name = "icon_class")
     private String iconClass;
-    
+
     @Column(name = "reg_dt")
     private LocalDateTime regDt;
 

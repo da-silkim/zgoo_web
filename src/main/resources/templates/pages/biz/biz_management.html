@@ -97,6 +97,7 @@
                                 <tr class="table-border-top">
                                     <th scope="col"></th>
                                     <th scope="col" style="display:none;">ID</th>
+                                    <th scope="col">No</th>
                                     <th scope="col">사업자명</th>
                                     <th scope="col">사업자구분</th>
                                     <th scope="col">사업자유형</th>
@@ -107,9 +108,11 @@
                                 </tr>
                             </thead>
                             <tbody id="pageList">
-                                <tr th:each="company : ${companyList}">
+                                <tr th:each="company, iterStat : ${companyList}">
                                     <td><input type="checkbox" /></td>
                                     <td th:text="${company.companyId}" style="display:none;"></td>
+                                    <td th:text="${startNumber + iterStat.count}">
+                                    </td>
                                     <td th:text="${company.companyName}"></td>
                                     <td th:text="${company.companyLvName}"></td>
                                     <td th:text="${company.companyTypeName}"></td>

@@ -13,12 +13,14 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import zgoo.cpos.domain.code.QCommonCode;
+import zgoo.cpos.domain.company.QCompany;
 import zgoo.cpos.domain.company.QCompanyRelationInfo;
 import zgoo.cpos.domain.member.QMember;
 import zgoo.cpos.domain.member.QVoc;
 import zgoo.cpos.domain.users.QUsers;
 import zgoo.cpos.dto.member.VocDto.VocListDto;
 import zgoo.cpos.dto.member.VocDto.VocRegDto;
+import zgoo.cpos.util.QueryUtils;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -28,15 +30,20 @@ public class VocRepositoryCustomImpl implements VocRepositoryCustom {
     QMember member = QMember.member;
     QUsers user = QUsers.users;
     QVoc voc = QVoc.voc;
+    QCompany company = QCompany.company;
     QCommonCode typeName = new QCommonCode("type");
     QCommonCode replyStatName = new QCommonCode("replyStat");
     QCommonCode channelName = new QCommonCode("channel");
 
     @Override
-    public Page<VocListDto> findVocWithPagination(Pageable pageable) {
+    public Page<VocListDto> findVocWithPagination(Pageable pageable, String levelPath, boolean isSuperAdmin) {
         BooleanBuilder builder = new BooleanBuilder();
 
         builder.and(voc.delYn.eq("N"));
+
+        if (!isSuperAdmin && levelPath != null && !levelPath.isEmpty()) {
+            builder.and(QueryUtils.hasCompanyLevelAccess(relation, levelPath));
+        }
 
         List<VocListDto> vocList = queryFactory.select(Projections.fields(VocListDto.class,
                 voc.id.as("vocId"),
@@ -48,10 +55,14 @@ public class VocRepositoryCustomImpl implements VocRepositoryCustom {
                 member.name.as("name"),
                 member.phoneNo.as("phoneNo"),
                 typeName.name.as("typeName"),
-                replyStatName.name.as("replyStatName")))
+                replyStatName.name.as("replyStatName"),
+                voc.regUserId.as("regUserId"),
+                voc.replyUserId.as("replyUserId")))
                 .from(voc)
                 .leftJoin(member).on(voc.member.eq(member))
-                .leftJoin(member).on(voc.member.id.eq(member.id))
+                .leftJoin(user).on(voc.regUserId.eq(user.userId))
+                .leftJoin(company).on(user.company.eq(company))
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
                 .leftJoin(typeName).on(voc.type.eq(typeName.commonCode))
                 .leftJoin(replyStatName).on(voc.replyStat.eq(replyStatName.commonCode))
                 .where(builder)
@@ -64,7 +75,9 @@ public class VocRepositoryCustomImpl implements VocRepositoryCustom {
                 .select(voc.count())
                 .from(voc)
                 .leftJoin(member).on(voc.member.eq(member))
-                .leftJoin(member).on(voc.member.id.eq(member.id))
+                .leftJoin(user).on(voc.regUserId.eq(user.userId))
+                .leftJoin(company).on(user.company.eq(company))
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
                 .where(builder)
                 .fetchOne();
 
@@ -72,7 +85,8 @@ public class VocRepositoryCustomImpl implements VocRepositoryCustom {
     }
 
     @Override
-    public Page<VocListDto> searchVocWithPagination(String type, String replyStat, String name, Pageable pageable) {
+    public Page<VocListDto> searchVocWithPagination(String type, String replyStat, String name, Pageable pageable,
+            String levelPath, boolean isSuperAdmin) {
         BooleanBuilder builder = new BooleanBuilder();
         builder.and(voc.delYn.eq("N"));
 
@@ -88,6 +102,10 @@ public class VocRepositoryCustomImpl implements VocRepositoryCustom {
             builder.and(member.name.contains(name));
         }
 
+        if (!isSuperAdmin && levelPath != null && !levelPath.isEmpty()) {
+            builder.and(QueryUtils.hasCompanyLevelAccess(relation, levelPath));
+        }
+
         List<VocListDto> vocList = queryFactory.select(Projections.fields(VocListDto.class,
                 voc.id.as("vocId"),
                 voc.type.as("type"),
@@ -101,6 +119,9 @@ public class VocRepositoryCustomImpl implements VocRepositoryCustom {
                 replyStatName.name.as("replyStatName")))
                 .from(voc)
                 .leftJoin(member).on(voc.member.eq(member))
+                .leftJoin(user).on(voc.regUserId.eq(user.userId))
+                .leftJoin(company).on(user.company.eq(company))
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
                 .leftJoin(typeName).on(voc.type.eq(typeName.commonCode))
                 .leftJoin(replyStatName).on(voc.replyStat.eq(replyStatName.commonCode))
                 .where(builder)
@@ -113,6 +134,9 @@ public class VocRepositoryCustomImpl implements VocRepositoryCustom {
                 .select(voc.count())
                 .from(voc)
                 .leftJoin(member).on(voc.member.eq(member))
+                .leftJoin(user).on(voc.regUserId.eq(user.userId))
+                .leftJoin(company).on(user.company.eq(company))
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
                 .where(builder)
                 .fetchOne();
 

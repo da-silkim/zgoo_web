@@ -3,7 +3,6 @@ package zgoo.cpos.repository.calc;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -25,6 +24,7 @@ import zgoo.cpos.domain.calc.QPurchaseInfo;
 import zgoo.cpos.domain.charger.QCpInfo;
 import zgoo.cpos.domain.code.QCommonCode;
 import zgoo.cpos.domain.company.QCompany;
+import zgoo.cpos.domain.company.QCompanyRelationInfo;
 import zgoo.cpos.domain.cs.QCsInfo;
 import zgoo.cpos.domain.cs.QCsLandInfo;
 import zgoo.cpos.domain.payment.QChargerPaymentInfo;
@@ -34,6 +34,7 @@ import zgoo.cpos.dto.calc.PurchaseDto.PurchaseDetailDto;
 import zgoo.cpos.dto.calc.PurchaseDto.PurchaseListDto;
 import zgoo.cpos.dto.calc.PurchaseDto.PurchaseRegDto;
 import zgoo.cpos.dto.statistics.PurchaseSalesDto.PurchaseSalesLineChartBaseDto;
+import zgoo.cpos.util.QueryUtils;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -49,48 +50,66 @@ public class PurchaseRepositoryCustomImpl implements PurchaseRepositoryCustom {
     QPgTrxRecon pgTrxRecon = QPgTrxRecon.pgTrxRecon;
     QCommonCode accountCdName = new QCommonCode("accountCode");
     QCommonCode paymentName = new QCommonCode("paymentMethod");
+    QCompanyRelationInfo relation = QCompanyRelationInfo.companyRelationInfo;
 
     @Override
-    public Page<PurchaseListDto> findPurchaseWithPagination(Pageable pageable) {
-        List<PurchaseListDto> purList = queryFactory.select(Projections.fields(PurchaseListDto.class,
-            purchase.id.as("purchaseId"),
-            purchase.purchaseDate.as("purchaseDate"),
-            purchase.bizNum.as("bizNum"),
-            purchase.bizName.as("bizName"),
-            purchase.approvalNo.as("approvalNo"),
-            purchase.item.as("item"),
-            purchase.supplyPrice.as("supplyPrice"),
-            purchase.vat.as("vat"),
-            purchase.totalAmount.as("totalAmount"),
-            Expressions.numberTemplate(Integer.class, "COALESCE({0}, 0)", purchase.charge).as("charge"),
-            csInfo.stationName.as("stationName"),
-            accountCdName.name.as("accountCodeName"),
-            paymentName.name.as("paymentMethodName")))
-            .from(purchase)
-            .leftJoin(csInfo).on(purchase.station.eq(csInfo))
-            .leftJoin(accountCdName).on(purchase.accountCode.eq(accountCdName.commonCode))
-            .leftJoin(paymentName).on(purchase.paymentMethod.eq(paymentName.commonCode))
-            .orderBy(purchase.regDt.desc(), purchase.id.desc())
-            .where(purchase.delYn.eq("N"))
-            .offset(pageable.getOffset())
-            .limit(pageable.getPageSize())
-            .fetch();
+    public Page<PurchaseListDto> findPurchaseWithPagination(Pageable pageable, String levelPath, boolean isSuperAdmin) {
 
+        BooleanBuilder builder = new BooleanBuilder();
+        builder.and(purchase.delYn.eq("N"));
+
+        if (!isSuperAdmin && levelPath != null && !levelPath.isEmpty()) {
+            builder.and(QueryUtils.hasCompanyLevelAccess(relation, levelPath));
+        }
+
+        List<PurchaseListDto> purList = queryFactory.select(Projections.fields(PurchaseListDto.class,
+                purchase.id.as("purchaseId"),
+                purchase.purchaseDate.as("purchaseDate"),
+                purchase.bizNum.as("bizNum"),
+                purchase.bizName.as("bizName"),
+                purchase.approvalNo.as("approvalNo"),
+                purchase.item.as("item"),
+                purchase.supplyPrice.as("supplyPrice"),
+                purchase.vat.as("vat"),
+                purchase.totalAmount.as("totalAmount"),
+                Expressions.numberTemplate(Integer.class, "COALESCE({0}, 0)", purchase.charge).as("charge"),
+                csInfo.stationName.as("stationName"),
+                accountCdName.name.as("accountCodeName"),
+                paymentName.name.as("paymentMethodName"),
+                company.companyName.as("companyName")))
+                .from(purchase)
+                .leftJoin(csInfo).on(purchase.station.eq(csInfo))
+                .leftJoin(company).on(purchase.station.company.eq(company))
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
+                .leftJoin(accountCdName).on(purchase.accountCode.eq(accountCdName.commonCode))
+                .leftJoin(paymentName).on(purchase.paymentMethod.eq(paymentName.commonCode))
+                .orderBy(purchase.regDt.desc(), purchase.id.desc())
+                .where(builder)
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
 
         long totalCount = queryFactory
-            .select(purchase.count())
-            .from(purchase)
-            .where(purchase.delYn.eq("N"))
-            .fetchOne();
+                .select(purchase.count())
+                .from(purchase)
+                .leftJoin(csInfo).on(purchase.station.eq(csInfo))
+                .leftJoin(company).on(purchase.station.company.eq(company))
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
+                .where(builder)
+                .fetchOne();
 
         return new PageImpl<>(purList, pageable, totalCount);
     }
 
     @Override
     public Page<PurchaseListDto> searchPurchaseWithPagination(String searchOp, String searchContent,
-            LocalDate startDate, LocalDate endDate, Pageable pageable) {
+            LocalDate startDate, LocalDate endDate, Pageable pageable, String levelPath, boolean isSuperAdmin) {
         BooleanBuilder builder = new BooleanBuilder();
         builder.and(purchase.delYn.eq("N"));
+
+        if (!isSuperAdmin && levelPath != null && !levelPath.isEmpty()) {
+            builder.and(QueryUtils.hasCompanyLevelAccess(relation, levelPath));
+        }
 
         if (searchOp != null & (searchContent != null && !searchContent.isEmpty())) {
             if (searchOp.equals("approvalNo")) {
@@ -109,38 +128,42 @@ public class PurchaseRepositoryCustomImpl implements PurchaseRepositoryCustom {
         }
 
         List<PurchaseListDto> purList = queryFactory.select(Projections.fields(PurchaseListDto.class,
-            purchase.id.as("purchaseId"),
-            purchase.purchaseDate.as("purchaseDate"),
-            purchase.bizNum.as("bizNum"),
-            purchase.bizName.as("bizName"),
-            purchase.approvalNo.as("approvalNo"),
-            purchase.item.as("item"),
-            purchase.supplyPrice.as("supplyPrice"),
-            purchase.vat.as("vat"),
-            purchase.totalAmount.as("totalAmount"),
-            Expressions.numberTemplate(Integer.class, "COALESCE({0}, 0)", purchase.charge).as("charge"),
-            csInfo.stationName.as("stationName"),
-            accountCdName.name.as("accountCodeName"),
-            paymentName.name.as("paymentMethodName")))
-            .from(purchase)
-            .leftJoin(csInfo).on(purchase.station.eq(csInfo))
-            .leftJoin(accountCdName).on(purchase.accountCode.eq(accountCdName.commonCode))
-            .leftJoin(paymentName).on(purchase.paymentMethod.eq(paymentName.commonCode))
-            .where(builder)
-            .orderBy(purchase.regDt.desc(), purchase.id.desc())
-            .offset(pageable.getOffset())
-            .limit(pageable.getPageSize())
-            .fetch();
-
+                purchase.id.as("purchaseId"),
+                purchase.purchaseDate.as("purchaseDate"),
+                purchase.bizNum.as("bizNum"),
+                purchase.bizName.as("bizName"),
+                purchase.approvalNo.as("approvalNo"),
+                purchase.item.as("item"),
+                purchase.supplyPrice.as("supplyPrice"),
+                purchase.vat.as("vat"),
+                purchase.totalAmount.as("totalAmount"),
+                Expressions.numberTemplate(Integer.class, "COALESCE({0}, 0)", purchase.charge).as("charge"),
+                csInfo.stationName.as("stationName"),
+                accountCdName.name.as("accountCodeName"),
+                paymentName.name.as("paymentMethodName"),
+                company.companyName.as("companyName")))
+                .from(purchase)
+                .leftJoin(csInfo).on(purchase.station.eq(csInfo))
+                .leftJoin(company).on(purchase.station.company.eq(company))
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
+                .leftJoin(accountCdName).on(purchase.accountCode.eq(accountCdName.commonCode))
+                .leftJoin(paymentName).on(purchase.paymentMethod.eq(paymentName.commonCode))
+                .where(builder)
+                .orderBy(purchase.regDt.desc(), purchase.id.desc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
 
         long totalCount = queryFactory
-            .select(purchase.count())
-            .from(purchase)
-            .leftJoin(csInfo).on(purchase.station.eq(csInfo))
-            .leftJoin(accountCdName).on(purchase.accountCode.eq(accountCdName.commonCode))
-            .leftJoin(paymentName).on(purchase.paymentMethod.eq(paymentName.commonCode))
-            .where(builder)
-            .fetchOne();
+                .select(purchase.count())
+                .from(purchase)
+                .leftJoin(csInfo).on(purchase.station.eq(csInfo))
+                .leftJoin(company).on(purchase.station.company.eq(company))
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
+                .leftJoin(accountCdName).on(purchase.accountCode.eq(accountCdName.commonCode))
+                .leftJoin(paymentName).on(purchase.paymentMethod.eq(paymentName.commonCode))
+                .where(builder)
+                .fetchOne();
 
         return new PageImpl<>(purList, pageable, totalCount);
     }
@@ -148,10 +171,10 @@ public class PurchaseRepositoryCustomImpl implements PurchaseRepositoryCustom {
     @Override
     public Long deletePurchaseOne(Long id) {
         return queryFactory
-            .update(purchase)
-            .set(purchase.delYn, "Y")
-            .where(purchase.id.eq(id))
-            .execute();
+                .update(purchase)
+                .set(purchase.delYn, "Y")
+                .where(purchase.id.eq(id))
+                .execute();
     }
 
     @Override
@@ -177,58 +200,58 @@ public class PurchaseRepositoryCustomImpl implements PurchaseRepositoryCustom {
         }
 
         return queryFactory.select(Projections.fields(PurchaseListDto.class,
-            purchase.id.as("purchaseId"),
-            purchase.purchaseDate.as("purchaseDate"),
-            purchase.bizNum.as("bizNum"),
-            purchase.bizName.as("bizName"),
-            purchase.approvalNo.as("approvalNo"),
-            purchase.item.as("item"),
-            purchase.unitPrice.as("unitPrice"),
-            purchase.supplyPrice.as("supplyPrice"),
-            purchase.vat.as("vat"),
-            purchase.charge.as("charge"),
-            purchase.surcharge.as("surcharge"),
-            purchase.cutoffAmount.as("cutoffAmount"),
-            purchase.unpaidAmount.as("unpaidAmount"),
-            purchase.totalAmount.as("totalAmount"),
-            purchase.power.as("power"),
-            csInfo.stationName.as("stationName"),
-            accountCdName.name.as("accountCodeName"),
-            paymentName.name.as("paymentMethodName")))
-            .from(purchase)
-            .leftJoin(csInfo).on(purchase.station.eq(csInfo))
-            .leftJoin(accountCdName).on(purchase.accountCode.eq(accountCdName.commonCode))
-            .leftJoin(paymentName).on(purchase.paymentMethod.eq(paymentName.commonCode))
-            .orderBy(purchase.regDt.desc(), purchase.id.desc())
-            .where(builder)
-            .fetch();
+                purchase.id.as("purchaseId"),
+                purchase.purchaseDate.as("purchaseDate"),
+                purchase.bizNum.as("bizNum"),
+                purchase.bizName.as("bizName"),
+                purchase.approvalNo.as("approvalNo"),
+                purchase.item.as("item"),
+                purchase.unitPrice.as("unitPrice"),
+                purchase.supplyPrice.as("supplyPrice"),
+                purchase.vat.as("vat"),
+                purchase.charge.as("charge"),
+                purchase.surcharge.as("surcharge"),
+                purchase.cutoffAmount.as("cutoffAmount"),
+                purchase.unpaidAmount.as("unpaidAmount"),
+                purchase.totalAmount.as("totalAmount"),
+                purchase.power.as("power"),
+                csInfo.stationName.as("stationName"),
+                accountCdName.name.as("accountCodeName"),
+                paymentName.name.as("paymentMethodName")))
+                .from(purchase)
+                .leftJoin(csInfo).on(purchase.station.eq(csInfo))
+                .leftJoin(accountCdName).on(purchase.accountCode.eq(accountCdName.commonCode))
+                .leftJoin(paymentName).on(purchase.paymentMethod.eq(paymentName.commonCode))
+                .orderBy(purchase.regDt.desc(), purchase.id.desc())
+                .where(builder)
+                .fetch();
     }
 
     @Override
     public PurchaseRegDto findPurchaseOne(Long id) {
         return queryFactory.select(Projections.fields(PurchaseRegDto.class,
-            purchase.id.as("purchaseId"),
-            purchase.station.id.as("stationId"),
-            purchase.approvalNo.as("approvalNo"),
-            purchase.accountCode.as("accountCode"),
-            purchase.purchaseDate.as("purchaseDate"),
-            purchase.bizNum.as("bizNum"),
-            purchase.bizName.as("bizName"),
-            purchase.item.as("item"),
-            purchase.paymentMethod.as("paymentMethod"),
-            purchase.unitPrice.as("unitPrice"),
-            purchase.amount.as("amount"),
-            purchase.supplyPrice.as("supplyPrice"),
-            purchase.vat.as("vat"),
-            Expressions.numberTemplate(Integer.class, "COALESCE({0}, 0)", purchase.charge).as("charge"),
-            Expressions.numberTemplate(Integer.class, "COALESCE({0}, 0)", purchase.surcharge).as("surcharge"),
-            Expressions.numberTemplate(Integer.class, "COALESCE({0}, 0)", purchase.cutoffAmount).as("cutoffAmount"),
-            Expressions.numberTemplate(Integer.class, "COALESCE({0}, 0)", purchase.unpaidAmount).as("unpaidAmount"),
-            Expressions.numberTemplate(Integer.class, "COALESCE({0}, 0)", purchase.power).as("power"),
-            purchase.totalAmount.as("totalAmount")))
-            .from(purchase)
-            .where(purchase.id.eq(id))
-            .fetchOne();
+                purchase.id.as("purchaseId"),
+                purchase.station.id.as("stationId"),
+                purchase.approvalNo.as("approvalNo"),
+                purchase.accountCode.as("accountCode"),
+                purchase.purchaseDate.as("purchaseDate"),
+                purchase.bizNum.as("bizNum"),
+                purchase.bizName.as("bizName"),
+                purchase.item.as("item"),
+                purchase.paymentMethod.as("paymentMethod"),
+                purchase.unitPrice.as("unitPrice"),
+                purchase.amount.as("amount"),
+                purchase.supplyPrice.as("supplyPrice"),
+                purchase.vat.as("vat"),
+                Expressions.numberTemplate(Integer.class, "COALESCE({0}, 0)", purchase.charge).as("charge"),
+                Expressions.numberTemplate(Integer.class, "COALESCE({0}, 0)", purchase.surcharge).as("surcharge"),
+                Expressions.numberTemplate(Integer.class, "COALESCE({0}, 0)", purchase.cutoffAmount).as("cutoffAmount"),
+                Expressions.numberTemplate(Integer.class, "COALESCE({0}, 0)", purchase.unpaidAmount).as("unpaidAmount"),
+                Expressions.numberTemplate(Integer.class, "COALESCE({0}, 0)", purchase.power).as("power"),
+                purchase.totalAmount.as("totalAmount")))
+                .from(purchase)
+                .where(purchase.id.eq(id))
+                .fetchOne();
     }
 
     @Override
@@ -239,7 +262,8 @@ public class PurchaseRepositoryCustomImpl implements PurchaseRepositoryCustom {
                 Expressions.numberTemplate(Integer.class, "COALESCE({0}, 0)", land.landUseFee).as("unitPrice"),
                 Expressions.numberTemplate(Integer.class, "COALESCE({0}, 0)", land.landUseFee).as("supplyPrice"),
                 Expressions.numberTemplate(Integer.class, "ROUND(COALESCE({0}, 0) * 0.1)", land.landUseFee).as("vat"),
-                Expressions.numberTemplate(Integer.class, "ROUND(COALESCE({0}, 0) * 1.1)", land.landUseFee).as("totalAmount")))
+                Expressions.numberTemplate(Integer.class, "ROUND(COALESCE({0}, 0) * 1.1)", land.landUseFee)
+                        .as("totalAmount")))
                 .from(csInfo)
                 .leftJoin(land).on(csInfo.csLandInfo.eq(land))
                 .where(csInfo.id.eq(stationId))
@@ -266,10 +290,10 @@ public class PurchaseRepositoryCustomImpl implements PurchaseRepositoryCustom {
                 .leftJoin(cpInfo).on(chgPaymentInfo.chargerId.eq(cpInfo.id))
                 .leftJoin(csInfo).on(cpInfo.stationId.eq(csInfo))
                 .where(csInfo.id.eq(stationId)
-                    .and(chgPaymentInfo.timestamp.between(startDate, endDate)))
+                        .and(chgPaymentInfo.timestamp.between(startDate, endDate)))
                 .fetch();
 
-        /* 
+        /*
          * 결제금액 = 승인금액 (상태코드 0) - 취소금액 (상태코드 2)
          * 상태코드 1은 승인금액과 취소금액 둘 다 변영되므로 제외
          */
@@ -283,13 +307,12 @@ public class PurchaseRepositoryCustomImpl implements PurchaseRepositoryCustom {
         if (approved == null)
             approved = BigDecimal.ZERO;
 
-        
         // 취소금액
         BigDecimal canceled = queryFactory
                 .select(pgTrxRecon.goodsAmt.sum())
                 .from(pgTrxRecon)
                 .where(pgTrxRecon.tid.in(tids).and(pgTrxRecon.stateCd.in("2"))
-                    .or(pgTrxRecon.otid.in(tids).and(pgTrxRecon.stateCd.eq("2"))))
+                        .or(pgTrxRecon.otid.in(tids).and(pgTrxRecon.stateCd.eq("2"))))
                 .fetchOne();
 
         if (canceled == null)
@@ -297,13 +320,13 @@ public class PurchaseRepositoryCustomImpl implements PurchaseRepositoryCustom {
 
         BigDecimal totalPrice = approved.subtract(canceled);
 
-        /* 
+        /*
          * 단가, 공급가액
          * totalPrice * rate * 0.01
          */
         BigDecimal percentage = totalPrice.multiply(BigDecimal.valueOf(rate)).divide(BigDecimal.valueOf(100));
 
-        /* 
+        /*
          * 부가세
          * vat = totalPrice * 0.1
          */
@@ -321,10 +344,14 @@ public class PurchaseRepositoryCustomImpl implements PurchaseRepositoryCustom {
     public PurchaseAccountDto searchAccountSafety(String stationId) {
         // 안전점검관리비
         return queryFactory.select(Projections.fields(PurchaseAccountDto.class,
-                Expressions.numberTemplate(Integer.class, "COALESCE({0}, 0)", csInfo.safetyManagementFee).as("unitPrice"),
-                Expressions.numberTemplate(Integer.class, "COALESCE({0}, 0)", csInfo.safetyManagementFee).as("supplyPrice"),
-                Expressions.numberTemplate(Integer.class, "ROUND(COALESCE({0}, 0) * 0.1)", csInfo.safetyManagementFee).as("vat"),
-                Expressions.numberTemplate(Integer.class, "ROUND(COALESCE({0}, 0) * 1.1)", csInfo.safetyManagementFee).as("totalAmount")))
+                Expressions.numberTemplate(Integer.class, "COALESCE({0}, 0)", csInfo.safetyManagementFee)
+                        .as("unitPrice"),
+                Expressions.numberTemplate(Integer.class, "COALESCE({0}, 0)", csInfo.safetyManagementFee)
+                        .as("supplyPrice"),
+                Expressions.numberTemplate(Integer.class, "ROUND(COALESCE({0}, 0) * 0.1)", csInfo.safetyManagementFee)
+                        .as("vat"),
+                Expressions.numberTemplate(Integer.class, "ROUND(COALESCE({0}, 0) * 1.1)", csInfo.safetyManagementFee)
+                        .as("totalAmount")))
                 .from(csInfo)
                 .leftJoin(land).on(csInfo.csLandInfo.eq(land))
                 .where(csInfo.id.eq(stationId))
@@ -334,36 +361,42 @@ public class PurchaseRepositoryCustomImpl implements PurchaseRepositoryCustom {
     @Override
     public PurchaseDetailDto findPurchaseDetailOne(Long id) {
         return queryFactory.select(Projections.fields(PurchaseDetailDto.class,
-            purchase.accountCode.as("accountCode"),
-            Expressions.stringTemplate("IF({0} IS NULL OR {0} = '', '정보없음', {0})", purchase.item).as("item"),
-            purchase.bizName.as("bizName"),
-            purchase.bizNum.as("bizNum"),
-            purchase.station.id.as("stationId"),
-            purchase.purchaseDate.as("purchaseDate"),
-            purchase.paymentMethod.as("paymentMethod"),
-            Expressions.stringTemplate("IF({0} IS NULL OR {0} = '', '정보없음', {0})", purchase.approvalNo).as("approvalNo"),
-            purchase.unitPrice.as("unitPrice"),
-            purchase.amount.as("amount"),
-            purchase.supplyPrice.as("supplyPrice"),
-            purchase.vat.as("vat"),
-            Expressions.numberTemplate(Integer.class, "COALESCE({0}, 0)", purchase.charge).as("charge"),
-            Expressions.numberTemplate(Integer.class, "COALESCE({0}, 0)", purchase.surcharge).as("surcharge"),
-            Expressions.numberTemplate(Integer.class, "COALESCE({0}, 0)", purchase.cutoffAmount).as("cutoffAmount"),
-            Expressions.numberTemplate(Integer.class, "COALESCE({0}, 0)", purchase.unpaidAmount).as("unpaidAmount"),
-            Expressions.numberTemplate(Integer.class, "COALESCE({0}, 0)", purchase.power).as("power"),
-            purchase.totalAmount.as("totalAmount"),
-            accountCdName.name.as("accountCodeName"),
-            paymentName.name.as("paymentMethodName")))
-            .from(purchase)
-            .leftJoin(accountCdName).on(purchase.accountCode.eq(accountCdName.commonCode))
-            .leftJoin(paymentName).on(purchase.paymentMethod.eq(paymentName.commonCode))
-            .where(purchase.id.eq(id))
-            .fetchOne();
+                purchase.accountCode.as("accountCode"),
+                Expressions.stringTemplate("IF({0} IS NULL OR {0} = '', '정보없음', {0})", purchase.item).as("item"),
+                purchase.bizName.as("bizName"),
+                purchase.bizNum.as("bizNum"),
+                purchase.station.id.as("stationId"),
+                purchase.purchaseDate.as("purchaseDate"),
+                purchase.paymentMethod.as("paymentMethod"),
+                Expressions.stringTemplate("IF({0} IS NULL OR {0} = '', '정보없음', {0})", purchase.approvalNo)
+                        .as("approvalNo"),
+                purchase.unitPrice.as("unitPrice"),
+                purchase.amount.as("amount"),
+                purchase.supplyPrice.as("supplyPrice"),
+                purchase.vat.as("vat"),
+                Expressions.numberTemplate(Integer.class, "COALESCE({0}, 0)", purchase.charge).as("charge"),
+                Expressions.numberTemplate(Integer.class, "COALESCE({0}, 0)", purchase.surcharge).as("surcharge"),
+                Expressions.numberTemplate(Integer.class, "COALESCE({0}, 0)", purchase.cutoffAmount).as("cutoffAmount"),
+                Expressions.numberTemplate(Integer.class, "COALESCE({0}, 0)", purchase.unpaidAmount).as("unpaidAmount"),
+                Expressions.numberTemplate(Integer.class, "COALESCE({0}, 0)", purchase.power).as("power"),
+                purchase.totalAmount.as("totalAmount"),
+                accountCdName.name.as("accountCodeName"),
+                paymentName.name.as("paymentMethodName")))
+                .from(purchase)
+                .leftJoin(accountCdName).on(purchase.accountCode.eq(accountCdName.commonCode))
+                .leftJoin(paymentName).on(purchase.paymentMethod.eq(paymentName.commonCode))
+                .where(purchase.id.eq(id))
+                .fetchOne();
     }
 
     @Override
-    public Integer findTotalAmountByYear(Long companyId, String searchOp, String searchContent, Integer year) {
+    public Integer findTotalAmountByYear(Long companyId, String searchOp, String searchContent, Integer year,
+            String levelPath, boolean isSuperAdmin) {
         BooleanBuilder builder = new BooleanBuilder();
+
+        if (!isSuperAdmin && levelPath != null && !levelPath.isEmpty()) {
+            builder.and(QueryUtils.hasCompanyLevelAccess(relation, levelPath));
+        }
 
         if (companyId != null) {
             builder.and(csInfo.company.id.eq(companyId));
@@ -385,17 +418,24 @@ public class PurchaseRepositoryCustomImpl implements PurchaseRepositoryCustom {
         builder.and(purchase.purchaseDate.between(startOfYear, endOfYear));
 
         return queryFactory
-            .select(purchase.totalAmount.sum())
-            .from(purchase)
-            .leftJoin(csInfo).on(csInfo.eq(purchase.station))
-            .where(builder)
-            .fetchOne();
+                .select(purchase.totalAmount.sum())
+                .from(purchase)
+                .leftJoin(csInfo).on(csInfo.eq(purchase.station))
+                .leftJoin(company).on(csInfo.company.eq(company))
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
+                .where(builder)
+                .fetchOne();
     }
 
     @Override
-    public List<PurchaseSalesLineChartBaseDto> searchMonthlyTotalAmount(Long companyId, String searchOp, String searchContent,
-            Integer year) {
+    public List<PurchaseSalesLineChartBaseDto> searchMonthlyTotalAmount(Long companyId, String searchOp,
+            String searchContent,
+            Integer year, String levelPath, boolean isSuperAdmin) {
         BooleanBuilder builder = new BooleanBuilder();
+
+        if (!isSuperAdmin && levelPath != null && !levelPath.isEmpty()) {
+            builder.and(QueryUtils.hasCompanyLevelAccess(relation, levelPath));
+        }
 
         if (companyId != null) {
             builder.and(csInfo.company.id.eq(companyId));
@@ -421,13 +461,15 @@ public class PurchaseRepositoryCustomImpl implements PurchaseRepositoryCustom {
                         .totalPrice(BigDecimal.ZERO)
                         .build())
                 .collect(Collectors.toList());
-        
+
         List<Tuple> results = queryFactory
                 .select(
-                    Expressions.numberTemplate(Integer.class, "MONTH({0})", purchase.purchaseDate).as("month"),
-                    purchase.totalAmount.sum())
+                        Expressions.numberTemplate(Integer.class, "MONTH({0})", purchase.purchaseDate).as("month"),
+                        purchase.totalAmount.sum())
                 .from(purchase)
                 .leftJoin(csInfo).on(csInfo.eq(purchase.station))
+                .leftJoin(company).on(csInfo.company.eq(company))
+                .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
                 .where(builder)
                 .groupBy(Expressions.numberTemplate(Integer.class, "MONTH({0})", purchase.purchaseDate))
                 .fetch();

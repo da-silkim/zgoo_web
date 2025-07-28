@@ -47,6 +47,7 @@ public class PurchaseDto {
         private String stationName;
         private String accountCodeName;
         private String paymentMethodName;
+        private String companyName;
     }
 
     @Data
@@ -71,7 +72,7 @@ public class PurchaseDto {
         private Integer supplyPrice;
         private Integer vat;
         private Integer totalAmount;
-        
+
         // 토지사용료
         private String landUseType;
     }

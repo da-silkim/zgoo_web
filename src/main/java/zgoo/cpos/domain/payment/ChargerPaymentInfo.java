@@ -20,7 +20,9 @@ import lombok.NoArgsConstructor;
         @UniqueConstraint(name = "UK_CHG_PAYMENT_HIST_TRANSACTION_ID", columnNames = { "transaction_id" })
 }, indexes = {
         @Index(name = "IDX_CHG_PAYMENT_HIST_TIMESTAMP", columnList = "timestamp"),
-        @Index(name = "IDX_CHG_PAYMENT_HIST_CHARGER_ID", columnList = "charger_id")
+        @Index(name = "IDX_CHG_PAYMENT_HIST_CHARGER_ID", columnList = "charger_id"),
+        @Index(name = "IDX_CHG_PAYMENT_HIST_ID_TAG", columnList = "id_tag"),
+        @Index(name = "IDX_CHG_PAYMENT_HIST_PRE_APPROVAL_NO", columnList = "pre_approval_no")
 })
 @Getter
 @NoArgsConstructor

@@ -85,9 +85,9 @@ public class StatisticsService {
         } catch (Exception e) {
             log.error("[searchYearChargeAmount] error: {}", e.getMessage());
             return TotalkwBarDto.builder()
-                .preYear(getDefaultDto(yearSearch - 1))
-                .curYear(getDefaultDto(yearSearch))
-                .build();
+                    .preYear(getDefaultDto(yearSearch - 1))
+                    .curYear(getDefaultDto(yearSearch))
+                    .build();
         }
     }
 
@@ -180,9 +180,9 @@ public class StatisticsService {
         } catch (Exception e) {
             log.error("[searchYearUsage] error: {}", e.getMessage());
             return UsageBarDto.builder()
-                .preYear(getDefaultUsageDto(yearSearch - 1))
-                .curYear(getDefaultUsageDto(yearSearch))
-                .build();
+                    .preYear(getDefaultUsageDto(yearSearch - 1))
+                    .curYear(getDefaultUsageDto(yearSearch))
+                    .build();
         }
     }
 
@@ -256,11 +256,13 @@ public class StatisticsService {
             }
 
             Integer prePurchase = Optional.ofNullable(
-                    this.purchaseRepository.findTotalAmountByYear(companyId, searchOp, searchContent, yearSearch - 1))
+                    this.purchaseRepository.findTotalAmountByYear(companyId, searchOp, searchContent, yearSearch - 1,
+                            levelPath, isSuperAdmin))
                     .orElse(0);
 
             Integer curPurchase = Optional.ofNullable(
-                    this.purchaseRepository.findTotalAmountByYear(companyId, searchOp, searchContent, yearSearch))
+                    this.purchaseRepository.findTotalAmountByYear(companyId, searchOp, searchContent, yearSearch,
+                            levelPath, isSuperAdmin))
                     .orElse(0);
 
             BigDecimal preSales = Optional.ofNullable(
@@ -330,7 +332,7 @@ public class StatisticsService {
 
             List<PurchaseSalesLineChartBaseDto> purList = this.purchaseRepository.searchMonthlyTotalAmount(companyId,
                     searchOp,
-                    searchContent, yearSearch);
+                    searchContent, yearSearch, levelPath, isSuperAdmin);
 
             List<PurchaseSalesLineChartBaseDto> salesList = this.chargerPaymentInfoRepository.searchMonthlyTotalSales(
                     companyId, searchOp, searchContent, yearSearch,
@@ -370,16 +372,16 @@ public class StatisticsService {
             }
 
             ErrorBaseDto preYear = this.errorHistRepository.findTotalErrorHistByYear(companyId, searchOp, searchContent,
-                yearSearch - 1, levelPath, isSuperAdmin);
+                    yearSearch - 1, levelPath, isSuperAdmin);
 
             ErrorBaseDto curYear = this.errorHistRepository.findTotalErrorHistByYear(companyId, searchOp, searchContent,
-                yearSearch, levelPath, isSuperAdmin);
+                    yearSearch, levelPath, isSuperAdmin);
 
             if (preYear == null || preYear.getTotal() == null) {
                 preYear = getDefaultErrorDto(yearSearch - 1);
             }
 
-            if (curYear == null || curYear.getTotal() == null ){
+            if (curYear == null || curYear.getTotal() == null) {
                 curYear = getDefaultErrorDto(yearSearch);
             }
 
@@ -396,9 +398,9 @@ public class StatisticsService {
         }
     }
 
-    /* 
-    * ErrorBarDto 빈 객체 생성
-    */
+    /*
+     * ErrorBarDto 빈 객체 생성
+     */
     public ErrorBaseDto getDefaultErrorDto(Integer year) {
         return ErrorBaseDto.builder()
                 .year(year)
@@ -427,13 +429,13 @@ public class StatisticsService {
             }
 
             List<ErrorLineChartBaseDto> speedLowList = this.errorHistRepository.searchMonthlyTotalErrorHist(companyId,
-                searchOp, searchContent, yearSearch, "SPEEDLOW", levelPath, isSuperAdmin);
+                    searchOp, searchContent, yearSearch, "SPEEDLOW", levelPath, isSuperAdmin);
 
             List<ErrorLineChartBaseDto> speedFastList = this.errorHistRepository.searchMonthlyTotalErrorHist(companyId,
-                searchOp, searchContent, yearSearch, "SPEEDFAST", levelPath, isSuperAdmin);
+                    searchOp, searchContent, yearSearch, "SPEEDFAST", levelPath, isSuperAdmin);
 
             List<ErrorLineChartBaseDto> speedDespnList = this.errorHistRepository.searchMonthlyTotalErrorHist(companyId,
-                searchOp, searchContent, yearSearch, "SPEEDDESPN", levelPath, isSuperAdmin);
+                    searchOp, searchContent, yearSearch, "SPEEDDESPN", levelPath, isSuperAdmin);
 
             return ErrorLineChartDto.builder()
                     .speedLowList(speedLowList)

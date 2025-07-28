@@ -28,7 +28,7 @@ public class CpFwVersion {
     @Column(name = "cpfwversion_id")
     private Long id;
 
-    @Column(name = "company_id")
+    @Column(name = "company_id", nullable = false)
     private Long companyId;
 
     @Column(name = "model_code")

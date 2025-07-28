@@ -31,19 +31,30 @@ public class VocService {
     private final ComService comService;
 
     // 1:1문의 조회
-    public Page<VocListDto> findVocInfoWithPagination(String type, String replyStat, String name, int page, int size) {
+    public Page<VocListDto> findVocInfoWithPagination(String type, String replyStat, String name, int page, int size,
+            String loginUserId) {
         Pageable pageable = PageRequest.of(page, size);
 
         try {
+            boolean isSuperAdmin = comService.checkSuperAdmin(loginUserId);
+            Long loginUserCompanyId = comService.getLoginUserCompanyId(loginUserId);
+            String levelPath = companyRepository.findLevelPathByCompanyId(loginUserCompanyId);
+            log.info("== levelPath : {}", levelPath);
+            if (levelPath == null) {
+                // 관계정보가 없을경우 빈 리스트 전달
+                return Page.empty(pageable);
+            }
+
             Page<VocListDto> vocList;
 
             if ((type == null || type.isEmpty()) && (replyStat == null || replyStat.isEmpty())
                     && (name == null || name.isEmpty())) {
                 log.info("Executing the [findVocWithPagination]");
-                vocList = this.vocRepository.findVocWithPagination(pageable);
+                vocList = this.vocRepository.findVocWithPagination(pageable, levelPath, isSuperAdmin);
             } else {
                 log.info("Executing the [searchVocWithPagination]");
-                vocList = this.vocRepository.searchVocWithPagination(type, replyStat, name, pageable);
+                vocList = this.vocRepository.searchVocWithPagination(type, replyStat, name, pageable, levelPath,
+                        isSuperAdmin);
             }
 
             return vocList;

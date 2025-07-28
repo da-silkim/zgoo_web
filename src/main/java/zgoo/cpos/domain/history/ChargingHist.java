@@ -37,19 +37,19 @@ public class ChargingHist {
     @Column(name = "charginghist_id")
     private Long id;
 
-    @Column(name = "charger_id")
+    @Column(name = "charger_id", nullable = false)
     private String chargerID;
 
-    @Column(name = "id_tag")
+    @Column(name = "id_tag", nullable = false)
     private String idTag;
 
     @Column(name = "start_time")
     private LocalDateTime startTime;
 
-    @Column(name = "transaction_id")
+    @Column(name = "transaction_id", nullable = false)
     private Integer transactionId;
 
-    @Column(name = "connector_id")
+    @Column(name = "connector_id", nullable = false)
     private Integer connectorId;
 
     @Column(name = "end_time")
