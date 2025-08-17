@@ -307,6 +307,80 @@ document.addEventListener("DOMContentLoaded", function () {
         })
     }
 
+    // VAS 암호화 키 요청 버튼 클릭 이벤트 처리
+    const reqEncKeyBtn = document.getElementById('reqEncKeyBtn');
+    if (reqEncKeyBtn) {
+        reqEncKeyBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+
+            //충전기가 선택되지 않은 경우
+            if (!selectedChargerId) {
+                alert('충전기가 선택되지 않았습니다.');
+                return;
+            }
+
+            // bid 가져오기
+            const bid = document.getElementById('vasBid').value;
+            // bkey 가져오기
+            const bkey = document.getElementById('vasBkey').value;
+
+            if (confirm(`선택한 충전기(${selectedChargerId}, bid: ${bid}, bkey: ${bkey})에 암호화 키 요청을 진행하시겠습니까?`)) {
+                const reqData = {
+                    chargerId: selectedChargerId,
+                    bid: bid,
+                    bkey: bkey,
+                    chargerCnt: 1
+                };
+
+                // 환경부 API 요청을 백엔드로 전달
+                fetch('/control/requestEncKey', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(reqData)
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log("환경부 응답 데이터:", data);
+
+                        // VasGetEncKeyDto 형식으로 데이터 구성
+                        const encKeyRequest = {
+                            resultCode: data.resultCode,
+                            resultTime: data.resultTime,
+                            successCnt: data.successCnt,
+                            reqChargerCnt: reqData.chargerCnt,
+                            errCode: data.errCode,
+                            errMsg: data.errMsg,
+                            chargerKeySet: data.chargerKeySet || []
+                        };
+
+
+                        // 두 번째 API 호출 - /control/getEncKey
+                        return fetch('/control/getEncKey', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(encKeyRequest)
+                        });
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'Accepted') {
+                            alert('암호화 키 요청이 성공적으로 처리되었습니다.');
+                        } else {
+                            alert('암호화 키 요청 처리 중 오류가 발생했습니다: ' + (data.message || '알 수 없는 오류'));
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('암호화 키 요청 중 오류가 발생했습니다.');
+                    });
+            }
+        })
+    }
+
     // 리셋 전송 버튼 클릭 이벤트 처리
     const sendResetBtn = document.getElementById('sendResetBtn');
     if (sendResetBtn) {

@@ -1,20 +1,30 @@
 package zgoo.cpos.cpcontrol.controller;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.client.RestTemplate;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import zgoo.cpos.cpcontrol.dto.CancelTestRequestDto;
 import zgoo.cpos.cpcontrol.dto.CancelTestRsponseDto;
 import zgoo.cpos.cpcontrol.dto.ChangeConfigurationReqDto;
+import zgoo.cpos.cpcontrol.dto.DataTransferDto;
 import zgoo.cpos.cpcontrol.dto.GetConfigurationReqDto;
 import zgoo.cpos.cpcontrol.dto.PaymentTestRequestDto;
 import zgoo.cpos.cpcontrol.dto.PaymentTestResponseDto;
@@ -24,7 +34,10 @@ import zgoo.cpos.cpcontrol.dto.ResetRequestDto;
 import zgoo.cpos.cpcontrol.dto.TidSearchRequest;
 import zgoo.cpos.cpcontrol.dto.TriggerMessageReqDto;
 import zgoo.cpos.cpcontrol.dto.UpdateFirmwareDto;
+import zgoo.cpos.cpcontrol.dto.VasEncKeyRequestDto;
+import zgoo.cpos.cpcontrol.dto.VasGetEncKeyDto;
 import zgoo.cpos.cpcontrol.message.changeconfiguration.ChangeConfigurationResponse;
+import zgoo.cpos.cpcontrol.message.datatransfer.DataTransferResponse;
 import zgoo.cpos.cpcontrol.message.firmware.UpdateFirmwareResponse;
 import zgoo.cpos.cpcontrol.message.getconfiguration.GetConfigurationResponse;
 import zgoo.cpos.cpcontrol.message.remotecharging.RemoteStartTransactionResponse;
@@ -32,6 +45,7 @@ import zgoo.cpos.cpcontrol.message.remotecharging.RemoteStopTransactionResponse;
 import zgoo.cpos.cpcontrol.message.reset.ResetResponse;
 import zgoo.cpos.cpcontrol.message.trigger.TriggerMessageResponse;
 import zgoo.cpos.cpcontrol.service.CpControlService;
+import zgoo.cpos.type.ocpp.DataTransferStatus;
 
 @Controller
 @RequiredArgsConstructor
@@ -82,6 +96,131 @@ public class CpControlController {
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
+        }
+    }
+
+    @PostMapping("/requestEncKey")
+    public ResponseEntity<?> requestEncKey(@RequestBody VasEncKeyRequestDto request) {
+        log.info("Request Enc Key from Environment Ministry API(/requestEncKey) : {}", request.toString());
+        try {
+            // 환경부 API 호출
+            String environmentApiUrl = "http://121.141.6.27:35083/v1/charger/battery/getEncKey";
+
+            // 요청 body 구성 (샘플 메시지 형식에 맞춤)
+            Map<String, Object> requestBody = new HashMap<>();
+            requestBody.put("bid", request.getBid());
+            requestBody.put("bkey", request.getBkey());
+            requestBody.put("chargerCnt", request.getChargerCnt()); // 현재는 단일 충전기만 처리
+
+            // 충전기 키셋 구성
+            List<Map<String, String>> chargerKeySet = new ArrayList<>();
+            Map<String, String> chargerKey = new HashMap<>();
+            chargerKey.put("chargerId", request.getBid() + request.getChargerId());
+            chargerKey.put("keyId", ""); // keyId는 환경부에서 생성하므로 빈 값으로 전송
+            chargerKeySet.add(chargerKey);
+            requestBody.put("chargerKeySet", chargerKeySet);
+
+            log.info("Environment Ministry API Request Body: {}", requestBody);
+
+            // RestTemplate을 사용하여 외부 API 호출
+            RestTemplate restTemplate = new RestTemplate();
+
+            // 요청 헤더 설정
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            // HTTP 엔티티 생성
+            HttpEntity<Map<String, Object>> entity = new HttpEntity<>(
+                    requestBody, headers);
+
+            // 외부 API 호출
+            ResponseEntity<Map> response = restTemplate.postForEntity(environmentApiUrl, entity, Map.class);
+
+            log.info("Environment Ministry API Response: {}", response.getBody());
+
+            return ResponseEntity.ok(response.getBody());
+        } catch (Exception e) {
+            log.error("Environment Ministry API 호출 중 오류 발생", e);
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("status", "error");
+            errorResponse.put("message", "환경부 API 호출 중 오류가 발생했습니다: " + e.getMessage());
+            return ResponseEntity.badRequest().body(errorResponse);
+        }
+    }
+
+    @PostMapping("/getEncKey")
+    public ResponseEntity<?> getEncKey(@RequestBody VasGetEncKeyDto request) {
+        log.info("Get Enc Key Request(/getEncKey) : {}", request.toString());
+        try {
+            // 환경부 API 응답 데이터 처리
+            Map<String, Object> response = new HashMap<>();
+            DataTransferResponse dataTransferResponse = new DataTransferResponse();
+
+            // 성공 여부 확인
+            if ("0".equals(request.getResultCode()) || "1".equals(request.getResultCode())) {
+                response.put("status", "Accepted");
+                response.put("message", "암호화 키 요청이 성공적으로 처리되었습니다.");
+
+                // 환경부 응답의 주요 정보 로깅
+                log.info(
+                        "Environment Ministry API Success Response - resultCode: {}, successCnt: {}, errCode: {}, errMsg: {}, chargerKeySet: {}",
+                        request.getResultCode(), request.getSuccessCnt(), request.getErrCode(), request.getErrMsg(),
+                        request.getChargerKeySet());
+
+                // chargerKeySet 정보가 있다면 로깅
+                if (!request.getChargerKeySet().isEmpty()) {
+                    // List<VasGetEncKeyDto.ChargerKeySet> chargerKeySet =
+                    // request.getChargerKeySet();
+                    // for (VasGetEncKeyDto.ChargerKeySet chargerKey : chargerKeySet) {
+                    // log.info(
+                    // "Charger Key Info - chargerId: {}, keyId: {}, retVal: {}, encryptPub:{},
+                    // validTime:{}",
+                    // chargerKey.getChargerId(), chargerKey.getKeyId(), chargerKey.getRetVal(),
+                    // chargerKey.getEncryptPub(), chargerKey.getValidTime());
+                    // }
+                    DataTransferDto dataTransferDto = new DataTransferDto();
+                    dataTransferDto.setChargerId(request.getChargerKeySet().get(0).getChargerId());
+                    dataTransferDto.setVendorId("kr.co.zgoo");
+                    dataTransferDto.setMessageId("meBattEncKey");
+
+                    // JsonNode를 이용해 data 설정
+                    ObjectMapper objectMapper = new ObjectMapper();
+                    JsonNode dataNode = objectMapper.createObjectNode()
+                            .put("resultTime", request.getResultTime())
+                            .put("chargerId", request.getChargerKeySet().get(0).getChargerId())
+                            .put("keyId", request.getChargerKeySet().get(0).getKeyId())
+                            .put("encryptPub", request.getChargerKeySet().get(0).getEncryptPub())
+                            .put("signData", request.getChargerKeySet().get(0).getSignData())
+                            .put("validTime", request.getChargerKeySet().get(0).getValidTime())
+                            .put("retVal", request.getChargerKeySet().get(0).getRetVal());
+
+                    dataTransferDto.setData(dataNode);
+                    dataTransferResponse = cpControlService.dataTransfer(dataTransferDto);
+
+                    if (dataTransferResponse.getStatus() == DataTransferStatus.Accepted) {
+                        response.put("status", "Accepted");
+                        response.put("message", "암호화 키 요청/배포가 성공적으로 처리되었습니다.");
+                    } else {
+                        response.put("status", "Rejected");
+                        response.put("message",
+                                "암호화 키 배포 오류(by 충전기 >> status:" + dataTransferResponse.getStatus() + ")");
+                    }
+                }
+            } else {
+                response.put("status", "Rejected");
+                response.put("message", "환경부 API 처리 실패(errMsg:" + request.getErrMsg() + ", errCode:"
+                        + request.getErrCode() + ", resultCode:" + request.getResultCode() + ")");
+                log.error("Environment Ministry API Error - resultCode: {}, errMsg: {}",
+                        request.getResultCode(), request.getErrMsg());
+            }
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            log.error("Get Enc Key 처리 중 오류 발생", e);
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("status", "Rejected");
+            errorResponse.put("message", "암호화 키 요청 처리 중 오류가 발생했습니다: " + e.getMessage());
+            return ResponseEntity.badRequest().body(errorResponse);
         }
     }
 

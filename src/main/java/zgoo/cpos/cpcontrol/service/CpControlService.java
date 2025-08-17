@@ -26,6 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 import zgoo.cpos.cpcontrol.dto.CancelTestRequestDto;
 import zgoo.cpos.cpcontrol.dto.CancelTestRsponseDto;
 import zgoo.cpos.cpcontrol.dto.ChangeConfigurationReqDto;
+import zgoo.cpos.cpcontrol.dto.DataTransferDto;
 import zgoo.cpos.cpcontrol.dto.GetConfigurationReqDto;
 import zgoo.cpos.cpcontrol.dto.PaymentTestRequestDto;
 import zgoo.cpos.cpcontrol.dto.PaymentTestResponseDto;
@@ -35,6 +36,7 @@ import zgoo.cpos.cpcontrol.dto.ResetRequestDto;
 import zgoo.cpos.cpcontrol.dto.TriggerMessageReqDto;
 import zgoo.cpos.cpcontrol.dto.UpdateFirmwareDto;
 import zgoo.cpos.cpcontrol.message.changeconfiguration.ChangeConfigurationResponse;
+import zgoo.cpos.cpcontrol.message.datatransfer.DataTransferResponse;
 import zgoo.cpos.cpcontrol.message.firmware.UpdateFirmwareResponse;
 import zgoo.cpos.cpcontrol.message.getconfiguration.GetConfigurationResponse;
 import zgoo.cpos.cpcontrol.message.remotecharging.RemoteStartTransactionResponse;
@@ -301,6 +303,56 @@ public class CpControlService {
         } catch (Exception e) {
             log.error("Remote Start Transaction Request(/remoteStartTransaction) 처리 중 예외 발생", e);
             throw new RuntimeException("Remote Start Transaction Request(/remoteStartTransaction) 처리 중 예외 발생", e);
+        }
+    }
+
+    public DataTransferResponse dataTransfer(DataTransferDto request) {
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            Map<String, Object> requestMap = new HashMap<>();
+            requestMap.put("chargePointId", request.getChargerId().substring(2));
+            requestMap.put("vendorId", request.getVendorId());
+            requestMap.put("messageId", request.getMessageId());
+            requestMap.put("data", request.getData());
+
+            log.info("Data Transfer Request : {}", requestMap.toString());
+
+            // HTTP 요청 엔티티 생성
+            HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestMap, headers);
+
+            log.info("외부 서버({})로 POST 요청 전송", gwServerUrl + "/dataTransfer");
+            long startTime = System.currentTimeMillis();
+
+            ResponseEntity<DataTransferResponse> response = restTemplate.postForEntity(
+                    gwServerUrl + "/dataTransfer",
+                    entity,
+                    DataTransferResponse.class);
+
+            long endTime = System.currentTimeMillis();
+            log.info("외부 서버 응답 수신 - 소요시간: {}ms, 상태코드: {}",
+                    (endTime - startTime), response.getStatusCodeValue());
+
+            if (response.getStatusCode().is2xxSuccessful()) {
+                // 응답데이터 로깅
+                log.info("외부 서버 응답 데이터: {}", response.getBody());
+
+                DataTransferResponse dataTransferResponse = response.getBody();
+
+                log.info("Data Transfer Request(/dataTransfer) 성공 - 결과메시지: {}", dataTransferResponse);
+
+                return dataTransferResponse;
+            } else {
+                log.error("Data Transfer Request(/dataTransfer) 실패 - 상태코드: {}, 응답: {}",
+                        response.getStatusCode(), response.getBody());
+                throw new RuntimeException(
+                        "Data Transfer Request(/dataTransfer) 실패 - 상태코드: " + response.getStatusCode());
+            }
+
+        } catch (Exception e) {
+            log.error("Data Transfer Request(/dataTransfer) 처리 중 예외 발생", e);
+            throw new RuntimeException("Data Transfer Request(/dataTransfer) 처리 중 예외 발생", e);
         }
     }
 
