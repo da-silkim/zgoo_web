@@ -6,8 +6,11 @@
             <div class="col-5 dashboard-col p-0">
                 <div class="card">
                     <div class="card-body">
-                        <div class="card-title"><span class="card-title-bar"></span><span>충전기 현황</span></div>
-                        <div>총 충전기 대수 <b class="price" style="font-size: 20px;" th:text="${cpCount}"></b>대</div>
+                        <div class="card-title"><span class="card-title-bar"></span><span
+                                th:text="#{dashboard.charger.status}">충전기 현황</span></div>
+                        <div><span th:text="#{dashboard.total.chargers}">총 충전기 대수</span> <b class="price"
+                                style="font-size: 20px;" th:text="${cpCount}"></b><span th:text="#{unit.count}">대</span>
+                        </div>
                         <canvas id="treeChart"></canvas>
                     </div>
                 </div>
@@ -15,7 +18,8 @@
             <div class="col-3 dashboard-col">
                 <div class="card">
                     <div class="card-body">
-                        <div class="card-title"><span class="card-title-bar"></span><span>가동률</span></div>
+                        <div class="card-title"><span class="card-title-bar"></span><span
+                                th:text="#{dashboard.operation.rate}">가동률</span></div>
                         <canvas id="doughnutChart"></canvas>
                     </div>
                 </div>
@@ -24,61 +28,60 @@
                 <div class="row pb-1 h-50 m-0 sales-container">
                     <div class="card">
                         <div class="card-body">
-                            <div class="card-title"><span class="card-title-bar"></span><span>매출 현황</span></div>
+                            <div class="card-title"><span class="card-title-bar"></span><span
+                                    th:text="#{dashboard.sales.status}">매출 현황</span></div>
                             <div class="dashboard-period">
                                 <i class="bi bi-clock-history me-1"></i>
-                                <span th:text="${saleStatus.period}"></span>
+                                <span th:text="${saleStatus != null ? saleStatus.period : ''}"></span>
                             </div>
                             <div class="sales-status">
                                 <div class="row">
-                                    <div class="col-3">급속</div>
-                                    <!-- <div class="col-4 text-right" th:text="|1,350,000 원|">
-                                    </div>
-                                    <div class="col-5 status-text">
-                                        <span class="font-color-brown" th:text="|▲ 지난달 대비 100,000 원|"></span>
-                                    </div> -->
+                                    <div class="col-3" th:text="#{charger.fast}">급속</div>
                                     <div class="col-4 text-right"
-                                        th:text="|${#numbers.formatDecimal(saleStatus.fastSales, 1, 'COMMA', 0, 'POINT')} 원|">
+                                        th:text="|${saleStatus != null ? #numbers.formatDecimal(saleStatus.fastSales, 1, 'COMMA', 0, 'POINT') : '0'} #{unit.won}|">
                                     </div>
                                     <div class="col-5 status-text">
-                                        <span th:if="${saleStatus.fastCheck == 1}" class="font-color-brown"
-                                            th:text="|▲ 지난달 대비 ${#numbers.formatDecimal(saleStatus.compareFast, 1, 'COMMA', 0, 'POINT')} 원|"></span>
-                                        <span th:if="${saleStatus.fastCheck == -1}" class="font-color-blue"
-                                            th:text="|▼ 지난달 대비 ${#numbers.formatDecimal(saleStatus.compareFast, 1, 'COMMA', 0, 'POINT')} 원|"></span>
-                                        <span th:if="${saleStatus.fastCheck == 0}" th:text="|-|"></span>
+                                        <span th:if="${saleStatus != null and saleStatus.fastCheck == 1}"
+                                            class="font-color-brown"
+                                            th:text="|#{status.increase} ${#numbers.formatDecimal(saleStatus.compareFast, 1, 'COMMA', 0, 'POINT')} #{unit.won}|"></span>
+                                        <span th:if="${saleStatus != null and saleStatus.fastCheck == -1}"
+                                            class="font-color-blue"
+                                            th:text="|#{status.decrease} ${#numbers.formatDecimal(saleStatus.compareFast, 1, 'COMMA', 0, 'POINT')} #{unit.won}|"></span>
+                                        <span th:if="${saleStatus != null and saleStatus.fastCheck == 0}"
+                                            th:text="#{status.no.change}"></span>
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <div class="col-3">완속</div>
-                                    <!-- <div class="col-4 text-right" th:text="|250,000 원|">
-                                    </div>
-                                    <div class="col-5 status-text">
-                                        <span class="font-color-brown" th:text="|▲ 지난달 대비 50,000 원|"></span>
-                                    </div> -->
+                                    <div class="col-3" th:text="#{charger.slow}">완속</div>
                                     <div class="col-4 text-right"
-                                        th:text="|${#numbers.formatDecimal(saleStatus.lowSales, 1, 'COMMA', 0, 'POINT')} 원|">
+                                        th:text="|${saleStatus != null ? #numbers.formatDecimal(saleStatus.lowSales, 1, 'COMMA', 0, 'POINT') : '0'} #{unit.won}|">
                                     </div>
                                     <div class="col-5 status-text">
-                                        <span th:if="${saleStatus.lowCheck == 1}" class="font-color-brown"
-                                            th:text="|▲ 지난달 대비 ${#numbers.formatDecimal(saleStatus.compareLow, 1, 'COMMA', 0, 'POINT')} 원|"></span>
-                                        <span th:if="${saleStatus.lowCheck == -1}" class="font-color-blue"
-                                            th:text="|▼ 지난달 대비 ${#numbers.formatDecimal(saleStatus.compareLow, 1, 'COMMA', 0, 'POINT')} 원|"></span>
-                                        <span th:if="${saleStatus.lowCheck == 0}" th:text="|-|"></span>
+                                        <span th:if="${saleStatus != null and saleStatus.lowCheck == 1}"
+                                            class="font-color-brown"
+                                            th:text="|#{status.increase} ${#numbers.formatDecimal(saleStatus.compareLow, 1, 'COMMA', 0, 'POINT')} #{unit.won}|"></span>
+                                        <span th:if="${saleStatus != null and saleStatus.lowCheck == -1}"
+                                            class="font-color-blue"
+                                            th:text="|#{status.decrease} ${#numbers.formatDecimal(saleStatus.compareLow, 1, 'COMMA', 0, 'POINT')} #{unit.won}|"></span>
+                                        <span th:if="${saleStatus != null and saleStatus.lowCheck == 0}"
+                                            th:text="#{status.no.change}"></span>
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <div class="col-3">디스펜서</div>
+                                    <div class="col-3" th:text="#{charger.dispenser}">디스펜서</div>
                                     <div class="col-4 text-right"
-                                        th:text="|${#numbers.formatDecimal(saleStatus.despnSales, 1, 'COMMA', 0, 'POINT')} 원|">
+                                        th:text="|${saleStatus != null ? #numbers.formatDecimal(saleStatus.despnSales, 1, 'COMMA', 0, 'POINT') : '0'} #{unit.won}|">
                                     </div>
                                     <div class="col-5 status-text">
-                                        <span th:if="${saleStatus.despnCheck == 1}" class="font-color-brown"
-                                            th:text="|▲ 지난달 대비 ${#numbers.formatDecimal(saleStatus.compareDespn, 1, 'COMMA', 0, 'POINT')} 원|"></span>
-                                        <span th:if="${saleStatus.despnCheck == -1}" class="font-color-blue"
-                                            th:text="|▼ 지난달 대비 ${#numbers.formatDecimal(saleStatus.compareDespn, 1, 'COMMA', 0, 'POINT')} 원|"></span>
-                                        <span th:if="${saleStatus.despnCheck == 0}" th:text="|-|"></span>
+                                        <span th:if="${saleStatus != null and saleStatus.despnCheck == 1}"
+                                            class="font-color-brown"
+                                            th:text="|#{status.increase} ${#numbers.formatDecimal(saleStatus.compareDespn, 1, 'COMMA', 0, 'POINT')} #{unit.won}|"></span>
+                                        <span th:if="${saleStatus != null and saleStatus.despnCheck == -1}"
+                                            class="font-color-blue"
+                                            th:text="|#{status.decrease} ${#numbers.formatDecimal(saleStatus.compareDespn, 1, 'COMMA', 0, 'POINT')} #{unit.won}|"></span>
+                                        <span th:if="${saleStatus != null and saleStatus.despnCheck == 0}"
+                                            th:text="#{status.no.change}"></span>
                                     </div>
-
                                 </div>
                             </div>
                         </div>
@@ -87,49 +90,59 @@
                 <div class="row pt-1 h-50 m-0 charge-container">
                     <div class="card h-100">
                         <div class="card-body">
-                            <div class="card-title"><span class="card-title-bar"></span><span>충전 현황</span></div>
+                            <div class="card-title"><span class="card-title-bar"></span><span
+                                    th:text="#{dashboard.charge.status}">충전 현황</span></div>
                             <div class="dashboard-period">
                                 <i class="bi bi-clock-history me-1"></i>
-                                <span th:text="${chgStatus.period}"></span>
+                                <span th:text="${chgStatus != null ? chgStatus.period : ''}"></span>
                             </div>
                             <div class="charge-status">
                                 <div class="row">
-                                    <div class="col-3">급속</div>
+                                    <div class="col-3" th:text="#{charger.fast}">급속</div>
                                     <div class="col-4 text-right"
-                                        th:text="|${#numbers.formatDecimal(chgStatus.fastChgAmount, 1, 'COMMA', 2, 'POINT')} kWh|">
+                                        th:text="|${chgStatus != null ? #numbers.formatDecimal(chgStatus.fastChgAmount, 1, 'COMMA', 2, 'POINT') : '0'} #{unit.kwh}|">
                                     </div>
                                     <div class="col-5 status-text">
-                                        <span th:if="${chgStatus.fastCheck == 1}" class="font-color-brown"
-                                            th:text="|▲ 지난달 대비 ${#numbers.formatDecimal(chgStatus.compareFast, 1, 'COMMA', 2, 'POINT')} kWh|"></span>
-                                        <span th:if="${chgStatus.fastCheck == -1}" class="font-color-blue"
-                                            th:text="|▼ 지난달 대비 ${#numbers.formatDecimal(chgStatus.compareFast, 1, 'COMMA', 2, 'POINT')} kWh|"></span>
-                                        <span th:if="${chgStatus.fastCheck == 0}" th:text="|-|"></span>
+                                        <span th:if="${chgStatus != null and chgStatus.fastCheck == 1}"
+                                            class="font-color-brown"
+                                            th:text="|#{status.increase} ${#numbers.formatDecimal(chgStatus.compareFast, 1, 'COMMA', 2, 'POINT')} #{unit.kwh}|"></span>
+                                        <span th:if="${chgStatus != null and chgStatus.fastCheck == -1}"
+                                            class="font-color-blue"
+                                            th:text="|#{status.decrease} ${#numbers.formatDecimal(chgStatus.compareFast, 1, 'COMMA', 2, 'POINT')} #{unit.kwh}|"></span>
+                                        <span th:if="${chgStatus != null and chgStatus.fastCheck == 0}"
+                                            th:text="#{status.no.change}"></span>
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <div class="col-3">완속</div>
+                                    <div class="col-3" th:text="#{charger.slow}">완속</div>
                                     <div class="col-4 text-right"
-                                        th:text="|${#numbers.formatDecimal(chgStatus.lowChgAmount, 1, 'COMMA', 2, 'POINT')} kWh|">
+                                        th:text="|${chgStatus != null ? #numbers.formatDecimal(chgStatus.lowChgAmount, 1, 'COMMA', 2, 'POINT') : '0'} #{unit.kwh}|">
                                     </div>
                                     <div class="col-5 status-text">
-                                        <span th:if="${chgStatus.lowCheck == 1}" class="font-color-brown"
-                                            th:text="|▲ 지난달 대비 ${#numbers.formatDecimal(chgStatus.compareLow, 1, 'COMMA', 2, 'POINT')} kWh|"></span>
-                                        <span th:if="${chgStatus.lowCheck == -1}" class="font-color-blue"
-                                            th:text="|▼ 지난달 대비 ${#numbers.formatDecimal(chgStatus.compareLow, 1, 'COMMA', 2, 'POINT')} kWh|"></span>
-                                        <span th:if="${chgStatus.lowCheck == 0}" th:text="|-|"></span>
+                                        <span th:if="${chgStatus != null and chgStatus.lowCheck == 1}"
+                                            class="font-color-brown"
+                                            th:text="|#{status.increase} ${#numbers.formatDecimal(chgStatus.compareLow, 1, 'COMMA', 2, 'POINT')} #{unit.kwh}|"></span>
+                                        <span th:if="${chgStatus != null and chgStatus.lowCheck == -1}"
+                                            class="font-color-blue"
+                                            th:text="|#{status.decrease} ${#numbers.formatDecimal(chgStatus.compareLow, 1, 'COMMA', 2, 'POINT')} #{unit.kwh}|"></span>
+                                        <span th:if="${chgStatus != null and chgStatus.lowCheck == 0}"
+                                            th:text="#{status.no.change}"></span>
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <div class="col-3">디스펜서</div>
+                                    <div class="col-3" th:text="#{charger.dispenser}">디스펜서</div>
                                     <div class="col-4 text-right"
-                                        th:text="|${#numbers.formatDecimal(chgStatus.despnChgAmount, 1, 'COMMA', 2, 'POINT')} kWh|">
+                                        th:text="|${chgStatus != null ? #numbers.formatDecimal(chgStatus.despnChgAmount, 1, 'COMMA', 2, 'POINT') : '0'} #{unit.kwh}|">
                                     </div>
                                     <div class="col-5 status-text">
-                                        <span th:if="${chgStatus.despnCheck == 1}" class="font-color-brown"
-                                            th:text="|▲ 지난달 대비 ${#numbers.formatDecimal(chgStatus.compareDespn, 1, 'COMMA', 2, 'POINT')} kWh|"></span>
-                                        <span th:if="${chgStatus.despnCheck == -1}" class="font-color-blue"
-                                            th:text="|▼ 지난달 대비 ${#numbers.formatDecimal(chgStatus.compareDespn, 1, 'COMMA', 2, 'POINT')} kWh|"></span>
-                                        <span th:if="${chgStatus.despnCheck == 0}" th:text="|-|"></span>
+                                        <span th:if="${chgStatus != null and chgStatus.despnCheck == 1}"
+                                            class="font-color-brown"
+                                            th:text="|#{status.increase} ${#numbers.formatDecimal(chgStatus.compareDespn, 1, 'COMMA', 2, 'POINT')} #{unit.kwh}|"></span>
+                                        <span th:if="${chgStatus != null and chgStatus.despnCheck == -1}"
+                                            class="font-color-blue"
+                                            th:text="|#{status.decrease} ${#numbers.formatDecimal(chgStatus.compareDespn, 1, 'COMMA', 2, 'POINT')} #{unit.kwh}|"></span>
+                                        <span th:if="${chgStatus != null and chgStatus.despnCheck == 0}"
+                                            th:text="#{status.no.change}"></span>
                                     </div>
                                 </div>
                             </div>
@@ -144,7 +157,8 @@
             <div class="col dashboard-col ps-0">
                 <div class="card">
                     <div class="card-body">
-                        <div class="card-title"><span class="card-title-bar"></span><span>충전기 설치 현황</span></div>
+                        <div class="card-title"><span class="card-title-bar"></span><span
+                                th:text="#{dashboard.charger.installation}">충전기 설치 현황</span></div>
                         <canvas class="w-100 h-90 mw-100 m-auto" id="barChart"></canvas>
                     </div>
                 </div>
@@ -152,10 +166,11 @@
             <div class="col-3 dashboard-col p-0">
                 <div class="card">
                     <div class="card-body">
-                        <div class="card-title"><span class="card-title-bar"></span><span>사용용도</span></div>
+                        <div class="card-title"><span class="card-title-bar"></span><span
+                                th:text="#{dashboard.usage.purpose}">사용용도</span></div>
                         <div class="dashboard-period">
                             <i class="bi bi-ev-station me-1"></i>
-                            <span th:text="전체" id="facilityText"></span>
+                            <span th:text="#{period.all}" id="facilityText">전체</span>
                         </div>
                         <canvas id="pieChart"></canvas>
                     </div>
@@ -168,9 +183,10 @@
             <div class="col-7 dashboard-col ps-0">
                 <div class="card">
                     <div class="card-body">
-                        <div class="card-title"><span class="card-title-bar"></span><span>고장/장애 이력</span>
-                            <span class="article-detail"><a th:href="@{/history/error}">더보기<i
-                                        class="bi bi-plus-circle ms-1"></i></a>
+                        <div class="card-title"><span class="card-title-bar"></span><span
+                                th:text="#{dashboard.error.history}">고장/장애 이력</span>
+                            <span class="article-detail"><a th:href="@{/history/error}"><span
+                                        th:text="#{action.more}">더보기</span><i class="bi bi-plus-circle ms-1"></i></a>
                             </span>
                         </div>
                         <div class="px-2">
@@ -178,12 +194,12 @@
                                 <table class="table text-center error-status table-hover" style="min-width: 647px;">
                                     <thead>
                                         <tr class="table-border-top">
-                                            <th scope="col">충전소명</th>
-                                            <th scope="col">충전기ID</th>
-                                            <th scope="col">커넥터ID</th>
-                                            <th scope="col">에러코드</th>
-                                            <th scope="col">에러명</th>
-                                            <th scope="col">발생일시</th>
+                                            <th scope="col" th:text="#{table.station.name}">충전소명</th>
+                                            <th scope="col" th:text="#{table.charger.id}">충전기ID</th>
+                                            <th scope="col" th:text="#{table.connector.id}">커넥터ID</th>
+                                            <th scope="col" th:text="#{table.error.code}">에러코드</th>
+                                            <th scope="col" th:text="#{table.error.name}">에러명</th>
+                                            <th scope="col" th:text="#{table.occurrence.time}">발생일시</th>
                                         </tr>
                                     </thead>
                                     <tbody id="errorList">
@@ -208,10 +224,12 @@
                 <div class="card">
                     <div class="card-body main-notice-container">
                         <div>
-                            <div class="card-title"><span class="card-title-bar"></span><span>공지 사항</span></div>
+                            <div class="card-title"><span class="card-title-bar"></span><span
+                                    th:text="#{dashboard.notice}">공지 사항</span></div>
                         </div>
                         <span class="article-detail">
-                            <a th:href="@{/system/notice/list}">더보기<i class="bi bi-plus-circle ms-1"></i></a>
+                            <a th:href="@{/system/notice/list}"><span th:text="#{action.more}">더보기</span><i
+                                    class="bi bi-plus-circle ms-1"></i></a>
                         </span>
                         <div>
                             <table>
@@ -222,7 +240,8 @@
                                                 class="no-underline">
                                                 <div>
                                                     <span th:text="|[${notice.typeName}] ${notice.title}|"></span>
-                                                    <span th:if="${notice.isNew}" class="new-article">NEW</span>
+                                                    <span th:if="${notice.isNew}" class="new-article"
+                                                        th:text="#{action.new}">NEW</span>
                                                     <span
                                                         th:text="${#temporals.format(notice.regDt, 'yyyy-MM-dd HH:mm:ss')}"
                                                         class="float-right"></span>
@@ -246,7 +265,16 @@
         var connStatus = /*[[${connStatus != null ? connStatus : '{}'}]]*/ {};
         var chargerCountList = /*[[${chargerCountList != null ? chargerCountList : '{}'}]]*/ {};
         var facilityList = /*[[${facilityList != null ? facilityList : '{}'}]]*/ {};
+
+        // 현재 언어 가져오기
+        var currentLanguage = /*[[${#locale.language}]]*/ 'ko';
     </script>
+
+    <!-- 공통 i18n 스크립트 포함 -->
+    <div th:replace="~{fragments/i18n/i18n-dashboard :: dashboard-i18n}"></div>
+
+    <!-- 언어 선택 스크립트 추가 -->
+    <div th:replace="~{fragments/language-selector :: language-script}"></div>
 </div>
 
 </html>

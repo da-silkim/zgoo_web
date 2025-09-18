@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -51,6 +53,7 @@ public class FirmwareController {
     private final CodeService codeService;
     private final MenuAuthorityService menuAuthorityService;
     private final ChargerService chargerService;
+    private final MessageSource messageSource;
 
     /*
      * 펌웨어 버전 등록
@@ -64,7 +67,7 @@ public class FirmwareController {
 
         // valid error발생시 결과 리턴
         if (bindingResult.hasErrors()) {
-            log.error("펌웨어 버전 등록 에러: {}", bindingResult.getAllErrors());
+            log.error("fw version add error: {}", bindingResult.getAllErrors());
 
             // 클라이언트에게 400 Bad Request 상태와 함께 에러 메시지 반환
             bindingResult.getFieldErrors().forEach(error -> {
@@ -84,16 +87,19 @@ public class FirmwareController {
 
             String result = fwService.registFwVersion(reqdto, principal.getName());
             if (result == null) {
-                response.put("message", "펌웨어 버전 등록에 실패했습니다.");
+                response.put("message", messageSource.getMessage("fw.api.messages.fwversionaddfailed", null,
+                        LocaleContextHolder.getLocale()));
                 return ResponseEntity.badRequest().body(response);
             }
 
-            response.put("message", "펌웨어 버전 정보가 정상적으로 등록되었습니다.");
+            response.put("message", messageSource.getMessage("fw.api.messages.fwversionaddsuccess", null,
+                    LocaleContextHolder.getLocale()));
             return ResponseEntity.ok(response);
 
         } catch (Exception e) {
             log.error("[createFwVersion] error: {}", e.getMessage());
-            response.put("message", "오류 발생으로 펌웨어 버전 등록에 실패했습니다.");
+            response.put("message", messageSource.getMessage("fw.api.messages.fwversionaddfailed", null,
+                    LocaleContextHolder.getLocale()));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
@@ -119,10 +125,13 @@ public class FirmwareController {
             }
 
             fwService.deleteFwVersion(fwId);
-            return ResponseEntity.ok("펌웨어 버전 삭제 완료");
+            return ResponseEntity.ok(messageSource.getMessage("fw.api.messages.fwversiondeletesuccess", null,
+                    LocaleContextHolder.getLocale()));
         } catch (Exception e) {
             log.error("[deleteFwVersion] error: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("펌웨어 버전 삭제 중 오류 발생");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(messageSource.getMessage("fw.api.messages.fwversiondeletefailed", null,
+                            LocaleContextHolder.getLocale()));
         }
     }
 

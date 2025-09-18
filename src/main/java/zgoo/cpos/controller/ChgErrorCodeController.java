@@ -2,6 +2,8 @@ package zgoo.cpos.controller;
 
 import java.security.Principal;
 
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -29,6 +31,7 @@ public class ChgErrorCodeController {
 
     private final ChgErrorCodeService chgErrorCodeService;
     private final ComService comService;
+    private final MessageSource messageSource;
 
     // 에러코드 단건 조회
     @GetMapping("/get/{errcdId}")
@@ -44,7 +47,7 @@ public class ChgErrorCodeController {
             return ResponseEntity.ok(errorCodeOne);
         } catch (Exception e) {
             log.error("[findErrorCodeOne] error: {}", e.getMessage());
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
@@ -55,17 +58,19 @@ public class ChgErrorCodeController {
 
         try {
             ResponseEntity<String> permissionCheck = this.comService.checkUserPermissions(principal,
-                MenuConstants.ERRCODE);
+                    MenuConstants.ERRCODE);
             if (permissionCheck != null) {
                 return permissionCheck;
             }
 
             this.chgErrorCodeService.saveErrorCode(dto);
-            return ResponseEntity.ok("에러코드 정보가 정상적으로 등록되었습니다.");
+            return ResponseEntity.ok(messageSource.getMessage("errcdMgmt.api.messages.regSuccess", null,
+                    LocaleContextHolder.getLocale()));
         } catch (Exception e) {
             log.error("[createErrorCode] error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                    .body("에러코드 등록 중 오류가 발생했습니다.");
+                    .body(messageSource.getMessage("errcdMgmt.api.messages.regError", null,
+                            LocaleContextHolder.getLocale()));
         }
     }
 
@@ -77,18 +82,20 @@ public class ChgErrorCodeController {
 
         try {
             ResponseEntity<String> permissionCheck = this.comService.checkUserPermissions(principal,
-                MenuConstants.ERRCODE);
+                    MenuConstants.ERRCODE);
             if (permissionCheck != null) {
                 return permissionCheck;
             }
 
             this.chgErrorCodeService.updateErrorCode(errcdId, dto);
             log.info("=== error code info update complete ===");
-            return ResponseEntity.ok("에러코드 정보가 정상적으로 수정되었습니다.");
+            return ResponseEntity.ok(messageSource.getMessage("errcdMgmt.api.messages.updateSuccess", null,
+                    LocaleContextHolder.getLocale()));
         } catch (Exception e) {
             log.error("[updateErrorCode] error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                    .body("에러코드 수정 중 오류가 발생했습니다.");
+                    .body(messageSource.getMessage("errcdMgmt.api.messages.updateError", null,
+                            LocaleContextHolder.getLocale()));
         }
     }
 
@@ -101,21 +108,24 @@ public class ChgErrorCodeController {
             if (errcdId == null) {
                 log.error("errcdId id is null");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                                        .body("에러코드ID가 없어 삭제할 수 없습니다.");
+                        .body(messageSource.getMessage("errcdMgmt.api.messages.deleteErrById", null,
+                                LocaleContextHolder.getLocale()));
             }
 
             ResponseEntity<String> permissionCheck = this.comService.checkUserPermissions(principal,
-                MenuConstants.ERRCODE);
+                    MenuConstants.ERRCODE);
             if (permissionCheck != null) {
                 return permissionCheck;
             }
 
             this.chgErrorCodeService.deleteErrorCode(errcdId);
-            return ResponseEntity.ok("에러코드가 정상적으로 삭제되었습니다.");
+            return ResponseEntity.ok(messageSource.getMessage("errcdMgmt.api.messages.deleteSuccess", null,
+                    LocaleContextHolder.getLocale()));
         } catch (Exception e) {
             log.error("[deleteErrorCode] error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                    .body("에러코드 삭제 중 오류가 발생했습니다.");
+                    .body(messageSource.getMessage("errcdMgmt.api.messages.deleteError", null,
+                            LocaleContextHolder.getLocale()));
         }
     }
 }

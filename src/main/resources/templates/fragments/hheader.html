@@ -3,17 +3,27 @@
         <a th:href="@{/dashboard}">
             <img th:src="@{/img/dongah_white.png}" alt="logo" class="dashboard-logo">
         </a>
-        <span class="lang-content">
-            <a th:href="@{/}" id="loginContainer" sec:authorize="isAnonymous()">
-                <span class="me-4" id="login">Sign In<i class="fa-solid fa-right-to-bracket ms-3"></i></span>
-            </a>
-            <span id="logoutContainer" sec:authorize="isAuthenticated()">
-                <span>
-                    <i class="fa-solid fa-user"></i>
-                    <span th:text="|${loginUserName}(${loginUserAuthority}) 님|"></span>
+        <div class="header-right-content">
+            <!-- 첫 번째 줄: 언어 선택기 -->
+            <div class="header-language-row">
+                <div class="header-language-selector">
+                    <div th:replace="~{fragments/language-selector :: language-selector}"></div>
+                </div>
+            </div>
+
+            <!-- 두 번째 줄: 사용자 정보 및 로그아웃 -->
+            <div class="header-user-row">
+                <a th:href="@{/}" id="loginContainer" sec:authorize="isAnonymous()">
+                    <span class="me-4" id="login">Sign In<i class="fa-solid fa-right-to-bracket ms-3"></i></span>
+                </a>
+                <span id="logoutContainer" sec:authorize="isAuthenticated()">
+                    <span class="user-info">
+                        <i class="fa-solid fa-user"></i>
+                        <span th:text="${loginUserName} + ' (' + ${loginUserAuthority} + ')'"></span>
+                    </span>
+                    <a th:href="@{/logout}" id="logout">Sign Out<i class="fa-solid fa-right-from-bracket ms-3"></i></a>
                 </span>
-                <a th:href="@{/logout}" class="me-4" id="logout">Sign Out<i class="fa-solid fa-right-from-bracket ms-3"></i></i></a>
-            </span>
-        </span>
+            </div>
+        </div>
     </div>
 </div>

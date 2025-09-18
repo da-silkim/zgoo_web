@@ -4,21 +4,25 @@
     <div class="card responsive-content">
         <!-- card body:1 start -->
         <div class="card-body">
-            <div class="content-title"><i class="fa-solid fa-plug font-ico me-2"></i>충전기 > 충전기 리스트</div>
+            <div class="content-title"><i class="fa-solid fa-plug font-ico me-2"></i><span
+                    th:text="#{cpList.titles.main}"></span></div>
             <!-- card:2 start -->
             <div class="card card-shadow">
                 <!-- card body:2 start -->
                 <div class="card-body">
-                    <div class="card-title"><span class="card-title-bar"></span><span>검색조건</span></div>
+                    <div class="card-title"><span class="card-title-bar"></span><span
+                            th:text="#{cpList.titles.search}"></span></div>
                     <!-- form start -->
                     <form id="searchForm" class="position-relative" th:action="@{/charger/list}" method="get">
                         <!-- row:1 start -->
                         <div class="row mb-3 row-cols-2 row-cols-lg-3 g-2">
                             <div class="col d-flex align-items-center">
                                 <label for="companyIdSearch"
-                                    class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">사업자</label>
+                                    class="flex-shrink-0 col-form-label font-weight-bold text-right w-25"
+                                    th:text="#{cpList.titles.company}"></label>
                                 <select id="companyIdSearch" class="mx-3 form-control" name="companyIdSearch">
-                                    <option value="" th:text="'(없음)'" th:selected="${selectedCompanyId == null}">
+                                    <option value="" th:text="#{cpList.titles.select}"
+                                        th:selected="${selectedCompanyId == null}">
                                     </option>
                                     <option th:each="company : ${companyList}" th:value="${company.companyId}"
                                         th:text="${company.companyName}"
@@ -27,14 +31,16 @@
                             </div>
                             <div class="col d-flex align-items-center">
                                 <label for="opSearch"
-                                    class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">검색조건</label>
+                                    class="flex-shrink-0 col-form-label font-weight-bold text-right w-25"
+                                    th:text="#{cpList.titles.search}"></label>
                                 <select id="opSearch" name="opSearch" class="ms-3 form-control w-40">
-                                    <option value="" th:selected="${selectedOpSearch == null}">(선택)</option>
-                                    <option value="stationName" th:text="충전소명"
+                                    <option value="" th:selected="${selectedOpSearch == null}"
+                                        th:text="#{cpList.titles.select}"></option>
+                                    <option value="stationName" th:text="#{cpList.searchOptions.stationName}"
                                         th:selected="${selectedOpSearch == 'stationName'}"></option>
-                                    <option value="stationId" th:text="충전소ID"
+                                    <option value="stationId" th:text="#{cpList.searchOptions.stationId}"
                                         th:selected="${selectedOpSearch == 'stationId'}"></option>
-                                    <option value="chargerId" th:text="충전기ID"
+                                    <option value="chargerId" th:text="#{cpList.searchOptions.chargerId}"
                                         th:selected="${selectedOpSearch == 'chargerId'}"></option>
                                 </select>
                                 <input type="text" name="contentSearch" id="contentSearch" class="mx-2 form-control"
@@ -42,9 +48,11 @@
                             </div>
                             <div class="col d-flex align-items-center">
                                 <label for="manfCodeSearch"
-                                    class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">제조사</label>
+                                    class="flex-shrink-0 col-form-label font-weight-bold text-right w-25"
+                                    th:text="#{cpList.titles.manuf}"></label>
                                 <select id="manfCodeSearch" class="mx-3 form-control" name="manfCodeSearch">
-                                    <option value="" th:text="'(없음)'" th:selected="${selectedManfCd == null}"></option>
+                                    <option value="" th:text="#{cpList.titles.select}"
+                                        th:selected="${selectedManfCd == null}"></option>
                                     <option th:each="data : ${manfCdList}" th:value="${data.commonCode}"
                                         th:text="${data.commonCodeName}"
                                         th:selected="${data.commonCode == selectedManfCd}"></option>
@@ -54,10 +62,12 @@
                         <div class="search-btn">
                             <button type="button" class="btn btn-outline-grey me-2" id="searchBtn"
                                 onclick="searchOption()">
-                                <i class="bi bi-search me-2"></i>검색</button>
+                                <i class="bi bi-search me-2"></i><span
+                                    th:text="#{cpList.buttons.search}"></span></button>
                             <button type="button" class="btn btn-outline-grey me-2" id="resetBtn"
                                 onclick="replacePage('/charger/list')">
-                                <i class="bi bi-arrow-repeat me-2"></i>초기화</button>
+                                <i class="bi bi-arrow-repeat me-2"></i><span
+                                    th:text="#{cpList.buttons.reset}"></span></button>
                         </div>
                         <!-- row:1 end -->
                     </form>
@@ -71,45 +81,56 @@
                 <div class="card-body btn-page-container">
                     <div class="connector-container connector-legend bg-light rounded">
                         <span class="me-3 d-flex align-items-center">
-                            <i class="fa-solid fa-plug available me-1 fa-lg"></i> <strong>사용가능</strong>
+                            <i class="fa-solid fa-plug available me-1 fa-lg"></i> <strong
+                                th:text="#{chart.available}"></strong>
                         </span>
                         <span class="me-3 d-flex align-items-center">
-                            <i class="fa-solid fa-plug preparing me-1 fa-lg"></i> <strong>준비중</strong>
+                            <i class="fa-solid fa-plug preparing me-1 fa-lg"></i> <strong
+                                th:text="#{chart.preparing}"></strong>
                         </span>
                         <span class="me-3 d-flex align-items-center">
-                            <i class="fa-solid fa-plug charging me-1 fa-lg"></i> <strong>충전중</strong>
+                            <i class="fa-solid fa-plug charging me-1 fa-lg"></i> <strong
+                                th:text="#{chart.charging}"></strong>
                         </span>
                         <span class="me-3 d-flex align-items-center">
-                            <i class="fa-solid fa-plug finishing me-1 fa-lg"></i> <strong>충전완료</strong>
+                            <i class="fa-solid fa-plug finishing me-1 fa-lg"></i> <strong
+                                th:text="#{chart.finishing}"></strong>
                         </span>
                         <span class="me-3 d-flex align-items-center">
-                            <i class="fa-solid fa-plug faulted me-1 fa-lg"></i> <strong>고장</strong>
+                            <i class="fa-solid fa-plug faulted me-1 fa-lg"></i> <strong
+                                th:text="#{chart.faulted}"></strong>
                         </span>
                         <span class="me-3 d-flex align-items-center">
-                            <i class="fa-solid fa-plug reserved me-1 fa-lg"></i> <strong>예약</strong>
+                            <i class="fa-solid fa-plug reserved me-1 fa-lg"></i> <strong
+                                th:text="#{chart.reserved}"></strong>
                         </span>
                         <span class="me-3 d-flex align-items-center">
-                            <i class="fa-solid fa-plug disconnected me-1 fa-lg"></i> <strong>연결끊김</strong>
+                            <i class="fa-solid fa-plug disconnected me-1 fa-lg"></i> <strong
+                                th:text="#{chart.disconnected}"></strong>
                         </span>
                     </div>
                     <div class="cp-btn-container">
                         <button class="btn btn-excel" onclick="cpExcelDownload()"
                             th:if="${menuAuthority.authority == 'SU' or menuAuthority.excelYn == 'Y'}">
-                            <i class="bi bi-file-earmark-spreadsheet"></i>엑셀다운로드</button>
+                            <i class="bi bi-file-earmark-spreadsheet"></i><span
+                                th:text="#{cpList.buttons.excel}"></span></button>
                         <div class="btn-mod" th:if="${menuAuthority.authority == 'SU' or menuAuthority.modYn == 'Y'}">
                             <button class="btn btn-data-add" id="addBtn" data-bs-toggle="modal"
-                                data-bs-target="#dataAddModal"><i class="bi bi-plus-square me-2"></i>등록</button>
+                                data-bs-target="#dataAddModal"><i class="bi bi-plus-square me-2"></i><span
+                                    th:text="#{cpList.buttons.add}"></span></button>
                             <button class="btn btn-data-edit" id="editBtn" data-bs-toggle="modal"
                                 data-bs-target="#dataAddModal" hidden><i
-                                    class="fa-regular fa-pen-to-square me-2"></i>수정</button>
+                                    class="fa-regular fa-pen-to-square me-2"></i><span
+                                    th:text="#{cpList.buttons.edit}"></span></button>
                             <button class="btn btn-data-delete" id="deleteBtn" hidden><i
-                                    class="bi bi-trash me-2"></i>삭제</button>
+                                    class="bi bi-trash me-2"></i><span
+                                    th:text="#{cpList.buttons.delete}"></span></button>
                         </div>
                     </div>
                     <div class="cp-page-container">
                         <span id="pageInfo">
                             <span
-                                th:text="'Page ' + (${currentPage + 1}) + ' of ' + ${totalPages} + ' [총 ' + ${totalCount} + '건]'"></span>
+                                th:text="'Page ' + (${currentPage + 1}) + ' of ' + ${totalPages} + ' [' + ${totalCount} + ']'"></span>
                         </span>
                         <select class="mx-3 page-select" id="size" name="size">
                             <option th:each="data : ${showListCnt}" th:value="${data.commonCode}"
@@ -124,16 +145,16 @@
                                     <th scope="col"></th>
                                     <th scope="col"></th>
                                     <th scope="col">No</th>
-                                    <th scope="col">사업자</th>
-                                    <th scope="col">충전소명</th>
-                                    <th scope="col">충전기명</th>
-                                    <th scope="col">충전기ID</th>
-                                    <th scope="col">공용구분</th>
-                                    <th scope="col">모델명</th>
-                                    <th scope="col">충전기상태</th>
-                                    <th scope="col">요금제</th>
-                                    <th scope="col">설치일</th>
-                                    <th scope="col">제조사</th>
+                                    <th scope="col" th:text="#{cpList.tables.company}"></th>
+                                    <th scope="col" th:text="#{cpList.tables.stationName}"></th>
+                                    <th scope="col" th:text="#{cpList.tables.cpName}"></th>
+                                    <th scope="col" th:text="#{cpList.tables.cpId}"></th>
+                                    <th scope="col" th:text="#{cpList.tables.commonType}"></th>
+                                    <th scope="col" th:text="#{cpList.tables.modelName}"></th>
+                                    <th scope="col" th:text="#{cpList.tables.cpStatus}"></th>
+                                    <th scope="col" th:text="#{cpList.tables.plan}"></th>
+                                    <th scope="col" th:text="#{cpList.tables.installDate}"></th>
+                                    <th scope="col" th:text="#{cpList.tables.manuf}"></th>
                                 </tr>
                             </thead>
                             <tbody id="pageList">
@@ -186,7 +207,7 @@
                                     <td th:text="${data.manufCdName}"></td>
                                 </tr>
                                 <tr th:if="${chargerList.size() == 0}">
-                                    <td colspan="12">조회된 데이터가 없습니다.</td>
+                                    <td colspan="12" th:text="#{cpList.messages.nodata}"></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -248,31 +269,36 @@
                     <div class="modal-body">
                         <!-- 모달 내용 -->
                         <!-- table:1 start -->
-                        <div class="modal-title mb-2"><span class="modal-title-bar"></span><span>충전소 정보</span></div>
+                        <div class="modal-title mb-2"><span class="modal-title-bar"></span><span
+                                th:text="#{cpList.modal.titles.stationInfo}"></span></div>
                         <table class="table table-bg-v table-fixed w-100 text-center align-middle">
                             <tbody>
                                 <tr class="table-border-top">
-                                    <th class="w-20">사업자<b class="required-data">*</b></th>
+                                    <th class="w-20" th:text="#{cpList.modal.titles.company}"><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <select id="modalCompanyId" name="modalCompanyId"
                                             class="form-control attr-control" required>
-                                            <option th:value="*{null}" th:text="'(없음)'"></option>
+                                            <option th:value="*{null}" th:text="#{cpList.titles.select}"></option>
                                             <option th:each="company : ${companyList}" th:value="${company.companyId}"
                                                 th:text="${company.companyName}"></option>
                                         </select>
                                     </td>
-                                    <th class="w-20">충전소ID<b class="required-data">*</b></th>
+                                    <th class="w-20" th:text="#{cpList.modal.titles.stationId}"><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <div class="" style="display: flex; align-items: center; gap: 10px;">
                                             <input type="text" name="modalCsid" id="modalCsid" class="form-control"
-                                                placeholder="충전소ID를 입력해주세요." required>
+                                                th:placeholder="#{cpList.modal.placeholders.phStationId}" required>
                                             <button class="btn btn-outline-grey" id="btnModalSearchCs"
-                                                style="flex: 0 0 auto; margin-left: 10px;">조회</button>
+                                                style="flex: 0 0 auto; margin-left: 10px;"
+                                                th:text="#{cpList.buttons.search}"></button>
                                         </div>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="w-20">충전소명<b class="required-data">*</b></th>
+                                    <th class="w-20" th:text="#{cpList.modal.titles.stationName}"><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <input type="text" name="modalCsname" id="modalCsname" class="form-control"
                                             placeholder="" required disabled>
@@ -283,69 +309,79 @@
                         </table>
                         <!-- table:1 end -->
                         <!-- table:2 start -->
-                        <div class="modal-title mb-2"><span class="modal-title-bar"></span><span>충전기 정보</span></div>
+                        <div class="modal-title mb-2"><span class="modal-title-bar"></span><span
+                                th:text="#{cpList.modal.titles.chargerInfo}"></span></div>
                         <table class="table table-bg-v table-fixed w-100 text-center align-middle">
                             <tbody>
                                 <tr class="table-border-top">
-                                    <th class="w-20">충전기 이름<b class="required-data">*</b></th>
+                                    <th class="w-20" th:text="#{cpList.modal.titles.chargerName}"><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <input type="text" name="modalCpName" id="modalCpName" class="form-control"
-                                            placeholder="충전기 이름을 입력하세요" required>
+                                            th:placeholder="#{cpList.modal.placeholders.phChargerName}" required>
                                     </td>
-                                    <th class="w-20">충전기 ID<b class="required-data">*</b></th>
+                                    <th class="w-20" th:text="#{cpList.modal.titles.chargerId}"><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <input type="text" name="modalCpID" id="modalCpID" class="form-control"
                                             placeholder="" required disabled>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="w-20">충전기 모델<b class="required-data">*</b></th>
+                                    <th class="w-20" th:text="#{cpList.modal.titles.chargerModel}"><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <select id="modalCpModelCd" class="form-control" required>
-                                            <option value='%'>(선택)</option>
+                                            <option value='%' th:text="#{cpList.titles.select}"></option>
                                         </select>
                                     </td>
-                                    <th class="w-20">충전기 유형</th>
+                                    <th class="w-20" th:text="#{cpList.modal.titles.chargerKind}"></th>
                                     <td class="w-30">
                                         <input type="text" name="modalCpType" id="modalCpType" class="form-control"
                                             placeholder="" required disabled>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="w-20">충전기 제조사<b class="required-data">*</b></th>
+                                    <th class="w-20" th:text="#{cpList.modal.titles.chargerManuf}"><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <input type="text" name="modalCpManfCd" id="modalCpManfCd" class="form-control"
                                             placeholder="" required disabled>
                                     </td>
-                                    <th class="w-20">충전기 용량<b class="required-data">*</b></th>
+                                    <th class="w-20" th:text="#{cpList.modal.titles.chargerPower}"><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <input type="text" name="modalCpKw" id="modalCpKw" class="form-control"
                                             placeholder="" required disabled>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="w-20">충전기 S/N<b class="required-data">*</b></th>
+                                    <th class="w-20" th:text="#{cpList.modal.titles.chargerSn}"><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <input type="text" name="modalCpSn" id="modalCpSn" class="form-control"
-                                            placeholder="" autocomplete="충전기 시리얼 번호를 입력해주세요">
+                                            autocomplete="off">
                                     </td>
-                                    <th class="w-20">F/W 버전<b class="required-data">*</b></th>
+                                    <th class="w-20" th:text="#{cpList.modal.titles.chargerFwver}"><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <input type="text" name="modalCpFwver" id="modalCpFwver" class="form-control"
                                             placeholder="" autocomplete="off" disabled>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="w-20">원격접속ID<b class="required-data">*</b></th>
+                                    <th class="w-20" th:text="#{cpList.modal.titles.chargerAnydeskId}"><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <input type="text" name="modalAnydeskId" id="modalAnydeskId"
                                             class="form-control" placeholder="" autocomplete="off">
                                     </td>
-                                    <th class="w-20">공용구분<b class="required-data">*</b></th>
+                                    <th class="w-20" th:text="#{cpList.modal.titles.commonType}"><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <select id="modalCommonType" name="modalCommonType"
                                             class="form-control attr-control" required>
-                                            <option th:value="*{null}" th:text="'(선택)'"></option>
+                                            <option th:value="*{null}" th:text="#{cpList.titles.select}"></option>
                                             <option th:each="data : ${commonTypeList}" th:value="${data.commonCode}"
                                                 th:text="${data.commonCodeName}">
                                             </option>
@@ -353,31 +389,34 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="w-20">설치일자<b class="required-data">*</b></th>
+                                    <th class="w-20" th:text="#{cpList.modal.titles.installDate}"><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <input type="date" min="1970-01-01" max="2199-12-31" name="installDate"
                                             id="installDate" class="form-control" required>
                                     </td>
-                                    <th class="w-20">요금제<b class="required-data">*</b></th>
+                                    <th class="w-20" th:text="#{cpList.modal.titles.plan}"><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <select id="modalPlan" class="form-control" required>
-                                            <option value='%'>(선택)</option>
+                                            <option value='%' th:text="#{cpList.titles.select}"></option>
                                         </select>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="w-20">충전기 사용여부<b class="required-data">*</b></th>
+                                    <th class="w-20" th:text="#{cpList.modal.titles.useYn}"><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <select id="modalUseYn" class="form-control" required>
-                                            <option value='Y' selected>사용</option>
-                                            <option value="N">미사용</option>
+                                            <option value='Y' selected th:text="#{cpList.modal.titles.useYn}"></option>
+                                            <option value="N" th:text="#{cpList.modal.titles.useYn}"></option>
                                         </select>
                                     </td>
-                                    <th class="w-20">미사용 사유</th>
+                                    <th class="w-20" th:text="#{cpList.modal.titles.reason}"></th>
                                     <td class="w-30">
                                         <select id="modalReason" name="modalReason" class="form-control attr-control"
                                             disabled>
-                                            <option th:value="*{null}" th:text="'(선택)'"></option>
+                                            <option th:value="*{null}" th:text="#{cpList.titles.select}"></option>
                                             <option th:each="data : ${reasonList}" th:value="${data.commonCode}"
                                                 th:text="${data.commonCodeName}">
                                             </option>
@@ -385,12 +424,12 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="w-20" scope="row">충전기 상세 위치<b class="required-data">*</b></th>
+                                    <th class="w-20" scope="row" th:text="#{cpList.modal.titles.location}"></th>
                                     <td class="w-30">
                                         <input type="text" name="cpLocation" id="cpLocation" class="form-control"
                                             placeholder="" autocomplete="off">
                                     </td>
-                                    <th class="w-20">동시채널 지원<b class="required-data">*</b></th>
+                                    <th class="w-20" th:text="#{cpList.modal.titles.dualyn}"></th>
                                     <td class="w-30">
                                         <input type="text" name="modalDualyn" id="modalDualyn" class="form-control"
                                             placeholder="" required disabled>
@@ -400,31 +439,34 @@
                         </table>
                         <!-- table:2 end -->
                         <!-- table:3 start -->
-                        <div class="modal-title mb-2"><span class="modal-title-bar"></span><span>모뎀 정보</span></div>
+                        <div class="modal-title mb-2"><span class="modal-title-bar"></span><span
+                                th:text="#{cpList.modal.titles.modemInfo}"></span></div>
                         <table class="table table-bg-v table-fixed w-100 text-center align-middle">
                             <tbody>
                                 <tr class="table-border-top">
-                                    <th class="w-20">시리얼 번호</th>
+                                    <th class="w-20" th:text="#{cpList.modal.titles.modemSn}"></th>
                                     <td class="w-30">
                                         <div class="" style="display: flex; align-items: center; gap: 10px;">
                                             <input type="text" name="modemSn" id="modemSn" class="form-control"
                                                 placeholder="" required>
                                             <button type="button" class="btn btn-outline-grey" id="modemSnDupCheckBtn"
-                                                style="flex: 0 0 auto; margin-left: 10px;">중복체크</button>
+                                                style="flex: 0 0 auto; margin-left: 10px;"
+                                                th:text="#{cpList.modal.buttons.dupcheck}"></button>
                                         </div>
                                     </td>
-                                    <th class="w-20">전화번호</th>
+                                    <th class="w-20" th:text="#{cpList.modal.titles.modemNum}"></th>
                                     <td class="w-30">
                                         <div class="" style="display: flex; align-items: center; gap: 10px;">
                                             <input type="text" name="modemNum" id="modemNum" class="form-control"
                                                 placeholder="" required>
                                             <button type="button" class="btn btn-outline-grey" id="modemNumDupCheckBtn"
-                                                style="flex: 0 0 auto; margin-left: 10px;">중복체크</button>
+                                                style="flex: 0 0 auto; margin-left: 10px;"
+                                                th:text="#{cpList.modal.buttons.dupcheck}"></button>
                                         </div>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="w-20">계약 기간</th>
+                                    <th class="w-20" th:text="#{cpList.modal.titles.modemContFromTo}"></th>
                                     <td class="d-flex align-items-center">
                                         <input type="date" min="1970-01-01" max="2199-12-31" name="fromDate"
                                             id="fromDate" class="form-control flex-grow-1" required>
@@ -432,23 +474,21 @@
                                         <input type="date" min="1970-01-01" max="2199-12-31" name="toDate" id="toDate"
                                             class="form-control flex-grow-1" required>
                                     </td>
-                                    <th class="w-20">요금제<b class="required-data">*</b></th>
+                                    <th class="w-20" th:text="#{cpList.modal.titles.modemPlan}"></th>
                                     <td class="w-30">
-                                        <input type="text" name="modemPlan" id="modemPlan" class="form-control"
-                                            placeholder="ex) OOO요금제(5,000원)" required>
+                                        <input type="text" name="modemPlan" id="modemPlan" class="form-control">
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="w-20">데이터 용량(MB)</th>
+                                    <th class="w-20" th:text="#{cpList.modal.titles.modemDataCap}"></th>
                                     <td class="w-30">
-                                        <input type="text" name="modemDataCap" id="modemDataCap" class="form-control"
-                                            placeholder="ex) 5GB" required>
+                                        <input type="text" name="modemDataCap" id="modemDataCap" class="form-control">
                                     </td>
-                                    <th class="w-20">통신사</th>
+                                    <th class="w-20" th:text="#{cpList.modal.titles.modemCorp}"></th>
                                     <td class="w-30">
                                         <select id="modemCorp" name="modemCorp" class="form-control attr-control"
                                             required>
-                                            <option th:value="*{null}" th:text="'(선택)'"></option>
+                                            <option th:value="*{null}" th:text="#{cpList.titles.select}"></option>
                                             <option th:each="data : ${modemCorpList}" th:value="${data.commonCode}"
                                                 th:text="${data.commonCodeName}">
                                             </option>
@@ -456,16 +496,16 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="w-20">모델명</th>
+                                    <th class="w-20" th:text="#{cpList.modal.titles.modemModelName}"></th>
                                     <td class="w-30">
                                         <input type="text" name="modemModelNm" id="modemModelNm" class="form-control"
                                             placeholder="">
                                     </td>
-                                    <th class="w-20">계약상태</th>
+                                    <th class="w-20" th:text="#{cpList.modal.titles.modemContractStatus}"></th>
                                     <td class="w-30">
                                         <select id="modemContStat" name="modemContStat"
                                             class="form-control attr-control" required>
-                                            <option th:value="*{null}" th:text="'(선택)'"></option>
+                                            <option th:value="*{null}" th:text="#{cpList.titles.select}"></option>
                                             <option th:each="data : ${modemContractOptionList}"
                                                 th:value="${data.commonCode}" th:text="${data.commonCodeName}">
                                             </option>
@@ -478,11 +518,12 @@
                     </div>
                     <!-- modal body end -->
                     <div class="modal-footer justify-content-center border-top-none">
-                        <button type="button" id="modalCancel" class="btn btn-outline-grey me-2"
-                            data-bs-dismiss="modal">취소</button>
+                        <button type="button" id="modalCancel" class="btn btn-outline-grey me-2" data-bs-dismiss="modal"
+                            th:text="#{cpList.modal.buttons.cancel}"></button>
                         <button type="button" id="modalClose" class="btn btn-outline-grey me-2" data-bs-dismiss="modal"
-                            hidden>닫기</button>
-                        <button type="button" id="modalBtn" class="btn btn-data-add">등록</button>
+                            hidden th:text="#{cpList.modal.buttons.close}"></button>
+                        <button type="button" id="modalBtn" class="btn btn-data-add"
+                            th:text="#{cpList.modal.buttons.add}"></button>
                     </div>
                 </form>
             </div>
@@ -538,9 +579,9 @@
                         connectorIcons.forEach(icon => {
                             updateConnectorIcon(icon, displayStatus);
                         });
-                        console.log(`충전기 ${chargerId}의 모든 커넥터 상태 변경: ${displayStatus}`);
+                        console.log(`All connectors of charger ${chargerId} status changed: ${displayStatus}`);
                     } else {
-                        console.warn(`충전기 ${chargerId}의 커넥터를 찾을 수 없습니다.`);
+                        console.warn(`Connector of charger ${chargerId} not found.`);
                     }
                 } else {
                     // 특정 커넥터만 업데이트
@@ -548,9 +589,9 @@
 
                     if (connectorIcon) {
                         updateConnectorIcon(connectorIcon, displayStatus);
-                        console.log(`충전기 ${chargerId}, 커넥터 ${connectorId} 상태 변경: ${displayStatus}`);
+                        console.log(`Charger ${chargerId}, connector ${connectorId} status changed: ${displayStatus}`);
                     } else {
-                        console.warn(`충전기 ${chargerId}, 커넥터 ${connectorId}를 찾을 수 없습니다.`);
+                        console.warn(`Charger ${chargerId}, connector ${connectorId} not found.`);
                     }
                 }
             }
@@ -569,6 +610,14 @@
             }
         });
     </script>
+    <script th:inline="javascript">
+        var currentLanguage = /*[[${#locale.language}]]*/ 'ko';
+    </script>
+
+    <!-- 공통 i18n 스크립트 포함 -->
+    <div th:replace="~{fragments/i18n/i18n-cp-list :: cp-list-i18n}"></div>
+    <!-- 언어 선택기 스크립트 -->
+    <div th:replace="~{fragments/language-selector :: language-script}"></div>
 </div>
 
 </html>

@@ -20,6 +20,7 @@ import zgoo.cpos.domain.users.QFaq;
 import zgoo.cpos.domain.users.QUsers;
 import zgoo.cpos.dto.users.FaqDto.FaqDetailDto;
 import zgoo.cpos.dto.users.FaqDto.FaqListDto;
+import zgoo.cpos.util.LocaleUtil;
 import zgoo.cpos.util.QueryUtils;
 
 @Slf4j
@@ -50,7 +51,8 @@ public class FaqRepositoryCustomImpl implements FaqRepositoryCustom {
                 faq.delYn.as("delYn"),
                 faq.regDt.as("regDt"),
                 users.name.as("userName"),
-                sectionCommonCode.name.as("sectionName")))
+                LocaleUtil.isEnglish() ? sectionCommonCode.nameEn.as("sectionName")
+                        : sectionCommonCode.name.as("sectionName")))
                 .from(faq)
                 .leftJoin(users).on(faq.user.userId.eq(users.userId))
                 .leftJoin(company).on(users.company.id.eq(company.id))
@@ -96,7 +98,8 @@ public class FaqRepositoryCustomImpl implements FaqRepositoryCustom {
                 faq.delYn.as("delYn"),
                 faq.regDt.as("regDt"),
                 users.name.as("userName"),
-                sectionCommonCode.name.as("sectionName")))
+                LocaleUtil.isEnglish() ? sectionCommonCode.nameEn.as("sectionName")
+                        : sectionCommonCode.name.as("sectionName")))
                 .from(faq)
                 .leftJoin(users).on(faq.user.userId.eq(users.userId))
                 .leftJoin(company).on(users.company.id.eq(company.id))
@@ -159,7 +162,8 @@ public class FaqRepositoryCustomImpl implements FaqRepositoryCustom {
                 faq.section.as("section"),
                 faq.regDt.as("regDt"),
                 users.name.as("userName"),
-                sectionCommonCode.name.as("sectionName")))
+                LocaleUtil.isEnglish() ? sectionCommonCode.nameEn.as("sectionName")
+                        : sectionCommonCode.name.as("sectionName")))
                 .from(faq)
                 .leftJoin(users).on(faq.user.userId.eq(users.userId))
                 .leftJoin(company).on(users.company.id.eq(company.id))
@@ -197,7 +201,8 @@ public class FaqRepositoryCustomImpl implements FaqRepositoryCustom {
                 faq.section.as("section"),
                 faq.regDt.as("regDt"),
                 users.name.as("userName"),
-                sectionCommonCode.name.as("sectionName")))
+                LocaleUtil.isEnglish() ? sectionCommonCode.nameEn.as("sectionName")
+                        : sectionCommonCode.name.as("sectionName")))
                 .from(faq)
                 .leftJoin(users).on(faq.user.userId.eq(users.userId))
                 .leftJoin(company).on(users.company.id.eq(company.id))
@@ -236,7 +241,8 @@ public class FaqRepositoryCustomImpl implements FaqRepositoryCustom {
                 faq.section.as("section"),
                 faq.regDt.as("regDt"),
                 users.name.as("userName"),
-                sectionCommonCode.name.as("sectionName")))
+                LocaleUtil.isEnglish() ? sectionCommonCode.nameEn.as("sectionName")
+                        : sectionCommonCode.name.as("sectionName")))
                 .from(faq)
                 .leftJoin(users).on(faq.user.userId.eq(users.userId))
                 .leftJoin(company).on(users.company.id.eq(company.id))

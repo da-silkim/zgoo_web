@@ -17,15 +17,20 @@ spring:
     open-in-view: false
     show-sql: false
     hibernate:
-      ddl-auto: update  # 애플리케이션 시작 시 스키마 새로 생성
+      ddl-auto: update  # 애플리케이션 시작 시 스키마 자동 생성
     properties:
       hibernate:
         format_sql: true
         show_sql: true
+        # 다국어 지원을 위한 컬럼 추가 설정
+        hbm2ddl:
+          auto: update
+    # defer-datasource-initialization: true
     defer-datasource-initialization: false
   
   sql:
     init:
+      # mode: always  # SQL 초기화 스크립트 항상 실행
       mode: never  # SQL 초기화 스크립트 항상 실행
       platform: mariadb
       continue-on-error: true
@@ -44,6 +49,13 @@ spring:
   devtools:
     livereload:
       enabled: true
+
+  # 국제화 설정 추가
+  messages:
+    basename: i18n/messages
+    encoding: UTF-8
+    fallback-to-system-locale: true
+    cache-duration: 3600
 
 # server 설정은 최상위 레벨에 추가
 server:
@@ -69,9 +81,13 @@ logging:
   level:
     root: WARN
     org.springframework: WARN
-    org.hibernate: WARN
+    org.hibernate: INFO  # Hibernate 로그 레벨을 INFO로 설정하여 스키마 변경 모니터링
     p6spy: INFO  # p6spy 로그 레벨을 INFO로 설정
     zgoo.cpos: INFO
+    org.springframework.web.servlet.i18n: DEBUG
+    org.springframework.context.support: DEBUG
+    org.springframework.web.servlet.mvc.method.annotation: DEBUG
+    org.springframework.jdbc.datasource.init: DEBUG  # SQL 초기화 스크립트 실행 로그
   
 
 

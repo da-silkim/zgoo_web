@@ -1,19 +1,19 @@
-$(document).ready(function() {
-    let modalCon = false, selectRow, btnMsg = "등록", errcdId;
+$(document).ready(function () {
+    let modalCon = false, selectRow, btnMsg = i18n.errcdMgmt.buttons.add, errcdId;
 
-    $('#size').on('change', function() {
-        updatePageSize(this, "/system/errcode/list", ["manfCdSearch", "opSearch", "contentSearch"]);                 
+    $('#size').on('change', function () {
+        updatePageSize(this, "/system/errcode/list", ["manfCdSearch", "opSearch", "contentSearch"]);
     });
 
-    $('#pageList').on('click', 'tr', function() {
+    $('#pageList').on('click', 'tr', function () {
         selectRow = $(this);
         errcdId = selectRow.find('td').eq(0).attr('id');
     });
 
-    $('#addBtn').on('click', function(event) {
+    $('#addBtn').on('click', function (event) {
         event.preventDefault();
         modalCon = false;
-        btnMsg = "등록";
+        btnMsg = i18n.errcdMgmt.buttons.add;
         $('#modalBtn').text(btnMsg);
 
         $('#menufCode').prop('selectedIndex', 0);
@@ -21,38 +21,38 @@ $(document).ready(function() {
         $('#errName').val('');
     });
 
-    $('#editBtn').on('click', function(event) {
+    $('#editBtn').on('click', function (event) {
         event.preventDefault();
         modalCon = true;
-        btnMsg = "수정";
+        btnMsg = i18n.errcdMgmt.buttons.edit;
         $('#modalBtn').text(btnMsg);
 
         $.ajax({
             type: 'GET',
             url: `/system/errcode/get/${errcdId}`,
-            success: function(data) {
+            success: function (data) {
                 $('#menufCode').val(data.menufCode || '');
                 $('#errCode').val(data.errCode || '');
                 $('#errName').val(data.errName || '');
             },
-            error: function(error) {
+            error: function (error) {
                 console.log(error);
             }
         });
     });
 
-    $('#deleteBtn').on('click', function() {
-        btnMsg = "삭제";
+    $('#deleteBtn').on('click', function () {
+        btnMsg = i18n.errcdMgmt.buttons.delete;
 
         if (confirmSubmit(btnMsg)) {
             $.ajax({
                 type: 'DELETE',
                 url: `/system/errcode/delete/${errcdId}`,
-                success: function(response) {
+                success: function (response) {
                     alert(response);
                     window.location.reload();
                 },
-                error: function(error) {
+                error: function (error) {
                     console.log(error);
                 }
             });
@@ -60,7 +60,7 @@ $(document).ready(function() {
 
     });
 
-    $('#modalBtn').on('click', function(event) {
+    $('#modalBtn').on('click', function (event) {
         event.preventDefault();
 
         if (confirmSubmit(btnMsg)) {
@@ -78,11 +78,11 @@ $(document).ready(function() {
                 method: TYPE,
                 contentType: 'application/json',
                 data: JSON.stringify(DATA),
-                success: function(response) {
+                success: function (response) {
                     alert(response);
                     window.location.reload();
                 },
-                error: function(xhr, status, error) {
+                error: function (xhr, status, error) {
                     console.log(error);
                 }
             });

@@ -15,10 +15,19 @@ document.addEventListener('DOMContentLoaded', () => {
             // Find the corresponding row for the selected checkbox
             const selectedRow = selectedCheckboxes[0].closest('tr');
             const applyCode = selectedRow.cells[5]?.innerText.trim(); // Get applyCode from the 6th cell
-            console.log("적용코드:", applyCode);
+            console.log("applyCode:", applyCode);
 
             if (editBtn) {
-                let editvisible = applyCode === "적용예정";
+                let editvisible = false;
+                if (currentLanguage === "en") {
+                    if (applyCode === "FUTURE") {
+                        editvisible = true;
+                    }
+                } else {
+                    if (applyCode === "적용예정") {
+                        editvisible = true;
+                    }
+                }
                 console.log("editvisible:", editvisible);
                 editBtn.disabled = !editvisible;
                 if (editvisible) {

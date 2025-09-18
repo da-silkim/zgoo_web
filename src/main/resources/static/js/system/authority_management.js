@@ -1,9 +1,9 @@
-$(document).ready(function() {
+$(document).ready(function () {
     var companyId, currCompany, currAuthority, currAuthorityName;
 
-    $('#companyIdSearch').on('change', function() {
+    $('#companyIdSearch').on('change', function () {
         companyId = $(this).val();
-        console.log("companyId: "+companyId);
+        console.log("companyId: " + companyId);
         var companyName;
         renderAuthorityTable();
         document.getElementById('saveBtn').disabled = true;
@@ -15,13 +15,13 @@ $(document).ready(function() {
         }
 
         var companyIdAll = document.querySelectorAll('.companyName');
-        companyIdAll.forEach(function(element) {
+        companyIdAll.forEach(function (element) {
             element.setAttribute('value', companyId);
             element.textContent = companyName;
         });
     });
 
-    $('#pageList').on('click', 'tr', function() {
+    $('#pageList').on('click', 'tr', function () {
         companyId = $(this).find('td').eq(0).attr('value');
         currCompany = $(this).find('td').eq(0).text();
         currAuthority = $(this).find('td').eq(1).text();
@@ -37,7 +37,7 @@ $(document).ready(function() {
         $('#authorityTable').empty();
         $('#currAuthority').append(`
             <span>
-                사업자명: ${currCompany} | 권한그룹ID: ${currAuthority} | 권한그룹명: ${currAuthorityName}
+                ${i18n.menuAuthMgmt.labels.company}: ${currCompany} | ${i18n.menuAuthMgmt.labels.authGrpId}: ${currAuthority} | ${i18n.menuAuthMgmt.labels.authGrpName}: ${currAuthorityName}
             </span>
         `);
 
@@ -46,10 +46,10 @@ $(document).ready(function() {
             url: `/system/authority/get/${companyId}/${authority}`,
             contentType: "application/json",
             dataType: 'json',
-            success: function(response) {
+            success: function (response) {
                 renderMenuTable(response.authorityList);
             },
-            error: function(xhr, status, error) {
+            error: function (xhr, status, error) {
                 console.error(error);
             }
         });
@@ -59,15 +59,15 @@ $(document).ready(function() {
         $('#authorityTable').empty();
         $('#authorityTable').append(`
             <tr>
-                <td colspan="6">사업자 선택 후 권한 항목 클릭 시 조회됩니다.</td>
+                <td colspan="6" th:text="#{menuAuthMgmt.messages.menuAuthInfo}"></td>
             </tr>
         `);
     }
 
     function renderMenuTable(menuList) {
         var authorityTable = $('#authorityTable');
-        
-        $.each(menuList, function(index, menu) {
+
+        $.each(menuList, function (index, menu) {
             var topMenu = "";
             var midMenu = "";
             var lowMenu = "";
@@ -102,10 +102,10 @@ $(document).ready(function() {
                 document.getElementById('saveBtn').disabled = false;
                 isEditable = true;
             } else if (menuAuthority.authority === 'AD') {
-                console.log("관리자 companyId: " + menuAuthority.companyId);
+                console.log("admin companyId: " + menuAuthority.companyId);
 
                 if (companyId === String(menuAuthority.companyId)) {
-                    console.log("관리자, 해당사업자");
+                    console.log("admin, company");
 
                     if (currAuthority === 'AD') {
                         document.getElementById('saveBtn').disabled = true;
@@ -115,7 +115,7 @@ $(document).ready(function() {
                         isEditable = true;
                     }
                 } else {
-                    console.log("관리자, 해당사업자X");
+                    console.log("admin, company not match");
                     document.getElementById('saveBtn').disabled = true;
                     isReadOnly = true;
                 }
@@ -143,15 +143,15 @@ $(document).ready(function() {
         });
     }
 
-    $('#saveBtn').on('click', function(event) {
+    $('#saveBtn').on('click', function (event) {
         event.preventDefault();
 
-        if (confirmSubmit("저장")) {
+        if (confirmSubmit(i18n.menuAuthMgmt.buttons.save)) {
 
             var menuAuthorities = [];
             var checkedYn = false;
 
-            $('#authorityTable tr').each(function(index, tr) {
+            $('#authorityTable tr').each(function (index, tr) {
                 var readYn = $('input[name="readYn_' + index + '"]').val();
                 var modYn = $('input[name="modYn_' + index + '"]').val();
                 var excelYn = $('input[name="excelYn_' + index + '"]').val();
@@ -171,7 +171,7 @@ $(document).ready(function() {
             });
 
             if (checkedYn) {
-                alert('Y/N 값만 설정할 수 있습니다.');
+                alert(i18n.menuAuthMgmt.messages.yNOnly);
                 return;
             }
 
@@ -180,10 +180,10 @@ $(document).ready(function() {
                 method: 'POST',
                 contentType: 'application/json',
                 data: JSON.stringify(menuAuthorities),
-                success: function(response) {
+                success: function (response) {
                     alert(response);
                 },
-                error: function(xhr, status, error) {
+                error: function (xhr, status, error) {
                     console.error(error);
                 }
             });

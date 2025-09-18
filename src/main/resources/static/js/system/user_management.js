@@ -1,27 +1,27 @@
-$(document).ready(function() {
+$(document).ready(function () {
     let modalCon = false;   // false: 등록 / true: 수정
     let selectRow; isDuplicateCheck = false, userIdCheck = false;
-    let btnMsg = "등록";
+    let btnMsg = i18n.userManagement.modal.buttons.regist;
     var userId;
 
     var passwordContainer = document.getElementById('passwordContainer');
     var passwordEditBtn = document.getElementById('passwordEditBtn');
 
-    $('#size').on('change', function() {
+    $('#size').on('change', function () {
         updatePageSize(this, "/system/user/list", ["companyIdSearch", "companyTypeSearch", "nameSearch"]);
     });
 
     // 행 선택
-    $('#pageList').on('click', 'tr', function() {
+    $('#pageList').on('click', 'tr', function () {
         selectRow = $(this);
         userId = selectRow.find('td').eq(3).text();
         buttonControl($(this), `/system/user/btncontrol/${userId}`);
     });
 
     // 사용자 - 등록
-    $('#addBtn').on('click', function() {
+    $('#addBtn').on('click', function () {
         modalCon = false;
-        btnMsg = "등록";
+        btnMsg = i18n.userManagement.modal.buttons.regist;
         $('#modalBtn').text(btnMsg);
         $('#userForm')[0].reset();
         $('#companyId').prop('disabled', false);
@@ -35,9 +35,9 @@ $(document).ready(function() {
     });
 
     // 사용자 - 수정
-    $(document).on('click', '#editBtn', function() {
+    $(document).on('click', '#editBtn', function () {
         modalCon = true;
-        btnMsg = "수정";
+        btnMsg = i18n.userManagement.modal.buttons.edit;
         $('#modalBtn').text(btnMsg);
         $('#userForm')[0].reset();
         $('#companyId').prop('disabled', true);
@@ -52,7 +52,7 @@ $(document).ready(function() {
             url: `/system/user/get/${userId}`,
             contentType: "application/json",
             dataType: 'json',
-            success: function(data) {
+            success: function (data) {
                 $('#companyId').val(data.companyId || '');
                 $('#userId').val(data.userId || '');
                 $('#name').val(data.name || '');
@@ -64,31 +64,31 @@ $(document).ready(function() {
         });
     });
 
-    $(document).on('click', '#deleteBtn', function() {
-        btnMsg = "삭제";
+    $(document).on('click', '#deleteBtn', function () {
+        btnMsg = i18n.userManagement.modal.buttons.delete;
 
-        if(confirmSubmit(btnMsg)) {
+        if (confirmSubmit(btnMsg)) {
             $.ajax({
                 type: 'DELETE',
                 url: `/system/user/delete/${userId}`,
                 contentType: "application/json",
-                success: function(response) {
+                success: function (response) {
                     alert(response);
                     window.location.replace('/system/user/list');
                 },
-                error: function(xhr, status, error) {
+                error: function (xhr, status, error) {
                     alert(xhr.responseText);
                 }
             });
         }
     });
 
-    $('#cancelBtn').on('click', function() {
+    $('#cancelBtn').on('click', function () {
         isDuplicateCheck = false;
         userIdCheck = false;
     });
 
-    $('#modalBtn').on('click', function(event) {
+    $('#modalBtn').on('click', function (event) {
         event.preventDefault();
 
         const userID = $('#userId').val();
@@ -100,13 +100,13 @@ $(document).ready(function() {
         if (!modalCon) {
             // 유효성 체크
             var form = document.getElementById('userForm');
-            if (!form.checkValidity()) { 
-                alert('필수 입력 값이 누락되어 있습니다.');
+            if (!form.checkValidity()) {
+                alert(i18n.userManagement.messages.essentialFieldCheckError);
                 return;
             }
 
-            if(!userIdCheck) {
-                alert('사용자ID를 다시 확인해주세요.');
+            if (!userIdCheck) {
+                alert(i18n.userManagement.messages.userIdCheckError);
                 return;
             }
 
@@ -117,13 +117,13 @@ $(document).ready(function() {
             }
 
             // 사용자ID 중복 버튼을 통해 중복ID 확인을 했는지
-            if(!isDuplicateCheck) {
-                alert('사용자ID 중복체크를 해주세요.');
+            if (!isDuplicateCheck) {
+                alert(i18n.userManagement.messages.duplicateCheckError);
                 return;
             }
         }
 
-        if(confirmSubmit(btnMsg)) {
+        if (confirmSubmit(btnMsg)) {
             const DATA = {
                 companyId: $('#companyId').val(),
                 userId: userID,
@@ -134,7 +134,7 @@ $(document).ready(function() {
                 authority: $('#authority').val()
             }
 
-            console.log("사용자 데이터 확인: ", DATA);
+            console.log("userdata: ", DATA);
 
             const URL = modalCon ? `/system/user/update` : `/system/user/new`;
             const TYPE = modalCon ? 'PATCH' : 'POST';
@@ -144,29 +144,29 @@ $(document).ready(function() {
                 url: URL,
                 data: JSON.stringify(DATA),
                 contentType: "application/json",
-                success: function(response) {
+                success: function (response) {
                     alert(response);
                     window.location.replace('/system/user/list');
                 },
-                error: function(xhr, status, error) {
+                error: function (xhr, status, error) {
                     alert(xhr.responseText);
                 }
             });
-        }        
+        }
     });
 
     // 중복검사
-    $('#duplicateBtn').on('click', function() {
+    $('#duplicateBtn').on('click', function () {
         isDuplicateCheck = true;
 
         var userId = $('#userId').val();
         if (userId.trim() === '') {
-            alert('사용자ID를 입력해주세요');
+            alert(i18n.userManagement.messages.inputUserId);
             userIdCheck = false;
             return;
         }
 
-        if (!isId(userId)) { 
+        if (!isId(userId)) {
             userIdCheck = false;
             return;
         }
@@ -175,30 +175,30 @@ $(document).ready(function() {
             url: '/system/user/checkUserId',
             type: 'GET',
             data: { userId: userId },
-            success: function(isDuplicate) {
+            success: function (isDuplicate) {
                 if (isDuplicate) {
-                    alert('이미 사용 중인 ID입니다.');
+                    alert(i18n.userManagement.messages.alreadyRegisteredUserId);
                     userIdCheck = false;
                 } else {
-                    alert('사용 가능한 ID입니다.');
+                    alert(i18n.userManagement.messages.availableUserId);
                     userIdCheck = true;
                 }
             },
-            error: function() {
-                $('#userIdCheckMessage').text('오류 발생: 다시 시도해 주세요.');
+            error: function () {
+                $('#userIdCheckMessage').text(i18n.userManagement.messages.error);
             }
         });
     });
 
     // 비밀번호 보이기
-    $('.info-eyes').on('click', function() {
+    $('.info-eyes').on('click', function () {
         // 현재 클릭한 요소의 부모인 .input-info-group에서 password input을 찾음
         var inputGroup = $(this).parents('.input-info-group');
         var passwordField = inputGroup.find('#password');
-        
+
         // .input-info-group에 active 클래스 토글
         inputGroup.toggleClass('active');
-        
+
         // active 클래스가 있는 경우 비밀번호를 텍스트로 보여줌, 없는 경우 숨김
         if (inputGroup.hasClass('active')) {
             $(this).find('.bi-eye').attr('class', 'bi bi-eye-slash');
@@ -225,8 +225,8 @@ $(document).ready(function() {
         const newPasswordCheck = $('#newPasswordCheck').val();
 
         var form = document.getElementById('passwordForm');
-        if (!form.checkValidity()) { 
-            alert('값을 모두 입력해주세요.');
+        if (!form.checkValidity()) {
+            alert(i18n.userManagement.messages.checkAllFields);
             return;
         }
 
@@ -235,7 +235,7 @@ $(document).ready(function() {
             newPassword: newPassword,
             newPasswordCheck: newPasswordCheck
         }
-        
+
         if (!isPasswordSpecial(newPassword)) { return; }
 
         var userId = $('#userId').val();
@@ -244,13 +244,13 @@ $(document).ready(function() {
             method: 'PATCH',
             contentType: 'application/json',
             data: JSON.stringify(DATA),
-            success: function(response) {
+            success: function (response) {
                 if (response.state === 1) {
                     editPasswordModal.hide();
                 }
                 alert(response.message);
             },
-            error: function(xhr, status, error) {
+            error: function (xhr, status, error) {
                 alert(JSON.parse(xhr.responseText).message);
             }
         });

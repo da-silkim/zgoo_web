@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>CP List I18n</title>
+</head>
+
+<body>
+    <script th:fragment="cp-list-i18n" th:inline="javascript">
+        var i18n = {
+            cpList: {
+                titles: {
+                    main: /*[[#{cpList.titles.main}]]*/ '충전기 > 충전기 리스트',
+                    search: /*[[#{cpList.titles.search}]]*/ '검색조건',
+                    company: /*[[#{cpList.titles.company}]]*/ '사업자',
+                    manuf: /*[[#{cpList.titles.manuf}]]*/ '제조사',
+                    select: /*[[#{cpList.titles.select}]]*/ '선택'
+                },
+                searchOptions: {
+                    stationName: /*[[#{cpList.searchOptions.stationName}]]*/ '충전소명',
+                    stationId: /*[[#{cpList.searchOptions.stationId}]]*/ '충전소ID',
+                    chargerId: /*[[#{cpList.searchOptions.chargerId}]]*/ '충전기ID',
+                },
+                buttons: {
+                    search: /*[[#{cpList.buttons.search}]]*/ '검색',
+                    reset: /*[[#{cpList.buttons.reset}]]*/ '초기화',
+                    excel: /*[[#{cpList.buttons.excel}]]*/ '엑셀다운로드',
+                    add: /*[[#{cpList.buttons.add}]]*/ '등록',
+                    edit: /*[[#{cpList.buttons.edit}]]*/ '수정',
+                    delete: /*[[#{cpList.buttons.delete}]]*/ '삭제',
+                },
+                tables: {
+                    company: /*[[#{cpList.tables.company}]]*/ '사업자',
+                    stationName: /*[[#{cpList.tables.stationName}]]*/ '충전소명',
+                    cpName: /*[[#{cpList.tables.cpName}]]*/ '충전기명',
+                    cpId: /*[[#{cpList.tables.cpId}]]*/ '충전기ID',
+                    commonType: /*[[#{cpList.tables.commonType}]]*/ '공용구분',
+                    modelName: /*[[#{cpList.tables.modelName}]]*/ '모델명',
+                    cpStatus: /*[[#{cpList.tables.cpStatus}]]*/ '충전기상태',
+                    plan: /*[[#{cpList.tables.plan}]]*/ '요금제',
+                    installDate: /*[[#{cpList.tables.installDate}]]*/ '설치일',
+                    manuf: /*[[#{cpList.tables.manuf}]]*/ '제조사'
+                },
+                messages: {
+                    nodata: /*[[#{cpList.messages.nodata}]]*/ '조회된 데이터가 없습니다.',
+                    inputCpId: /*[[#{cpList.messages.inputCpId}]]*/ '충전소ID를 입력해주세요.',
+                    getCpIdError: /*[[#{cpList.messages.getCpIdError}]]*/ '충전기ID 정보를 가져오지 못했습니다.',
+                    getStationError: /*[[#{cpList.messages.getStationError}]]*/ '충전소 정보를 가져오지 못했습니다.',
+                    getModelError: /*[[#{cpList.messages.getModelError}]]*/ '모델 정보가 존재하지 않습니다.',
+                    inputModemSerialNum: /*[[#{cpList.messages.inputModemSerialNum}]]*/ '모뎀 시리얼번호를 입력해주세요.',
+                    alreadyRegisteredModemSerialNum: /*[[#{cpList.messages.alreadyRegisteredModemSerialNum}]]*/ '이미 등록된 시리얼번호 입니다.',
+                    availableModemSerialNum: /*[[#{cpList.messages.availableModemSerialNum}]]*/ '등록 가능한 시리얼번호 입니다.',
+                    errorModemSerialNum: /*[[#{cpList.messages.errorModemSerialNum}]]*/ '모뎀 시리얼번호 중복체크 오류',
+                    inputModemNum: /*[[#{cpList.messages.inputModemNum}]]*/ '모뎀 전화번호를 입력해주세요.',
+                    alreadyRegisteredModemNum: /*[[#{cpList.messages.alreadyRegisteredModemNum}]]*/ '이미 등록된 전화번호 입니다.',
+                    availableModemNum: /*[[#{cpList.messages.availableModemNum}]]*/ '등록 가능한 전화번호 입니다.',
+                    errorModemNum: /*[[#{cpList.messages.errorModemNum}]]*/ '모뎀 전화번호 중복체크 오류',
+                    inputCpSn: /*[[#{cpList.messages.inputCpSn}]]*/ '충전기 시리얼번호를 입력해주세요.',
+                    alreadyRegisteredCpSn: /*[[#{cpList.messages.alreadyRegisteredCpSn}]]*/ '이미 등록된 시리얼번호 입니다.',
+                    availableCpSn: /*[[#{cpList.messages.availableCpSn}]]*/ '등록 가능한 시리얼번호 입니다.',
+                    errorCpSn: /*[[#{cpList.messages.errorCpSn}]]*/ '충전기 시리얼번호 중복체크 오류',
+                    inputStationId: /*[[#{cpList.messages.inputStationId}]]*/ '충전소ID를 입력해주세요.',
+                    inputModelId: /*[[#{cpList.messages.inputModelId}]]*/ '모델을 선택해주세요.',
+                    inputPlanId: /*[[#{cpList.messages.inputPlanId}]]*/ '요금제를 선택해주세요.',
+                    inputConnectorId: /*[[#{cpList.messages.inputConnectorId}]]*/ 'Connector ID를 입력해주세요.',
+                    inputConnectorType: /*[[#{cpList.messages.inputConnectorType}]]*/ 'Connector Type을 선택해주세요.',
+                    connectorIdCheck: /*[[#{cpList.messages.connectorIdCheck}]]*/ '모든 Connector ID는 필수 항목입니다. 값을 입력해주세요.',
+                    connectorTypeCheck: /*[[#{cpList.messages.connectorTypeCheck}]]*/ '모든 Connector Type은 필수 항목입니다. 값을 선택해주세요.',
+                    duplicateConnectorId: /*[[#{cpList.messages.duplicateConnectorId}]]*/ '중복된 Connector ID가 있습니다.',
+                    duplicateConnectorType: /*[[#{cpList.messages.duplicateConnectorType}]]*/ '중복된 Connector Type이 있습니다.',
+                    addSuccess: /*[[#{cpList.messages.addSuccess}]]*/ '충전기가 성공적으로 등록되었습니다.',
+                    addError: /*[[#{cpList.messages.addError}]]*/ '충전기 등록 중 오류가 발생했습니다.',
+                    editSuccess: /*[[#{cpList.messages.editSuccess}]]*/ '충전기 정보가 성공적으로 수정되었습니다.',
+                    editError: /*[[#{cpList.messages.editError}]]*/ '충전기 정보 수정 중 오류가 발생했습니다.',
+                    deleteSuccess: /*[[#{cpList.messages.deleteSuccess}]]*/ '충전기가 성공적으로 삭제되었습니다.',
+                    deleteError: /*[[#{cpList.messages.deleteError}]]*/ '충전기 삭제 중 오류가 발생했습니다.',
+                    selectDeleteItem: /*[[#{cpList.messages.selectDeleteItem}]]*/ '삭제할 항목을 선택해주세요.',
+                    confirmDelete: /*[[#{cpList.messages.confirmDelete}]]*/ '선택한 충전기를 삭제하시겠습니까?'
+                },
+                placeholders: {
+                    phInputNumber: /*[[#{cpList.placeholders.phInputNumber}]]*/ '숫자만 입력해주세요.'
+                },
+                modal: {
+                    titles: {
+                        modelInfo: /*[[#{cpList.modal.titles.modelInfo}]]*/ '모델 정보',
+                        connectorInfo: /*[[#{cpList.modal.titles.connectorInfo}]]*/ '커넥터 정보'
+                    },
+                    labels: {
+                        company: /*[[#{cpList.modal.labels.company}]]*/ '사업자',
+                        station: /*[[#{cpList.modal.labels.station}]]*/ '충전소',
+                        model: /*[[#{cpList.modal.labels.model}]]*/ '모델',
+                        plan: /*[[#{cpList.modal.labels.plan}]]*/ '요금제',
+                        cpSn: /*[[#{cpList.modal.labels.cpSn}]]*/ '충전기 시리얼번호',
+                        modemSerialNum: /*[[#{cpList.modal.labels.modemSerialNum}]]*/ '모뎀 시리얼번호',
+                        modemNum: /*[[#{cpList.modal.labels.modemNum}]]*/ '모뎀 전화번호'
+                    },
+                    buttons: {
+                        cancel: /*[[#{cpList.modal.buttons.cancel}]]*/ '취소',
+                        close: /*[[#{cpList.modal.buttons.close}]]*/ '닫기',
+                        add: /*[[#{cpList.modal.buttons.add}]]*/ '등록',
+                        dupcheck: /*[[#{cpList.modal.buttons.dupcheck}]]*/ '중복체크',
+                        edit: /*[[#{cpList.modal.buttons.edit}]]*/ '수정'
+                    },
+                    placeholders: {
+                        phInputNumber: /*[[#{cpList.modal.placeholders.phInputNumber}]]*/ '숫자만 입력해주세요.'
+                    }
+                }
+            }
+        };
+    </script>
+</body>
+
+</html>

@@ -14,6 +14,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import zgoo.cpos.dto.menu.MenuDto;
+import zgoo.cpos.util.LocaleUtil;
 
 @Entity
 @Table(name = "MENU", indexes = {
@@ -40,6 +41,9 @@ public class Menu {
     @Column(name = "menu_name")
     private String menuName;
 
+    @Column(name = "menu_name_en")
+    private String menuNameEn;
+
     @Column(name = "menu_lv")
     private String menuLv;
 
@@ -61,6 +65,7 @@ public class Menu {
         this.parentCode = menu.getParentCode();
         this.menuUrl = menu.getMenuUrl();
         this.menuName = menu.getMenuName();
+        this.menuNameEn = menu.getMenuNameEn();
         this.menuLv = menu.getMenuLv();
         this.useYn = menu.getUseYn();
         this.iconClass = menu.getIconClass();
@@ -68,5 +73,18 @@ public class Menu {
 
     public void setUseYn(String useYn) {
         this.useYn = useYn;
+    }
+
+    /**
+     * 현재 로케일에 따라 적절한 메뉴 이름을 반환
+     * 
+     * @return 로케일별 메뉴 이름
+     */
+    public String getLocalizedMenuName() {
+        // 한국어는 기존 menuName 사용, 영어는 menuNameEn 사용
+        if (LocaleUtil.isEnglish() && this.menuNameEn != null && !this.menuNameEn.trim().isEmpty()) {
+            return this.menuNameEn;
+        }
+        return this.menuName; // 기본값은 한국어 (기존 컬럼)
     }
 }

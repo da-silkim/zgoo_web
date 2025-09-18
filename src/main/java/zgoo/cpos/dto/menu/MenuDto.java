@@ -21,6 +21,7 @@ public class MenuDto {
         private String parentCode;
         private String menuUrl;
         private String menuName;
+        private String menuNameEn;
         private String menuLv;
         private String useYn;
         private String iconClass;

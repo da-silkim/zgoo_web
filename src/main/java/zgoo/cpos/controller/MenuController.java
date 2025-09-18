@@ -3,6 +3,8 @@ package zgoo.cpos.controller;
 import java.security.Principal;
 import java.util.List;
 
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -28,15 +30,16 @@ import zgoo.cpos.service.MenuService;
 @RequiredArgsConstructor
 @RequestMapping("/system/menu")
 public class MenuController {
-    
+
     private final MenuService menuService;
     private final ComService comService;
-    
+    private final MessageSource messageSource;
+
     // 메뉴 등록
     @PostMapping("/new")
     public ResponseEntity<String> createMenu(@RequestBody MenuDto.MenuRegDto dto, Principal principal) {
         log.info("=== create menu info ===");
-        
+
         try {
             ResponseEntity<String> permissionCheck = this.comService.checkSuperAdminPermissions(principal);
             if (permissionCheck != null) {
@@ -44,11 +47,13 @@ public class MenuController {
             }
 
             this.menuService.saveMenu(dto);
-            return ResponseEntity.ok("메뉴가 정상적으로 등록되었습니다.");
+            return ResponseEntity.ok(messageSource.getMessage("menuManagement.api.registerSuccess", null,
+                    LocaleContextHolder.getLocale()));
         } catch (Exception e) {
             log.error("[createMenu] error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                 .body("메뉴 등록 중 오류가 발생했습니다.");
+                    .body(messageSource.getMessage("menuManagement.api.registerError", null,
+                            LocaleContextHolder.getLocale()));
         }
     }
 
@@ -67,7 +72,7 @@ public class MenuController {
         try {
             MenuDto.MenuRegDto menuFindOne = this.menuService.findMenuOne(menuCode);
 
-            if ( menuFindOne != null) {
+            if (menuFindOne != null) {
                 return ResponseEntity.ok(menuFindOne);
             }
 
@@ -90,11 +95,13 @@ public class MenuController {
             }
 
             this.menuService.updateMenu(dto);
-            return ResponseEntity.ok("메뉴가 정상적으로 수정되었습니다.");
+            return ResponseEntity.ok(messageSource.getMessage("menuManagement.api.updateSuccess", null,
+                    LocaleContextHolder.getLocale()));
         } catch (Exception e) {
             log.error("[updateMenu] error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                  .body("메뉴 수정 중 오류가 발생했습니다.");
+                    .body(messageSource.getMessage("menuManagement.api.updateError", null,
+                            LocaleContextHolder.getLocale()));
         }
     }
 
@@ -110,14 +117,18 @@ public class MenuController {
             }
 
             this.menuService.deleteMenu(menuCode);
-            return ResponseEntity.ok("메뉴가 정상적으로 삭제되었습니다.");
+            return ResponseEntity.ok(messageSource.getMessage("menuManagement.api.deleteSuccess", null,
+                    LocaleContextHolder.getLocale()));
         } catch (EntityNotFoundException e) {
             log.error("[deleteMenu] EntityNotFoundException: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("메뉴 정보를 찾을 수 없습니다.");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(messageSource.getMessage("menuManagement.api.menuInfoNotFound", null,
+                            LocaleContextHolder.getLocale()));
         } catch (Exception e) {
             log.error("[deleteMenu] error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                    .body("메뉴 삭제 중 오류가 발생했습니다.");
+                    .body(messageSource.getMessage("menuManagement.api.deleteError", null,
+                            LocaleContextHolder.getLocale()));
         }
     }
 
@@ -130,10 +141,11 @@ public class MenuController {
 
     // 사업자별 메뉴 권한 저장
     @PostMapping("/company/new")
-    public ResponseEntity<String> createCompanuMenuAuthority(@RequestBody List<CompanyMenuAuthorityDto.CompanyMenuAuthorityBaseDto> dto,
+    public ResponseEntity<String> createCompanuMenuAuthority(
+            @RequestBody List<CompanyMenuAuthorityDto.CompanyMenuAuthorityBaseDto> dto,
             Principal principal) {
         log.info("=== create company menu info ===");
-        
+
         try {
             ResponseEntity<String> permissionCheck = this.comService.checkSuperAdminPermissions(principal);
             if (permissionCheck != null) {
@@ -142,29 +154,40 @@ public class MenuController {
 
             int result = this.menuService.saveCompanyMenuAuthorities(dto);
             return switch (result) {
-                case 0 -> ResponseEntity.status(HttpStatus.CONFLICT).body("이미 등록된 데이터입니다.");
-                case -1-> ResponseEntity.status(HttpStatus.BAD_REQUEST).body("등록할 정보가 없습니다.");
-                case 1 -> ResponseEntity.status(HttpStatus.OK).body("정상적으로 등록되었습니다.");
-                default -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("예상치 못한 오류가 발생했습니다.");
+                case 0 -> ResponseEntity.status(HttpStatus.CONFLICT)
+                        .body(messageSource.getMessage("menuManagement.api.existData", null,
+                                LocaleContextHolder.getLocale()));
+                case -1 -> ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(messageSource.getMessage("menuManagement.api.noData", null,
+                                LocaleContextHolder.getLocale()));
+                case 1 -> ResponseEntity.status(HttpStatus.OK)
+                        .body(messageSource.getMessage("menuManagement.api.addsuccess", null,
+                                LocaleContextHolder.getLocale()));
+                default -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body(messageSource.getMessage("menuManagement.api.unexpectedError", null,
+                                LocaleContextHolder.getLocale()));
             };
 
         } catch (Exception e) {
             log.error("[createCompanuMenuAuthority] error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                    .body("사업장별 메뉴 권한 등록 중 오류가 발생했습니다.");
+                    .body(messageSource.getMessage("menuManagement.api.menuAuthRegError", null,
+                            LocaleContextHolder.getLocale()));
         }
     }
 
     // 사업자별 메뉴 권한 - 단건 조회
     @GetMapping("/company/get/{companyId}")
     @ResponseBody
-    public List<CompanyMenuAuthorityDto.CompanyMenuAuthorityListDto> findCompanyMenuOne(@PathVariable("companyId") Long companyId) {
+    public List<CompanyMenuAuthorityDto.CompanyMenuAuthorityListDto> findCompanyMenuOne(
+            @PathVariable("companyId") Long companyId) {
         return this.menuService.findCompanyMenuAuthorityList(companyId);
     }
 
     // 사업자별 메뉴 권한 수정
     @PatchMapping("/company/update")
-    public ResponseEntity<String> updateCompanyMenuAuthority(@RequestBody List<CompanyMenuAuthorityDto.CompanyMenuAuthorityBaseDto> dto,
+    public ResponseEntity<String> updateCompanyMenuAuthority(
+            @RequestBody List<CompanyMenuAuthorityDto.CompanyMenuAuthorityBaseDto> dto,
             Principal principal) {
         log.info("=== update company menu info ===");
 
@@ -175,11 +198,13 @@ public class MenuController {
             }
 
             this.menuService.updateCompanyMenuAuthority(dto);
-            return ResponseEntity.ok("메뉴 권한이 정상적으로 수정되었습니다.");
+            return ResponseEntity.ok(messageSource.getMessage("menuManagement.api.menuAuthEditSuccess", null,
+                    LocaleContextHolder.getLocale()));
         } catch (Exception e) {
             log.error("[updateCompanyMenuAuthority] error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                    .body("사업장별 메뉴 권한 수정 중 오류가 발생했습니다.");
+                    .body(messageSource.getMessage("menuManagement.api.menuAuthEditError", null,
+                            LocaleContextHolder.getLocale()));
         }
     }
 
@@ -196,14 +221,18 @@ public class MenuController {
             }
 
             this.menuService.deleteCompanyMenuAuthority(companyId);
-            return ResponseEntity.ok("메뉴 권한이 정상적으로 삭제되었습니다.");
+            return ResponseEntity.ok(messageSource.getMessage("menuManagement.api.menuAuthDeleteSuccess", null,
+                    LocaleContextHolder.getLocale()));
         } catch (EntityNotFoundException e) {
             log.error("[deleteCompanyMenuAuthority] EntityNotFoundException: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("메뉴 권한 정보를 찾을 수 없습니다.");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(messageSource.getMessage("menuManagement.api.menuAuthInfoNotFound", null,
+                            LocaleContextHolder.getLocale()));
         } catch (Exception e) {
             log.error("[deleteCompanyMenuAuthority] error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                    .body("사업장별 메뉴 권한 삭제 중 오류가 발생했습니다.");
+                    .body(messageSource.getMessage("menuManagement.api.menuAuthDeleteError", null,
+                            LocaleContextHolder.getLocale()));
         }
     }
 }

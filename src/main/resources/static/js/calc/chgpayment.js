@@ -24,7 +24,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // 시작일이 종료일보다 이후인 경우
         if (startDate > endDate) {
-            alert('시작 월은 종료 월보다 이전이어야 합니다.');
+            alert(i18n.chgpayment.messages.startmontherr);
             startMonthInput.value = endMonthInput.value;
             return;
         }
@@ -35,7 +35,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // 2개월 초과 선택 시
         if (monthDiff > 2) {
-            alert('조회 기간은 최대 2개월까지만 가능합니다.');
+            alert(i18n.chgpayment.messages.searchperioderr);
 
             // 종료일 기준으로 시작일 조정 (종료일로부터 2개월 전)
             const newStartDate = new Date(endDate);

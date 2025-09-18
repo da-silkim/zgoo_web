@@ -1,19 +1,19 @@
-$(document).ready(function() {
-    let modalCon = false, selectRow, btnMsg = "등록";
+$(document).ready(function () {
+    let modalCon = false, selectRow, btnMsg = i18n.modelManagement.buttons.add;
     var modelId;
 
-    $('#size').on('change', function() {
+    $('#size').on('change', function () {
         updatePageSize(this, "/system/model/list", ["companyIdSearch", "manfCdSearch", "chgSpeedCdSearch"]);
     });
 
-    $('#pageList').on('click', 'tr', function() {
+    $('#pageList').on('click', 'tr', function () {
         selectRow = $(this);
     });
 
-    $('#addBtn').on('click', function(event) {
+    $('#addBtn').on('click', function (event) {
         event.preventDefault();
         modalCon = false;
-        btnMsg = "등록";
+        btnMsg = i18n.modelManagement.buttons.add;
         $('#modalBtn').text(btnMsg);
         $('#cpModelForm')[0].reset();
         $('#collapseOne').collapse('hide');
@@ -23,10 +23,10 @@ $(document).ready(function() {
         $('#connectorTable tbody').empty();
     });
 
-    $('#editBtn').on('click', function(event) {
+    $('#editBtn').on('click', function (event) {
         event.preventDefault();
         modalCon = true;
-        btnMsg = "수정";
+        btnMsg = i18n.modelManagement.buttons.edit;
         $('#modalBtn').text(btnMsg);
         $('#cpModelForm')[0].reset();
         $('#collapseOne').collapse('hide');
@@ -36,7 +36,7 @@ $(document).ready(function() {
             url: `/system/model/get/${modelId}`,
             contentType: "application/json",
             dataType: 'json',
-            success: function(data) {
+            success: function (data) {
                 $('#manufCd').val(data.manufCd || '');
                 $('#powerUnit').val(data.powerUnit || '');
                 $('#modelName').val(data.modelName || '');
@@ -58,7 +58,7 @@ $(document).ready(function() {
                     row.classList.add("connector-row");
                     const selectElement = document.createElement('select');
                     selectElement.classList.add('form-control', 'connectorType');
-                    connTypeData.forEach(function(data) {
+                    connTypeData.forEach(function (data) {
                         const option = document.createElement('option');
                         option.value = data.commonCode;
                         option.textContent = data.commonCodeName;
@@ -116,38 +116,38 @@ $(document).ready(function() {
         });
     });
 
-    $('#deleteBtn').on('click', function() {
-        btnMsg = "삭제";
+    $('#deleteBtn').on('click', function () {
+        btnMsg = i18n.modelManagement.buttons.delete;
 
-        if(confirmSubmit(btnMsg)) {
+        if (confirmSubmit(btnMsg)) {
             modelId = selectRow.find('td').eq(0).attr('id');
 
             $.ajax({
                 type: 'DELETE',
                 url: `/system/model/delete/${modelId}`,
                 contentType: "application/json",
-                success: function(response) {
+                success: function (response) {
                     console.log(response);
                     window.location.replace('/system/model/list');
                 },
-                error: function(error) {
+                error: function (error) {
                     console.log(error);
                 }
             });
         }
     });
 
-    $('#modalCalcelBtn').on('click', function() {
+    $('#modalCalcelBtn').on('click', function () {
         // window.location.reload();
     });
 
-    $('#modalBtn').on('click', function(event) {
+    $('#modalBtn').on('click', function (event) {
         event.preventDefault();
 
         const connectorInfoList = getConnectorList();
 
         if (!connectorInfoList) {
-            alert("모든 Connector ID는 필수 항목입니다. 값을 입력해주세요.");
+            alert(i18n.modelManagement.messages.connectorIdCheck);
             return;
         }
 
@@ -196,20 +196,20 @@ $(document).ready(function() {
                 powerModule: $('#powerModule').val(),
                 charger: $('#charger').val(),
             };
-    
+
             if (modalCon) modelId = selectRow.find('td').eq(0).attr('id');
             const URL = modalCon ? `/system/model/update/${modelId}` : '/system/model/new';
             const TYPE = modalCon ? 'PATCH' : 'POST';
-    
+
             $.ajax({
                 url: URL,
                 method: TYPE,
                 contentType: 'application/json',
                 data: JSON.stringify(DATA),
-                success: function(response) {
+                success: function (response) {
                     window.location.reload();
                 },
-                error: function(xhr, status, error) {
+                error: function (xhr, status, error) {
                     alert(xhr.responseText);
                 }
             });
@@ -240,7 +240,7 @@ $(document).ready(function() {
             return null;
         }
 
-        console.log("커넥터 정보:", connectorInfoList);
+        console.log("connectorInfo:", connectorInfoList);
         return connectorInfoList;
     }
 });

@@ -73,7 +73,8 @@ function initializeContentModal() {
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="contentModalLabel">상세 내용</h5>
+                        <h5 class="modal-title" id="contentModalLabel"><span
+                                th:text="#{commhist.titles.details}"></span></h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">

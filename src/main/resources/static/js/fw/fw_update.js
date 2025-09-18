@@ -58,8 +58,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // company가 선택되지 않은경우 모델 리스트 초기화
         if (!companyId || companyId === '*{null}') {
-            $('#modelSearch').html('<option value="">(선택)</option>');
-            $('#versionSearch').html('<option value="">(선택)</option>');
+            $('#modelSearch').html('<option value="">' + i18n.fw.labels.select + '</option>');
+            $('#versionSearch').html('<option value="">' + i18n.fw.labels.select + '</option>');
             $('#urlSearch').val('');
             return;
         }
@@ -70,7 +70,7 @@ document.addEventListener("DOMContentLoaded", function () {
             type: 'GET',
             data: { companyId: companyId },
             success: function (models) {
-                let options = '<option value="">(선택)</option>';
+                let options = '<option value="">' + i18n.fw.labels.select + '</option>';
 
                 //모델리스트 생성
                 $.each(models, function (i, model) {
@@ -80,12 +80,12 @@ document.addEventListener("DOMContentLoaded", function () {
                 $('#modelSearch').html(options);
 
                 //모델 선택 초기화 시 버전도 초기화
-                $('#versionSearch').html('<option value="">(선택)</option>');
+                $('#versionSearch').html('<option value="">' + i18n.fw.labels.select + '</option>');
                 $('#urlSearch').val('');
             },
             error: function (xhr, status, error) {
-                console.error('모델 리스트 조회 실패:', error);
-                alert('모델 리스트 조회에 실패했습니다.');
+                console.error('model list search failed:', error);
+                alert(i18n.fw.messages.modellistsearchfailed);
             }
         });
     });
@@ -96,7 +96,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const companyId = $('#companyIdFw').val();
 
         if (!modelCode || !companyId) {
-            $('#versionSearch').html('<option value="">(선택)</option>');
+            $('#versionSearch').html('<option value="">' + i18n.fw.labels.select + '</option>');
             $('#urlSearch').val('');
             return;
         }
@@ -109,7 +109,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 modelCode: modelCode
             },
             success: function (versions) {
-                let options = '<option value="">(선택)</option>';
+                let options = '<option value="">' + i18n.fw.labels.select + '</option>';
 
                 $.each(versions, function (i, version) {
                     options += '<option value="' + version.fwVersion + '">' + version.fwVersion + '</option>';
@@ -119,8 +119,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 $('#urlSearch').val('');
             },
             error: function (xhr, status, error) {
-                console.error('버전 리스트 조회 실패:', error);
-                alert('버전 리스트 조회에 실패했습니다.');
+                console.error('version list search failed:', error);
+                alert(i18n.fw.messages.versionlistsearchfailed);
             }
         });
     });
@@ -148,8 +148,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 $('#urlSearch').val(url);
             },
             error: function (xhr, status, error) {
-                console.error('url 조회 실패:', error);
-                alert('url 조회에 실패했습니다.');
+                console.error('url search failed:', error);
+                alert(i18n.fw.messages.urlsearchfailed);
             }
         });
     });
@@ -162,7 +162,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             // 전체 체크박스 개수가 10개를 초과하는 경우
             if (checkboxes.length > 10 && this.checked) {
-                alert("한 번에 최대 10개까지만 선택할 수 있습니다.");
+                alert(i18n.fw.messages.maxselect);
                 this.checked = false;
                 return;
             }
@@ -204,7 +204,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             // 10개 초과 선택 시 체크 해제
             if (checkedCount > 10) {
-                alert("한 번에 최대 10개까지만 선택할 수 있습니다.");
+                alert(i18n.fw.messages.maxselect);
                 checkbox.checked = false;
             }
 
@@ -243,7 +243,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const retrieveDate = document.getElementById('retrieveDate').value;
 
             if (!selectedUrl) {
-                alert("URL 정보가 없습니다.");
+                alert(i18n.fw.messages.nourlinfo);
                 return;
             }
 
@@ -256,17 +256,17 @@ document.addEventListener("DOMContentLoaded", function () {
             });
 
             if (selectedChargers.length === 0) {
-                alert("업데이트할 충전기를 선택해주세요.");
+                alert(i18n.fw.messages.selectcharger);
                 return;
             }
 
             // 10개 초과 선택 체크 (추가 안전장치)
             if (selectedChargers.length > 10) {
-                alert("한 번에 최대 10개까지만 선택할 수 있습니다.");
+                alert(i18n.fw.messages.maxselect);
                 return;
             }
 
-            if (confirm(`선택한 ${selectedChargers.length}개의 충전기를 업데이트하시겠습니까?`)) {
+            if (confirm(`${i18n.fw.messages.confirmupdate}(${i18n.fw.messages.selectedchargernum} ${selectedChargers.length})`)) {
                 // 벌크 업데이트 처리
                 const updatePromises = selectedChargers.map(chargerId => {
                     const updateData = {
@@ -291,7 +291,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         const successCount = results.filter(result => result.status === 'Accepted').length;
                         const failCount = results.length - successCount;
 
-                        alert(`펌웨어 업데이트 요청 결과:\n성공: ${successCount}건\n실패: ${failCount}건`);
+                        alert(`${i18n.fw.messages.updateresult}\n${i18n.fw.messages.success}: ${successCount}\n${i18n.fw.messages.fail}: ${failCount}`);
 
                         // 체크박스 초기화
                         if (selectAllCheckbox) {
@@ -303,8 +303,8 @@ document.addEventListener("DOMContentLoaded", function () {
                         });
                     })
                     .catch(error => {
-                        alert('펌웨어 업데이트 요청 중 오류가 발생했습니다.');
-                        console.error('업데이트 요청 오류:', error);
+                        alert(i18n.fw.messages.updatefailed);
+                        console.error('update request error:', error);
                     });
             }
         });

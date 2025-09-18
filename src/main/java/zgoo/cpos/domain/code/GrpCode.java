@@ -12,6 +12,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import zgoo.cpos.dto.code.CodeDto.GrpCodeDto;
+import zgoo.cpos.util.LocaleUtil;
 
 @Entity
 @Getter
@@ -26,6 +27,9 @@ public class GrpCode {
 
     @Column(name = "grpcd_name", length = 50)
     private String grpcdName;
+
+    @Column(name = "grpcd_name_en", length = 100)
+    private String grpcdNameEn;
 
     @Column(name = "reg_user_id", length = 20)
     private String regUserId;
@@ -53,7 +57,21 @@ public class GrpCode {
 
     public void updateGrpcdCode(GrpCodeDto grpcode) {
         this.grpcdName = grpcode.getGrpcdName();
+        this.grpcdNameEn = grpcode.getGrpcdNameEn();
         this.modUserId = grpcode.getModUserId();
         this.modDt = LocalDateTime.now();
+    }
+
+    /**
+     * 현재 로케일에 따라 적절한 그룹코드 이름을 반환
+     * 
+     * @return 로케일별 그룹코드 이름
+     */
+    public String getLocalizedGrpcdName() {
+        // 한국어는 기존 grpcdName 사용, 영어는 grpcdNameEn 사용
+        if (LocaleUtil.isEnglish() && this.grpcdNameEn != null && !this.grpcdNameEn.trim().isEmpty()) {
+            return this.grpcdNameEn;
+        }
+        return this.grpcdName; // 기본값은 한국어 (기존 컬럼)
     }
 }

@@ -4,21 +4,24 @@
     <div class="card responsive-content">
         <!-- card body:1 start -->
         <div class="card-body">
-            <div class="content-title"><i class="fa-solid fa-charging-station font-ico me-2"></i>충전소 > 충전소 리스트</div>
+            <div class="content-title"><i class="fa-solid fa-charging-station font-ico me-2"></i><span
+                    th:text="#{csList.titles.main}"></span></div>
             <!-- card:2 start -->
             <div class="card card-shadow">
                 <!-- card body:2 start -->
                 <div class="card-body">
-                    <div class="card-title"><span class="card-title-bar"></span><span>검색조건</span></div>
+                    <div class="card-title"><span class="card-title-bar"></span><span
+                            th:text="#{csList.titles.search}"></span></div>
                     <!-- form start -->
                     <form id="searchForm" class="position-relative" th:action="@{/station/list}" method="get">
                         <!-- row:1 start -->
                         <div class="row mb-3 row-cols-2 row-cols-lg-3 g-2">
                             <div class="col d-flex align-items-center">
                                 <label for="companyIdSearch"
-                                    class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">사업자</label>
+                                    class="flex-shrink-0 col-form-label font-weight-bold text-right w-25"
+                                    th:text="#{csList.titles.company}"></label>
                                 <select id="companyIdSearch" name="companyIdSearch" class="mx-3 form-control">
-                                    <option th:value="null">선택</option>
+                                    <option th:value="null" th:text="#{csList.selectOptions.select}"></option>
                                     <option th:each="company : ${companyList}" th:value="${company.companyId}"
                                         th:text="${company.companyName}"
                                         th:selected="${company.companyId == selectedCompanyId}"></option>
@@ -26,12 +29,14 @@
                             </div>
                             <div class="col d-flex align-items-center">
                                 <label for="opSearch"
-                                    class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">검색조건</label>
+                                    class="flex-shrink-0 col-form-label font-weight-bold text-right w-25"
+                                    th:text="#{csList.titles.search}"></label>
                                 <select id="opSearch" name="opSearch" class="ms-3 form-control w-40">
-                                    <option th:value="null" th:selected="${selectedOpSearch == null}">(선택)</option>
-                                    <option th:value="'stationName'" th:text="충전소명"
+                                    <option th:value="null" th:selected="${selectedOpSearch == null}"
+                                        th:text="#{csList.selectOptions.select}"></option>
+                                    <option th:value="'stationName'" th:text="#{csList.selectOptions.stationName}"
                                         th:selected="${selectedOpSearch == 'stationName'}"></option>
-                                    <option th:value="'stationId'" th:text="충전소ID"
+                                    <option th:value="'stationId'" th:text="#{csList.selectOptions.stationId}"
                                         th:selected="${selectedOpSearch == 'stationId'}"></option>
                                 </select>
                                 <input type="text" name="contentSearch" id="contentSearch" class="mx-2 form-control"
@@ -42,10 +47,12 @@
                         <div class="search-btn">
                             <button type="button" class="btn btn-outline-grey me-2" id="searchBtn"
                                 onclick="searchOption()">
-                                <i class="bi bi-search me-2"></i>검색</button>
+                                <i class="bi bi-search me-2"></i><span
+                                    th:text="#{csList.buttons.search}"></span></button>
                             <button type="button" class="btn btn-outline-grey me-2" id="resetBtn"
                                 onclick="replacePage('/station/list')">
-                                <i class="bi bi-arrow-repeat me-2"></i>초기화</button>
+                                <i class="bi bi-arrow-repeat me-2"></i><span
+                                    th:text="#{csList.buttons.reset}"></span></button>
                         </div>
                     </form>
                     <!-- form end -->
@@ -61,22 +68,24 @@
                         <button class="btn btn-excel" id="excelBtn"
                             onclick="excelDownload('/excel/download/station', ['companyIdSearch', 'opSearch', 'contentSearch'])"
                             th:if="${menuAuthority.authority == 'SU' or menuAuthority.excelYn == 'Y'}">
-                            <i class="bi bi-file-earmark-spreadsheet"></i>엑셀다운로드</button>
+                            <i class="bi bi-file-earmark-spreadsheet"></i><span
+                                th:text="#{csList.buttons.excel}"></span></button>
                         <div class="btn-mod" th:if="${menuAuthority.authority == 'SU' or menuAuthority.modYn == 'Y'}">
                             <button class="btn btn-data-add" id="addBtn" data-bs-toggle="modal"
                                 data-bs-target="#dataAddModal">
-                                <i class="bi bi-plus-square"></i>등록</button>
+                                <i class="bi bi-plus-square"></i><span th:text="#{csList.buttons.add}"></span></button>
                             <button class="btn btn-data-edit" id="editBtn" data-bs-toggle="modal"
                                 data-bs-target="#dataAddModal" hidden>
-                                <i class="fa-regular fa-pen-to-square"></i>수정</button>
+                                <i class="fa-regular fa-pen-to-square"></i><span
+                                    th:text="#{csList.buttons.edit}"></span></button>
                             <button class="btn btn-data-delete" id="deleteBtn" hidden>
-                                <i class="bi bi-trash"></i>삭제</button>
+                                <i class="bi bi-trash"></i><span th:text="#{csList.buttons.delete}"></span></button>
                         </div>
                     </div>
                     <div class="page-container">
                         <span id="pageInfo">
                             <span
-                                th:text="'Page ' + (${currentPage + 1}) + ' of ' + ${totalPages} + ' [총 ' + ${totalCount} + '건]'"></span>
+                                th:text="'Page ' + (${currentPage + 1}) + ' of ' + ${totalPages} + ' [' + ${totalCount} + ']'"></span>
                         </span>
                         <select class="mx-3 page-select" id="size" name="size">
                             <option th:each="data : ${showListCnt}" th:value="${data.commonCode}"
@@ -90,14 +99,14 @@
                                     <th scope="col"></th>
                                     <th scope="col"></th>
                                     <th scope="col">No</th>
-                                    <th scope="col">사업자</th>
-                                    <th scope="col">충전소명</th>
-                                    <th scope="col">충전소ID</th>
-                                    <th scope="col">설치주소</th>
-                                    <th scope="col">충전기수</th>
-                                    <th scope="col">운영상태</th>
-                                    <th scope="col">운영시작시간</th>
-                                    <th scope="col">운영종료시간</th>
+                                    <th scope="col" th:text="#{csList.tables.company}"> </th>
+                                    <th scope="col" th:text="#{csList.tables.stationName}"></th>
+                                    <th scope="col" th:text="#{csList.tables.stationId}"></th>
+                                    <th scope="col" th:text="#{csList.tables.address}"></th>
+                                    <th scope="col" th:text="#{csList.tables.cpCount}"></th>
+                                    <th scope="col" th:text="#{csList.tables.opStatus}"></th>
+                                    <th scope="col" th:text="#{csList.tables.openStartTime}"></th>
+                                    <th scope="col" th:text="#{csList.tables.openEndTime}"></th>
                                 </tr>
                             </thead>
                             <tbody id="pageList">
@@ -124,7 +133,7 @@
                                     <td th:text="${cs.openEndTime}"></td>
                                 </tr>
                                 <tr th:if="${csList.size() == 0}">
-                                    <td colspan="10">조회된 데이터가 없습니다.</td>
+                                    <td colspan="10" th:text="#{csList.messages.nodata}"></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -180,11 +189,13 @@
                     <!-- modal body start -->
                     <div class="modal-body">
                         <!-- table:1 start -->
-                        <div class="modal-title mb-2"><span class="modal-title-bar"></span><span>사업자 정보</span></div>
+                        <div class="modal-title mb-2"><span class="modal-title-bar"></span><span
+                                th:text="#{csList.modal.titles.companyInfo}"></span></div>
                         <table class="table table-bg-v table-fixed w-100 text-center align-middle">
                             <tbody>
                                 <tr class="table-border-top">
-                                    <th class="w-20">사업자<b class="required-data">*</b></th>
+                                    <th class="w-20" th:text="#{csList.titles.company}"><b class="required-data">*</b>
+                                    </th>
                                     <td class="w-30">
                                         <select id="companyId" name="companyId" class="form-control attr-control"
                                             required>
@@ -198,27 +209,31 @@
                         </table>
                         <!-- table:1 end -->
                         <!-- table:2 start -->
-                        <div class="modal-title mb-2"><span class="modal-title-bar"></span><span>충전소 정보</span></div>
+                        <div class="modal-title mb-2"><span class="modal-title-bar"></span><span
+                                th:text="#{csList.modal.titles.stationInfo}"></span></div>
                         <table class="table table-bg-v table-fixed w-100 text-center align-middle">
                             <tbody>
                                 <tr class="table-border-top">
-                                    <th class="w-20">충전소 이름<b class="required-data">*</b></th>
+                                    <th class="w-20" th:text="#{csList.modal.titles.stationName}"><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <div class="display-input-btn">
                                             <input type="text" name="stationName" id="stationName"
                                                 class="form-control attr-control" required>
                                             <button type="button" class="btn btn-outline-grey flex-btn attr-control"
-                                                id="duplicateBtn">중복체크</button>
+                                                id="duplicateBtn" th:text="#{csList.modal.buttons.dupcheck}"></button>
                                         </div>
                                     </td>
-                                    <th class="w-20">충전소ID<b class="required-data">*</b></th>
+                                    <th class="w-20" th:text="#{csList.modal.titles.stationId}"><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <input type="text" name="stationId" id="stationId" class="form-control"
                                             disabled>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="w-20">충전소 유형<b class="required-data">*</b></th>
+                                    <th class="w-20" th:text="#{csList.modal.titles.stationType}"><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <select id="stationType" name="stationType" class="form-control attr-control"
                                             required>
@@ -226,7 +241,8 @@
                                                 th:text="${data.commonCodeName}"></option>
                                         </select>
                                     </td>
-                                    <th class="w-20">충전소 시설 구분<b class="required-data">*</b></th>
+                                    <th class="w-20" th:text="#{csList.modal.titles.stationFacility}"><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <select id="facilityType" name="facilityType" class="form-control attr-control"
                                             required>
@@ -236,12 +252,14 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="w-20">문의전화<b class="required-data">*</b></th>
+                                    <th class="w-20" th:text="#{csList.modal.titles.asNum}"><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <input type="number" name="asNum" id="asNum" class="form-control attr-control"
                                             autocomplete="off" required>
                                     </td>
-                                    <th class="w-20">운영상태<b class="required-data">*</b></th>
+                                    <th class="w-20" th:text="#{csList.modal.titles.opStatus}"><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <select id="opStatus" name="opStatus" class="form-control attr-control"
                                             required>
@@ -251,35 +269,41 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="w-20">주소<b class="required-data">*</b></th>
+                                    <th class="w-20" th:text="#{csList.modal.titles.address}"><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30" colspan="3">
                                         <div class="address-container mb-2 display-input-btn">
                                             <input type="text" name="zipCode" id="zipCode" class="form-control w-25"
                                                 disabled>
-                                            <button class="btn btn-outline-grey flex-btn attr-control"
-                                                id="search-btn">주소 검색</button>
+                                            <button class="btn btn-outline-grey flex-btn attr-control" id="search-btn"
+                                                th:text="#{csList.buttons.search}"></button>
                                             <input type="text" name="sido" id="sido" hidden>
                                         </div>
                                         <input type="text" name="address" id="address" class="form-control mb-2"
                                             autocomplete="off" disabled>
                                         <input type="text" name="addressDetail" id="addressDetail"
-                                            class="form-control attr-control" placeholder="상세 주소" autocomplete="off">
+                                            class="form-control attr-control"
+                                            th:placeholder="#{csList.modal.placeholders.addressDetail}"
+                                            autocomplete="off">
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="w-20">위도<b class="required-data">*</b></th>
+                                    <th class="w-20" th:text="#{csList.modal.titles.latitude}"><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <input type="text" name="latitude" id="latitude" class="form-control"
                                             autocomplete="off" required disabled>
                                     </td>
-                                    <th class="w-20">경도<b class="required-data">*</b></th>
+                                    <th class="w-20" th:text="#{csList.modal.titles.longitude}"><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <input type="text" name="longitude" id="longitude" class="form-control"
                                             autocomplete="off" required disabled>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="w-20" scope="row">운영시간<b class="required-data">*</b></th>
+                                    <th class="w-20" scope="row" th:text="#{csList.modal.titles.operationTime}"><b
+                                            class="required-data">*</b></th>
                                     <td class="" style="display: flex; align-items: center;">
                                         <input type="time" name="openStartTime" id="openStartTime"
                                             class="form-control attr-control" placeholder="시작 시간">
@@ -289,19 +313,20 @@
                                     </td>
                                     <td colspan="2" class="text-left">
                                         <input type="checkbox" id="openingAllTime" class="attr-control">
-                                        <label for="openingAllTime">24시간 운영</label>
+                                        <label for="openingAllTime" th:text="#{csList.modal.titles.fulltime}"></label>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="w-20" scope="row">주차요금 정보</th>
+                                    <th class="w-20" scope="row" th:text="#{csList.modal.titles.parkingFee}"></th>
                                     <td>
                                         <div class="display-radio">
                                             <input type="radio" name="parkingFeeYn" id="parkingFeeYes"
                                                 class="attr-control" value="Y">
-                                            <label for="parkingFeeYes">유료</label>
+                                            <label for="parkingFeeYes"
+                                                th:text="#{csList.modal.titles.pkfeeYes}"></label>
                                             <input type="radio" name="parkingFeeYn" id="parkingFeeNo"
                                                 class="attr-control" value="N" checked>
-                                            <label for="parkingFeeNo">무료</label>
+                                            <label for="parkingFeeNo" th:text="#{csList.modal.titles.pkfeeNo}"></label>
                                         </div>
                                     </td>
                                     <td colspan="2"></td>
@@ -310,16 +335,19 @@
                         </table>
                         <!-- table:2 end -->
                         <!-- table:3 start -->
-                        <div class="modal-title mb-2"><span class="modal-title-bar"></span><span>부지 정보</span></div>
+                        <div class="modal-title mb-2"><span class="modal-title-bar"></span><span
+                                th:text="#{csList.modal.titles.landinfo}"></span></div>
                         <table class="table table-bg-v table-fixed w-100 text-center align-middle">
                             <tbody>
                                 <tr class="table-border-top">
-                                    <th class="w-20">계약기관 명<b class="required-data">*</b></th>
+                                    <th class="w-20" th:text="#{csList.modal.titles.contractCompany}"><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <input type="text" name="institutionName" id="institutionName"
                                             class="form-control attr-control" autocomplete="off" required>
                                     </td>
-                                    <th class="w-20">계약 부지 구분<b class="required-data">*</b></th>
+                                    <th class="w-20" th:text="#{csList.modal.titles.contractLandKind}"><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <select id="landType" name="landType" class="form-control attr-control"
                                             required>
@@ -329,12 +357,12 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="w-20">담당자 명</th>
+                                    <th class="w-20" th:text="#{csList.modal.titles.staffName}"></th>
                                     <td class="d-flex align-items-center">
                                         <input type="text" name="staffName" id="staffName"
                                             class="form-control attr-control" autocomplete="off">
                                     </td>
-                                    <th class="w-20">담당자 연락처</th>
+                                    <th class="w-20" th:text="#{csList.modal.titles.staffPhone}"></th>
                                     <td class="w-30">
                                         <input type="text" name="staffPhone" id="staffPhone"
                                             class="form-control attr-control" maxlength="13" oninput="phoneFormat(this)"
@@ -342,12 +370,13 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="w-20">계약일자</th>
+                                    <th class="w-20" th:text="#{csList.modal.titles.contractDate}"></th>
                                     <td class="w-30">
                                         <input type="date" min="1970-01-01" max="2199-12-31" name="contractDate"
                                             id="contractDate" class="form-control attr-control">
                                     </td>
-                                    <th class="w-20">계약기간<b class="required-data">*</b></th>
+                                    <th class="w-20" th:text="#{csList.modal.titles.contractFromTo}"><b
+                                            class="required-data">*</b></th>
                                     <td class="input-date-container">
                                         <input type="date" min="1970-01-01" max="2199-12-31" name="startDate"
                                             id="startDate" class="form-control attr-control" required>
@@ -357,33 +386,34 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="w-20">토지사용구분<b class="required-data">*</b></th>
+                                    <th class="w-20" th:text="#{csList.modal.titles.landUseType}"><b
+                                            class="required-data">*</b></th>
                                     <td>
                                         <div class="display-radio">
                                             <input type="radio" name="landUseType" id="FIX" class="attr-control"
                                                 value="FIX" checked>
-                                            <label for="FIX">고정형</label>
+                                            <label for="FIX" th:text="#{csList.modal.titles.fixType}"></label>
                                             <input type="radio" name="landUseType" id="RATE" class="attr-control"
                                                 value="RATE">
-                                            <label for="RATE">사용료율</label>
+                                            <label for="RATE" th:text="#{csList.modal.titles.rateType}"></label>
                                         </div>
                                     </td>
-                                    <th class="w-20">토지사용료<b class="required-data">*</b></th>
+                                    <th class="w-20" th:text="#{csList.modal.titles.landUseFee}"><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <div class="display-input-btn">
                                             <input type="number" name="landUseFee" id="landUseFee"
                                                 class="form-control attr-control" autocomplete="off" required>
-                                            <span id="unit">원</span>
+                                            <span id="unit" th:text="#{csList.modal.titles.currency}"></span>
                                         </div>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="w-20">정산일</th>
+                                    <th class="w-20" th:text="#{csList.modal.titles.settlementDate}"></th>
                                     <td class="w-30">
                                         <div class="display-input-btn">
                                             <input type="text" name="settlementDate" id="settlementDate"
                                                 class="form-control attr-control" autocomplete="off" required>
-                                            <span>일</span>
                                         </div>
                                     </td>
                                     <td colspan="2"></td>
@@ -392,48 +422,52 @@
                         </table>
                         <!-- table:3 end -->
                         <!-- table:4 start -->
-                        <div class="modal-title mb-2"><span class="modal-title-bar"></span><span>한전 계약정보</span></div>
+                        <div class="modal-title mb-2"><span class="modal-title-bar"></span><span
+                                th:text="#{csList.modal.titles.kepcoContractInfo}"></span></div>
                         <table class="table table-bg-v table-fixed w-100 text-center align-middle">
                             <tbody>
                                 <tr class="table-border-top">
-                                    <th class="w-20">한전 고객 번호<b class="required-data">*</b></th>
+                                    <th class="w-20" th:text="#{csList.modal.titles.kepcoCustNo}"><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <input type="number" name="kepcoCustNo" id="kepcoCustNo"
                                             class="form-control attr-control" required>
                                     </td>
-                                    <th class="w-20">개통일<b class="required-data">*</b></th>
+                                    <th class="w-20" th:text="#{csList.modal.titles.openingDate}"><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <input type="date" min="1970-01-01" max="2199-12-31" name="openingDate"
                                             id="openingDate" class="form-control attr-control" required>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="w-20">계약전력(kW)<b class="required-data">*</b></th>
+                                    <th class="w-20" th:text="#{csList.modal.titles.contPower}"><b
+                                            class="required-data">*</b></th>
                                     <td class="d-flex align-items-center">
                                         <input type="number" name="contPower" id="contPower"
                                             class="form-control attr-control" required>
                                     </td>
-                                    <th class="w-20">수전방식</th>
+                                    <th class="w-20" th:text="#{csList.modal.titles.rcvCapacityMethod}"></th>
                                     <td class="w-30">
                                         <select id="rcvCapacityMethod" name="rcvCapacityMethod"
                                             class="form-control attr-control" required>
-                                            <option th:value="null">(선택)</option>
+                                            <option th:value="null" th:text="#{csList.selectOptions.select}"></option>
                                             <option th:each="data : ${faucetType}" th:value="${data.commonCode}"
                                                 th:text="${data.commonCodeName}"></option>
                                         </select>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="w-20">수전용량(kVA)</th>
+                                    <th class="w-20" th:text="#{csList.modal.titles.rcvCapacity}"></th>
                                     <td class="w-30">
                                         <input type="number" name="rcvCapacity" id="rcvCapacity"
                                             class="form-control attr-control">
                                     </td>
-                                    <th class="w-20">가입요금제</th>
+                                    <th class="w-20" th:text="#{csList.modal.titles.voltageType}"></th>
                                     <td class="w-30">
                                         <select id="voltageType" name="voltageType" class="form-control attr-control"
                                             required>
-                                            <option th:value="null">(선택)</option>
+                                            <option th:value="null" th:text="#{csList.selectOptions.select}"></option>
                                             <option th:each="data : ${powerType}" th:value="${data.commonCode}"
                                                 th:text="${data.commonCodeName}"></option>
                                         </select>
@@ -443,11 +477,13 @@
                         </table>
                         <!-- table:4 end -->
                         <!-- table:5 start -->
-                        <div class="modal-title mb-2"><span class="modal-title-bar"></span><span>안전점검관리비 정보</span></div>
+                        <div class="modal-title mb-2"><span class="modal-title-bar"></span><span
+                                th:text="#{csList.modal.titles.safetyManagementFeeInfo}"></span></div>
                         <table class="table table-bg-v table-fixed w-100 text-center align-middle">
                             <tbody>
                                 <tr class="table-border-top">
-                                    <th class="w-20">안전점검관리비(원)<b class="required-data">*</b></th>
+                                    <th class="w-20" th:text="#{csList.modal.titles.safetyManagementFee}"><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <input type="number" name="safetyManagementFee" id="safetyManagementFee"
                                             class="form-control attr-control" required>
@@ -460,11 +496,12 @@
                     </div>
                     <!-- modal body end -->
                     <div class="modal-footer justify-content-center border-top-none">
-                        <button type="button" id="modalCancel" class="btn btn-outline-grey me-2"
-                            data-bs-dismiss="modal">취소</button>
+                        <button type="button" id="modalCancel" class="btn btn-outline-grey me-2" data-bs-dismiss="modal"
+                            th:text="#{csList.modal.buttons.cancel}"></button>
                         <button type="button" id="modalClose" class="btn btn-outline-grey me-2" data-bs-dismiss="modal"
-                            hidden>닫기</button>
-                        <button type="button" id="modalBtn" class="btn btn-data-add">등록</button>
+                            hidden th:text="#{csList.modal.buttons.close}"></button>
+                        <button type="button" id="modalBtn" class="btn btn-data-add"
+                            th:text="#{csList.modal.buttons.add}"></button>
                     </div>
                 </form>
                 <!-- form end -->
@@ -475,6 +512,15 @@
     </div>
     <!-- Add Modal end -->
     <script type="text/javascript" th:src="@{/js/charge/cs_list.js}"></script>
+    <script th:inline="javascript">
+        var currentLanguage = /*[[${#locale.language}]]*/ 'ko';
+    </script>
+
+    <!-- 공통 i18n 스크립트 포함 -->
+    <div th:replace="~{fragments/i18n/i18n-cs-list :: cs-list-i18n}"></div>
+
+    <!-- 언어 선택기 스크립트 -->
+    <div th:replace="~{fragments/language-selector :: language-script}"></div>
 </div>
 
 </html>

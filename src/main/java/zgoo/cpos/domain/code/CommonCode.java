@@ -17,6 +17,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import zgoo.cpos.dto.code.CodeDto.CommCodeDto;
+import zgoo.cpos.util.LocaleUtil;
 
 @Entity
 @Table(name = "COMMON_CODE", indexes = {
@@ -35,6 +36,9 @@ public class CommonCode {
 
     @Column(name = "name", length = 50)
     private String name;
+
+    @Column(name = "name_en", length = 100)
+    private String nameEn;
 
     @Column(name = "reserved", length = 100)
     private String reserved;
@@ -64,8 +68,21 @@ public class CommonCode {
 
     public void updateCommonCodeName(CommCodeDto cdto) {
         this.name = cdto.getCommonCodeName();
+        this.nameEn = cdto.getCommonCodeNameEn();
         this.modUserId = cdto.getModUserId();
         this.modDt = LocalDateTime.now();
     }
 
+    /**
+     * 현재 로케일에 따라 적절한 이름을 반환
+     * 
+     * @return 로케일별 이름
+     */
+    public String getLocalizedName() {
+        // 한국어는 기존 name 사용, 영어는 nameEn 사용
+        if (LocaleUtil.isEnglish() && this.nameEn != null && !this.nameEn.trim().isEmpty()) {
+            return this.nameEn;
+        }
+        return this.name; // 기본값은 한국어 (기존 컬럼)
+    }
 }

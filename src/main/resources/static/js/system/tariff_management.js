@@ -68,12 +68,12 @@ document.addEventListener("DOMContentLoaded", function () {
                 })
                     .then(response => {
                         if (!response.ok) {
-                            throw new Error("[GET]요금정보 조회실패: " + response.statusText);
+                            throw new Error("[GET]Failed to get TariffInfo: " + response.statusText);
                         }
                         return response.json();
                     })
                     .then(data => {
-                        console.log("TariffInfo 조회결과: ", data);
+                        console.log("TariffInfo result: ", data);
                         //sublist 테이블 구성
                         selected_tinfo_data = data;
                         makeTariffInfoTable(data);
@@ -93,7 +93,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const row = document.createElement("tr");
 
             row.innerHTML = `
-            <td colspan="9">조회된 데이터가 없습니다.</td>
+            <td colspan="9">${i18n.tariffMgmt.messages.nodata}</td>
         `;
 
             tableBody.appendChild(row);
@@ -123,7 +123,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const row = document.createElement("tr");
 
             row.innerHTML = `
-            <td colspan="9">조회된 데이터가 없습니다.</td>
+            <td colspan="9">${i18n.tariffMgmt.messages.nodata}</td>
         `;
 
             tableBody.appendChild(row);
@@ -161,7 +161,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function updateTariffInfoTable() {
         const selectedStatcode = document.getElementById("modalTariffStatCode").value;
-        console.log("단가 상태코드:", selectedStatcode);
+        console.log("stateCode:", selectedStatcode);
 
         //todo create tariffinfo table >> 
     }
@@ -222,7 +222,7 @@ document.addEventListener("DOMContentLoaded", function () {
             if (planModaIcon) {
                 //수정일 경우에만 등록된 날짜 가져오기
                 const startDateTIme = planSelectedRow.cells[4].innerText;
-                const formattedStartDate = formatDate(startDateTIme);
+                const formattedStartDate = formatDate(new Date(startDateTIme));
                 applyStart.value = formattedStartDate;
             } else {
                 applyStart.value = "";
@@ -276,8 +276,8 @@ document.addEventListener("DOMContentLoaded", function () {
     //메인폼 요금제 '등록' 버튼 클릭시 모달 등록버튼 메시지 
     document.getElementById("addBtn").addEventListener("click", function () {
         planModaIcon = false;
-        btnMsg = "등록";
-        modaltitle = "요금제 등록"
+        btnMsg = i18n.tariffMgmt.buttons.add;
+        modaltitle = i18n.tariffMgmt.titles.regPlan;
         $('#planModalBtn').text(btnMsg);
         $('#modalTitle').text(modaltitle);
 
@@ -288,8 +288,8 @@ document.addEventListener("DOMContentLoaded", function () {
     //수정버튼 클릭 이벤트 처리
     document.getElementById("editBtn").addEventListener("click", function () {
         planModaIcon = true;
-        btnMsg = "수정";
-        modaltitle = "요금제 수정"
+        btnMsg = i18n.tariffMgmt.buttons.edit;
+        modaltitle = i18n.tariffMgmt.titles.editPlan;
         $('#planModalBtn').text(btnMsg);
         $('#modalTitle').text(modaltitle);
 
@@ -311,7 +311,13 @@ document.addEventListener("DOMContentLoaded", function () {
             applyCode: document.getElementById("modalTariffStatCode").value,
             tariffInfo: tariffInfoList
         };
-        console.log("입력 data: ", bodyData);
+        console.log("input data: ", bodyData);
+
+        //필수항목 체크 (null, undefined, 빈 문자열 모두 체크)
+        if (!bodyData.policyName || !bodyData.applyStartDate || !bodyData.applyCode) {
+            alert(i18n.tariffMgmt.messages.planRegError);
+            return;
+        }
 
 
         const m_url = planModaIcon ? "/system/tariff/update" : "/system/tariff/new";
@@ -325,18 +331,18 @@ document.addEventListener("DOMContentLoaded", function () {
         })
             .then(response => {
                 if (!response.ok) {
-                    throw new Error(planModaIcon ? "요금제 수정 실패: " + response.statusText : "요금제 등록 실패: " + response.statusText);
+                    throw new Error(planModaIcon ? "Plan updaate failed: " + response.statusText : "Plan registration failed: " + response.statusText);
                 }
                 return response.text();
             })
             .then(data => {
-                console.log("처리결과:", data);
-                alert("요금제 등록/수정 처리 완료");
+                console.log("result:", data);
+                alert(i18n.tariffMgmt.messages.planRegSuccess);
                 window.location.replace('/system/tariff/list');
             })
             .catch(error => {
-                if (planModaIcon == false) console.error("요금제 등록 실패:", error);
-                else console.error("요금제 수정 실패:", error);
+                if (planModaIcon == false) console.error("Plan registration failed:", error);
+                else console.error("Plan update failed:", error);
             });
 
     });
@@ -355,16 +361,16 @@ document.addEventListener("DOMContentLoaded", function () {
             })
                 .then(response => {
                     if (!response.ok) {
-                        throw new Error("[DELETE]요금제 삭제 실패: " + response.statusText);
+                        throw new Error("[DELETE]Plan deletion failed: " + response.statusText);
                     }
                     return response.text();
                 })
                 .then(data => {
-                    console.log("처리결과:", data);
+                    console.log("result:", data);
                     window.location.replace('/system/tariff/list');
                 })
                 .catch(error => {
-                    console.error("요금제 삭제 실패:", error);
+                    console.error("Plan deletion failed:", error);
                 });
         }
     });

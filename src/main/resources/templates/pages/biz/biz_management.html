@@ -4,21 +4,25 @@
     <div class="card responsive-content">
         <!-- card body:1 start -->
         <div class="card-body">
-            <div class="content-title"><i class="fa-solid fa-building me-2"></i>업체관리 > 사업자 관리</div>
+            <div class="content-title"><i class="fa-solid fa-building me-2"></i><span
+                    th:text="#{biz.titles.main}"></span></div>
             <!-- card:2 start -->
             <div class="card card-shadow">
                 <!-- card body:2 start -->
                 <div class="card-body">
-                    <div class="card-title"><span class="card-title-bar"></span><span>검색조건</span></div>
+                    <div class="card-title"><span class="card-title-bar"></span><span
+                            th:text="#{biz.titles.search}"></span></div>
                     <!-- form start -->
                     <form id="searchForm" class="position-relative" th:action="@{/biz/list}" method="get">
                         <div class="row mb-3 row-cols-2 row-cols-lg-3 g-2">
                             <div class="col d-flex align-items-center p-0 search-border">
                                 <label for="companyIdSearch"
                                     class="d-flex justify-content-center align-items-center flex-shrink-0 col-form-label font-weight-bold text-center w-25"
-                                    style="background-color: #F5F5F5; height: 54px;">사업자<b>*</b></label>
+                                    style="background-color: #F5F5F5; height: 54px;"><span
+                                        th:text="#{biz.labels.company}"></span><b>*</b></label>
                                 <select id="companyIdSearch" class="mx-3 form-control" name="companyIdSearch" required>
-                                    <option value="" th:text="'(없음)'" th:selected="${selectedCompanyId == null}">
+                                    <option value="" th:text="#{biz.labels.select}"
+                                        th:selected="${selectedCompanyId == null}">
                                     </option>
                                     <option th:each="company : ${allCompanyList}" th:value="${company.companyId}"
                                         th:text="${company.companyName}"
@@ -28,10 +32,12 @@
                             <div class="col d-flex align-items-center search-border">
                                 <label for="companyTypeSearch"
                                     class="d-flex justify-content-center align-items-center flex-shrink-0 col-form-label font-weight-bold text-center w-25"
-                                    style="background-color: #F5F5F5; height: 54px;">사업자유형<b>*</b></label>
+                                    style="background-color: #F5F5F5; height: 54px;"><span
+                                        th:text="#{biz.labels.bizkind}"></span><b>*</b></label>
                                 <select id="companyTypeSearch" class="mx-3 form-control" name="companyTypeSearch"
                                     required>
-                                    <option value="" th:text="'(없음)'" th:selected="${selectedCompanyKind == null}">
+                                    <option value="" th:text="#{biz.labels.select}"
+                                        th:selected="${selectedCompanyKind == null}">
                                     </option>
                                     <option th:each="data : ${ckindlist}" th:value="${data.commonCode}"
                                         th:text="${data.commonCodeName}"
@@ -41,9 +47,11 @@
                             <div class="col d-flex align-items-center search-border">
                                 <label for="companyLvSearch"
                                     class="d-flex justify-content-center align-items-center flex-shrink-0 col-form-label font-weight-bold text-center w-25"
-                                    style="background-color: #F5F5F5; height: 54px;">사업자레벨<b>*</b></label>
+                                    style="background-color: #F5F5F5; height: 54px;"><span
+                                        th:text="#{biz.labels.bizlevel}"></span><b>*</b></label>
                                 <select class="mx-3 form-control" id="companyLvSearch" name="companyLvSearch" required>
-                                    <option value="" th:text="'(없음)'" th:selected="${selectedCompanyLv == null}">
+                                    <option value="" th:text="#{biz.labels.select}"
+                                        th:selected="${selectedCompanyLv == null}">
                                     <option th:each="data : ${clvlist}" th:value="${data.commonCode}"
                                         th:text="${data.commonCodeName}"
                                         th:selected="${data.commonCode == selectedCompanyLv}"></option>
@@ -52,9 +60,11 @@
                         </div>
                         <div class="search-btn">
                             <button type="button" class="btn btn-outline-grey me-2" id="companySearchBtn"
-                                onclick="searchOption()"><i class="bi bi-search me-2"></i>검색</button>
+                                onclick="searchOption()"><i class="bi bi-search me-2"></i><span
+                                    th:text="#{biz.buttons.search}"></span></button>
                             <button type="button" class="btn btn-outline-grey me-2" id="resetBtn"
-                                onclick="replacePage('/biz/list')"><i class="bi bi-arrow-repeat me-2"></i>초기화</button>
+                                onclick="replacePage('/biz/list')"><i class="bi bi-arrow-repeat me-2"></i><span
+                                    th:text="#{biz.buttons.reset}"></span></button>
                         </div>
                     </form>
                     <!-- form end -->
@@ -67,23 +77,24 @@
                 <!-- card body:3 start -->
                 <div class="card-body">
                     <div class="card-title">
-                        <span class="card-title-bar"></span><span>업체 리스트</span>
+                        <span class="card-title-bar"></span><span th:text="#{biz.titles.bizlist}"></span>
                     </div>
                     <div class="mt-3 btn-page-area">
                         <div th:if="${menuAuthority.authority == 'SU' or menuAuthority.modYn == 'Y'}">
                             <button class="btn btn-data-add" id="addBtn" data-bs-toggle="modal"
                                 data-bs-target="#dataAddModal">
-                                <i class="bi bi-plus-square"></i>등록</button>
+                                <i class="bi bi-plus-square"></i><span th:text="#{biz.buttons.add}"></span></button>
                             <button class="btn btn-data-edit" id="editBtn" data-bs-toggle="modal"
                                 data-bs-target="#dataAddModal" hidden>
-                                <i class="fa-regular fa-pen-to-square"></i>수정</button>
+                                <i class="fa-regular fa-pen-to-square"></i><span
+                                    th:text="#{biz.buttons.edit}"></span></button>
                             <button class="btn btn-data-delete" id="deleteBtn" hidden>
-                                <i class="bi bi-trash"></i>삭제</button>
+                                <i class="bi bi-trash"></i><span th:text="#{biz.buttons.delete}"></span></button>
                         </div>
                         <span>
                             <span id="pageInfo">
                                 <span
-                                    th:text="'Page ' + (${currentPage + 1}) + ' of ' + ${totalPages} + ' [총 ' + ${totalCount} + '건]'"></span>
+                                    th:text="'Page ' + (${currentPage + 1}) + ' of ' + ${totalPages} + ' [' + ${totalCount} + ']'"></span>
                             </span>
                             <select class="mx-3 page-select" id="size" name="size">
                                 <option th:each="data : ${showListCnt}" th:value="${data.commonCode}"
@@ -98,13 +109,13 @@
                                     <th scope="col"></th>
                                     <th scope="col" style="display:none;">ID</th>
                                     <th scope="col">No</th>
-                                    <th scope="col">사업자명</th>
-                                    <th scope="col">사업자구분</th>
-                                    <th scope="col">사업자유형</th>
-                                    <th scope="col">상위사업자</th>
-                                    <th scope="col">가입일</th>
-                                    <th scope="col">종료일</th>
-                                    <th scope="col">계약상태</th>
+                                    <th scope="col"><span th:text="#{biz.labels.biznm}"></span></th>
+                                    <th scope="col"><span th:text="#{biz.labels.bizlevel}"></span></th>
+                                    <th scope="col"><span th:text="#{biz.labels.bizkind}"></span></th>
+                                    <th scope="col"><span th:text="#{biz.labels.parentcompany}"></span></th>
+                                    <th scope="col"><span th:text="#{biz.labels.contstartdt}"></span></th>
+                                    <th scope="col"><span th:text="#{biz.labels.contenddt}"></span></th>
+                                    <th scope="col"><span th:text="#{biz.labels.contstatus}"></span></th>
                                 </tr>
                             </thead>
                             <tbody id="pageList">
@@ -122,7 +133,7 @@
                                     <td th:text="${company.contractStatName}"></td>
                                 </tr>
                                 <tr th:if="${companyList.size() == 0}">
-                                    <td colspan="9">조회된 데이터가 없습니다.</td>
+                                    <td colspan="9"><span th:text="#{biz.messages.nodata}"></span></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -177,19 +188,22 @@
                 <div class="modal-body">
                     <form th:object="${companyRegDto}">
                         <!-- 모달 내용 -->
-                        <div class="modal-title mb-2"><span class="modal-title-bar"></span><span>사업자 정보</span></div>
+                        <div class="modal-title mb-2"><span class="modal-title-bar"></span><span
+                                th:text="#{biz.titles.bizinfo}"></span></div>
                         <!-- table:1 start -->
                         <table class="table table-bg-v table-fixed w-100 text-center align-middle">
                             <tbody>
                                 <tr class="table-border-top">
-                                    <th class="w-20">사업자유형<b class="required-data">*</b></th>
+                                    <th class="w-20"><span th:text="#{biz.labels.bizkind}"></span><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <select id="companyType" class="form-control" required>
                                             <option th:each="data : ${ckindlist}" th:value="${data.commonCode}"
                                                 th:text="${data.commonCodeName}" th:field="*{companyType}"></option>
                                         </select>
                                     </td>
-                                    <th class="w-20">사업자레벨<b class="required-data">*</b></th>
+                                    <th class="w-20"><span th:text="#{biz.labels.bizlevel}"></span><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <select id="companyLv" class="form-control" required>
                                             <option th:each="data : ${clvlist}" th:value="${data.commonCode}"
@@ -198,38 +212,44 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="w-20">사업자명<b class="required-data">*</b></th>
+                                    <th class="w-20"><span th:text="#{biz.labels.biznm}"></span><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <input type="text" name="companyName" id="companyName" class="form-control"
                                             placeholder="" autocomplete="off" th:field="*{companyName}" required>
                                     </td>
-                                    <th class="w-20">사업자등록번호<b class="required-data">*</b></th>
+                                    <th class="w-20"><span th:text="#{biz.labels.biznum}"></span><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <input type="text" name="bizNum" id="bizNum" class="form-control" maxlength="13"
                                             placeholder="" autocomplete="off" th:field="*{bizNum}" required>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="w-20">대표자명<b class="required-data">*</b></th>
+                                    <th class="w-20"><span th:text="#{biz.labels.ceo}"></span><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <input type="text" name="ceoName" id="ceoName" class="form-control"
                                             placeholder="" th:field="*{ceoName}" required>
                                     </td>
-                                    <th class="w-20">대표전화번호<b class="required-data">*</b></th>
+                                    <th class="w-20"><span th:text="#{biz.labels.headphone}"></span><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <input type="text" name="headPhone" id="headPhone" class="form-control"
                                             placeholder="" th:field="*{headPhone}" required>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="w-20">사업자구분<b class="required-data">*</b></th>
+                                    <th class="w-20"><span th:text="#{biz.labels.biztype}"></span><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <select id="bizType" class="form-control" required>
                                             <option th:each="biztype : ${biztypelist}" th:value="${biztype.commonCode}"
                                                 th:text="${biztype.commonCodeName}" th:field="*{bizType}"></option>
                                         </select>
                                     </td>
-                                    <th class="w-20">사업자코드<b class="required-data">*</b></th>
+                                    <th class="w-20"><span th:text="#{biz.labels.bizcode}"></span><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <select id="companyCode" class="form-control" required>
                                             <option th:each="companycd : ${companyCodeList}"
@@ -240,47 +260,54 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="w-20">업종<b class="required-data">*</b></th>
+                                    <th class="w-20"><span th:text="#{biz.labels.bizcategory}"></span><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <select id="bizKind" class="form-control" required>
                                             <option th:each="bizkind : ${bizkindlist}" th:value="${bizkind.commonCode}"
                                                 th:text="${bizkind.commonCodeName}" th:field="*{bizKind}"></option>
                                         </select>
                                     </td>
-                                    <th class="w-20">로고URL<b class="required-data">*</b></th>
+                                    <th class="w-20"><span th:text="#{biz.labels.logourl}"></span><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <input type="text" name="logoUrl" id="logoUrl" class="form-control"
                                             th:field="*{logoUrl}" required>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="w-20">주소<b class="required-data">*</b></th>
+                                    <th class="w-20"><span th:text="#{biz.labels.address}"></span><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30" colspan="3">
                                         <div class="address-container mb-2 display-input-btn">
                                             <input type="text" name="zipCode" id="zipCode" class="form-control w-25"
                                                 placeholder="" th:field="*{zipcode}" disabled>
                                             <button class="btn btn-outline-grey flex-btn" id="postBtn"
-                                                onclick="postSearch(); return false;">주소 검색</button>
+                                                onclick="postSearch(); return false;"><span
+                                                    th:text="#{biz.buttons.addrsearch}"></span></button>
                                         </div>
                                         <input type="text" name="address" id="address" class="form-control mb-2"
                                             placeholder="" autocomplete="off" th:field="*{address}" disabled>
                                         <input type="text" name="addressDetail" id="addressDetail" class="form-control"
-                                            placeholder="상세 주소" th:field="*{addressDetail}" autocomplete="off">
+                                            th:placeholder="#{biz.placeholders.detailaddr}" th:field="*{addressDetail}"
+                                            autocomplete="off">
                                     </td>
                                 </tr>
                             </tbody>
                         </table>
                         <!-- table:1 end -->
                         <!-- table:2 start -->
-                        <div class="modal-title mb-2"><span class="modal-title-bar"></span><span>사업자 관계 정보</span></div>
+                        <div class="modal-title mb-2"><span class="modal-title-bar"></span><span
+                                th:text="#{biz.titles.bizrelationinfo}"></span></div>
                         <table class="table table-bg-v table-fixed w-100 text-center align-middle">
                             <tbody>
                                 <tr class="table-border-top">
-                                    <th class="w-20">상위사업자</th>
+                                    <th class="w-20"><span th:text="#{biz.labels.parentcompany}"></span></th>
                                     <td class="w-30">
                                         <select id="parentCompanyOptions" th:field="*{parentCompanyName}"
                                             class="form-control">
-                                            <option th:value="*{null}" th:text="'해당없음'" selected="selected"></option>
+                                            <option th:value="*{null}" th:text="#{biz.labels.notapplicable}"
+                                                selected="selected"></option>
                                         </select>
                                     </td>
                                     <td colspan="2"></td>
@@ -290,19 +317,23 @@
                         <!-- table:2 end -->
                         <!-- table:3 start -->
                         <div class="modal-title mb-2 position-relative">
-                            <span class="modal-title-bar"></span><span>로밍 정보</span>
+                            <span class="modal-title-bar"></span><span th:text="#{biz.titles.roaminginfo}"></span>
                             <span class="ms-5 position-absolute" style="margin-left: 4px; right: 0;">
-                                <button type="button" class="btn btn-outline-grey me-2" onclick="addRow()">+ 추가</button>
-                                <button type="button" class="btn btn-outline-grey" onclick="deleteRow()">- 삭제</button>
+                                <button type="button" class="btn btn-outline-grey me-2" onclick="addRow()"><span
+                                        th:text="#{biz.buttons.addrow}"></span></button>
+                                <button type="button" class="btn btn-outline-grey" onclick="deleteRow()"><span
+                                        th:text="#{biz.buttons.deleterow}"></span></button>
                             </span>
                         </div>
                         <table class="table table-bg table-fixed w-100 text-center align-middle" id="roamingTable">
                             <thead>
                                 <tr class="table-border-top">
                                     <th scope="col" class="w-5"></th>
-                                    <th scope="col" class="w-15">로밍기관</th>
-                                    <th scope="col" class="w-25">기관 인증키</th>
-                                    <th scope="col" class="w-25">e-mail</th>
+                                    <th scope="col" class="w-15"><span
+                                            th:text="#{biz.labels.roaminginstitution}"></span></th>
+                                    <th scope="col" class="w-25"><span th:text="#{biz.labels.institutionkey}"></span>
+                                    </th>
+                                    <th scope="col" class="w-25"><span th:text="#{biz.labels.email}"></span></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -319,28 +350,33 @@
                         </table>
                         <!-- table:3 end -->
                         <!-- table:4 start -->
-                        <div class="modal-title mb-2"><span class="modal-title-bar"></span><span>담당자 정보</span></div>
+                        <div class="modal-title mb-2"><span class="modal-title-bar"></span><span
+                                th:text="#{biz.titles.staffinfo}"></span></div>
                         <table class="table table-bg-v table-fixed w-100 text-center align-middle">
                             <tbody>
                                 <tr class="table-border-top">
-                                    <th class="w-20">이름<b class="required-data">*</b></th>
+                                    <th class="w-20"><span th:text="#{biz.labels.name}"></span><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <input type="text" name="staffName" id="staffName" class="form-control"
                                             placeholder="" th:field="*{staffName}" required>
                                     </td>
-                                    <th class="w-20">이메일<b class="required-data">*</b></th>
+                                    <th class="w-20"><span th:text="#{biz.labels.email}"></span><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <input type="text" name="staffEmail" id="staffEmail" class="form-control"
                                             placeholder="" th:field="*{staffEmail}" required>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="w-20">전화번호<b class="required-data">*</b></th>
+                                    <th class="w-20"><span th:text="#{biz.labels.tel}"></span><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <input type="text" name="staffTel" id="staffTel" class="form-control"
                                             placeholder="" th:field="*{staffTel}" required>
                                     </td>
-                                    <th class="w-20">휴대전화<b class="required-data">*</b></th>
+                                    <th class="w-20"><span th:text="#{biz.labels.cpnum}"></span><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <input type="text" name="staffPhone" id="staffPhone" class="form-control"
                                             placeholder="" th:field="*{staffPhone}" required>
@@ -350,11 +386,13 @@
                         </table>
                         <!-- table:4 end -->
                         <!-- table:5 start -->
-                        <div class="modal-title mb-2"><span class="modal-title-bar"></span><span>PG 결제정보</span></div>
+                        <div class="modal-title mb-2"><span class="modal-title-bar"></span><span
+                                th:text="#{biz.titles.pginfo}"></span></div>
                         <table class="table table-bg-v table-fixed w-100 text-center align-middle">
                             <tbody>
                                 <tr class="table-border-top">
-                                    <th class="w-20">결제위탁사용<b class="required-data">*</b></th>
+                                    <th class="w-20"><span th:text="#{biz.labels.consignmentYn}"></span><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <select id="consignmentState" class="form-control" required>
                                             <option th:each="element : ${consignmentList}"
@@ -363,7 +401,8 @@
                                             </option>
                                         </select>
                                     </td>
-                                    <th class="w-20">MID<b class="required-data">*</b></th>
+                                    <th class="w-20"><span th:text="#{biz.labels.mid}"></span><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <input type="text" name="mID" id="mID" class="form-control" placeholder=""
                                             th:field="*{mid}" required>
@@ -391,11 +430,13 @@
                         </table>
                         <!-- table:5 end -->
                         <!-- table:6 start -->
-                        <div class="modal-title mb-2"><span class="modal-title-bar"></span><span>계약 정보</span></div>
+                        <div class="modal-title mb-2"><span class="modal-title-bar"></span><span
+                                th:text="#{biz.titles.contractinfo}"></span></div>
                         <table class="table table-bg-v table-fixed w-100 text-center align-middle">
                             <tbody>
                                 <tr class="table-border-top">
-                                    <th class="w-20">계약 상태<b class="required-data">*</b></th>
+                                    <th class="w-20"><span th:text="#{biz.labels.contstatus}"></span><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <select id="contractState" class="form-control" required>
                                             <option th:each="element : ${contractStatList}"
@@ -404,27 +445,30 @@
                                             </option>
                                         </select>
                                     </td>
-                                    <th class="w-20">계약일자<b class="required-data">*</b></th>
+                                    <th class="w-20"><span th:text="#{biz.labels.contdt}"></span><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <input type="date" min="1970-01-01" max="2199-12-31" name="contractAt"
                                             id="contractAt" class="form-control" th:field="*{contractedAt}" required>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="w-20">계약시작<b class="required-data">*</b></th>
+                                    <th class="w-20"><span th:text="#{biz.labels.contstartdt}"></span><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <input type="date" min="1970-01-01" max="2199-12-31" name="contractStart"
                                             id="contractStart" class="form-control" th:field="*{contractStart}"
                                             required>
                                     </td>
-                                    <th class="w-20">계약종료<b class="required-data">*</b></th>
+                                    <th class="w-20"><span th:text="#{biz.labels.contenddt}"></span><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <input type="date" min="1970-01-01" max="2199-12-31" name="contractEnd"
                                             id="contractEnd" class="form-control" th:field="*{contractEnd}" required>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="w-20">유지보수</th>
+                                    <th class="w-20"><span th:text="#{biz.labels.maintain}"></span></th>
                                     <td class="w-30">
                                         <select id="asCompany" class="form-control" required>
                                             <option th:each="element : ${mcompanyList}" th:value="${element.commonCode}"
@@ -434,13 +478,13 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="w-20">고객센터</th>
+                                    <th class="w-20"><span th:text="#{biz.labels.asnum}"></span></th>
                                     <td class="w-30">
                                         <input type="text" name="asNum" id="asNum" class="form-control" placeholder=""
                                             th:field="*{asNum}">
                                     </td>
                                     <td colspan="2">
-                                        <div class="text-left">**자체 유지보수 시, 사업자 정보의 전화번호가 고객센터 전화로 안내됩니다.</div>
+                                        <div class="text-left"><span th:text="#{biz.labels.asinfo}"></span></div>
                                     </td>
                                 </tr>
                             </tbody>
@@ -450,8 +494,10 @@
                 </div>
                 <!-- modal body end -->
                 <div class="modal-footer justify-content-center border-top-none">
-                    <button type="button" class="btn btn-outline-grey me-2" data-bs-dismiss="modal">취소</button>
-                    <button type="submit" id="companyModalBtn" class="btn btn-data-add">등록</button>
+                    <button type="button" class="btn btn-outline-grey me-2" data-bs-dismiss="modal"><span
+                            th:text="#{biz.buttons.cancel}"></span></button>
+                    <button type="submit" id="companyModalBtn" class="btn btn-data-add"><span
+                            th:text="#{biz.buttons.add}"></span></button>
                 </div>
             </div>
             <!-- modal content end -->
@@ -512,6 +558,23 @@
     </script>
     <script type="text/javascript" th:src="@{/js/biz/biz_management.js}"></script>
 
+    <script th:inline="javascript">
+        var i18n = {
+            biz: {
+                buttons: {
+                    add: /*[[#{biz.buttons.add}]]*/ '등록',
+                    edit: /*[[#{biz.buttons.edit}]]*/ '수정'
+                },
+                labels: {
+                    select: /*[[#{biz.labels.select}]]*/ '선택'
+                }
+            }
+        };
+
+        var currentLanguage = /*[[${#locale.language}]]*/ 'ko';
+    </script>
+    <!-- 언어 선택기 스크립트 -->
+    <div th:replace="~{fragments/language-selector :: language-script}"></div>
 </div>
 
 </html>

@@ -18,6 +18,7 @@ import zgoo.cpos.domain.company.QCompanyRelationInfo;
 import zgoo.cpos.domain.cp.QCpModel;
 import zgoo.cpos.domain.fw.QCpFwVersion;
 import zgoo.cpos.dto.fw.CpFwversionDto;
+import zgoo.cpos.util.LocaleUtil;
 import zgoo.cpos.util.QueryUtils;
 
 @RequiredArgsConstructor
@@ -42,7 +43,7 @@ public class CpFwVersionRepositoryCustomImpl implements CpFwVersionRepositoryCus
         List<CpFwversionDto> list = queryFactory.select(Projections.fields(CpFwversionDto.class,
                 fwVersion.id.as("fwId"),
                 company.companyName.as("companyName"),
-                manufCdName.name.as("manfName"),
+                LocaleUtil.isEnglish() ? manufCdName.nameEn.as("manfName") : manufCdName.name.as("manfName"),
                 fwVersion.modelCode.as("modelCode"),
                 fwVersion.fwVersion.as("fwVersion"),
                 fwVersion.url.as("url"),
@@ -81,7 +82,7 @@ public class CpFwVersionRepositoryCustomImpl implements CpFwVersionRepositoryCus
         List<CpFwversionDto> list = queryFactory.select(Projections.fields(CpFwversionDto.class,
                 fwVersion.id.as("fwId"),
                 company.companyName.as("companyName"),
-                manufCdName.name.as("manfName"),
+                LocaleUtil.isEnglish() ? manufCdName.nameEn.as("manfName") : manufCdName.name.as("manfName"),
                 fwVersion.modelCode.as("modelCode"),
                 fwVersion.fwVersion.as("fwVersion"),
                 fwVersion.url.as("url"),

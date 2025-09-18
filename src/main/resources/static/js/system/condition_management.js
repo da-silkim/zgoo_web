@@ -1,13 +1,13 @@
-$(document).ready(function() {
+$(document).ready(function () {
     let selectRow, histSelectRow;
     var conditionCode, conditionName;
 
-    $('#pageList').on('click', 'tr', function() {
+    $('#pageList').on('click', 'tr', function () {
         selectRow = $(this);
         conditionCode = selectRow.find('td').eq(0).attr('id');
         conditionName = selectRow.find('td').eq(2).text();
-        document.getElementById('conditionCodeSub').innerText  = conditionCode;
-        document.getElementById('conditionNameSub').innerText  = conditionName;
+        document.getElementById('conditionCodeSub').innerText = conditionCode;
+        document.getElementById('conditionNameSub').innerText = conditionName;
         renderConditionHist();
     });
 
@@ -15,17 +15,17 @@ $(document).ready(function() {
         $.ajax({
             type: 'GET',
             url: `/system/condition/hist/search/${conditionCode}`,
-            success: function(data) {
+            success: function (data) {
                 $('#pageListSub').empty();
 
                 if (!data || data.length === 0) {
                     $('#pageListSub').append(`
                         <tr>
-                            <td colspan="6">조회된 데이터가 없습니다.</td>
+                            <td colspan="6">${i18n.conditionmgmt.messages.nodata}</td>
                         </tr>
                     `);
                 } else {
-                    data.forEach(function(con) {
+                    data.forEach(function (con) {
                         $('#pageListSub').append(`
                             <tr>
                                 <td id=${con.conditionVersionHistId}><input type="checkbox"/></td>
@@ -40,64 +40,64 @@ $(document).ready(function() {
                     });
                 }
             },
-            error: function(xhr, status, error) {
+            error: function (xhr, status, error) {
             }
         });
     }
 
-    $('#pageListSub').on('click', 'tr', function() {
+    $('#pageListSub').on('click', 'tr', function () {
         histSelectRow = $(this);
     });
 
-    $('#addBtn').on('click', function(event) {
+    $('#addBtn').on('click', function (event) {
         event.preventDefault();
         $('#conditionForm')[0].reset();
     });
 
-    $('#addBtnSub').on('click', function(event) {
+    $('#addBtnSub').on('click', function (event) {
         event.preventDefault();
         $('#conHistForm')[0].reset();
     });
 
-    $('#deleteBtn').on('click', function() {
-        if(confirmSubmit("삭제")) {
+    $('#deleteBtn').on('click', function () {
+        if (confirmSubmit(i18n.conditionmgmt.buttons.delete)) {
             $.ajax({
                 type: 'DELETE',
                 url: `/system/condition/delete/${conditionCode}`,
                 contentType: "application/json",
-                success: function(response) {
+                success: function (response) {
                     alert(response);
                     window.location.reload();
                 },
-                error: function(xhr, status, error) {
+                error: function (xhr, status, error) {
                     alert(xhr.responseText);
                 }
             });
         }
     });
 
-    $('#deleteBtnSub').on('click', function() {
-        if(confirmSubmit("삭제")) {
+    $('#deleteBtnSub').on('click', function () {
+        if (confirmSubmit(i18n.conditionmgmt.buttons.delete)) {
             const conditionVersionHistId = histSelectRow.find('td').eq(0).attr('id');
             $.ajax({
                 type: 'DELETE',
                 url: `/system/condition/delete/hist/${conditionVersionHistId}`,
                 contentType: "application/json",
-                success: function(response) {
+                success: function (response) {
                     alert(response);
                     window.location.reload();
                 },
-                error: function(xhr, status, error) {
+                error: function (xhr, status, error) {
                     alert(xhr.responseText);
                 }
             });
         }
     });
 
-    $('#modalBtn').on('click', function(event) {
+    $('#modalBtn').on('click', function (event) {
         event.preventDefault();
 
-        if(confirmSubmit("저장")) {
+        if (confirmSubmit(i18n.conditionmgmt.buttons.save)) {
             const DATA = {
                 section: $('input[name="section"]:checked').val(),
                 conditionCode: $('#conditionCode').val(),
@@ -109,21 +109,21 @@ $(document).ready(function() {
                 url: '/system/condition/new',
                 data: JSON.stringify(DATA),
                 contentType: "application/json",
-                success: function(response) {
+                success: function (response) {
                     alert(response);
                     window.location.reload();
                 },
-                error: function(xhr, status, error) {
+                error: function (xhr, status, error) {
                     alert(xhr.responseText);
                 }
             });
         }
     });
 
-    $('#histModalBtn').on('click', function(event) {
+    $('#histModalBtn').on('click', function (event) {
         event.preventDefault();
 
-        if(confirmSubmit("저장")) {
+        if (confirmSubmit(i18n.conditionmgmt.buttons.save)) {
             const formData = new FormData();
             var conditionCode = $('#conditionCodeSub').text();
             var conditionName = $('#conditionNameSub').text();
@@ -134,10 +134,10 @@ $(document).ready(function() {
 
             // 필수 값 체크
             if (!conditionFile || !applyDtString || !version) {
-                alert("필수 항목을 입력해주세요.");
+                alert(i18n.conditionmgmt.messages.essentialFieldCheckError);
                 return;
             }
-            
+
             formData.append('conditionCode', conditionCode);
             formData.append('conditionName', conditionName);
             formData.append('applyDtString', applyDtString);
@@ -153,12 +153,12 @@ $(document).ready(function() {
                 contentType: false,
                 processData: false,
                 cache: false,
-                success: function(response) {
+                success: function (response) {
                     alert(response);
                     $('#conHistAddModal').modal('hide');
                     renderConditionHist();
                 },
-                error: function(xhr, status, error) {
+                error: function (xhr, status, error) {
                     alert(xhr.responseText);
                 }
             });

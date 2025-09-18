@@ -27,6 +27,7 @@ import zgoo.cpos.dto.cs.CsInfoDto.CsInfoListDto;
 import zgoo.cpos.dto.cs.CsInfoDto.CsInfoRegDto;
 import zgoo.cpos.dto.cs.CsInfoDto.StationOpStatusDto;
 import zgoo.cpos.dto.cs.CsInfoDto.StationSearchDto;
+import zgoo.cpos.util.LocaleUtil;
 import zgoo.cpos.util.QueryUtils;
 
 @Slf4j
@@ -250,7 +251,11 @@ public class CsRepositoryCustomImpl implements CsRepositoryCustom {
                 csInfo.openStartTime.as("openStartTime"),
                 csInfo.openEndTime.as("openEndTime"),
                 csInfo.parkingFeeYn.as("parkingFeeYn"),
-                Expressions.stringTemplate("IF({0}  = 'Y', '유료', '무료')", csInfo.parkingFeeYn).as("parkingFeeString"),
+                LocaleUtil.isEnglish()
+                        ? Expressions.stringTemplate("IF({0}  = 'Y', 'Paid', 'Free')", csInfo.parkingFeeYn)
+                                .as("parkingFeeString")
+                        : Expressions.stringTemplate("IF({0}  = 'Y', '유료', '무료')", csInfo.parkingFeeYn)
+                                .as("parkingFeeString"),
                 csInfo.sido.as("sido"),
                 Expressions.stringTemplate("IF({0} IS NULL, '정보없음', {0})", csInfo.safetyManagementFee)
                         .as("safetyFeeString"),
@@ -274,7 +279,7 @@ public class CsRepositoryCustomImpl implements CsRepositoryCustom {
                 kepco.rcvCapacityMethod.as("rcvCapacityMethod"),
                 kepco.rcvCapacity.as("rcvCapacity"),
                 kepco.voltageType.as("voltageType"),
-                opStatusCode.name.as("opStatusName"),
+                LocaleUtil.isEnglish() ? opStatusCode.nameEn.as("opStatusName") : opStatusCode.name.as("opStatusName"),
                 stationTypeCode.name.as("stationTypeName"),
                 facilityTypeCode.name.as("facilityTypeName"),
                 landTypeCode.name.as("landTypeName"),

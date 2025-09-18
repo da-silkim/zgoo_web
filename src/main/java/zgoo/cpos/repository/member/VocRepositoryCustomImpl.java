@@ -20,6 +20,7 @@ import zgoo.cpos.domain.member.QVoc;
 import zgoo.cpos.domain.users.QUsers;
 import zgoo.cpos.dto.member.VocDto.VocListDto;
 import zgoo.cpos.dto.member.VocDto.VocRegDto;
+import zgoo.cpos.util.LocaleUtil;
 import zgoo.cpos.util.QueryUtils;
 
 @Slf4j
@@ -54,8 +55,9 @@ public class VocRepositoryCustomImpl implements VocRepositoryCustom {
                 voc.replyDt.as("replyDt"),
                 member.name.as("name"),
                 member.phoneNo.as("phoneNo"),
-                typeName.name.as("typeName"),
-                replyStatName.name.as("replyStatName"),
+                LocaleUtil.isEnglish() ? typeName.nameEn.as("typeName") : typeName.name.as("typeName"),
+                LocaleUtil.isEnglish() ? replyStatName.nameEn.as("replyStatName")
+                        : replyStatName.name.as("replyStatName"),
                 voc.regUserId.as("regUserId"),
                 voc.replyUserId.as("replyUserId")))
                 .from(voc)
@@ -115,8 +117,9 @@ public class VocRepositoryCustomImpl implements VocRepositoryCustom {
                 voc.replyDt.as("replyDt"),
                 member.name.as("name"),
                 member.phoneNo.as("phoneNo"),
-                typeName.name.as("typeName"),
-                replyStatName.name.as("replyStatName")))
+                LocaleUtil.isEnglish() ? typeName.nameEn.as("typeName") : typeName.name.as("typeName"),
+                LocaleUtil.isEnglish() ? replyStatName.nameEn.as("replyStatName")
+                        : replyStatName.name.as("replyStatName")))
                 .from(voc)
                 .leftJoin(member).on(voc.member.eq(member))
                 .leftJoin(user).on(voc.regUserId.eq(user.userId))
@@ -156,9 +159,10 @@ public class VocRepositoryCustomImpl implements VocRepositoryCustom {
                 voc.replyContent.as("replyContent"),
                 member.name.as("name"),
                 member.phoneNo.as("phoneNo"),
-                typeName.name.as("typeName"),
-                replyStatName.name.as("replyStatName"),
-                channelName.name.as("channelName")))
+                LocaleUtil.isEnglish() ? typeName.nameEn.as("typeName") : typeName.name.as("typeName"),
+                LocaleUtil.isEnglish() ? replyStatName.nameEn.as("replyStatName")
+                        : replyStatName.name.as("replyStatName"),
+                LocaleUtil.isEnglish() ? channelName.nameEn.as("channelName") : channelName.name.as("channelName")))
                 .from(voc)
                 .leftJoin(member).on(voc.member.eq(member))
                 .leftJoin(typeName).on(voc.type.eq(typeName.commonCode))

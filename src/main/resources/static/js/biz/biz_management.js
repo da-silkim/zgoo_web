@@ -72,7 +72,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         // 모달 제목 및 버튼 텍스트 초기화 (등록 모드로)
-        document.getElementById('companyModalBtn').textContent = '등록';
+        document.getElementById('companyModalBtn').textContent = i18n.biz.buttons.add;
 
         // 숨겨진 필드 초기화 (있다면)
         const hiddenCompanyId = document.getElementById('companyId');
@@ -108,11 +108,11 @@ document.addEventListener("DOMContentLoaded", function () {
         const selectedCompanyLv = document.getElementById("companyLv").value;
         const parentCompanySelect = document.getElementById("parentCompanyOptions");
 
-        console.log("업체리스트", companyList);
-        console.log("선택된 업체레벨", selectedCompanyLv);
+        console.log("companyList", companyList);
+        console.log("seelcted lv", selectedCompanyLv);
 
         //기존 옵션 초기화
-        parentCompanySelect.innerHTML = '<option value="">없음</option>';
+        parentCompanySelect.innerHTML = '<option value="">' + i18n.biz.labels.select + '</option>';
 
         if (selectedCompanyLv === "MID") {
             companyList.filter(company => company.companyLv === "TOP")
@@ -141,7 +141,7 @@ document.addEventListener("DOMContentLoaded", function () {
     function consignmentOptionCheck() {
         const selectedOption = document.getElementById("consignmentState").value;
 
-        console.log("결제위탁: ", selectedOption);
+        console.log("consignment: ", selectedOption);
 
         const f_mid = document.getElementById("mID");
 
@@ -175,7 +175,7 @@ document.addEventListener("DOMContentLoaded", function () {
             });
         });
 
-        console.log("로밍정보:", roamingInfoList);
+        console.log("roaminginfo:", roamingInfoList);
         return roamingInfoList;
     }
 
@@ -202,16 +202,16 @@ document.addEventListener("DOMContentLoaded", function () {
             })
                 .then(response => {
                     if (!response.ok) {
-                        throw new Error("[DELETE]업제삭제 실패: " + response.statusText);
+                        throw new Error("Delete Failed: " + response.statusText);
                     }
                     return response.text();
                 })
                 .then(data => {
-                    console.log("처리결과:", data);
+                    console.log("result:", data);
                     window.location.replace('/biz/list');
                 })
                 .catch(error => {
-                    console.error("업체정보 삭제 실패:", error);
+                    console.error("company info delete failed:", error);
                 });
         }
     });
@@ -219,7 +219,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // 수정버튼 클릭 이벤트 처리
     document.getElementById("editBtn").addEventListener("click", function () {
         companyModalCon = true;
-        btnMsg = "수정";
+        btnMsg = i18n.biz.buttons.edit;
         $('#companyModalBtn').text(btnMsg);
 
         if (companySelectedRow) {
@@ -234,13 +234,13 @@ document.addEventListener("DOMContentLoaded", function () {
             })
                 .then(response => {
                     if (!response.ok) {
-                        throw new Error("[UPDATE]업체정보 조회 실패: " + response.statusText);
+                        throw new Error("[UPDATE]Faild to get company info: " + response.statusText);
                     }
                     return response.json();
                 })
                 .then(data => {
                     // 서버 응답 후 처리 (예: 검색 결과 출력)
-                    console.log("검색 결과:", data);
+                    console.log("search results:", data);
 
                     // document.getElementById("companyType").value = data.companyType ? data.companyType : "";
                     document.getElementById("companyType").value = data.companyType ? data.companyType : "";
@@ -301,7 +301,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // 메인폼 '등록' 버튼 클릭시 모달 등록버튼 메시지 수정
     document.getElementById("addBtn").addEventListener("click", function () {
         companyModalCon = false;
-        btnMsg = "등록";
+        btnMsg = i18n.biz.buttons.add;
         $('#companyModalBtn').text(btnMsg);
     });
 
@@ -341,7 +341,7 @@ document.addEventListener("DOMContentLoaded", function () {
         };
 
         // 선택된 값 콘솔 출력 (디버깅용)
-        console.log("폼 data: ", bodyData);
+        console.log("data: ", bodyData);
 
         // 선택된 값으로 필터링을 위한 요청 처리 (예시: AJAX, Fetch API 등)
         // 예를 들어, Fetch API로 서버에 데이터를 전송하는 방법
@@ -356,17 +356,17 @@ document.addEventListener("DOMContentLoaded", function () {
         })
             .then(response => {
                 if (!response.ok) {
-                    throw new Error(companyModalCon ? "업체수정 실패: " + response.statusText : "업체등록 실패: " + response.statusText);
+                    throw new Error(companyModalCon ? "company update failed: " + response.statusText : "company register failed: " + response.statusText);
                 }
                 return response.text();
             })
             .then(data => {
-                console.log("처리결과:", data);
+                console.log("result:", data);
                 window.location.replace('/biz/list');
             })
             .catch(error => {
-                if (companyModalCon == false) console.error("업체정보 등록 실패:", error);
-                else console.error("업체정보 수정 실패:", error);
+                if (companyModalCon == false) console.error("company register failed:", error);
+                else console.error("company update failed:", error);
             });
 
     });

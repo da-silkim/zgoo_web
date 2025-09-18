@@ -1,17 +1,83 @@
-document.addEventListener('DOMContentLoaded', function(){
+document.addEventListener('DOMContentLoaded', function () {
     let label1, label2;
-    
-    if (STAT === 'PUR') {
-        label1 = '매입';
-        label2 = '매출';
-    } else {
-        label1 = '급속';
-        label2 = '완속';
+
+    // 현재 언어 감지 함수
+    function isEnglishLanguage() {
+        // currentLanguage 변수 확인
+        if (typeof currentLanguage !== 'undefined') {
+            return currentLanguage === 'en';
+        } else {
+            // currentLanguage가 없으면 브라우저 언어로 판단
+            var browserLang = navigator.language || navigator.userLanguage;
+            return browserLang.startsWith('en');
+        }
     }
+
+    // 현재 언어에 따른 라벨 설정 (리소스 메시지 사용)
+    function getLabels() {
+        // chartLabels 객체가 정의되어 있는지 확인
+        if (typeof chartLabels !== 'undefined') {
+            if (STAT === 'PUR') {
+                return { label1: chartLabels.purchase, label2: chartLabels.sales };
+            } else {
+                return { label1: chartLabels.fast, label2: chartLabels.slow };
+            }
+        } else {
+            // fallback: chartLabels가 정의되지 않은 경우
+            var isEnglish = isEnglishLanguage();
+
+            if (STAT === 'PUR') {
+                if (isEnglish) {
+                    return { label1: 'Purchase', label2: 'Sales' };
+                } else {
+                    return { label1: '매입', label2: '매출' };
+                }
+            } else {
+                if (isEnglish) {
+                    return { label1: 'Fast', label2: 'Slow' };
+                } else {
+                    return { label1: '급속', label2: '완속' };
+                }
+            }
+        }
+    }
+
+    // 현재 언어에 따른 월별 라벨 설정 (리소스 메시지 사용)
+    function getMonthLabels() {
+        // monthLabels 객체가 정의되어 있는지 확인
+        if (typeof monthLabels !== 'undefined') {
+            return [
+                monthLabels.january,
+                monthLabels.february,
+                monthLabels.march,
+                monthLabels.april,
+                monthLabels.may,
+                monthLabels.june,
+                monthLabels.july,
+                monthLabels.august,
+                monthLabels.september,
+                monthLabels.october,
+                monthLabels.november,
+                monthLabels.december
+            ];
+        } else {
+            // fallback: monthLabels가 정의되지 않은 경우
+            var isEnglish = isEnglishLanguage();
+            if (isEnglish) {
+                return ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            } else {
+                return ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"];
+            }
+        }
+    }
+
+    const labels = getLabels();
+    label1 = labels.label1;
+    label2 = labels.label2;
 
     // line Chart
     const lineData = {
-        labels: ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"],
+        labels: getMonthLabels(),
         datasets: [
             {
                 label: label1,

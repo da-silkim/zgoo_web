@@ -4,28 +4,33 @@
     <div class="card responsive-content">
         <!-- card body:1 start -->
         <div class="card-body">
-            <div class="content-title"><i class="fa-solid fa-charging-station font-ico me-2"></i>충전기 > 충전기 리스트</div>
+            <div class="content-title"><i class="fa-solid fa-charging-station font-ico me-2"></i><span
+                    th:text="#{cpList.titles.main}"></span></div>
             <!-- card:2 start -->
             <div class="card card-shadow">
                 <!-- card body:2 start -->
                 <div class="card-body">
                     <div class="detail-container">
                         <!-- table:1 start -->
-                        <div class="card-title mb-2"><span class="card-title-bar"></span><span>충전소 정보</span></div>
+                        <div class="card-title mb-2"><span class="card-title-bar"></span><span
+                                th:text="#{cpList.modal.titles.stationInfo}"></span></div>
                         <table class="table table-bg-v table-fixed w-100 text-center align-middle">
                             <tbody>
                                 <tr class="table-border-top">
-                                    <th class="w-20">사업자<b class="required-data">*</b></th>
+                                    <th class="w-20"><span th:text="#{cpList.titles.company}"></span><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <span th:text="${cpInfo.companyName}"></span>
                                     </td>
-                                    <th class="w-20">충전소ID<b class="required-data">*</b></th>
+                                    <th class="w-20"><span th:text="#{cpList.searchOptions.stationId}"></span><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <span th:text="${cpInfo.stationId}"></span>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="w-20">충전소명<b class="required-data">*</b></th>
+                                    <th class="w-20"><span th:text="#{cpList.searchOptions.stationName}"></span><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <span th:text="${cpInfo.stationName}"></span>
                                     </td>
@@ -35,85 +40,102 @@
                         </table>
                         <!-- table:1 end -->
                         <!-- table:2 start -->
-                        <div class="card-title mb-2"><span class="card-title-bar"></span><span>충전기 정보</span></div>
+                        <div class="card-title mb-2"><span class="card-title-bar"></span><span
+                                th:text="#{cpList.modal.titles.chargerInfo}"></span></div>
                         <table class="table table-bg-v table-fixed w-100 text-center align-middle">
                             <tbody>
                                 <tr class="table-border-top">
-                                    <th class="w-20">충전기 이름<b class="required-data">*</b></th>
+                                    <th class="w-20"><span th:text="#{cpList.modal.titles.chargerName}"></span><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <span th:text="${cpInfo.chargerName}"></span>
                                     </td>
-                                    <th class="w-20">충전기ID<b class="required-data">*</b></th>
+                                    <th class="w-20"><span th:text="#{cpList.modal.titles.chargerId}"></span><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <span th:text="${cpInfo.chargerId}"></span>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="w-20">충전기 모델<b class="required-data">*</b></th>
+                                    <th class="w-20"><span th:text="#{cpList.modal.titles.chargerModel}"></span><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <span th:text="${cpInfo.modelCode}"></span>
                                     </td>
-                                    <th class="w-20">충전기 유형<b class="required-data">*</b></th>
+                                    <th class="w-20"><span th:text="#{cpList.modal.titles.chargerKind}"></span><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <span th:text="${cpInfo.cpType}"></span>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="w-20">충전기 제조사<b class="required-data">*</b></th>
+                                    <th class="w-20"><span th:text="#{cpList.modal.titles.chargerManuf}"></span><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <span th:text="${cpInfo.manufCdName}"></span>
                                     </td>
-                                    <th class="w-20">충전기 용량(KW)<b class="required-data">*</b></th>
+                                    <th class="w-20"><span th:text="#{cpList.modal.titles.chargerPower}"></span><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <span th:text="${cpInfo.chgKw}"></span>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="w-20">충전기 S/N<b class="required-data">*</b></th>
+                                    <th class="w-20"><span th:text="#{cpList.modal.titles.chargerSn}"></span><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <span th:text="${cpInfo.chgSerialNo}"></span>
                                     </td>
-                                    <th class="w-20">F/W 버전<b class="required-data">*</b></th>
+                                    <th class="w-20"><span th:text="#{cpList.modal.titles.chargerFwver}"></span><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <span th:text="${cpInfo.fwversion}"></span>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="w-20">원격접속ID<b class="required-data">*</b></th>
+                                    <th class="w-20"><span th:text="#{cpList.modal.titles.chargerAnydeskId}"></span><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <span th:text="${cpInfo.anydeskId}"></span>
                                     </td>
-                                    <th class="w-20">공용구분<b class="required-data">*</b></th>
+                                    <th class="w-20"><span th:text="#{cpList.modal.titles.commonType}"></span><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <span th:text="${cpInfo.commonTypeName}"></span>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="w-20">설치일자<b class="required-data">*</b></th>
+                                    <th class="w-20"><span th:text="#{cpList.modal.titles.installDate}"></span><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <span th:text="${cpInfo.installDate}"></span>
                                     </td>
-                                    <th class="w-20">요금제<b class="required-data">*</b></th>
+                                    <th class="w-20"><span th:text="#{cpList.modal.titles.plan}"></span><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <span th:text="${cpInfo.cpPlanName}"></span>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="w-20">충전기 사용여부<b class="required-data">*</b></th>
+                                    <th class="w-20"><span th:text="#{cpList.modal.titles.useYn}"></span><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <span th:text="${cpInfo.useYn}"></span>
                                     </td>
-                                    <th class="w-20">미사용 사유<b class="required-data">*</b></th>
+                                    <th class="w-20"><span th:text="#{cpList.modal.titles.reason}"></span><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <span th:text="${cpInfo.reasonName}"></span>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="w-20">충전기 상세위치<b class="required-data">*</b></th>
+                                    <th class="w-20"><span th:text="#{cpList.modal.titles.location}"></span><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <span th:text="${cpInfo.location}"></span>
                                     </td>
-                                    <th class="w-20">동시채널 지원<b class="required-data">*</b></th>
+                                    <th class="w-20"><span th:text="#{cpList.modal.titles.dualyn}"></span><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <span th:text="${cpInfo.dualYn}"></span>
                                     </td>
@@ -122,46 +144,56 @@
                         </table>
                         <!-- table:2 end -->
                         <!-- table:3 start -->
-                        <div class="card-title mb-2"><span class="card-title-bar"></span><span>모뎀 정보</span></div>
+                        <div class="card-title mb-2"><span class="card-title-bar"></span><span
+                                th:text="#{cpList.modal.titles.modemInfo}"></span></div>
                         <table class="table table-bg-v table-fixed w-100 text-center align-middle">
                             <tbody>
                                 <tr class="table-border-top">
-                                    <th class="w-20">시리얼 번호<b class="required-data">*</b></th>
+                                    <th class="w-20"><span th:text="#{cpList.modal.titles.modemSn}"></span><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <span th:text="${cpInfo.modemSerialNo}"></span>
                                     </td>
-                                    <th class="w-20">전화번호<b class="required-data">*</b></th>
+                                    <th class="w-20"><span th:text="#{cpList.modal.titles.modemNum}"></span><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <span th:text="${cpInfo.modemNo}"></span>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="w-20">계약 기간</th>
+                                    <th class="w-20"><span th:text="#{cpList.modal.titles.modemContFromTo}"></span><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <span
                                             th:text="${cpInfo.modemContractStart} + ' ~ ' + ${cpInfo.modemContractEnd}"></span>
                                     </td>
-                                    <th class="w-20">요금제</th>
+                                    <th class="w-20"><span th:text="#{cpList.modal.titles.modemPlan}"></span><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <span th:text="${cpInfo.modemPricePlan}"></span>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="w-20">데이터용량(MB)</th>
+                                    <th class="w-20"><span th:text="#{cpList.modal.titles.modemDataCap}"></span><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <span th:text="${cpInfo.modemdataCapacity}"></span>
                                     </td>
-                                    <th class="w-20">통신사<b class="required-data">*</b></th>
+                                    <th class="w-20"><span th:text="#{cpList.modal.titles.modemCorp}"></span><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <span th:text="${cpInfo.modemTelCorp}"></span>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="w-20">모델명</th>
+                                    <th class="w-20"><span th:text="#{cpList.modal.titles.modemModelName}"></span><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <span th:text="${cpInfo.modemModelName}"></span>
                                     </td>
-                                    <th class="w-20">계약상태<b class="required-data">*</b></th>
+                                    <th class="w-20"><span
+                                            th:text="#{cpList.modal.titles.modemContractStatus}"></span><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <span th:text="${cpInfo.modemContractStatusNm}"></span>
                                     </td>
@@ -170,7 +202,8 @@
                         </table>
                         <!-- table:3 end -->
                         <button type="button" class="list-btn" onclick="goToList('/charger/list',
-                            ['companyIdSearch', 'manfCodeSearch', 'opSearch', 'contentSearch'])"> 목록 </button>
+                            ['companyIdSearch', 'manfCodeSearch', 'opSearch', 'contentSearch'])"><span
+                                th:text="#{common.buttons.list}"></span></button>
                     </div>
                 </div>
                 <!-- card body:2 end -->
@@ -180,6 +213,14 @@
         <!-- card body:1 end -->
     </div>
     <!-- card:1 end -->
+    <script th:inline="javascript">
+        var currentLanguage = /*[[${#locale.language}]]*/ 'ko';
+    </script>
+
+    <!-- 공통 i18n 스크립트 포함 -->
+    <div th:replace="~{fragments/i18n/i18n-cp-list :: cp-list-i18n}"></div>
+    <!-- 언어 선택기 스크립트 -->
+    <div th:replace="~{fragments/language-selector :: language-script}"></div>
 </div>
 
 </html>

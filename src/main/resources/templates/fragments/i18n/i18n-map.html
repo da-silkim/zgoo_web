@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Map I18n</title>
+</head>
+
+<body>
+    <script th:fragment="map-i18n" th:inline="javascript">
+        var i18n = {
+            map: {
+                title: /*[[#{map.title}]]*/ '지도',
+                search: {
+                    placeholder: /*[[#{map.search.placeholder}]]*/ '충전소 이름을 입력하세요.'
+                },
+                station: {
+                    info: /*[[#{map.station.info}]]*/ '충전소 정보',
+                    name: /*[[#{map.station.name}]]*/ '충전소명',
+                    company: /*[[#{map.station.company}]]*/ '사업자명',
+                    id: /*[[#{map.station.id}]]*/ '충전소ID',
+                    address: /*[[#{map.station.address}]]*/ '주소',
+                    operation: /*[[#{map.station.operation}]]*/ '운영여부',
+                    parking: /*[[#{map.station.parking}]]*/ '주차정보',
+                    customerCenter: /*[[#{map.station.customerCenter}]]*/ '고객센터'
+                },
+                charger: {
+                    info: /*[[#{map.charger.info}]]*/ '충전기 정보'
+                },
+                nearbyStation: /*[[#{map.nearbyStation}]]*/ '주변충전소'
+            },
+            error: {
+                locationUnavailable: /*[[#{map.error.locationUnavailable}]]*/ '현재 위치를 가져올 수 없습니다.'
+            }
+        };
+    </script>
+</body>
+
+</html>

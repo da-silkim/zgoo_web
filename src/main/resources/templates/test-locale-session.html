@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:lang="${#locale.language}">
+
+<head>
+    <meta charset="UTF-8">
+    <title>세션 언어 설정 테스트</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/bootstrap.min.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/common.css}">
+</head>
+
+<body>
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-md-8 offset-md-2">
+                <div class="card">
+                    <div class="card-header">
+                        <h4>세션 언어 설정 테스트</h4>
+                    </div>
+                    <div class="card-body">
+                        <h5>현재 언어 정보</h5>
+                        <ul class="list-group mb-3">
+                            <li class="list-group-item">
+                                <strong>언어 코드:</strong> <span th:text="${#locale.language}">ko</span>
+                            </li>
+                            <li class="list-group-item">
+                                <strong>국가 코드:</strong> <span th:text="${#locale.country}">KR</span>
+                            </li>
+                            <li class="list-group-item">
+                                <strong>표시 언어:</strong> <span th:text="${#locale.displayLanguage}">한국어</span>
+                            </li>
+                        </ul>
+
+                        <h5>다국어 텍스트 테스트</h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">대시보드</div>
+                                    <div class="card-body">
+                                        <p><strong>제목:</strong> <span th:text="#{dashboard.charger.status}">충전기
+                                                현황</span></p>
+                                        <p><strong>단위:</strong> <span th:text="#{unit.count}">대</span></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">지도</div>
+                                    <div class="card-body">
+                                        <p><strong>제목:</strong> <span th:text="#{map.title}">지도</span></p>
+                                        <p><strong>검색:</strong> <span th:text="#{map.search.placeholder}">충전소 이름을
+                                                입력하세요.</span></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-3">
+                            <a href="/dashboard" class="btn btn-primary">대시보드로 이동</a>
+                            <a href="/map" class="btn btn-success">지도로 이동</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>

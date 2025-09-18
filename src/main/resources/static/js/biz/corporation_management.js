@@ -1,5 +1,5 @@
 $(document).ready(function () {
-    let modalCon = false, selectRow, btnMsg = "등록";
+    let modalCon = false, selectRow, btnMsg = i18n.corp.buttons.add;
     var bizId;
 
     // 전체 동의 체크박스 기능
@@ -40,7 +40,7 @@ $(document).ready(function () {
         const termsId = $(this).attr('data-terms-id');
 
         // 모달 제목 설정
-        $('#termsDetailModalLabel').text(termsTitle + ' 상세보기');
+        $('#termsDetailModalLabel').text(termsTitle);
 
         // 모든 약관 내용 숨기기
         $('.terms-content').addClass('d-none');
@@ -115,7 +115,7 @@ $(document).ready(function () {
 
     // 약관 내용 로드 함수 - 정적 리소스만 사용
     function loadTermsContent(termsId) {
-        console.log('약관 내용 로드 시작:', termsId);
+        console.log('terms content load start:', termsId);
 
         // 약관 내용을 담을 컨테이너 생성
         let termsContainer = $('#termsContent-' + termsId);
@@ -125,13 +125,13 @@ $(document).ready(function () {
         }
 
         // 약관 내용 로드 중 표시
-        termsContainer.html('<p class="text-center">약관 내용을 불러오는 중입니다...</p>');
+        termsContainer.html('<p class="text-center">terms content loading...</p>');
         termsContainer.removeClass('d-none');
 
         // 약관 ID에 따라 다른 URL 사용
         let url = '/terms/' + termsId + '_content.htm';
 
-        console.log('약관 URL:', url);
+        console.log('terms URL:', url);
 
         // AJAX로 약관 내용 로드
         $.ajax({
@@ -139,7 +139,7 @@ $(document).ready(function () {
             type: 'GET',
             dataType: 'html',
             success: function (html) {
-                console.log('약관 내용 로드 성공');
+                console.log('terms content load success');
 
                 // HTML 파싱
                 try {
@@ -149,13 +149,13 @@ $(document).ready(function () {
 
                     let title = '';
                     if (termsId === 'etf') {
-                        title = 'NICE페이먼츠 전자금융거래 이용약관 동의';
+                        title = i18n.corp.terms.term1;
                     } else if (termsId === 'regularBilling') {
-                        title = '정기과금(자동승인)이용약관 동의';
+                        title = i18n.corp.terms.term2;
                     } else if (termsId === 'privacy') {
-                        title = '개인정보 수집 및 이용에 대한 동의';
+                        title = i18n.corp.terms.term3;
                     } else if (termsId === 'privacy3rd') {
-                        title = '개인정보 제3자 제공에 대한 동의';
+                        title = i18n.corp.terms.term4;
                     }
 
                     if (wordSection) {
@@ -164,15 +164,15 @@ $(document).ready(function () {
                         termsContainer.html('<div class="terms-content-body"><h5>' + title + '</h5>' + doc.body.innerHTML + '</div>');
                     }
                 } catch (error) {
-                    console.error('약관 내용 파싱 오류:', error);
-                    termsContainer.html('<p class="text-danger">약관 내용을 파싱하는데 실패했습니다.</p>');
+                    console.error('terms content parse error:', error);
+                    termsContainer.html('<p class="text-danger">' + i18n.corp.messages.termscontentloaderr + '</p>');
                 }
 
                 applyTermsContentStyle();
             },
             error: function (xhr, status, error) {
-                console.error('약관 로드 오류:', xhr.status, error);
-                termsContainer.html('<p class="text-danger">약관 내용을 불러오는데 실패했습니다: ' + error + '</p>');
+                console.error('terms load error:', xhr.status, error);
+                termsContainer.html('<p class="text-danger">' + i18n.corp.messages.termscontentloaderr + ': ' + error + '</p>');
             }
         });
     }
@@ -241,7 +241,7 @@ $(document).ready(function () {
 
     //===============빌키 발급 요청 시작====
     $('#billkeyBtn').on('click', function () {
-        console.log('빌키발급 START >> ');
+        console.log('billkey issue START >> ');
         if (!validateCardInfo()) {
             return;
         }
@@ -270,15 +270,15 @@ $(document).ready(function () {
             contentType: 'application/json',
             data: JSON.stringify(requestData),
             success: function (response) {
-                console.log('빌키 발급 결과:', response);
+                console.log('billkey issue result:', response);
                 $('#bid').val(response.BID);
                 $('#cardCode').val(response.CardCode);
                 $('#cardName').val(response.CardName);
                 $('#authDate').val(response.AuthDate);
             },
             error: function (error) {
-                console.log('빌키 발급 오류:', error);
-                alert('빌키 발급 오류가 발생했습니다. 다시 시도해주세요.');
+                console.log('billkey issue error:', error);
+                alert(i18n.corp.messages.billkeyissueerr);
             }
         });
 
@@ -311,33 +311,33 @@ $(document).ready(function () {
 
         // 모든 필드가 입력되었는지 확인
         if (!bizName || !bizNo) {
-            alert('법인 정보를 모두 입력해 주세요.');
+            alert(i18n.corp.messages.inputallcorpinfo);
             return false;
         }
 
         if (!cardNum1 || !cardNum2 || !cardNum3 || !cardNum4 ||
             !cardExpMonth || !cardExpYear || !cardPwd) {
-            alert('카드 정보를 모두 입력해 주세요.');
+            alert(i18n.corp.messages.inputallcardinfo);
             return false;
         }
 
         // 카드번호 길이 확인
         if (cardNum1.length !== 4 || cardNum2.length !== 4 ||
             cardNum3.length !== 4 || cardNum4.length !== 4) {
-            alert('카드번호가 잘못되었습니다.');
+            alert(i18n.corp.messages.wrongcardnum);
             return false;
         }
 
         // 유효기간 형식 확인
         if (cardExpMonth.length !== 2 || cardExpYear.length !== 2 ||
             parseInt(cardExpMonth) < 1 || parseInt(cardExpMonth) > 12) {
-            alert('유효기간이 잘못되었습니다.');
+            alert(i18n.corp.messages.wrongvalidityperiod);
             return false;
         }
 
         // 카드 비밀번호 길이 확인
         if (cardPwd.length !== 2) {
-            alert('카드 비밀번호가 잘못되었습니다.');
+            alert(i18n.corp.messages.wrongcardpwd);
             return false;
         }
 
@@ -346,7 +346,7 @@ $(document).ready(function () {
 
             return true;
         } else {
-            alert('생년월일 6자리 혹은 사업자번호 10자리를 입력해주세요.');
+            alert(i18n.corp.messages.wrongbizno);
             return false;
         }
         // if (birthDay.length !== 6 || birthDay.length !== 10) {
@@ -412,7 +412,7 @@ $(document).ready(function () {
     $('#addBtn').on('click', function (event) {
         event.preventDefault();
         modalCon = false;
-        btnMsg = "등록";
+        btnMsg = i18n.corp.buttons.add;
         $('#modalBtn').text(btnMsg);
         $('#bizName').val('');
         $('#bizNo').val('');
@@ -438,7 +438,7 @@ $(document).ready(function () {
     $('#editBtn').on('click', function (event) {
         event.preventDefault();
         modalCon = true;
-        btnMsg = "수정";
+        btnMsg = i18n.corp.buttons.edit;
         $('#modalBtn').text(btnMsg);
         $.ajax({
             type: 'GET',
@@ -469,7 +469,7 @@ $(document).ready(function () {
     });
 
     $('#deleteBtn').on('click', function () {
-        btnMsg = "삭제";
+        btnMsg = i18n.corp.buttons.delete;
 
         if (confirmSubmit(btnMsg)) {
 
@@ -494,17 +494,17 @@ $(document).ready(function () {
         event.preventDefault();
 
         if (!validateBid()) {
-            alert('빌키가 존재하지 않습니다. 빌키발급을 진행해주세요.');
+            alert(i18n.corp.messages.nobillkey);
             return;
         }
 
         // 약관에 동의하지 않은 경우 경고 메시지 표시
         if (!checkTerms()) {
-            alert('필수 이용약관에 모두두 동의해주세요.');
+            alert(i18n.corp.messages.alltermsagree);
             return;
         }
 
-        console.log('카드번호: ' + updateCardNum());
+        console.log('cardnum: ' + updateCardNum());
         if (confirmSubmit(btnMsg)) {
             const DATA = {
                 bizNo: $('#bizNo').val(),

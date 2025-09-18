@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Model Management I18n</title>
+</head>
+
+<body>
+    <script th:fragment="model-management-i18n" th:inline="javascript">
+        var i18n = {
+            modelManagement: {
+                mainTitle: /*[[#{modelManagement.mainTitle}]]*/ '시스템 > 모델관리',
+                searchTitle: /*[[#{modelManagement.searchTitle}]]*/ '검색조건',
+                selectOptions: {
+                    select: /*[[#{modelManagement.selectOptions.select}]]*/ '선택',
+                },
+                labels: {
+                    company: /*[[#{modelManagement.labels.company}]]*/ '사업자',
+                    manuf: /*[[#{modelManagement.labels.manuf}]]*/ '제조사',
+                    chargerType: /*[[#{modelManagement.labels.chargerType}]]*/ '충전기유형'
+                },
+                buttons: {
+                    search: /*[[#{modelManagement.buttons.search}]]*/ '검색',
+                    reset: /*[[#{modelManagement.buttons.reset}]]*/ '초기화',
+                    add: /*[[#{modelManagement.buttons.add}]]*/ '등록',
+                    edit: /*[[#{modelManagement.buttons.edit}]]*/ '수정',
+                    delete: /*[[#{modelManagement.buttons.delete}]]*/ '삭제'
+                },
+                tables: {
+                    company: /*[[#{modelManagement.tables.company}]]*/ '사업자',
+                    manuf: /*[[#{modelManagement.tables.manuf}]]*/ '제조사',
+                    modelCode: /*[[#{modelManagement.tables.modelCode}]]*/ '모델코드',
+                    modelName: /*[[#{modelManagement.tables.modelName}]]*/ '모델명',
+                    output: /*[[#{modelManagement.tables.output}]]*/ '출력(kW)',
+                    chargerType: /*[[#{modelManagement.tables.chargerType}]]*/ '충전기유형',
+                    regDateTime: /*[[#{modelManagement.tables.regDateTime}]]*/ '등록일시'
+                },
+                messages: {
+                    nodata: /*[[#{modelManagement.messages.nodata}]]*/ '조회된 데이터가 없습니다.',
+                    connectorIdCheck: /*[[#{modelManagement.messages.connectorIdCheck}]]*/ '모든 Connector ID는 필수 항목입니다. 값을 입력해주세요.'
+                },
+                placeholders: {
+                    inputModelName: /*[[#{modelManagement.placeholders.inputModelName}]]*/ '모델명을 입력해주세요.',
+                    inputModelCode: /*[[#{modelManagement.placeholders.inputModelCode}]]*/ '모델코드를 입력해주세요.'
+                },
+                modal: {
+                    titles: {
+                        modelInfo: /*[[#{modelManagement.modal.titles.modelInfo}]]*/ '모델 정보',
+                        connectorInfo: /*[[#{modelManagement.modal.titles.connectorInfo}]]*/ '커넥터 정보',
+                        modelDetailInfo: /*[[#{modelManagement.modal.titles.modelDetailInfo}]]*/ '모델상세 정보',
+                        modelDetailAddInfo: /*[[#{modelManagement.modal.titles.modelDetailAddInfo}]]*/ '모델상세 부가정보'
+                    },
+                    labels: {
+                        manuf: /*[[#{modelManagement.modal.labels.manuf}]]*/ '제조사',
+                        output: /*[[#{modelManagement.modal.labels.output}]]*/ '출력(kW)',
+                        modelName: /*[[#{modelManagement.modal.labels.modelName}]]*/ '모델명',
+                        modelCode: /*[[#{modelManagement.modal.labels.modelCode}]]*/ '모델코드',
+                        chargerType: /*[[#{modelManagement.modal.labels.chargerType}]]*/ '충전기유형',
+                        installationType: /*[[#{modelManagement.modal.labels.installationType}]]*/ '설치유형',
+                        dualYn: /*[[#{modelManagement.modal.labels.dualYn}]]*/ '동시채널 지원',
+                        acinputvoltage: /*[[#{modelManagement.modal.labels.acinputvoltage}]]*/ 'AC입력전압(V)',
+                        inputfrequency: /*[[#{modelManagement.modal.labels.inputfrequency}]]*/ '입력주파수(Hz)',
+                        inputtype: /*[[#{modelManagement.modal.labels.inputtype}]]*/ '입력타입(P)',
+                        inputcurr: /*[[#{modelManagement.modal.labels.inputcurr}]]*/ '입력전류(A)',
+                        inputpower: /*[[#{modelManagement.modal.labels.inputpower}]]*/ '입력전원(kVA)',
+                        powerfactor: /*[[#{modelManagement.modal.labels.powerfactor}]]*/ '역률(PF)',
+                        dcoutputvoltage: /*[[#{modelManagement.modal.labels.dcoutputvoltage}]]*/ 'DC출력전압(V)',
+                        maxoutputcurr: /*[[#{modelManagement.modal.labels.maxoutputcurr}]]*/ '최대출력전류(A)',
+                        ratedpower: /*[[#{modelManagement.modal.labels.ratedpower}]]*/ '정격출력(kW)',
+                        peakefficiency: /*[[#{modelManagement.modal.labels.peakefficiency}]]*/ '최고효율(%)',
+                        thdi: /*[[#{modelManagement.modal.labels.thdi}]]*/ 'THDi(%)',
+                        grdtype: /*[[#{modelManagement.modal.labels.grdtype}]]*/ '접지형',
+                        opaltitude: /*[[#{modelManagement.modal.labels.opaltitude}]]*/ '작동고도(m)',
+                        optemperature: /*[[#{modelManagement.modal.labels.optemperature}]]*/ '작동온도',
+                        temperaturederating: /*[[#{modelManagement.modal.labels.temperaturederating}]]*/ '온도감소율',
+                        storagetemperaturerange: /*[[#{modelManagement.modal.labels.storagetemperaturerange}]]*/ '보관온도범위(˚C)',
+                        humidity: /*[[#{modelManagement.modal.labels.humidity}]]*/ '습도(%)',
+                        dimensions: /*[[#{modelManagement.modal.labels.dimensions}]]*/ '치수(mm)',
+                        ipnik: /*[[#{modelManagement.modal.labels.ipnik}]]*/ 'IP & IK 등급',
+                        weight: /*[[#{modelManagement.modal.labels.weight}]]*/ '무게(kg)',
+                        material: /*[[#{modelManagement.modal.labels.material}]]*/ '재질',
+                        cablelength: /*[[#{modelManagement.modal.labels.cablelength}]]*/ '케이블 길이(m)',
+                        screen: /*[[#{modelManagement.modal.labels.screen}]]*/ '화면',
+                        rfid: /*[[#{modelManagement.modal.labels.rfid}]]*/ 'RFID Reader',
+                        emergencybtn: /*[[#{modelManagement.modal.labels.emergencybtn}]]*/ '비상버튼',
+                        communicationinterface: /*[[#{modelManagement.modal.labels.communicationinterface}]]*/ '통신인터페이스',
+                        lang: /*[[#{modelManagement.modal.labels.lang}]]*/ '언어',
+                        coolingmethod: /*[[#{modelManagement.modal.labels.coolingmethod}]]*/ '냉각방식',
+                        emc: /*[[#{modelManagement.modal.labels.emc}]]*/ 'EMC',
+                        protection: /*[[#{modelManagement.modal.labels.protection}]]*/ '보호장치',
+                        opfunc: /*[[#{modelManagement.modal.labels.opfunc}]]*/ '옵션기능',
+                        standard: /*[[#{modelManagement.modal.labels.standard}]]*/ '표준',
+                        powermodule: /*[[#{modelManagement.modal.labels.powermodule}]]*/ '전력모듈',
+                        charger: /*[[#{modelManagement.modal.labels.charger}]]*/ '충전기'
+                    },
+                    buttons: {
+                        add: /*[[#{modelManagement.modal.buttons.add}]]*/ '+ 추가',
+                        delete: /*[[#{modelManagement.modal.buttons.delete}]]*/ '- 삭제',
+                        cancel: /*[[#{modelManagement.modal.buttons.cancel}]]*/ '취소',
+                        regist: /*[[#{modelManagement.modal.buttons.regist}]]*/ '등록',
+                        edit: /*[[#{modelManagement.modal.buttons.edit}]]*/ '수정'
+                    }
+                }
+            }
+        };
+    </script>
+</body>
+
+</html>

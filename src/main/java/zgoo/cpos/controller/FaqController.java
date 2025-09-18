@@ -4,6 +4,8 @@ import java.security.Principal;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -28,6 +30,7 @@ import zgoo.cpos.service.FaqService;
 public class FaqController {
 
     private final FaqService faqService;
+    private final MessageSource messageSource;
 
     // FAQ 등록
     @PostMapping("/new")
@@ -36,11 +39,13 @@ public class FaqController {
 
         try {
             this.faqService.saveFaq(dto, principal.getName());
-            return ResponseEntity.ok("FAQ가 정상적으로 등록되었습니다.");
+            return ResponseEntity.ok(messageSource.getMessage("faq.api.messages.regSuccess", null,
+                    LocaleContextHolder.getLocale()));
         } catch (Exception e) {
             log.error("[createFaq] error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("FAQ 등록 중 오류가 발생했습니다.");
+                    .body(messageSource.getMessage("faq.api.messages.regError", null,
+                            LocaleContextHolder.getLocale()));
         }
     }
 
@@ -105,16 +110,19 @@ public class FaqController {
             if (id == null) {
                 log.error("FAQ id is null");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body("FAQ ID값이 누락됐습니다.");
+                        .body(messageSource.getMessage("faq.api.messages.omittedFaqId", null,
+                                LocaleContextHolder.getLocale()));
             }
             dto.setId(id);
 
             this.faqService.updateFaq(dto, principal.getName());
-            return ResponseEntity.ok("FAQ가 정상적으로 수정되었습니다.");
+            return ResponseEntity.ok(messageSource.getMessage("faq.api.messages.updateSuccess", null,
+                    LocaleContextHolder.getLocale()));
         } catch (Exception e) {
             log.error("[updateFaq] error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("FAQ 수정 중 오류가 발생했습니다.");
+                    .body(messageSource.getMessage("faq.api.messages.updateError", null,
+                            LocaleContextHolder.getLocale()));
         }
     }
 
@@ -127,14 +135,17 @@ public class FaqController {
             if (id == null) {
                 log.error("FAQ id is null");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body("FAQ ID값이 누락됐습니다.");
+                        .body(messageSource.getMessage("faq.api.messages.omittedFaqId", null,
+                                LocaleContextHolder.getLocale()));
             }
             this.faqService.deleteFaq(id, principal.getName());
-            return ResponseEntity.ok("FAQ가 정상적으로 삭제되었습니다.");
+            return ResponseEntity.ok(messageSource.getMessage("faq.api.messages.deleteSuccess", null,
+                    LocaleContextHolder.getLocale()));
         } catch (Exception e) {
             log.error("[deleteFaq] error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("FAQ 삭제 중 오류가 발생했습니다.");
+                    .body(messageSource.getMessage("faq.api.messages.deleteError", null,
+                            LocaleContextHolder.getLocale()));
         }
     }
 
@@ -150,7 +161,8 @@ public class FaqController {
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             log.error("[FaqController >> buttonControl] error: {}", e.getMessage());
-            response.put("message", "버튼 권한 확인 중 오류가 발생했습니다.");
+            response.put("message", messageSource.getMessage("faq.api.messages.buttonControlError", null,
+                    LocaleContextHolder.getLocale()));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }

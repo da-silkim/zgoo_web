@@ -4,108 +4,121 @@
     <div class="card responsive-content">
         <!-- card body:1 start -->
         <div class="card-body">
-            <div class="content-title"><i class="fa-solid fa-receipt me-2"></i>정산 > 매입관리</div>
+            <div class="content-title"><i class="fa-solid fa-receipt me-2"></i><span th:text="#{pc.titles.main}"></span>
+            </div>
             <!-- card:2 start -->
             <div class="card card-shadow">
                 <!-- card body:2 start -->
                 <div class="card-body">
                     <div class="detail-container">
                         <!-- table:1 start -->
-                        <div class="card-title mb-2"><span class="card-title-bar"></span><span>매입 정보</span></div>
+                        <div class="card-title mb-2"><span class="card-title-bar"></span><span
+                                th:text="#{pc.titles.purchaseInfo}"></span></div>
                         <table class="table table-bg-v table-fixed w-100 text-center align-middle">
                             <tbody>
                                 <tr class="table-border-top">
-                                    <th class="w-20">계정과목<b class="required-data">*</b></th>
+                                    <th class="w-20"><span th:text="#{pc.labels.category}"></span><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <span th:text="${purchase.accountCodeName}"></span>
                                     </td>
-                                    <th class="w-20">품목명</th>
+                                    <th class="w-20"><span th:text="#{pc.labels.itemnm}"></span></th>
                                     <td class="w-30">
                                         <span th:text="${purchase.item}"></span>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th>거래처명<b class="required-data">*</b></th>
+                                    <th><span th:text="#{pc.labels.clientnm}"></span><b class="required-data">*</b></th>
                                     <td>
                                         <span th:text="${purchase.bizName}"></span>
                                     </td>
-                                    <th>사업자등록번호<b class="required-data">*</b></th>
+                                    <th><span th:text="#{pc.labels.businessnum}"></span><b class="required-data">*</b>
+                                    </th>
                                     <td>
                                         <span th:text="${purchase.bizNum}"></span>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th>충전소ID<b class="required-data">*</b></th>
+                                    <th><span th:text="#{pc.labels.stationid}"></span><b class="required-data">*</b>
+                                    </th>
                                     <td>
                                         <span th:text="${purchase.stationId}"></span>
                                     </td>
-                                    <th>매입거래일자<b class="required-data">*</b></th>
+                                    <th><span th:text="#{pc.labels.purchasedate}"></span><b class="required-data">*</b>
+                                    </th>
                                     <td>
                                         <span th:text="${purchase.purchaseDate}"></span>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th>대금거래방법<b class="required-data">*</b></th>
+                                    <th><span th:text="#{pc.labels.paymethod}"></span><b class="required-data">*</b>
+                                    </th>
                                     <td>
                                         <span th:text="${purchase.paymentMethodName}"></span>
                                     </td>
-                                    <th>승인번호</th>
+                                    <th><span th:text="#{pc.labels.appnum}"></span></th>
                                     <td>
                                         <span th:text="${purchase.approvalNo}"></span>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th>단가<b class="required-data">*</b></th>
+                                    <th><span th:text="#{pc.labels.unitprice}"></span><b class="required-data">*</b>
+                                    </th>
                                     <td>
                                         <span th:text="${purchase.unitPrice}" class="price-format"></span>
                                     </td>
-                                    <th>수량<b class="required-data">*</b></th>
+                                    <th><span th:text="#{pc.labels.count}"></span><b class="required-data">*</b></th>
                                     <td>
                                         <span th:text="${purchase.amount}" class="int-format"></span>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th>공급가액<b class="required-data">*</b></th>
+                                    <th><span th:text="#{pc.labels.supplyprice}"></span><b class="required-data">*</b>
+                                    </th>
                                     <td>
                                         <span th:text="${purchase.supplyPrice}" class="price-format"></span>
                                     </td>
-                                    <th>부가세<b class="required-data">*</b></th>
+                                    <th><span th:text="#{pc.labels.vat}"></span><b class="required-data">*</b></th>
                                     <td>
                                         <span th:text="${purchase.vat}" class="price-format"></span>
                                     </td>
                                 </tr>
                                 <tr th:if="${purchase.accountCode == 'ELCFEE'}">
-                                    <th>부담금<b class="required-data">*</b></th>
+                                    <th><span th:text="#{pc.labels.contribution}"></span><b class="required-data">*</b>
+                                    </th>
                                     <td>
                                         <span th:text="${purchase.charge}" class="price-format"></span>
                                     </td>
-                                    <th>가산금<b class="required-data">*</b></th>
+                                    <th><span th:text="#{pc.labels.surcharge}"></span><b class="required-data">*</b>
+                                    </th>
                                     <td>
                                         <span th:text="${purchase.surcharge}" class="price-format"></span>
                                     </td>
                                 </tr>
                                 <tr th:if="${purchase.accountCode == 'ELCFEE'}">
-                                    <th>절사액<b class="required-data">*</b></th>
+                                    <th><span th:text="#{pc.labels.cutoffamount}"></span><b class="required-data">*</b>
+                                    </th>
                                     <td>
                                         <span th:text="${purchase.cutoffAmount}" class="price-format"></span>
                                     </td>
-                                    <th>미납급액<b class="required-data">*</b></th>
+                                    <th><span th:text="#{pc.labels.notpaidamount}"></span><b class="required-data">*</b>
+                                    </th>
                                     <td>
                                         <span th:text="${purchase.unpaidAmount}" class="price-format"></span>
                                     </td>
                                 </tr>
                                 <tr th:if="${purchase.accountCode == 'ELCFEE'}">
-                                    <th>합계액<b class="required-data">*</b></th>
+                                    <th><span th:text="#{pc.labels.totamt}"></span><b class="required-data">*</b></th>
                                     <td>
                                         <span th:text="${purchase.totalAmount}" class="price-format"></span>
                                     </td>
-                                    <th>사용량(kWh)<b class="required-data">*</b></th>
+                                    <th><span th:text="#{pc.labels.usagekw}"></span><b class="required-data">*</b></th>
                                     <td>
                                         <span th:text="${purchase.power}" class="int-format"></span>
                                     </td>
                                 </tr>
                                 <tr th:unless="${purchase.accountCode == 'ELCFEE'}">
-                                    <th>합계액<b class="required-data">*</b></th>
+                                    <th><span th:text="#{pc.labels.totamt}"></span><b class="required-data">*</b></th>
                                     <td>
                                         <span th:text="${purchase.totalAmount}" class="price-format"></span>
                                     </td>
@@ -115,7 +128,8 @@
                         </table>
                         <!-- table:1 end -->
                         <button type="button" class="list-btn" onclick="goToList('/calc/purchase',
-                            ['opSearch', 'contentSearch', 'startDate', 'endDate'])"> 목록 </button>
+                            ['opSearch', 'contentSearch', 'startDate', 'endDate'])"><span
+                                th:text="#{common.buttons.list}"></span></button>
                     </div>
                 </div>
                 <!-- card body:2 end -->
@@ -125,5 +139,8 @@
         <!-- card body:1 end -->
     </div>
     <!-- card:1 end -->
+    <!-- 언어 선택기 스크립트 -->
+    <div th:replace="~{fragments/language-selector :: language-script}"></div>
 </div>
+
 </html>

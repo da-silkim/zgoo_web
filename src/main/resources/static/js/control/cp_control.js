@@ -129,7 +129,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // OCPP 설정값 로드
     function loadOcppConfigurationValues(chargerId) {
         if (!chargerId) {
-            alert('충전기가 선택되지 않았습니다.');
+            alert(i18n.cpcontrol.messages.noSelectedCharger);
             return;
         }
 
@@ -182,7 +182,7 @@ document.addEventListener("DOMContentLoaded", function () {
             event.preventDefault();
 
             if (!selectedChargerId) {
-                alert('충전기가 선택되지 않았습니다.');
+                alert(i18n.cpcontrol.messages.noSelectedCharger);
                 return;
             }
 
@@ -213,7 +213,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             // 충전기가 선택되지 않은 경우
             if (!selectedChargerId) {
-                alert('충전기가 선택되지 않았습니다.');
+                alert(i18n.cpcontrol.messages.noSelectedCharger);
                 return;
             }
 
@@ -225,7 +225,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const configValue = document.getElementById('configValue').value;
             selectedConfigValue = configValue;
 
-            if (confirm(`선택한 충전기(${selectedChargerId})에 Key: ${selectedConfigKey} Value: ${selectedConfigValue} 설정값을 전송하시겠습니까?`)) {
+            if (confirm(i18n.cpcontrol.messages.changeconfigSendNotice + `(CP: ${selectedChargerId} ,Key: ${selectedConfigKey} ,Value: ${selectedConfigValue} )`)) {
                 const configData = {
                     chargerId: selectedChargerId,
                     key: selectedConfigKey,
@@ -242,14 +242,14 @@ document.addEventListener("DOMContentLoaded", function () {
                     .then(response => response.json())
                     .then(data => {
                         if (data.status === 'Accepted') {
-                            alert('ChangeConfiguration 요청이 성공적으로 처리되었습니다.');
+                            alert(i18n.cpcontrol.messages.changeconfigReqSuccess);
                         } else {
-                            alert('ChangeConfiguration 요청 처리 중 오류가 발생했습니다: ' + (data.message || '알 수 없는 오류'));
+                            alert(i18n.cpcontrol.messages.changeconfigReqError + (data.message || i18n.cpcontrol.messages.UnknownError));
                         }
                     })
                     .catch(error => {
                         console.error('ChangeConfiguration request failed:', error);
-                        alert('ChangeConfiguration 요청 중 오류가 발생했습니다.');
+                        alert(i18n.cpcontrol.messages.changeconfigReqError);
                     });
             }
         })
@@ -263,7 +263,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             // 충전기가 선택되지 않은 경우
             if (!selectedChargerId) {
-                alert('충전기가 선택되지 않았습니다.');
+                alert(i18n.cpcontrol.messages.noSelectedCharger);
                 return;
             }
 
@@ -276,7 +276,7 @@ document.addEventListener("DOMContentLoaded", function () {
             selectedConnectorId = connectorId;
 
 
-            if (confirm(`선택한 충전기(${selectedChargerId})에 ${selectedMessage} 메시지를 전송하시겠습니까?`)) {
+            if (confirm(i18n.cpcontrol.messages.triggerSendNotice + `(CP: ${selectedChargerId}, Message: ${selectedMessage}, ConnectorId: ${selectedConnectorId} )`)) {
                 const triggerData = {
                     chargerId: selectedChargerId,
                     requestedMessage: selectedMessage,
@@ -293,14 +293,14 @@ document.addEventListener("DOMContentLoaded", function () {
                     .then(response => response.json())
                     .then(data => {
                         if (data.status === 'Accepted') {
-                            alert('트리거 메시지 전송이 성공적으로 처리되었습니다.');
+                            alert(i18n.cpcontrol.messages.triggerReqSuccess);
                         } else {
-                            alert('트리거 메시지 전송 처리 중 오류가 발생했습니다: ' + (data.message || '알 수 없는 오류'));
+                            alert(i18n.cpcontrol.messages.triggerReqError + (data.message || i18n.cpcontrol.messages.UnknownError));
                         }
                     })
                     .catch(error => {
                         console.error('Trigger message request failed:', error);
-                        alert('트리거 메시지 전송 중 오류가 발생했습니다.');
+                        alert(i18n.cpcontrol.messages.triggerReqError);
                     });
             }
 
@@ -315,7 +315,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             //충전기가 선택되지 않은 경우
             if (!selectedChargerId) {
-                alert('충전기가 선택되지 않았습니다.');
+                alert(i18n.cpcontrol.messages.noSelectedCharger);
                 return;
             }
 
@@ -324,7 +324,7 @@ document.addEventListener("DOMContentLoaded", function () {
             // bkey 가져오기
             const bkey = document.getElementById('vasBkey').value;
 
-            if (confirm(`선택한 충전기(${selectedChargerId}, bid: ${bid}, bkey: ${bkey})에 암호화 키 요청을 진행하시겠습니까?`)) {
+            if (confirm(i18n.cpcontrol.messages.reqAlert + `(CP: ${selectedChargerId}, bid: ${bid}, bkey: ${bkey})`)) {
                 const reqData = {
                     chargerId: selectedChargerId,
                     bid: bid,
@@ -368,14 +368,14 @@ document.addEventListener("DOMContentLoaded", function () {
                     .then(response => response.json())
                     .then(data => {
                         if (data.status === 'Accepted') {
-                            alert('암호화 키 요청이 성공적으로 처리되었습니다.');
+                            alert(i18n.cpcontrol.messages.reqSuccess);
                         } else {
-                            alert('암호화 키 요청 처리 중 오류가 발생했습니다: ' + (data.message || '알 수 없는 오류'));
+                            alert(i18n.cpcontrol.messages.reqError + (data.message || i18n.cpcontrol.messages.UnknownError));
                         }
                     })
                     .catch(error => {
                         console.error('Error:', error);
-                        alert('암호화 키 요청 중 오류가 발생했습니다.');
+                        alert(i18n.cpcontrol.messages.reqError);
                     });
             }
         })
@@ -389,7 +389,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             // 충전기가 선택되지 않은 경우
             if (!selectedChargerId) {
-                alert('충전기가 선택되지 않았습니다.');
+                alert(i18n.cpcontrol.messages.noSelectedCharger);
                 return;
             }
 
@@ -397,7 +397,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const resetType = document.getElementById('resetType').value;
 
             // 확인 대화상자 표시
-            if (confirm(`선택한 충전기(${selectedChargerId})를 ${resetType} 리셋하시겠습니까?`)) {
+            if (confirm(i18n.cpcontrol.messages.reqAlert + `(CP: ${selectedChargerId}, ResetType: ${resetType})`)) {
                 // 리셋 요청 데이터 생성
                 const resetData = {
                     chargerId: selectedChargerId,
@@ -415,14 +415,14 @@ document.addEventListener("DOMContentLoaded", function () {
                     .then(response => response.json())
                     .then(data => {
                         if (data.status === 'Accepted') {
-                            alert('리셋 요청이 성공적으로 처리되었습니다.');
+                            alert(i18n.cpcontrol.messages.reqSuccess);
                         } else {
-                            alert('리셋 요청 처리 중 오류가 발생했습니다: ' + (data.message || '알 수 없는 오류'));
+                            alert(i18n.cpcontrol.messages.reqError + (data.message || i18n.cpcontrol.messages.UnknownError));
                         }
                     })
                     .catch(error => {
                         console.error('Reset request failed:', error);
-                        alert('리셋 요청 중 오류가 발생했습니다.');
+                        alert(i18n.cpcontrol.messages.reqError);
                     });
             }
         });
@@ -472,7 +472,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
             //확인 팝업
-            if (confirm(`선택한 충전기(${selectedChargerId})에 ${remoteAction} 요청을 전송하시겠습니까?`)) {
+            if (confirm(i18n.cpcontrol.messages.reqAlert + `(CP: ${selectedChargerId}, RemoteAction: ${remoteAction})`)) {
                 // API 호출 로직
                 fetch(fetchUrl, {
                     method: 'POST',
@@ -484,14 +484,14 @@ document.addEventListener("DOMContentLoaded", function () {
                     .then(response => response.json())
                     .then(result => {
                         if (result.status === 'Accepted') {
-                            alert('원격 충전 제어 요청이 성공적으로 처리되었습니다.');
+                            alert(i18n.cpcontrol.messages.reqSuccess);
                         } else {
-                            alert('원격 충전 제어 요청 처리 중 오류가 발생했습니다: ' + (result.message || '알 수 없는 오류'));
+                            alert(i18n.cpcontrol.messages.reqError + (result.message || i18n.cpcontrol.messages.UnknownError));
                         }
                     })
                     .catch(error => {
                         console.error('Error:', error);
-                        alert('원격 충전 제어 요청 중 오류가 발생했습니다.');
+                        alert(i18n.cpcontrol.messages.reqError);
                     });
             }
 

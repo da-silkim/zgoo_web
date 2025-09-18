@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -34,6 +36,7 @@ public class VocController {
 
     private final VocService vocService;
     private final ComService comService;
+    private final MessageSource messageSource;
 
     // 1:1 단건 조회
     @GetMapping("/get/{vocId}")
@@ -46,7 +49,8 @@ public class VocController {
             VocRegDto vocOne = this.vocService.findVocOne(vocId);
 
             if (vocOne == null) {
-                response.put("message", "정보를 불러오는데 실패했습니다. 다시 시도해 주세요.");
+                response.put("message",
+                        messageSource.getMessage("voc.api.messages.loadFail", null, LocaleContextHolder.getLocale()));
                 response.put("vocInfo", Collections.emptyList());
                 return ResponseEntity.ok(response);
             }
@@ -55,7 +59,8 @@ public class VocController {
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             log.error("[findVocOne] error: {}", e.getMessage());
-            response.put("message", "서버 오류가 발생했습니다. 다시 시도해 주세요.");
+            response.put("message",
+                    messageSource.getMessage("voc.api.messages.serverError", null, LocaleContextHolder.getLocale()));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
@@ -73,11 +78,13 @@ public class VocController {
             }
 
             this.vocService.saveVocCall(dto, principal.getName());
-            return ResponseEntity.ok("회원 정보가 정상적으로 등록되었습니다.");
+            return ResponseEntity.ok(messageSource.getMessage("voc.api.messages.memInfoAddSuccess", null,
+                    LocaleContextHolder.getLocale()));
         } catch (Exception e) {
             log.error("[createVocCall] error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("문의 정보 등록 중 오류 발생");
+                    .body(messageSource.getMessage("voc.api.messages.vocregFailed", null,
+                            LocaleContextHolder.getLocale()));
         }
     }
 
@@ -97,14 +104,18 @@ public class VocController {
             Integer result = this.vocService.updateVocAnswer(vocId, dto, principal.getName());
             log.info("=== voc answer update complete ===");
             return switch (result) {
-                case -1 -> ResponseEntity.status(HttpStatus.OK).body("답변이 빈 값으로 처리되지 않았습니다.");
-                case 1 -> ResponseEntity.status(HttpStatus.OK).body("답변이 정상적으로 처리되었습니다.");
-                default -> ResponseEntity.status(HttpStatus.OK).body("오류로 인해 답변이 처리되지 않았습니다.");
+                case -1 -> ResponseEntity.status(HttpStatus.OK).body(messageSource
+                        .getMessage("voc.api.messages.emptyReplyContent", null, LocaleContextHolder.getLocale()));
+                case 1 -> ResponseEntity.status(HttpStatus.OK).body(messageSource
+                        .getMessage("voc.api.messages.replaySuccess", null, LocaleContextHolder.getLocale()));
+                default -> ResponseEntity.status(HttpStatus.OK).body(messageSource
+                        .getMessage("voc.api.messages.replayFailed", null, LocaleContextHolder.getLocale()));
             };
         } catch (Exception e) {
             log.error("[updateVocAnswer] error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("답변 저장 중 오류 발생");
+                    .body(messageSource.getMessage("voc.api.messages.replayFailed", null,
+                            LocaleContextHolder.getLocale()));
         }
     }
 
@@ -120,7 +131,8 @@ public class VocController {
             List<MemberListDto> memberList = this.vocService.findMemberList(memName, memPhone);
 
             if (memberList == null) {
-                response.put("message", "조회된 데이터가 없습니다.");
+                response.put("message",
+                        messageSource.getMessage("voc.messages.nodata", null, LocaleContextHolder.getLocale()));
                 response.put("memberList", Collections.emptyList());
                 return ResponseEntity.ok(response);
             }
@@ -129,7 +141,8 @@ public class VocController {
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             log.error("[searchMember] error: {}", e.getMessage());
-            response.put("message", "서버 오류가 발생했습니다. 다시 시도해 주세요.");
+            response.put("message",
+                    messageSource.getMessage("voc.api.messages.serverError", null, LocaleContextHolder.getLocale()));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }

@@ -32,7 +32,8 @@ public class NavController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         // 인증된 사용자인지 확인
-        if (authentication != null && authentication.isAuthenticated() && !"anonymousUser".equals(authentication.getPrincipal())) {
+        if (authentication != null && authentication.isAuthenticated()
+                && !"anonymousUser".equals(authentication.getPrincipal())) {
             String userId = authentication.getName();
             Long companyId = this.usersService.findCompanyId(userId);
 
@@ -40,7 +41,7 @@ public class NavController {
 
             for (GrantedAuthority authority : authorities) {
                 String authorityName = authority.getAuthority();
-    
+
                 if ("SU".equals(authorityName)) {
                     return this.menuService.findMenuListWithChild(authorityName);
                 }

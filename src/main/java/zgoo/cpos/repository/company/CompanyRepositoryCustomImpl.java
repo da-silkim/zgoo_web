@@ -21,6 +21,7 @@ import zgoo.cpos.domain.company.QCompanyRelationInfo;
 import zgoo.cpos.dto.company.CompanyDto;
 import zgoo.cpos.dto.company.CompanyDto.BaseCompnayDto;
 import zgoo.cpos.dto.company.CompanyDto.CompanyListDto;
+import zgoo.cpos.util.LocaleUtil;
 import zgoo.cpos.util.QueryUtils;
 
 @RequiredArgsConstructor
@@ -49,14 +50,17 @@ public class CompanyRepositoryCustomImpl implements CompanyRepositoryCustom {
                         company.id.as("companyId"),
                         company.companyName.as("companyName"),
                         company.companyLv.as("companyLv"),
-                        companyLevelCode.name.as("companyLvName"),
+                        LocaleUtil.isEnglish() ? companyLevelCode.nameEn.as("companyLvName")
+                                : companyLevelCode.name.as("companyLvName"),
                         company.companyType.as("companyType"),
-                        companyTypeCode.name.as("companyTypeName"),
+                        LocaleUtil.isEnglish() ? companyTypeCode.nameEn.as("companyTypeName")
+                                : companyTypeCode.name.as("companyTypeName"),
                         parentCompany.companyName.as("parentCompanyName"),
                         contract.contractedAt.as("contractedAt"),
                         contract.contractEnd.as("contractEnd"),
                         contract.contractStatus.as("contractStatus"),
-                        contractStatusCode.name.as("contractStatName")))
+                        LocaleUtil.isEnglish() ? contractStatusCode.nameEn.as("contractStatName")
+                                : contractStatusCode.name.as("contractStatName")))
                 .from(company)
                 .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
                 .leftJoin(parentCompany).on(relation.parentCompany.eq(parentCompany))
@@ -93,14 +97,17 @@ public class CompanyRepositoryCustomImpl implements CompanyRepositoryCustom {
                         company.id.as("companyId"),
                         company.companyName.as("companyName"),
                         company.companyLv.as("companyLv"),
-                        companyLevelCode.name.as("companyLvName"),
+                        LocaleUtil.isEnglish() ? companyLevelCode.nameEn.as("companyLvName")
+                                : companyLevelCode.name.as("companyLvName"),
                         company.companyType.as("companyType"),
-                        companyTypeCode.name.as("companyTypeName"),
+                        LocaleUtil.isEnglish() ? companyTypeCode.nameEn.as("companyTypeName")
+                                : companyTypeCode.name.as("companyTypeName"),
                         parentCompany.companyName.as("parentCompanyName"),
                         contract.contractedAt.as("contractedAt"),
                         contract.contractEnd.as("contractEnd"),
                         contract.contractStatus.as("contractStatus"),
-                        contractStatusCode.name.as("contractStatName")))
+                        LocaleUtil.isEnglish() ? contractStatusCode.nameEn.as("contractStatName")
+                                : contractStatusCode.name.as("contractStatName")))
                 .from(company)
                 .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
                 .leftJoin(parentCompany).on(relation.parentCompany.eq(parentCompany))
@@ -175,9 +182,11 @@ public class CompanyRepositoryCustomImpl implements CompanyRepositoryCustom {
                 company.id.as("companyId"),
                 company.companyName.as("companyName"),
                 company.companyLv.as("companyLv"),
-                companyLevelCode.name.as("companyLvName"),
+                LocaleUtil.isEnglish() ? companyLevelCode.nameEn.as("companyLvName")
+                        : companyLevelCode.name.as("companyLvName"),
                 company.companyType.as("companyType"),
-                companyTypeCode.name.as("companyTypeName")))
+                LocaleUtil.isEnglish() ? companyTypeCode.nameEn.as("companyTypeName")
+                        : companyTypeCode.name.as("companyTypeName")))
                 .from(company)
                 .leftJoin(companyLevelCode).on(company.companyLv.eq(companyLevelCode.commonCode))
                 .leftJoin(companyTypeCode).on(company.companyType.eq(companyTypeCode.commonCode))
@@ -214,14 +223,17 @@ public class CompanyRepositoryCustomImpl implements CompanyRepositoryCustom {
                         company.id.as("companyId"),
                         company.companyName.as("companyName"),
                         company.companyLv.as("companyLv"),
-                        companyLevelCode.name.as("companyLvName"),
+                        LocaleUtil.isEnglish() ? companyLevelCode.nameEn.as("companyLvName")
+                                : companyLevelCode.name.as("companyLvName"),
                         company.companyType.as("companyType"),
-                        companyTypeCode.name.as("companyTypeName"),
+                        LocaleUtil.isEnglish() ? companyTypeCode.nameEn.as("companyTypeName")
+                                : companyTypeCode.name.as("companyTypeName"),
                         parentCompany.companyName.as("parentCompanyName"),
                         contract.contractedAt.as("contractedAt"),
                         contract.contractEnd.as("contractEnd"),
                         contract.contractStatus.as("contractStatus"),
-                        contractStatusCode.name.as("contractStatName")))
+                        LocaleUtil.isEnglish() ? contractStatusCode.nameEn.as("contractStatName")
+                                : contractStatusCode.name.as("contractStatName")))
                 .from(company)
                 .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
                 .leftJoin(parentCompany).on(relation.parentCompany.eq(parentCompany))

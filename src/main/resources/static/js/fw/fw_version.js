@@ -57,16 +57,16 @@ document.addEventListener("DOMContentLoaded", function () {
                 })
                     .then(response => {
                         if (!response.ok) {
-                            throw new Error("[DELETE]펌웨어 버전 삭제 실패: " + response.statusText);
+                            throw new Error("Delete Firmware Version Failed: " + response.statusText);
                         }
                         return response.text();
                     })
                     .then(data => {
-                        console.log("처리결과:", data);
+                        console.log("result:", data);
                         window.location.replace('/fw/version');
                     })
                     .catch(error => {
-                        console.error("펌웨어 버전 삭제 실패:", error);
+                        console.error("Delete Firmware Version Failed:", error);
                     });
             }
         });
@@ -81,25 +81,25 @@ document.addEventListener("DOMContentLoaded", function () {
             version: document.getElementById('version').value,
             url: document.getElementById('filePath').value
         };
-        console.log("입력 data: ", bodyData);
+        console.log("data: ", bodyData);
 
         if (bodyData.companyId == '') {
-            alert("사업자정보를 선택해주세요.");
+            alert(i18n.fw.messages.selectcompany);
             return;
         }
 
         if (bodyData.cpModelCode == '') {
-            alert("모델명을 선택해주세요.");
+            alert(i18n.fw.messages.selectchgmodel);
             return;
         }
 
         if (bodyData.version == '') {
-            alert("버전정보를 입력해주세요.");
+            alert(i18n.fw.messages.inputversion);
             return;
         }
 
         if (bodyData.url == '') {
-            alert("파일 경로를 입력해주세요.");
+            alert(i18n.fw.messages.inputurl);
             return;
         }
 
@@ -114,16 +114,16 @@ document.addEventListener("DOMContentLoaded", function () {
         })
             .then(response => {
                 if (!response.ok) {
-                    throw new Error("펌웨어 버전 등록 실패: " + response.statusText);
+                    throw new Error("Register Firmware Version Failed: " + response.statusText);
                 }
                 return response.text();
             })
             .then(data => {
-                console.log("처리결과:", data);
+                console.log("result:", data);
                 window.location.replace('/fw/version');
             })
             .catch(error => {
-                console.error("펌웨어 버전 등록 실패:", error);
+                console.error("Register Firmware Version Failed:", error);
             });
 
     });
@@ -134,7 +134,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // company가 선택되지 않은경우 모델 리스트 초기화
         if (!companyId || companyId === '*{null}') {
-            $('#modelCode').html('<option value="">(선택)</option>');
+            $('#modelCode').html('<option value="">' + i18n.fw.labels.select + '</option>');
             return;
         }
 
@@ -144,7 +144,7 @@ document.addEventListener("DOMContentLoaded", function () {
             type: 'GET',
             data: { companyId: companyId },
             success: function (models) {
-                let options = '<option value="">(선택)</option>';
+                let options = '<option value="">' + i18n.fw.labels.select + '</option>';
 
                 //모델리스트 생성
                 $.each(models, function (i, model) {
@@ -155,8 +155,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
             },
             error: function (xhr, status, error) {
-                console.error('모델 리스트 조회 실패:', error);
-                alert('모델 리스트 조회에 실패했습니다.');
+                console.error('Model List Search Failed:', error);
+                alert(i18n.fw.messages.modellistsearchfailed);
             }
         });
     });

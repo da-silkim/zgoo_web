@@ -4,21 +4,25 @@
     <div class="card responsive-content">
         <!-- card body:1 start -->
         <div class="card-body">
-            <div class="content-title"><i class="fa-solid fa-clipboard-list font-ico me-2"></i>이력 > 에러이력</div>
+            <div class="content-title"><i class="fa-solid fa-clipboard-list font-ico me-2"></i><span
+                    th:text="#{errorhist.titles.main}"></span></div>
             <!-- card:2 start -->
             <div class="card card-shadow">
                 <!-- card body:2 start -->
                 <div class="card-body">
-                    <div class="card-title"><span class="card-title-bar"></span><span>검색조건</span></div>
+                    <div class="card-title"><span class="card-title-bar"></span><span
+                            th:text="#{errorhist.titles.search}"></span></div>
                     <!-- form start -->
                     <form id="searchForm" class="position-relative" th:action="@{/history/error}" method="get">
                         <!-- row:1 start -->
                         <div class="row mb-3 row-cols-2 row-cols-lg-3 g-2">
                             <div class="col d-flex align-items-center">
                                 <label for="companyIdSearch"
-                                    class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">사업자</label>
+                                    class="flex-shrink-0 col-form-label font-weight-bold text-right w-25"><span
+                                        th:text="#{errorhist.labels.company}"></span></label>
                                 <select id="companyIdSearch" class="mx-3 form-control" name="companyIdSearch">
-                                    <option value="" th:text="'(없음)'" th:selected="${selectedCompanyId == null}">
+                                    <option value="" th:text="#{errorhist.labels.select}"
+                                        th:selected="${selectedCompanyId == null}">
                                     </option>
                                     <option th:each="company : ${companyList}" th:value="${company.companyId}"
                                         th:text="${company.companyName}"
@@ -27,9 +31,11 @@
                             </div>
                             <div class="col d-flex align-items-center">
                                 <label for="manfCodeSearch"
-                                    class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">제조사</label>
+                                    class="flex-shrink-0 col-form-label font-weight-bold text-right w-25"><span
+                                        th:text="#{errorhist.labels.manfcode}"></span></label>
                                 <select id="manfCodeSearch" class="mx-3 form-control" name="manfCodeSearch">
-                                    <option value="" th:text="'(없음)'" th:selected="${selectedManfCd == null}"></option>
+                                    <option value="" th:text="#{errorhist.labels.select}"
+                                        th:selected="${selectedManfCd == null}"></option>
                                     <option th:each="data : ${manfCdList}" th:value="${data.commonCode}"
                                         th:text="${data.commonCodeName}"
                                         th:selected="${data.commonCode == selectedManfCd}"></option>
@@ -37,23 +43,26 @@
                             </div>
                             <div class="col d-flex align-items-center">
                                 <label for="opSearch"
-                                    class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">검색조건</label>
+                                    class="flex-shrink-0 col-form-label font-weight-bold text-right w-25"><span
+                                        th:text="#{errorhist.titles.search}"></span></label>
                                 <select id="opSearch" name="opSearch" class="ms-3 form-control w-40">
-                                    <option value="" th:selected="${selectedOpSearch == null}">선택</option>
-                                    <option value="stationName" th:text="충전소명"
+                                    <option value="" th:selected="${selectedOpSearch == null}"
+                                        th:text="#{errorhist.labels.select}"></option>
+                                    <option value="stationName" th:text="#{errorhist.labels.stationname}"
                                         th:selected="${selectedOpSearch == 'stationName'}"></option>
                                     </option>
-                                    <option value="chargerId" th:text="충전기ID"
+                                    <option value="chargerId" th:text="#{errorhist.labels.chargerid}"
                                         th:selected="${selectedOpSearch == 'chargerId'}"></option>
-                                    <option value="errcd" th:text="에러코드" th:selected="${selectedOpSearch == 'errcd'}">
+                                    <option value="errcd" th:text="#{errorhist.labels.errcd}"
+                                        th:selected="${selectedOpSearch == 'errcd'}">
                                     </option>
                                 </select>
                                 <input type="text" name="contentSearch" id="contentSearch" class="mx-2 form-control"
                                     th:value="${selectedContentSearch}" autocomplete="off">
                             </div>
                             <div class="col d-flex align-items-center">
-                                <span
-                                    class="flex-shrink-0 col-form-label font-weight-bold mr-3p text-right w-25">발생일시</span>
+                                <span class="flex-shrink-0 col-form-label font-weight-bold mr-3p text-right w-25"><span
+                                        th:text="#{errorhist.labels.occurdatetime}"></span></span>
                                 <input type="date" min="1970-01-01" max="2199-12-31" th:value="${selectedTimeFrom}"
                                     name="chgStartTimeFrom" id="chgStartTimeFrom" class="mx-3 form-control">
                                 <span class="flex-shrink-0 col-form-label font-weight-bold">~</span>
@@ -64,10 +73,12 @@
                         <div class="search-btn">
                             <button type="button" class="btn btn-outline-grey me-2" id="searchBtn"
                                 onclick="searchOption()">
-                                <i class="bi bi-search me-2"></i>검색</button>
+                                <i class="bi bi-search me-2"></i><span
+                                    th:text="#{errorhist.buttons.search}"></span></button>
                             <button type="button" class="btn btn-outline-grey me-2" id="resetBtn"
                                 onclick="replacePage('/history/error')">
-                                <i class="bi bi-arrow-repeat me-2"></i>초기화</button>
+                                <i class="bi bi-arrow-repeat me-2"></i><span
+                                    th:text="#{errorhist.buttons.reset}"></span></button>
                         </div>
                         <!-- row:1 end -->
                     </form>
@@ -80,12 +91,13 @@
             <div class="card card-shadow mt-4">
                 <!-- card body:3 start -->
                 <div class="card-body">
-                    <div class="card-title"><span class="card-title-bar"></span><span>에러이력</span></div>
+                    <div class="card-title"><span class="card-title-bar"></span><span
+                            th:text="#{errorhist.titles.errorlist}"></span></div>
                     <div class="mt-3 btn-page-area">
                         <span>
                             <span id="pageInfo">
                                 <span
-                                    th:text="'Page ' + (${currentPage + 1}) + ' of ' + ${totalPages} + ' [총 ' + ${totalCount} + '건]'"></span>
+                                    th:text="'Page ' + (${currentPage + 1}) + ' of ' + ${totalPages} + ' [' + ${totalCount} + ']'"></span>
                             </span>
                             <select class="mx-3 page-select" id="size" name="size">
                                 <option th:each="data : ${showListCnt}" th:value="${data.commonCode}"
@@ -99,14 +111,14 @@
                                 <thead>
                                     <tr class="table-border-top">
                                         <th scope="col">No</th>
-                                        <th scope="col">사업자</th>
-                                        <th scope="col">제조사</th>
-                                        <th scope="col">충전소명</th>
-                                        <th scope="col">충전기ID</th>
-                                        <th scope="col">커넥터ID</th>
-                                        <th scope="col">에러코드</th>
-                                        <th scope="col">에러명</th>
-                                        <th scope="col">발생일시</th>
+                                        <th scope="col"><span th:text="#{errorhist.labels.company}"></span></th>
+                                        <th scope="col"><span th:text="#{errorhist.labels.manfcode}"></span></th>
+                                        <th scope="col"><span th:text="#{errorhist.labels.stationname}"></span></th>
+                                        <th scope="col"><span th:text="#{errorhist.labels.chargerid}"></span></th>
+                                        <th scope="col"><span th:text="#{errorhist.labels.connectorid}"></span></th>
+                                        <th scope="col"><span th:text="#{errorhist.labels.errcd}"></span></th>
+                                        <th scope="col"><span th:text="#{errorhist.labels.errnm}"></span></th>
+                                        <th scope="col"><span th:text="#{errorhist.labels.occurdatetime}"></span></th>
                                     </tr>
                                 </thead>
                                 <tbody id="pageList">
@@ -124,7 +136,8 @@
                                         </td>
                                     </tr>
                                     <tr th:if="${errorHistList.size() == 0}">
-                                        <td colspan="9" class="text-center">정보가 없습니다.</td>
+                                        <td colspan="9" class="text-center"><span
+                                                th:text="#{errorhist.messages.nodata}"></span></td>
                                     </tr>
                                 </tbody>
                             </table>

@@ -4,12 +4,14 @@
     <div class="card responsive-content">
         <!-- card body:1 start -->
         <div class="card-body">
-            <div class="content-title"><i class="fa-solid fa-user-tie font-ico me-2"></i>회원관리 > 회원 리스트</div>
+            <div class="content-title" th:text="#{member.titles.main}"><i
+                    class="fa-solid fa-user-tie font-ico me-2"></i></div>
             <!-- card:2 start -->
             <div class="card card-shadow">
                 <!-- card body:2 start -->
                 <div class="card-body">
-                    <div class="card-title"><span class="card-title-bar"></span><span>검색조건</span></div>
+                    <div class="card-title"><span class="card-title-bar"></span><span
+                            th:text="#{member.titles.search}"></span></div>
                     <!-- form start -->
                     <form id="searchForm" class="position-relative" th:action="@{/member/list}" method="get">
                         <!-- row: start -->
@@ -26,25 +28,31 @@
                             </div> -->
                             <div class="col d-flex align-items-center">
                                 <label for="idTagSearch"
-                                    class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">회원카드번호</label>
+                                    class="flex-shrink-0 col-form-label font-weight-bold text-right w-25"
+                                    th:text="#{member.labels.membercard}"></label>
                                 <input type="text" name="idTagSearch" id="idTagSearch" class="mx-3 form-control"
-                                    placeholder="회원카드번호를 입력해주세요." th:value="${selectedIdTag}" autocomplete="off">
+                                    th:placeholder="#{member.placeholders.membercard}" th:value="${selectedIdTag}"
+                                    autocomplete="off">
                             </div>
                             <div class="col d-flex align-items-center">
                                 <label for="nameSearch"
-                                    class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">사용자명</label>
+                                    class="flex-shrink-0 col-form-label font-weight-bold text-right w-25"
+                                    th:text="#{member.labels.membername}"></label>
                                 <input type="text" name="nameSearch" id="nameSearch" class="mx-3 form-control"
-                                    placeholder="사용자명을 입력해주세요." th:value="${selectedName}" autocomplete="off">
+                                    th:placeholder="#{member.placeholders.membername}" th:value="${selectedName}"
+                                    autocomplete="off">
                             </div>
                         </div>
                         <!-- row: end -->
                         <div class="search-btn">
                             <button type="button" class="btn btn-outline-grey me-2" id="searchBtn"
                                 onclick="searchOption()">
-                                <i class="bi bi-search me-2"></i>검색</button>
+                                <i class="bi bi-search me-2"></i><span
+                                    th:text="#{member.buttons.search}"></span></button>
                             <button type="button" class="btn btn-outline-grey me-2" id="resetBtn"
                                 onclick="replacePage('/member/list')">
-                                <i class="bi bi-arrow-repeat me-2"></i>초기화</button>
+                                <i class="bi bi-arrow-repeat me-2"></i><span
+                                    th:text="#{member.buttons.reset}"></span></button>
                         </div>
                     </form>
                 </div>
@@ -59,22 +67,24 @@
                         <button class="btn btn-excel" id="excelBtn"
                             onclick="excelDownload('/excel/download/member_list', ['idTagSearch', 'nameSearch'])"
                             th:if="${menuAuthority.authority == 'SU' or menuAuthority.excelYn == 'Y'}">
-                            <i class="bi bi-file-earmark-spreadsheet"></i>엑셀다운로드</button>
+                            <i class="bi bi-file-earmark-spreadsheet"></i><span
+                                th:text="#{member.buttons.excel}"></span></button>
                         <div class="btn-mod" th:if="${menuAuthority.authority == 'SU' or menuAuthority.modYn == 'Y'}">
                             <button class="btn btn-data-add" id="addBtn" data-bs-toggle="modal"
                                 data-bs-target="#dataAddModal">
-                                <i class="bi bi-plus-square"></i>등록</button>
+                                <i class="bi bi-plus-square"></i><span th:text="#{member.buttons.reg}"></span></button>
                             <button class="btn btn-data-edit" id="editBtn" data-bs-toggle="modal"
                                 data-bs-target="#dataAddModal" hidden>
-                                <i class="fa-regular fa-pen-to-square"></i>수정</button>
+                                <i class="fa-regular fa-pen-to-square"></i><span
+                                    th:text="#{member.buttons.edit}"></span></button>
                             <button class="btn btn-data-delete" id="deleteBtn" hidden>
-                                <i class="bi bi-trash"></i>삭제</button>
+                                <i class="bi bi-trash"></i><span th:text="#{member.buttons.del}"></span></button>
                         </div>
                     </div>
                     <div class="page-container">
                         <span id="pageInfo">
                             <span
-                                th:text="'Page ' + (${currentPage + 1}) + ' of ' + ${totalPages} + ' [총 ' + ${totalCount} + '건]'"></span>
+                                th:text="'Page ' + (${currentPage + 1}) + ' of ' + ${totalPages} + ' [' + ${totalCount} + ']'"></span>
                         </span>
                         <select class="mx-3 page-select" id="size" name="size">
                             <option th:each="data : ${showListCnt}" th:value="${data.commonCode}"
@@ -89,13 +99,13 @@
                                         <th scope="col"></th>
                                         <th scope="col"></th>
                                         <th scope="col">No</th>
-                                        <th scope="col">사용자명</th>
-                                        <th scope="col">사용자ID</th>
-                                        <th scope="col">회원카드번호</th>
-                                        <th scope="col">휴대전화</th>
-                                        <th scope="col">이메일</th>
-                                        <th scope="col">개인/법인</th>
-                                        <th scope="col">가입일자</th>
+                                        <th scope="col" th:text="#{member.tables.membername}"></th>
+                                        <th scope="col" th:text="#{member.tables.memberid}"></th>
+                                        <th scope="col" th:text="#{member.tables.idtag}"></th>
+                                        <th scope="col" th:text="#{member.tables.cellnum}"></th>
+                                        <th scope="col" th:text="#{member.tables.email}"></th>
+                                        <th scope="col" th:text="#{member.tables.membertype}"></th>
+                                        <th scope="col" th:text="#{member.tables.joindate}"></th>
                                     </tr>
                                 </thead>
                                 <tbody id="pageList">
@@ -119,7 +129,7 @@
                                         <td th:text="${#temporals.format(member.joinedDt, 'yyyy-MM-dd HH:mm:ss')}"></td>
                                     </tr>
                                     <tr th:if="${memberList.size() == 0}">
-                                        <td colspan="10">조회된 데이터가 없습니다.</td>
+                                        <td colspan="10" th:text="#{member.tables.nodata}"></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -605,7 +615,15 @@
     <script th:inline="javascript">
         var creditCardList = /*[[${creditCardList}]]*/[];
         var bizTypeList = /*[[${bizTypeList}]]*/[];
+
+        var currentLanguage = /*[[${#locale.language}]]*/ 'ko';
     </script>
+
+    <!-- 공통 i18n 스크립트 포함 -->
+    <div th:replace="~{fragments/i18n/i18n-member :: member-i18n}"></div>
+
+    <!-- 언어 선택기 스크립트 -->
+    <div th:replace="~{fragments/language-selector :: language-script}"></div>
 </div>
 
 </html>

@@ -4,18 +4,21 @@
     <div class="card responsive-content">
         <!-- card body:1 start -->
         <div class="card-body">
-            <div class="content-title"><i class="fa-solid fa-gear font-ico me-2"></i>시스템 > 공지사항 관리</div>
+            <div class="content-title"><i class="fa-solid fa-gear font-ico me-2"></i><span
+                    th:text="#{noticeManagement.titles.main}"></span></div>
             <!-- card:2 start -->
             <div class="card card-shadow">
                 <!-- card body:2 start -->
                 <div class="card-body">
-                    <div class="card-title"><span class="card-title-bar"></span><span>공지사항</span></div>
+                    <div class="card-title"><span class="card-title-bar"></span><span
+                            th:text="#{noticeManagement.detail.title}"></span></div>
                     <div class="notice-detail-container">
                         <div>
                             <div th:text="|[${notice.typeName}] ${notice.title}|"></div>
                             <div>
-                                <span th:text="|작성자: ${notice.userName} &nbsp;&nbsp;&nbsp; 등록일:  ${#temporals.format(notice.regDt, 'yyyy.MM.dd')}|"></span>
-                                <span th:text="|조회: ${notice.views}|"></span>
+                                <span
+                                    th:text="|#{noticeManagement.detail.writer}: ${notice.userName} &nbsp;&nbsp;&nbsp; #{noticeManagement.detail.regDate}:  ${#temporals.format(notice.regDt, 'yyyy.MM.dd')}|"></span>
+                                <span th:text="|#{noticeManagement.detail.views}: ${notice.views}|"></span>
                             </div>
                         </div>
                         <div th:utext="${content}"></div>
@@ -28,7 +31,7 @@
                                     endDateSearch=${selectedEndDate != null ? selectedEndDate : ''})}"
                                     th:text="|[${nextNotice.typeName}] ${nextNotice.title}|" class="no-underline"></a>
                             </span>
-                            <span th:if="${nextNotice == null}">다음글이 없습니다.</span>
+                            <span th:if="${nextNotice == null}" th:text="#{noticeManagement.detail.noNext}"></span>
                         </div>
                         <div>
                             <i class="bi bi-caret-down me-2"></i>
@@ -37,12 +40,15 @@
                                     companyIdSearch=${selectedCompanyId != null ? selectedCompanyId : ''},
                                     startDateSearch=${selectedStartDate != null ? selectedStartDate : ''},
                                     endDateSearch=${selectedEndDate != null ? selectedEndDate : ''})}"
-                                    th:text="|[${previousNotice.typeName}] ${previousNotice.title}|" class="no-underline"></a>
+                                    th:text="|[${previousNotice.typeName}] ${previousNotice.title}|"
+                                    class="no-underline"></a>
                             </span>
-                            <span th:if="${previousNotice == null}">이전글이 없습니다.</span>
+                            <span th:if="${previousNotice == null}"
+                                th:text="#{noticeManagement.detail.noPrevious}"></span>
                         </div>
                         <button type="button" class="list-btn" onclick="goToList('/system/notice/list',
-                            ['companyIdSearch', 'startDateSearch', 'endDateSearch'])"> 목록 </button>
+                            ['companyIdSearch', 'startDateSearch', 'endDateSearch'])"> <span
+                                th:text="#{common.buttons.list}"></span> </button>
                     </div>
                 </div>
                 <!-- card body:2 end -->
@@ -52,5 +58,13 @@
         <!-- card body:1 end -->
     </div>
     <!-- card:1 end -->
+
+    <script th:inline="javascript">
+        var currentLanguage = /*[[${#locale.language}]]*/ 'ko';
+    </script>
+
+    <!-- 언어 선택기 스크립트 -->
+    <div th:replace="~{fragments/language-selector :: language-script}"></div>
 </div>
+
 </html>

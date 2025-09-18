@@ -1,28 +1,28 @@
-$(document).ready(function() {
+$(document).ready(function () {
     let modalCon = false;
-    let selectRow, btnMsg = "등록";
+    let selectRow, btnMsg = i18n.noticeManagement.modal.buttons.add;
     var idx;
 
-    $('#size').on('change', function() {
+    $('#size').on('change', function () {
         updatePageSize(this, "/system/notice/list", ["companyIdSearch", "startDateSearch", "endDateSearch"]);
     });
 
-    $('#pageList').on('click', 'tr', function() {
+    $('#pageList').on('click', 'tr', function () {
         selectRow = $(this);
         idx = selectRow.find('td').eq(0).attr('id');
         buttonControl($(this), `/system/notice/btncontrol/${idx}`);
     });
 
-    $('#addBtn').on('click', function() {
+    $('#addBtn').on('click', function () {
         modalCon = false;
-        btnMsg = "등록";
+        btnMsg = i18n.noticeManagement.modal.buttons.add;
         $('#modalBtn').text(btnMsg);
         $('#noticeForm')[0].reset();
     });
 
-    $(document).on('click', '#editBtn', function() {
+    $(document).on('click', '#editBtn', function () {
         modalCon = true;
-        btnMsg = "수정";
+        btnMsg = i18n.noticeManagement.modal.buttons.edit;
         $('#modalBtn').text(btnMsg);
 
         $.ajax({
@@ -30,7 +30,7 @@ $(document).ready(function() {
             url: `/system/notice/get/${idx}`,
             contentType: "application/json",
             dataType: 'json',
-            success: function(data) {
+            success: function (data) {
                 $('#type').val(data.type || '');
                 $('#title').val(data.title || '');
                 $('#content').val(data.content || '');
@@ -40,28 +40,28 @@ $(document).ready(function() {
         });
     });
 
-    $(document).on('click', '#deleteBtn', function() {
-        btnMsg = "삭제";
+    $(document).on('click', '#deleteBtn', function () {
+        btnMsg = i18n.noticeManagement.modal.buttons.delete;
 
-        if(confirmSubmit(btnMsg)) {
+        if (confirmSubmit(btnMsg)) {
             $.ajax({
                 type: 'PATCH',
                 url: `/system/notice/delete/${idx}`,
-                success: function(response) {
+                success: function (response) {
                     alert(response);
                     window.location.reload();
                 },
-                error: function(xhr, status, error) {
+                error: function (xhr, status, error) {
                     alert(xhr.responseText);
                 }
             });
         }
     });
 
-    $('#modalBtn').on('click', function(event) {
+    $('#modalBtn').on('click', function (event) {
         event.preventDefault();
 
-        if(confirmSubmit(btnMsg)) {
+        if (confirmSubmit(btnMsg)) {
             const DATA = {
                 type: $('#type').val(),
                 title: $('#title').val(),
@@ -69,7 +69,7 @@ $(document).ready(function() {
                 startDate: $('#startDate').val(),
                 endDate: $('#endDate').val()
             }
-            
+
             const URL = modalCon ? `/system/notice/update/${idx}` : `/system/notice/new`;
             const TYPE = modalCon ? 'PATCH' : 'POST';
 
@@ -78,11 +78,11 @@ $(document).ready(function() {
                 url: URL,
                 data: JSON.stringify(DATA),
                 contentType: "application/json",
-                success: function(response) {
+                success: function (response) {
                     alert(response);
                     window.location.reload();
                 },
-                error: function(xhr, status, error) {
+                error: function (xhr, status, error) {
                     alert(xhr.responseText);
                 }
             });

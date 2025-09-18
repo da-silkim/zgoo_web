@@ -7,6 +7,8 @@ import java.time.format.DateTimeParseException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -31,6 +33,7 @@ import zgoo.cpos.service.NoticeService;
 public class NoticeController {
 
     private final NoticeService noticeService;
+    private final MessageSource messageSource;
 
     // 공지사항 - 등록
     @PostMapping("/new")
@@ -39,11 +42,13 @@ public class NoticeController {
 
         try {
             this.noticeService.saveNotice(dto, principal.getName());
-            return ResponseEntity.ok("공지사항이 정상적으로 등록되었습니다.");
+            return ResponseEntity.ok(messageSource.getMessage("noticeManagement.api.registerSuccess", null,
+                    LocaleContextHolder.getLocale()));
         } catch (Exception e) {
             log.error("[createNotice] error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("공지사항 등록 중 오류가 발생했습니다.");
+                    .body(messageSource.getMessage("noticeManagement.api.registerError", null,
+                            LocaleContextHolder.getLocale()));
         }
     }
 
@@ -130,16 +135,19 @@ public class NoticeController {
             if (idx == null) {
                 log.error("[updateNotice] noticeId is null");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body("공지사항 ID값이 누락됐습니다.");
+                        .body(messageSource.getMessage("noticeManagement.api.noticeIdNotFound", null,
+                                LocaleContextHolder.getLocale()));
             }
             dto.setIdx(idx);
 
             this.noticeService.updateNotice(dto, principal.getName());
-            return ResponseEntity.ok("공지사항이 정상적으로 수정되었습니다.");
+            return ResponseEntity.ok(messageSource.getMessage("noticeManagement.api.updateSuccess", null,
+                    LocaleContextHolder.getLocale()));
         } catch (Exception e) {
             log.error("[updateNotice] error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("공지사항 수정 중 오류가 발생했습니다.");
+                    .body(messageSource.getMessage("noticeManagement.api.updateError", null,
+                            LocaleContextHolder.getLocale()));
         }
     }
 
@@ -152,14 +160,17 @@ public class NoticeController {
             if (idx == null) {
                 log.error("[deleteNotice] noticeId is null");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body("공지사항 ID값이 누락됐습니다.");
+                        .body(messageSource.getMessage("noticeManagement.api.noticeIdNotFound", null,
+                                LocaleContextHolder.getLocale()));
             }
             this.noticeService.deleteNotice(idx, principal.getName());
-            return ResponseEntity.ok("공지사항이 정상적으로 삭제되었습니다.");
+            return ResponseEntity.ok(messageSource.getMessage("noticeManagement.api.deleteSuccess", null,
+                    LocaleContextHolder.getLocale()));
         } catch (Exception e) {
             log.error("[deleteNotice] error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("공지사항 삭제 중 오류가 발생했습니다.");
+                    .body(messageSource.getMessage("noticeManagement.api.deleteError", null,
+                            LocaleContextHolder.getLocale()));
         }
     }
 
@@ -175,7 +186,8 @@ public class NoticeController {
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             log.error("[NoticeController >> buttonControl] error: {}", e.getMessage());
-            response.put("message", "버튼 권한 확인 중 오류가 발생했습니다.");
+            response.put("message", messageSource.getMessage("noticeManagement.api.buttonAuthError", null,
+                    LocaleContextHolder.getLocale()));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }

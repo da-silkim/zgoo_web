@@ -14,7 +14,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
         integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
-
     <script src="https://code.jquery.com/jquery-3.4.1.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-treemap"></script>
@@ -28,11 +27,11 @@
         src="//dapi.kakao.com/v2/maps/sdk.js?appkey=2627a1d15418d5bd6f92dfadded8a675&libraries=services"></script>
     <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
     <script lang="javascript" src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
-    <script type="text/javascript" th:src="@{/js/common.js}"></script>
     <script type="text/javascript" th:src="@{/js/table.js}"></script>
     <script th:inline="javascript">
         var menuAuthority = /*[[${menuAuthority != null ? menuAuthority : '{}'}]]*/ {};
     </script>
+
 </head>
 
 <body>
@@ -50,6 +49,7 @@
             <div th:replace="~{fragments/ffooter :: footerFragment}"></div>
         </div>
     </div>
+    <script type="text/javascript" th:src="@{/js/common.js}"></script>
 </body>
 
 </html>

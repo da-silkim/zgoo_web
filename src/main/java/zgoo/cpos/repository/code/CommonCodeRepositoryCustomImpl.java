@@ -12,6 +12,7 @@ import zgoo.cpos.domain.code.CommonCode;
 import zgoo.cpos.domain.code.QCommonCode;
 import zgoo.cpos.domain.code.QGrpCode;
 import zgoo.cpos.dto.code.CodeDto.CommCdBaseDto;
+import zgoo.cpos.util.LocaleUtil;
 
 @RequiredArgsConstructor
 public class CommonCodeRepositoryCustomImpl implements CommonCodeRepositoryCustom {
@@ -80,7 +81,8 @@ public class CommonCodeRepositoryCustomImpl implements CommonCodeRepositoryCusto
                                 .select(Projections.fields(CommCdBaseDto.class,
                                                 commonCode.group.grpCode.as("grpCode"),
                                                 commonCode.commonCode.as("commonCode"),
-                                                commonCode.name.as("commonCodeName")))
+                                                LocaleUtil.isEnglish() ? commonCode.nameEn.as("commonCodeName")
+                                                                : commonCode.name.as("commonCodeName")))
                                 .from(commonCode)
                                 .where(commonCode.group.grpCode.eq(grpcode))
                                 .fetch();
@@ -134,15 +136,16 @@ public class CommonCodeRepositoryCustomImpl implements CommonCodeRepositoryCusto
         public List<CommCdBaseDto> commonCodeStringSort(String grpcode) {
                 return queryFactory
                                 .select(Projections.fields(CommCdBaseDto.class,
-                                        commonCode.group.grpCode.as("grpCode"),
-                                        commonCode.commonCode.as("commonCode"),
-                                        commonCode.name.as("commonCodeName")))
+                                                commonCode.group.grpCode.as("grpCode"),
+                                                commonCode.commonCode.as("commonCode"),
+                                                LocaleUtil.isEnglish() ? commonCode.nameEn.as("commonCodeName")
+                                                                : commonCode.name.as("commonCodeName")))
                                 .from(commonCode)
                                 .where(commonCode.group.grpCode.eq(grpcode))
                                 .orderBy(
-                                        Expressions.numberTemplate(Integer.class, "LENGTH({0})", commonCode.commonCode).asc(),
-                                        commonCode.commonCode.asc()
-                                )
+                                                Expressions.numberTemplate(Integer.class, "LENGTH({0})",
+                                                                commonCode.commonCode).asc(),
+                                                commonCode.commonCode.asc())
                                 .fetch();
         }
 
@@ -152,10 +155,11 @@ public class CommonCodeRepositoryCustomImpl implements CommonCodeRepositoryCusto
                                 .select(Projections.fields(CommCdBaseDto.class,
                                                 commonCode.group.grpCode.as("grpCode"),
                                                 commonCode.commonCode.as("commonCode"),
-                                                commonCode.name.as("commonCodeName")))
+                                                LocaleUtil.isEnglish() ? commonCode.nameEn.as("commonCodeName")
+                                                                : commonCode.name.as("commonCodeName")))
                                 .from(commonCode)
                                 .where(commonCode.group.grpCode.eq(grpcode)
-                                        .and(commonCode.commonCode.ne("SU")))
+                                                .and(commonCode.commonCode.ne("SU")))
                                 .fetch();
         }
 
@@ -169,12 +173,12 @@ public class CommonCodeRepositoryCustomImpl implements CommonCodeRepositoryCusto
                         builder.and(commonCode.commonCode.ne("SU"));
                 }
 
-
                 return queryFactory
                                 .select(Projections.fields(CommCdBaseDto.class,
                                                 commonCode.group.grpCode.as("grpCode"),
                                                 commonCode.commonCode.as("commonCode"),
-                                                commonCode.name.as("commonCodeName")))
+                                                LocaleUtil.isEnglish() ? commonCode.nameEn.as("commonCodeName")
+                                                                : commonCode.name.as("commonCodeName")))
                                 .from(commonCode)
                                 .where(builder)
                                 .fetch();

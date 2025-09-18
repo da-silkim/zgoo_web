@@ -4,40 +4,45 @@
     <div class="card responsive-content">
         <!-- card body:1 start -->
         <div class="card-body">
-            <div class="content-title"><i class="fa-solid fa-chart-simple me-2"></i>통계 > 이용률 통계</div>
+            <div class="content-title"><i class="fa-solid fa-chart-simple me-2"></i><span
+                    th:text="#{pns.titles.usage}"></span></div>
             <!-- card:2 start -->
             <div class="card card-shadow">
                 <!-- card body:2 start -->
                 <div class="card-body">
-                    <div class="card-title"><span class="card-title-bar"></span><span>검색조건</span></div>
+                    <div class="card-title"><span class="card-title-bar"></span><span
+                            th:text="#{pns.titles.search}"></span></div>
                     <!-- form start -->
                     <form id="searchForm" class="statistics-form" th:action="@{/statistics/usage}" method="get">
                         <div class="row">
                             <div class="col-12 search-table">
-                                <label for="companyIdSearch" class="col-form-label">사업자<b>*</b></label>
+                                <label for="companyIdSearch" class="col-form-label"><span
+                                        th:text="#{pns.labels.company}"></span><b>*</b></label>
                                 <select id="companyIdSearch" class="mx-3 form-control" name="companyIdSearch">
-                                    <option th:value="*{null}" th:text="'선택'"></option>
+                                    <option th:value="*{null}" th:text="#{pns.labels.select}"></option>
                                     <option th:each="company : ${companyList}" th:value="${company.companyId}"
                                         th:text="${company.companyName}"
                                         th:selected="${company.companyId == selectedCompanyId}"></option>
                                 </select>
                             </div>
                             <div class="col-12 search-table">
-                                <label for="opSearch" class="col-form-label">검색조건<b>*</b></label>
+                                <label for="opSearch" class="col-form-label"><span
+                                        th:text="#{pns.titles.search}"></span><b>*</b></label>
                                 <select id="opSearch" class="ms-3 form-control" name="opSearch">
-                                    <option th:value="*{null}" th:text="'선택'"></option>
-                                    <option th:value="'stationName'" th:text="충전소명"
+                                    <option th:value="*{null}" th:text="#{pns.labels.select}"></option>
+                                    <option th:value="'stationName'" th:text="#{pns.labels.stationnm}"
                                         th:selected="${selectedOpSearch == 'stationName'}"></option>
-                                    <option th:value="'stationId'" th:text="충전소ID"
+                                    <option th:value="'stationId'" th:text="#{pns.labels.stationid}"
                                         th:selected="${selectedOpSearch == 'stationId'}"></option>
-                                    <option th:value="'chargerId'" th:text="충전기ID"
+                                    <option th:value="'chargerId'" th:text="#{pns.labels.chargerid}"
                                         th:selected="${selectedOpSearch == 'chargerId'}"></option>
                                 </select>
                                 <input type="text" id="contentSearch" name="contentSearch" class="form-control"
                                     th:value="${selectedContentSearch}" autocomplete="off" />
                             </div>
                             <div class="col-12 search-table">
-                                <label for="yearSearch" class="col-form-label">조회연도<b>*</b></label>
+                                <label for="yearSearch" class="col-form-label"><span
+                                        th:text="#{pns.labels.searchyear}"></span><b>*</b></label>
                                 <select id="yearSearch" name="yearSearch" class="form-control mx-3">
                                     <option th:each="year : ${yearOption}" th:value="${year.value}"
                                         th:text="${year.text}" th:selected="${year.value == selectedYear}"></option>
@@ -46,10 +51,11 @@
                         </div>
                         <div>
                             <button type="submit" class="btn btn-outline-grey me-2" id="serachBtn">
-                                <i class="bi bi-search me-2"></i>검색</button>
+                                <i class="bi bi-search me-2"></i><span th:text="#{pns.buttons.search}"></span></button>
                             <button type="button" class="btn btn-outline-grey me-2" id="resetBtn"
                                 onclick="replacePage('/statistics/usage')">
-                                <i class="bi bi-arrow-repeat me-2"></i>초기화</button>
+                                <i class="bi bi-arrow-repeat me-2"></i><span
+                                    th:text="#{pns.buttons.reset}"></span></button>
                         </div>
                     </form>
                     <!-- form end -->
@@ -64,22 +70,23 @@
                     <!-- 조회연도 메출통계 -->
                     <div class="card-title">
                         <span class="card-title-bar"></span>
-                        <span th:text="|조회연도 이용률 통계(${usage.curYear.year}년)|"></span>
+                        <span th:text="|#{pns.titles.usagetotofyear}(${usage.curYear.year})|"></span>
                     </div>
                     <div class="w-100 table-responsive position-relative">
                         <table class="table text-center mt-2 table-bg">
                             <thead>
                                 <tr class="table-border-top">
                                     <th scope="col" class="w-20"></th>
-                                    <th scope="col">급속</th>
-                                    <th scope="col">완속</th>
-                                    <th scope="col">디스펜서</th>
-                                    <th scope="col">합계</th>
+                                    <th scope="col"><span th:text="#{chart.labels.fast}"></span></th>
+                                    <th scope="col"><span th:text="#{chart.labels.slow}"></span></th>
+                                    <th scope="col"><span th:text="#{chart.labels.dispenser}"></span></th>
+                                    <th scope="col"><span th:text="#{pns.labels.total}"></span></th>
                                 </tr>
                             </thead>
                             <tbody id="pageList">
                                 <tr>
-                                    <th style="background-color: #f5f7f8;">전체 충전 횟수</th>
+                                    <th style="background-color: #f5f7f8;"><span
+                                            th:text="#{pns.labels.totchargingcnt}"></span></th>
                                     <td th:text="${usage.curYear.fastCount}"></td>
                                     <td th:text="${usage.curYear.lowCount}"></td>
                                     <td th:text="${usage.curYear.despnCount}"></td>
@@ -92,7 +99,8 @@
                         <canvas id="lineChart"></canvas>
                     </div>
                     <!-- 전연도 데이터 비교 -->
-                    <div class="card-title mt-4"><span class="card-title-bar"></span><span>전연도 데이터 비교</span></div>
+                    <div class="card-title mt-4"><span class="card-title-bar"></span><span
+                            th:text="#{pns.labels.comparewithpreviousyear}"></span></div>
                     <div class="statistics-chart">
                         <canvas id="barChart"></canvas>
                     </div>
@@ -108,15 +116,37 @@
         var usage = /*[[${usage != null ? usage : '{}'}]]*/ {};
         var lineChartData = /*[[${lineChart != null ? lineChart : '{}'}]]*/ {};
 
+        // 리소스 메시지를 JavaScript 변수로 설정
+        const monthLabels = {
+            january: /*[[#{chart.month.january}]]*/ '1월',
+            february: /*[[#{chart.month.february}]]*/ '2월',
+            march: /*[[#{chart.month.march}]]*/ '3월',
+            april: /*[[#{chart.month.april}]]*/ '4월',
+            may: /*[[#{chart.month.may}]]*/ '5월',
+            june: /*[[#{chart.month.june}]]*/ '6월',
+            july: /*[[#{chart.month.july}]]*/ '7월',
+            august: /*[[#{chart.month.august}]]*/ '8월',
+            september: /*[[#{chart.month.september}]]*/ '9월',
+            october: /*[[#{chart.month.october}]]*/ '10월',
+            november: /*[[#{chart.month.november}]]*/ '11월',
+            december: /*[[#{chart.month.december}]]*/ '12월'
+        };
+
+        const chartLabels = {
+            fast: /*[[#{chart.labels.fast}]]*/ '급속',
+            slow: /*[[#{chart.labels.slow}]]*/ '완속',
+            dispenser: /*[[#{chart.labels.dispenser}]]*/ '디스펜서'
+        };
+
         // line Chart
         const speedFastList = lineChartData.speedFastList.map(item => item.totalUsage);
         const speedLowList = lineChartData.speedLowList.map(item => item.totalUsage);
         const speedDespnList = lineChartData.speedDespnList.map(item => item.totalUsage);
 
         const lineChartConfig = [
-            { label: '급속', data: speedFastList, color: '#379C6D' },
-            { label: '완속', data: speedLowList, color: '#E58A10' },
-            { label: '디스펜서', data: speedDespnList, color: '#EFEFEF' }
+            { label: chartLabels.fast, data: speedFastList, color: '#379C6D' },
+            { label: chartLabels.slow, data: speedLowList, color: '#E58A10' },
+            { label: chartLabels.dispenser, data: speedDespnList, color: '#3366CC' }
         ];
 
         const lineDatasets = lineChartConfig.map(item => ({
@@ -127,8 +157,15 @@
             fill: false
         }));
 
+        // 월별 라벨 생성 (한글일 때는 "월" 추가, 영문일 때는 월 추가 안함)
+        const monthArray = [
+            monthLabels.january, monthLabels.february, monthLabels.march, monthLabels.april,
+            monthLabels.may, monthLabels.june, monthLabels.july, monthLabels.august,
+            monthLabels.september, monthLabels.october, monthLabels.november, monthLabels.december
+        ];
+
         const lineData = {
-            labels: [...Array(12).keys()].map(i => `${i + 1}월`),
+            labels: monthArray,
             datasets: lineDatasets
         }
 
@@ -169,9 +206,9 @@
 
         // bar Chart
         const barCharConfig = [
-            { label: '급속', data: [usage.preYear.fastCount, usage.curYear.fastCount], color: '#379C6D' },
-            { label: '완속', data: [usage.preYear.lowCount, usage.curYear.lowCount], color: '#E58A10' },
-            { label: '디스펜서', data: [usage.preYear.despnCount, usage.curYear.despnCount], color: '#EFEFEF' }
+            { label: chartLabels.fast, data: [usage.preYear.fastCount, usage.curYear.fastCount], color: '#379C6D' },
+            { label: chartLabels.slow, data: [usage.preYear.lowCount, usage.curYear.lowCount], color: '#E58A10' },
+            { label: chartLabels.dispenser, data: [usage.preYear.despnCount, usage.curYear.despnCount], color: '#3366CC' }
         ];
 
         const barDatasets = barCharConfig.map(item => ({
@@ -215,6 +252,7 @@
             }
         });
     </script>
+    <div th:replace="~{fragments/language-selector :: language-script}"></div>
 </div>
 
 </html>

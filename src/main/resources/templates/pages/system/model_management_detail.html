@@ -4,52 +4,63 @@
     <div class="card responsive-content">
         <!-- card body:1 start -->
         <div class="card-body">
-            <div class="content-title"><i class="fa-solid fa-gear font-ico me-2"></i>시스템 > 모델관리</div>
+            <div class="content-title"><i class="fa-solid fa-gear font-ico me-2"></i><span
+                    th:text="#{modelManagement.mainTitle}"></span></div>
             <!-- card:2 start -->
             <div class="card card-shadow">
                 <!-- card body:2 start -->
                 <div class="card-body">
                     <div class="detail-container">
                         <!-- table:1 start -->
-                        <div class="card-title mb-2"><span class="card-title-bar"></span><span>모델 정보</span></div>
+                        <div class="card-title mb-2"><span class="card-title-bar"></span><span
+                                th:text="#{modelManagement.modal.titles.modelInfo}"></span></div>
                         <table class="table table-bg-v table-fixed w-100 text-center align-middle">
                             <tbody>
                                 <tr class="table-border-top">
-                                    <th class="w-20">제조사<b class="required-data">*</b></th>
+                                    <th class="w-20"><span th:text="#{modelManagement.modal.labels.manuf}"></span><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <span th:text="${cpModel.manufCdName}"></span>
                                     </td>
-                                    <th class="w-20">출력(kW)<b class="required-data">*</b></th>
+                                    <th class="w-20"><span th:text="#{modelManagement.modal.labels.output}"></span><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <span th:text="${cpModel.powerUnit}"></span>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="w-20">모델명<b class="required-data">*</b></th>
+                                    <th class="w-20"><span th:text="#{modelManagement.modal.labels.modelName}"></span><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <span th:text="${cpModel.modelName}"></span>
                                     </td>
-                                    <th class="w-20">모델코드<b class="required-data">*</b></th>
+                                    <th class="w-20"><span th:text="#{modelManagement.modal.labels.modelCode}"></span><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <span th:text="${cpModel.modelCode}"></span>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="w-20">충전기유형<b class="required-data">*</b></th>
+                                    <th class="w-20"><span
+                                            th:text="#{modelManagement.modal.labels.chargerType}"></span><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <span th:text="${cpModel.cpTypeName}"></span>
                                     </td>
-                                    <th class="w-20">설치유형<b class="required-data">*</b></th>
+                                    <th class="w-20"><span
+                                            th:text="#{modelManagement.modal.labels.installationType}"></span><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <span th:text="${cpModel.installationTypeName}"></span>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="w-20">듀얼채널여부<b class="required-data">*</b></th>
+                                    <th class="w-20"><span th:text="#{modelManagement.modal.labels.dualYn}"></span><b
+                                            class="required-data">*</b></th>
                                     <td colspan="3">
                                         <div class="display-radio">
-                                            <input type="radio" name="dualYn" id="dualYes" class="attr-control" value="Y"
-                                                th:checked="${cpModel.dualYn == 'Y'}" disabled>
+                                            <input type="radio" name="dualYn" id="dualYes" class="attr-control"
+                                                value="Y" th:checked="${cpModel.dualYn == 'Y'}" disabled>
                                             <label for="dualYes">Y</label>
                                             <input type="radio" name="dualYn" id="dualNo" class="attr-control" value="N"
                                                 th:checked="${cpModel.dualYn == 'N'}" disabled>
@@ -61,7 +72,8 @@
                         </table>
                         <!-- table:1 end -->
                         <!-- table:2 start -->
-                        <div class="card-title mb-2"><span class="card-title-bar"></span><span>커넥터 정보</span></div>
+                        <div class="card-title mb-2"><span class="card-title-bar"></span><span
+                                th:text="#{modelManagement.modal.titles.connectorInfo}"></span></div>
                         <table class="table table-bg table-fixed w-100 text-center align-middle" id="connectorTable">
                             <thead>
                                 <tr class="table-border-top" style="vertical-align: middle;">
@@ -81,55 +93,66 @@
                         </table>
                         <!-- table:2 end -->
                         <!-- table:3 start -->
-                        <div class="card-title mb-2"><span class="card-title-bar"></span><span>모델상세 정보</span></div>
+                        <div class="card-title mb-2"><span class="card-title-bar"></span><span
+                                th:text="#{modelManagement.modal.titles.modelDetailInfo}"></span></div>
                         <table class="table table-bg-v table-fixed w-100 text-center align-middle">
                             <tbody>
                                 <tr class="table-border-top">
-                                    <th class="w-20">AC입력전압(V)</th>
+                                    <th class="w-20"><span
+                                            th:text="#{modelManagement.modal.labels.acinputvoltage}"></span></th>
                                     <td class="w-30">
                                         <span th:text="${cpModel.inputVoltage}"></span>
                                     </td>
-                                    <th class="w-20">입력주파수(Hz)</th>
+                                    <th class="w-20"><span
+                                            th:text="#{modelManagement.modal.labels.inputfrequency}"></span></th>
                                     <td class="w-30">
                                         <span th:text="${cpModel.inputFrequency}"></span>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="w-20">입력타입(P)</th>
+                                    <th class="w-20"><span th:text="#{modelManagement.modal.labels.inputtype}"></span>
+                                    </th>
                                     <td class="w-30">
                                         <span th:text="${cpModel.inputType}"></span>
                                     </td>
-                                    <th class="w-20">입력전류(A)</th>
+                                    <th class="w-20"><span th:text="#{modelManagement.modal.labels.inputcurr}"></span>
+                                    </th>
                                     <td class="w-30">
                                         <span th:text="${cpModel.inputCurr}"></span>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="w-20">입력전원(kVA)</th>
+                                    <th class="w-20"><span th:text="#{modelManagement.modal.labels.inputpower}"></span>
+                                    </th>
                                     <td class="w-30">
                                         <span th:text="${cpModel.inputPower}"></span>
                                     </td>
-                                    <th class="w-20">역률(PF)</th>
+                                    <th class="w-20"><span th:text="#{modelManagement.modal.labels.powerfactor}"></span>
+                                    </th>
                                     <td class="w-30">
                                         <span th:text="${cpModel.powerFactorToString}"></span>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="w-20">DC출력전압(V)</th>
+                                    <th class="w-20"><span
+                                            th:text="#{modelManagement.modal.labels.dcoutputvoltage}"></span></th>
                                     <td class="w-30">
                                         <span th:text="${cpModel.outputVoltage}"></span>
                                     </td>
-                                    <th class="w-20">최대출력전류(A)</th>
+                                    <th class="w-20"><span
+                                            th:text="#{modelManagement.modal.labels.maxoutputcurr}"></span></th>
                                     <td class="w-30">
                                         <span th:text="${cpModel.maxOutputCurr}"></span>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="w-20">정격출력(kW)</th>
+                                    <th class="w-20"><span th:text="#{modelManagement.modal.labels.ratedpower}"></span>
+                                    </th>
                                     <td class="w-30">
                                         <span th:text="${cpModel.ratedPower}"></span>
                                     </td>
-                                    <th class="w-20">최고효율(%)</th>
+                                    <th class="w-20"><span
+                                            th:text="#{modelManagement.modal.labels.peakefficiency}"></span></th>
                                     <td class="w-30">
                                         <span th:text="${cpModel.peakEfficiencyToString}"></span>
                                     </td>
@@ -138,125 +161,144 @@
                         </table>
                         <!-- table:3 end -->
                         <!-- table:4 start -->
-                        <div class="card-title mb-2"><span class="card-title-bar"></span><span>모델상세 부가정보</span></div>
+                        <div class="card-title mb-2"><span class="card-title-bar"></span><span
+                                th:text="#{modelManagement.modal.titles.modelDetailAddInfo}"></span></div>
                         <table class="table table-bg-v table-fixed w-100 text-center align-middle">
                             <tbody>
                                 <tr class="table-border-top">
-                                    <th class="w-20">THDi(%)</th>
+                                    <th class="w-20"><span th:text="#{modelManagement.modal.labels.thdi}"></span></th>
                                     <td class="w-30">
                                         <span th:text="${cpModel.thdi}"></span>
                                     </td>
-                                    <th class="w-20">접지형</th>
+                                    <th class="w-20"><span th:text="#{modelManagement.modal.labels.grdtype}"></span>
+                                    </th>
                                     <td class="w-30">
                                         <span th:text="${cpModel.grdType}"></span>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="w-20">작동고도(m)</th>
+                                    <th class="w-20"><span th:text="#{modelManagement.modal.labels.opaltitude}"></span>
+                                    </th>
                                     <td class="w-30">
                                         <span th:text="${cpModel.opAltitude}"></span>
                                     </td>
-                                    <th class="w-20">작동온도</th>
+                                    <th class="w-20"><span
+                                            th:text="#{modelManagement.modal.labels.optemperature}"></span></th>
                                     <td class="w-30">
                                         <span th:text="${cpModel.opTemperature}"></span>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="w-20">온도감소율</th>
+                                    <th class="w-20"><span
+                                            th:text="#{modelManagement.modal.labels.temperaturederating}"></span></th>
                                     <td class="w-30">
                                         <span th:text="${cpModel.temperatureDerating}"></span>
                                     </td>
-                                    <th class="w-20">보관온도범위(˚C)</th>
+                                    <th class="w-20"><span
+                                            th:text="#{modelManagement.modal.labels.storagetemperaturerange}"></span>
+                                    </th>
                                     <td class="w-30">
                                         <span th:text="${cpModel.storageTemperatureRange}"></span>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="w-20">습도(%)</th>
+                                    <th class="w-20"><span th:text="#{modelManagement.modal.labels.humidity}"></span>
+                                    </th>
                                     <td class="w-30">
                                         <span th:text="${cpModel.humidity}"></span>
                                     </td>
-                                    <th class="w-20">치수(mm)</th>
+                                    <th class="w-20"><span th:text="#{modelManagement.modal.labels.dimensions}"></span>
+                                    </th>
                                     <td class="w-30">
                                         <span th:text="${cpModel.dimensions}"></span>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="w-20">IP & IK 등급</th>
+                                    <th class="w-20"><span th:text="#{modelManagement.modal.labels.ipnik}"></span></th>
                                     <td class="w-30">
                                         <span th:text="${cpModel.ipNIk}"></span>
                                     </td>
-                                    <th class="w-20">무게(kg)</th>
+                                    <th class="w-20"><span th:text="#{modelManagement.modal.labels.weight}"></span></th>
                                     <td class="w-30">
                                         <span th:text="${cpModel.weight}"></span>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="w-20">재질</th>
+                                    <th class="w-20"><span th:text="#{modelManagement.modal.labels.material}"></span>
+                                    </th>
                                     <td class="w-30">
                                         <span th:text="${cpModel.material}"></span>
                                     </td>
-                                    <th class="w-20">케이블 길이(m)</th>
+                                    <th class="w-20"><span th:text="#{modelManagement.modal.labels.cablelength}"></span>
+                                    </th>
                                     <td class="w-30">
                                         <span th:text="${cpModel.cableLength}"></span>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="w-20">화면</th>
+                                    <th class="w-20"><span th:text="#{modelManagement.modal.labels.screen}"></span></th>
                                     <td class="w-30">
                                         <span th:text="${cpModel.screen}"></span>
                                     </td>
-                                    <th class="w-20">RFID Reader</th>
+                                    <th class="w-20"><span th:text="#{modelManagement.modal.labels.rfid}"></span></th>
                                     <td class="w-30">
                                         <span th:text="${cpModel.rfid}"></span>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="w-20">비상버튼</th>
+                                    <th class="w-20"><span
+                                            th:text="#{modelManagement.modal.labels.emergencybtn}"></span></th>
                                     <td class="w-30">
                                         <span th:text="${cpModel.emergencyBtn}"></span>
                                     </td>
-                                    <th class="w-20">통신인터페이스</th>
+                                    <th class="w-20"><span
+                                            th:text="#{modelManagement.modal.labels.communicationinterface}"></span>
+                                    </th>
                                     <td class="w-30">
                                         <span th:text="${cpModel.communicationInterface}"></span>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="w-20">언어</th>
+                                    <th class="w-20"><span th:text="#{modelManagement.modal.labels.lang}"></span></th>
                                     <td class="w-30">
                                         <span th:text="${cpModel.lang}"></span>
                                     </td>
-                                    <th class="w-20">냉각방식</th>
+                                    <th class="w-20"><span
+                                            th:text="#{modelManagement.modal.labels.coolingmethod}"></span></th>
                                     <td class="w-30">
                                         <span th:text="${cpModel.coolingMethod}"></span>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="w-20">EMC</th>
+                                    <th class="w-20"><span th:text="#{modelManagement.modal.labels.emc}"></span></th>
                                     <td class="w-30">
                                         <span th:text="${cpModel.emc}"></span>
                                     </td>
-                                    <th class="w-20">보호장치</th>
+                                    <th class="w-20"><span th:text="#{modelManagement.modal.labels.protection}"></span>
+                                    </th>
                                     <td class="w-30">
                                         <span th:text="${cpModel.protection}"></span>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="w-20">옵션기능</th>
+                                    <th class="w-20"><span th:text="#{modelManagement.modal.labels.opfunc}"></span></th>
                                     <td class="w-30">
                                         <span th:text="${cpModel.opFunc}"></span>
                                     </td>
-                                    <th class="w-20">표준</th>
+                                    <th class="w-20"><span th:text="#{modelManagement.modal.labels.standard}"></span>
+                                    </th>
                                     <td class="w-30">
                                         <span th:text="${cpModel.standard}"></span>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="w-20">전력모듈</th>
+                                    <th class="w-20"><span th:text="#{modelManagement.modal.labels.powermodule}"></span>
+                                    </th>
                                     <td class="w-30">
                                         <span th:text="${cpModel.powerModule}"></span>
                                     </td>
-                                    <th class="w-20">충전기</th>
+                                    <th class="w-20"><span th:text="#{modelManagement.modal.labels.charger}"></span>
+                                    </th>
                                     <td class="w-30">
                                         <span th:text="${cpModel.charger}"></span>
                                     </td>
@@ -265,7 +307,8 @@
                         </table>
                         <!-- table:4 end -->
                         <button type="button" class="list-btn" onclick="goToList('/system/model/list',
-                            ['companyIdSearch', 'manfCdSearch', 'chgSpeedCdSearch'])"> 목록 </button>
+                            ['companyIdSearch', 'manfCdSearch', 'chgSpeedCdSearch'])"><span
+                                th:text="#{common.buttons.list}"></span></button>
                     </div>
                 </div>
                 <!-- card body:2 end -->
@@ -275,5 +318,12 @@
         <!-- card body:1 end -->
     </div>
     <!-- card:1 end -->
+
+    <!-- 공통 i18n 스크립트 포함 -->
+    <div th:replace="~{fragments/i18n/i18n-model-management :: model-management-i18n}"></div>
+
+    <!-- 언어 선택기 스크립트 -->
+    <div th:replace="~{fragments/language-selector :: language-script}"></div>
 </div>
+
 </html>

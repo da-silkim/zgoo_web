@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>CS List I18n</title>
+</head>
+
+<body>
+    <script th:fragment="cs-list-i18n" th:inline="javascript">
+        var i18n = {
+            csList: {
+                modal: {
+                    titles: {
+                        companyInfo: /*[[#{csList.modal.titles.companyInfo}]]*/ '사업자 정보',
+                        stationInfo: /*[[#{csList.modal.titles.stationInfo}]]*/ '충전소 정보',
+                        stationName: /*[[#{csList.modal.titles.stationName}]]*/ '충전소 이름',
+                        stationId: /*[[#{csList.modal.titles.stationId}]]*/ '충전소ID',
+                        stationKind: /*[[#{csList.modal.titles.stationType}]]*/ '충전소 유형',
+                        stationFacility: /*[[#{csList.modal.titles.stationFacility}]]*/ '충전소 시설 구분',
+                        asNum: /*[[#{csList.modal.titles.asNum}]]*/ '문의전화',
+                        opStatus: /*[[#{csList.modal.titles.opStatus}]]*/ '운영상태',
+                        address: /*[[#{csList.modal.titles.address}]]*/ '주소',
+                        latitude: /*[[#{csList.modal.titles.latitude}]]*/ '위도',
+                        longitude: /*[[#{csList.modal.titles.longitude}]]*/ '경도',
+                        operationTime: /*[[#{csList.modal.titles.operationTime}]]*/ '운영시간',
+                        fulltime: /*[[#{csList.modal.titles.fulltime}]]*/ '24시간 운영',
+                        parkingFee: /*[[#{csList.modal.titles.parkingFee}]]*/ '주차요금 정보',
+                        pkfeeYes: /*[[#{csList.modal.titles.pkfeeYes}]]*/ '유료',
+                        pkfeeNo: /*[[#{csList.modal.titles.pkfeeNo}]]*/ '무료',
+                        landinfo: /*[[#{csList.modal.titles.landinfo}]]*/ '부지정보',
+                        contractCompany: /*[[#{csList.modal.titles.contractCompany}]]*/ '계약기관명',
+                        contractLandKind: /*[[#{csList.modal.titles.contractLandKind}]]*/ '계약 부지 구분',
+                        staffName: /*[[#{csList.modal.titles.staffName}]]*/ '담당자 명',
+                        staffPhone: /*[[#{csList.modal.titles.staffPhone}]]*/ '담당자 연락처',
+                        contractDate: /*[[#{csList.modal.titles.contractDate}]]*/ '계약일자',
+                        contractFromTo: /*[[#{csList.modal.titles.contractFromTo}]]*/ '계약기간',
+                        landUseType: /*[[#{csList.modal.titles.landUseType}]]*/ '토지사용구분',
+                        fixType: /*[[#{csList.modal.titles.fixType}]]*/ '고정형',
+                        rateType: /*[[#{csList.modal.titles.rateType}]]*/ '사용료율',
+                        landUseFee: /*[[#{csList.modal.titles.landUseFee}]]*/ '토지사용료',
+                        currency: /*[[#{csList.modal.titles.currency}]]*/ '원',
+                        settlementDate: /*[[#{csList.modal.titles.settlementDate}]]*/ '정산일',
+                        kepcoContractInfo: /*[[#{csList.modal.titles.kepcoContractInfo}]]*/ '한전 계약정보',
+                        kepcoCustNo: /*[[#{csList.modal.titles.kepcoCustNo}]]*/ '한전 고객 번호',
+                        openingDate: /*[[#{csList.modal.titles.openingDate}]]*/ '개통일',
+                        contPower: /*[[#{csList.modal.titles.contPower}]]*/ '계약전력(kW)',
+                        rcvCapacityMethod: /*[[#{csList.modal.titles.rcvCapacityMethod}]]*/ '수전방식',
+                        rcvCapacity: /*[[#{csList.modal.titles.rcvCapacity}]]*/ '수전용량(kVA)',
+                        voltageType: /*[[#{csList.modal.titles.voltageType}]]*/ '가입요금제',
+                        safetyManagementFeeInfo: /*[[#{csList.modal.titles.safetyManagementFeeInfo}]]*/ '안전점검관리비 정보',
+                        safetyManagementFee: /*[[#{csList.modal.titles.safetyManagementFee}]]*/ '안전점검관리비(원)',
+                    },
+                    buttons: {
+                        dupcheck: /*[[#{csList.modal.buttons.dupcheck}]]*/ '중복체크',
+                        cancel: /*[[#{csList.modal.buttons.cancel}]]*/ '취소',
+                        close: /*[[#{csList.modal.buttons.close}]]*/ '닫기',
+                        add: /*[[#{csList.modal.buttons.add}]]*/ '등록'
+                    },
+                    placeholders: {
+                        addressDetail: /*[[#{csList.modal.placeholders.addressDetail}]]*/ '상세 주소를 입력해주세요.'
+                    }
+                }
+            }
+        };
+    </script>
+</body>
+
+</html>

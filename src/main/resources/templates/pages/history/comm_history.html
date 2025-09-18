@@ -4,34 +4,40 @@
     <div class="card responsive-content">
         <!-- card body:1 start -->
         <div class="card-body">
-            <div class="content-title"><i class="fa-solid fa-clipboard-list font-ico me-2"></i>이력 > 통신이력</div>
+            <div class="content-title"><i class="fa-solid fa-clipboard-list font-ico me-2"></i><span
+                    th:text="#{commhist.titles.main}"></span></div>
             <!-- card:2 start -->
             <div class="card card-shadow">
                 <!-- card body:2 start -->
                 <div class="card-body">
-                    <div class="card-title"><span class="card-title-bar"></span><span>검색조건</span></div>
+                    <div class="card-title"><span class="card-title-bar"></span><span
+                            th:text="#{commhist.titles.search}"></span></div>
                     <!-- form start -->
                     <form id="searchForm" class="position-relative" th:action="@{/history/comm}" method="get">
                         <!-- row:1 start -->
                         <div class="row mb-3 row-cols-2 row-cols-lg-3 g-2">
                             <div class="col d-flex align-items-center">
                                 <label for="opSearch"
-                                    class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">검색조건</label>
+                                    class="flex-shrink-0 col-form-label font-weight-bold text-right w-25"><span
+                                        th:text="#{commhist.titles.search}"></span></label>
                                 <select id="opSearch" name="opSearch" class="ms-3 form-control w-40">
-                                    <option value="" th:selected="${selectedOpSearch == null}">(선택)</option>
-                                    <option value="action" th:text="메시지" th:selected="${selectedOpSearch == 'action'}">
+                                    <option value="" th:selected="${selectedOpSearch == null}"
+                                        th:text="#{commhist.selectopt.select}"></option>
+                                    <option value="action" th:text="#{commhist.selectopt.message}"
+                                        th:selected="${selectedOpSearch == 'action'}">
                                     </option>
-                                    <option value="chargerId" th:text="충전기ID"
+                                    <option value="chargerId" th:text="#{commhist.selectopt.chargerid}"
                                         th:selected="${selectedOpSearch == 'chargerId'}"></option>
-                                    <option value="uuid" th:text="uuid" th:selected="${selectedOpSearch == 'uuid'}">
+                                    <option value="uuid" th:text="#{commhist.selectopt.uuid}"
+                                        th:selected="${selectedOpSearch == 'uuid'}">
                                     </option>
                                 </select>
                                 <input type="text" name="contentSearch" id="contentSearch" class="mx-2 form-control"
                                     th:value="${selectedContentSearch}" autocomplete="off">
                             </div>
                             <div class="col d-flex align-items-center">
-                                <span
-                                    class="flex-shrink-0 col-form-label font-weight-bold mr-3p text-right w-25">기간조회</span>
+                                <span class="flex-shrink-0 col-form-label font-weight-bold mr-3p text-right w-25"><span
+                                        th:text="#{commhist.labels.searchperiod}"></span></span>
                                 <input type="date" min="1970-01-01" max="2199-12-31" th:value="${selectedRecvFrom}"
                                     name="recvFromSearch" id="recvFromSearch" class="mx-3 form-control">
                                 <span class="flex-shrink-0 col-form-label font-weight-bold">~</span>
@@ -42,10 +48,12 @@
                         <div class="search-btn">
                             <button type="button" class="btn btn-outline-grey me-2" id="searchBtn"
                                 onclick="searchOption()">
-                                <i class="bi bi-search me-2"></i>검색</button>
+                                <i class="bi bi-search me-2"></i><span
+                                    th:text="#{commhist.buttons.search}"></span></button>
                             <button type="button" class="btn btn-outline-grey me-2" id="resetBtn"
                                 onclick="replacePage('/history/comm')">
-                                <i class="bi bi-arrow-repeat me-2"></i>초기화</button>
+                                <i class="bi bi-arrow-repeat me-2"></i><span
+                                    th:text="#{commhist.buttons.reset}"></span></button>
                         </div>
                         <!-- row:1 end -->
                     </form>
@@ -59,13 +67,13 @@
                 <!-- card body:3 start -->
                 <div class="card-body">
                     <div class="card-title">
-                        <span class="card-title-bar"></span><span>통신이력</span>
+                        <span class="card-title-bar"></span><span th:text="#{commhist.titles.commlist}"></span>
                     </div>
                     <div class="mt-3 btn-page-area">
                         <span>
                             <span id="pageInfo">
                                 <span
-                                    th:text="'Page ' + (${currentPage + 1}) + ' of ' + ${totalPages} + ' [총 ' + ${totalCount} + '건]'"></span>
+                                    th:text="'Page ' + (${currentPage + 1}) + ' of ' + ${totalPages} + ' [' + ${totalCount} + ']'"></span>
                             </span>
                             <select class="mx-3 page-select" id="size" name="size">
                                 <option th:each="data : ${showListCnt}" th:value="${data.commonCode}"
@@ -80,14 +88,14 @@
                                 <thead>
                                     <tr class="table-border-top">
                                         <th scope="col">No</th>
-                                        <th scope="col">충전기ID</th>
+                                        <th scope="col"><span th:text="#{commhist.labels.chargerid}"></span></th>
                                         <!-- <th scope="col">커넥터ID</th> -->
-                                        <th scope="col">메시지</th>
-                                        <th scope="col">수신내용</th>
-                                        <th scope="col">수신일시</th>
-                                        <th scope="col">발신내용</th>
-                                        <th scope="col">발신일시</th>
-                                        <th scope="col">UUID</th>
+                                        <th scope="col"><span th:text="#{commhist.labels.message}"></span></th>
+                                        <th scope="col"><span th:text="#{commhist.labels.recvcontent}"></span></th>
+                                        <th scope="col"><span th:text="#{commhist.labels.recvtime}"></span></th>
+                                        <th scope="col"><span th:text="#{commhist.labels.sendcontent}"></span></th>
+                                        <th scope="col"><span th:text="#{commhist.labels.sendtime}"></span></th>
+                                        <th scope="col"><span th:text="#{commhist.labels.uuid}"></span></th>
                                     </tr>
                                 </thead>
                                 <tbody id="pageList">
@@ -110,7 +118,8 @@
                                         <td th:text="${data.recvUuid}"></td>
                                     </tr>
                                     <tr th:if="${chgCommlogList.size() == 0}">
-                                        <td colspan="8" class="text-center">정보가 없습니다.</td>
+                                        <td colspan="8" class="text-center"><span
+                                                th:text="#{commhist.messages.nodata}"></span></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -167,7 +176,8 @@
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="contentModalLabel">상세 내용</h5>
+                    <h5 class="modal-title" id="contentModalLabel"><span th:text="#{commhist.titles.details}"></span>
+                    </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -177,6 +187,21 @@
         </div>
     </div>
     <script type="text/javascript" th:src="@{/js/history/comm_history.js}"></script>
+    <!-- Add Modal end -->
+    <script type="text/javascript" th:src="@{/js/customer/faq.js}"></script>
+    <script th:inline="javascript">
+        var i18n = {
+            commhist: {
+                titles: {
+                    details: /*[[#{commhist.titles.details}]]*/ '상세 내용'
+                }
+            }
+        };
+
+        var currentLanguage = /*[[${#locale.language}]]*/ 'ko';
+    </script>
+    <!-- 언어 선택기 스크립트 -->
+    <div th:replace="~{fragments/language-selector :: language-script}"></div>
 </div>
 
 </html>

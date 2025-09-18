@@ -1,25 +1,25 @@
-$(document).ready(function() {
-    let modalCon = false, selectRow, btnMsg = "등록", chargerIdValid = false;
+$(document).ready(function () {
+    let modalCon = false, selectRow, btnMsg = i18n.disabilitymgm.buttons.add, chargerIdValid = false;
     var cpmaintainId, chargerId;
 
-    $('#size').on('change', function() {
+    $('#size').on('change', function () {
         updatePageSize(this, "/maintenance/errlist", ["companyIdSearch", "opSearch", "contentSearch",
             "processStatusSearch", "startDateSearch", "endDateSearch"]);
     });
 
-    $('#pageList').on('click', 'tr', function() {
+    $('#pageList').on('click', 'tr', function () {
         selectRow = $(this);
         cpmaintainId = selectRow.find('td').eq(0).attr('id');
         buttonControl($(this), `/errlist/btncontrol/${cpmaintainId}`);
     });
 
-    $('#chargerIdSearchBtn').on('click', function() {
+    $('#chargerIdSearchBtn').on('click', function () {
         chargerId = $('#chargerId').val();
 
         $.ajax({
             type: 'GET',
             url: `/errlist/search/${chargerId}`,
-            success: function(data) {
+            success: function (data) {
                 $('#companyName').val(data.cpInfo.companyName || '');
                 $('#stationId').val(data.cpInfo.stationId || '');
                 $('#stationName').val(data.cpInfo.stationName || '');
@@ -31,22 +31,22 @@ $(document).ready(function() {
                 } else {
                     chargerIdValid = true;
                 }
-                
+
             },
-            error: function(xhr, status, error) {
+            error: function (xhr, status, error) {
                 alert(JSON.parse(xhr.responseText).message);
             }
         });
     });
 
-    $('#chargerId').on('input', function() {
+    $('#chargerId').on('input', function () {
         chargerIdValid = false;
     });
 
-    $('#addBtn').on('click', function(event) {
+    $('#addBtn').on('click', function (event) {
         event.preventDefault();
         modalCon = false;
-        btnMsg = "등록";
+        btnMsg = i18n.disabilitymgm.buttons.add;
         $('#modalBtn').text(btnMsg);
         $('#modalBtn').show();
         $('#maintainForm')[0].reset();
@@ -62,10 +62,10 @@ $(document).ready(function() {
         removeImage('pictureLoc3');
     });
 
-    $(document).on('click', '#editBtn', function(event) {
+    $(document).on('click', '#editBtn', function (event) {
         event.preventDefault();
         modalCon = true;
-        btnMsg = "수정";
+        btnMsg = i18n.disabilitymgm.buttons.edit;
         $('#modalBtn').text(btnMsg);
         $('#modalBtn').show();
         $('#maintainForm')[0].reset();
@@ -81,7 +81,7 @@ $(document).ready(function() {
             url: `/errlist/get/${cpmaintainId}`,
             contentType: "application/json",
             dataType: 'json',
-            success: function(data) {
+            success: function (data) {
                 $('#companyName').val(data.cpInfo.companyName || '');
                 $('#stationId').val(data.cpInfo.stationId || '');
                 $('#stationName').val(data.cpInfo.stationName || '');
@@ -92,7 +92,7 @@ $(document).ready(function() {
                 $('#processStatus').val(data.cpMaintain.processStatus || '');
                 $('#processContent').val(data.cpMaintain.processContent || '');
 
-                ['1', '2', '3'].forEach(function(i) {
+                ['1', '2', '3'].forEach(function (i) {
                     const pic = data.cpMaintain['pictureLoc' + i];
                     if (pic) {
                         $('#pictureLoc' + i).attr('src', pic);
@@ -122,29 +122,29 @@ $(document).ready(function() {
         }
     }
 
-    $(document).on('click', '#deleteBtn', function() {
-        if(confirmSubmit("삭제")) {
+    $(document).on('click', '#deleteBtn', function () {
+        if (confirmSubmit(i18n.disabilitymgm.buttons.delete)) {
             $.ajax({
                 type: 'DELETE',
                 url: `/errlist/delete/${cpmaintainId}`,
                 contentType: "application/json",
-                success: function(response) {
+                success: function (response) {
                     alert(response);
                     window.location.reload();
                 },
-                error: function(xhr, status, error) {
+                error: function (xhr, status, error) {
                     alert(xhr.responseText);
                 }
             });
         }
     });
 
-    $('#modalBtn').on('click', function(event) {
+    $('#modalBtn').on('click', function (event) {
         event.preventDefault();
 
         if (!modalCon) {
-            if(!chargerIdValid) {
-                alert('충전소ID 정보를 확인해 주세요.');
+            if (!chargerIdValid) {
+                alert(i18n.disabilitymgm.messages.checkChargerId);
                 return;
             }
         }
@@ -152,7 +152,7 @@ $(document).ready(function() {
         const processStatus = document.getElementById('processStatus').value;
         const processContent = document.getElementById('processContent').value;
         if ((!processContent || processContent.trim() === '') && processStatus === 'FSTATFINISH') {
-            alert('처리내용을 작성해 주세요.');
+            alert(i18n.disabilitymgm.messages.writeProcessContent);
             return;
         }
 
@@ -160,7 +160,7 @@ $(document).ready(function() {
             const formData = new FormData();
             formData.append('chargerId', $('#chargerId').val());
             formData.append('errorType', $('#errorType').val());
-            formData.append('errorContent',  $('#errorContent').val());
+            formData.append('errorContent', $('#errorContent').val());
             formData.append('processStatus', $('#processStatus').val());
             formData.append('processContent', $('#processContent').val());
             formData.append('existingPictureLoc1', $('#existing-pictureLoc1').val());
@@ -170,7 +170,7 @@ $(document).ready(function() {
             var fileLoc1 = $('#input-pictureLoc1')[0].files[0];
             var fileLoc2 = $('#input-pictureLoc2')[0].files[0];
             var fileLoc3 = $('#input-pictureLoc3')[0].files[0];
-            
+
             if (fileLoc1) {
                 formData.append('fileLoc1', fileLoc1);
             }
@@ -192,19 +192,19 @@ $(document).ready(function() {
                 contentType: false,
                 processData: false,
                 cache: false,
-                success: function(response) {
+                success: function (response) {
                     alert(response);
                     $('#dataAddModal').modal('hide');
                     window.location.reload();
                 },
-                error: function(xhr, status, error) {
+                error: function (xhr, status, error) {
                     alert(xhr.responseText);
                 }
             });
         }
     });
 
-    $('#processStatus').on('change', function() {
+    $('#processStatus').on('change', function () {
         const processStatus = document.getElementById('processStatus').value;
         const processContent = document.getElementById('processContent');
 
@@ -224,7 +224,7 @@ function loadFile(input, imageId) {
     if (file) {
         const reader = new FileReader();
 
-        reader.onload = function(e) {
+        reader.onload = function (e) {
             img.src = e.target.result;
             img.style.display = 'block';
 

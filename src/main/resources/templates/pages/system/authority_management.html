@@ -4,20 +4,23 @@
     <div class="card responsive-content">
         <!-- card body:1 start -->
         <div class="card-body">
-            <div class="content-title"><i class="fa-solid fa-gear font-ico me-2"></i>시스템 > 메뉴접근권한 관리</div>
+            <div class="content-title"><i class="fa-solid fa-gear font-ico me-2"></i><span
+                    th:text="#{menuAuthMgmt.titles.main}"></span></div>
             <!-- card:2 start -->
             <div class="card card-shadow">
                 <!-- card body:2 start -->
                 <div class="card-body">
                     <div class="card-title title-btn-area">
-                        <span class="card-title-bar"></span><span>사업자 권한 리스트</span>
+                        <span class="card-title-bar"></span><span
+                            th:text="#{menuAuthMgmt.titles.companyAuthList}"></span>
                         <div class="d-flex align-items-center search-container" id="companySearchContainer"
                             th:if="${menuAuthority.authority == 'SU'}">
-                            <label for="companyIdSearch">사업자</label>
-                            <select id="companyIdSearch" name="companyIdSearch" class="mx-3 form-control" style="width: 230px;">
-                                <option th:value="null">선택</option>
+                            <label for="companyIdSearch" th:text="#{menuAuthMgmt.labels.company}"></label>
+                            <select id="companyIdSearch" name="companyIdSearch" class="mx-3 form-control"
+                                style="width: 230px;">
+                                <option th:value="null" th:text="#{menuAuthMgmt.labels.select}"></option>
                                 <option th:each="company : ${companyList}" th:value="${company.companyId}"
-                                            th:text="${company.companyName}"></option>
+                                    th:text="${company.companyName}"></option>
                             </select>
                         </div>
                     </div>
@@ -26,9 +29,9 @@
                         <table class="table text-center table-bg table-hover">
                             <thead>
                                 <tr>
-                                    <th scope="col" class="w-40">사업자</th>
-                                    <th scope="col" class="w-25">권한그룹ID</th>
-                                    <th scope="col" class="w-35">권한그룹명</th>
+                                    <th scope="col" class="w-40" th:text="#{menuAuthMgmt.labels.company}"></th>
+                                    <th scope="col" class="w-25" th:text="#{menuAuthMgmt.labels.authGrpId}"></th>
+                                    <th scope="col" class="w-35" th:text="#{menuAuthMgmt.labels.authGrpName}"></th>
                                 </tr>
                             </thead>
                             <tbody id="pageList">
@@ -41,7 +44,7 @@
                                     <td th:text="${authority.commonCodeName}"></td>
                                 </tr>
                                 <tr th:if="${authorityList.size() == 0}">
-                                    <td colspan="3">조회된 데이터가 없습니다.</td>
+                                    <td colspan="3" th:text="#{menuAuthMgmt.messages.nodata}"></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -56,32 +59,33 @@
                 <!-- card body:3 start -->
                 <div class="card-body">
                     <div class="card-title">
-                        <span class="card-title-bar"></span><span>메뉴별 접근 권한</span>
+                        <span class="card-title-bar"></span><span th:text="#{menuAuthMgmt.titles.menuAuth}"></span>
                         <span class="ms-3" id="currAuthority"></span>
                     </div>
                     <!-- 메뉴별 접근 권한 form: start -->
-                    <form class="position-relative">                        
+                    <form class="position-relative">
                         <div class="table-responsive scroll-table-container mt-3">
                             <table class="table text-center table-bg table-hover">
                                 <thead>
                                     <tr>
-                                        <th scope="col">메뉴그룹(대)</th>
-                                        <th scope="col">메뉴그룹(중)</th>
-                                        <th scope="col">메뉴그룹(소)</th>
-                                        <th scope="col">조회권한</th>
-                                        <th scope="col">등록/수정 권한</th>
-                                        <th scope="col">엑셀다운로드권한</th>
+                                        <th scope="col" th:text="#{menuAuthMgmt.labels.menuGrpLarge}"></th>
+                                        <th scope="col" th:text="#{menuAuthMgmt.labels.menuGrpMiddle}"></th>
+                                        <th scope="col" th:text="#{menuAuthMgmt.labels.menuGrpSmall}"></th>
+                                        <th scope="col" th:text="#{menuAuthMgmt.labels.searchAuth}"></th>
+                                        <th scope="col" th:text="#{menuAuthMgmt.labels.editAuth}"></th>
+                                        <th scope="col" th:text="#{menuAuthMgmt.labels.excelAuth}"></th>
                                     </tr>
                                 </thead>
                                 <tbody id="authorityTable">
                                     <tr>
-                                        <td colspan="6">사업자 선택 후 권한 항목 클릭 시 조회됩니다.</td>
+                                        <td colspan="6" th:text="#{menuAuthMgmt.messages.menuAuthInfo}"></td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
                         <button type="button" class="btn btn-outline-grey" id="saveBtn"
-                            th:if="${menuAuthority.authority == 'SU' or menuAuthority.authority == 'AD'}" disabled></i>저장</button>
+                            th:if="${menuAuthority.authority == 'SU' or menuAuthority.authority == 'AD'}"
+                            disabled></i><span th:text="#{menuAuthMgmt.buttons.save}"></span></button>
                     </form>
                     <!-- 메뉴별 접근 권한 form: end -->
                 </div>
@@ -93,5 +97,30 @@
     </div>
     <!-- card:1 end -->
     <script type="text/javascript" th:src="@{/js/system/authority_management.js}"></script>
+
+    <script th:inline="javascript">
+        var i18n = {
+            menuAuthMgmt: {
+                labels: {
+                    company: /*[[#{menuAuthMgmt.labels.company}]]*/ '사업자',
+                    authGrpId: /*[[#{menuAuthMgmt.labels.authGrpId}]]*/ '권한그룹ID',
+                    authGrpName: /*[[#{menuAuthMgmt.labels.authGrpName}]]*/ '권한그룹명'
+                },
+                messages: {
+                    menuAuthInfo: /*[[#{menuAuthMgmt.messages.menuAuthInfo}]]*/ '사업자 선택 후 권한 항목 클릭 시 조회됩니다.',
+                    yNOnly: /*[[#{menuAuthMgmt.messages.yNOnly}]]*/ 'Y/N 값만 설정할 수 있습니다.'
+                },
+                buttons: {
+                    save: /*[[#{menuAuthMgmt.buttons.save}]]*/ '저장'
+                }
+            }
+
+        };
+
+        var currentLanguage = /*[[${#locale.language}]]*/ 'ko';
+    </script>
+    <!-- 언어 선택기 스크립트 -->
+    <div th:replace="~{fragments/language-selector :: language-script}"></div>
 </div>
+
 </html>

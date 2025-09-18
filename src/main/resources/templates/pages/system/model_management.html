@@ -4,50 +4,65 @@
     <div class="card responsive-content">
         <!-- card body:1 start -->
         <div class="card-body">
-            <div class="content-title"><i class="fa-solid fa-gear font-ico me-2"></i>시스템 > 모델관리</div>
+            <div class="content-title"><i class="fa-solid fa-gear font-ico me-2"></i><span
+                    th:text="#{modelManagement.mainTitle}"></span></div>
             <!-- card:2 start -->
             <div class="card card-shadow">
                 <!-- card body:2 start -->
                 <div class="card-body">
-                    <div class="card-title"><span class="card-title-bar"></span><span>검색조건</span></div>
+                    <div class="card-title"><span class="card-title-bar"></span><span
+                            th:text="#{modelManagement.searchTitle}"></span></div>
                     <!-- form start -->
                     <form id="searchForm" class="position-relative" th:action="@{/system/model/list}" method="get">
                         <!-- row:1 start -->
                         <div class="row mb-3 row-cols-2 row-cols-lg-3 g-2">
                             <div class="col d-flex align-items-center">
-                                <label for="companyIdSearch" class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">사업자</label>
+                                <label for="companyIdSearch"
+                                    class="flex-shrink-0 col-form-label font-weight-bold text-right w-25"><span
+                                        th:text="#{modelManagement.labels.company}"></span></label>
                                 <select id="companyIdSearch" name="companyIdSearch" class="mx-3 form-control">
-                                    <option th:value="null">선택</option>
+                                    <option th:value="null"><span
+                                            th:text="#{modelManagement.selectOptions.select}"></span></option>
                                     <option th:each="company : ${companyList}" th:value="${company.companyId}"
-                                                th:text="${company.companyName}"
-                                                th:selected="${company.companyId == selectedCompanyId}"></option>
+                                        th:text="${company.companyName}"
+                                        th:selected="${company.companyId == selectedCompanyId}"></option>
                                 </select>
                             </div>
                             <div class="col d-flex align-items-center">
-                                <label for="manfCdSearch" class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">제조사</label>
+                                <label for="manfCdSearch"
+                                    class="flex-shrink-0 col-form-label font-weight-bold text-right w-25"><span
+                                        th:text="#{modelManagement.labels.manuf}"></span></label>
                                 <select id="manfCdSearch" name="manfCdSearch" class="mx-3 form-control">
-                                    <option th:value="null">선택</option>
+                                    <option th:value="null"><span
+                                            th:text="#{modelManagement.selectOptions.select}"></span></option>
                                     <option th:each="data : ${manfCd}" th:value="${data.commonCode}"
-                                                th:text="${data.commonCodeName}"
-                                                th:selected="${data.commonCode == selectedManfCd}"></option>
+                                        th:text="${data.commonCodeName}"
+                                        th:selected="${data.commonCode == selectedManfCd}"></option>
                                 </select>
                             </div>
                             <div class="col d-flex align-items-center">
-                                <label for="chgSpeedCdSearch" class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">충전기 유형</label>
+                                <label for="chgSpeedCdSearch"
+                                    class="flex-shrink-0 col-form-label font-weight-bold text-right w-25"><span
+                                        th:text="#{modelManagement.labels.chargerType}"></span></label>
                                 <select id="chgSpeedCdSearch" name="chgSpeedCdSearch" class="mx-3 form-control">
-                                    <option th:value="null">선택</option>
+                                    <option th:value="null"><span
+                                            th:text="#{modelManagement.selectOptions.select}"></span></option>
                                     <option th:each="data : ${chgSpeedCd}" th:value="${data.commonCode}"
-                                                th:text="${data.commonCodeName}"
-                                                th:selected="${data.commonCode == selectedChgSpeedCd}"></option>
+                                        th:text="${data.commonCodeName}"
+                                        th:selected="${data.commonCode == selectedChgSpeedCd}"></option>
                                 </select>
                             </div>
                         </div>
                         <!-- row:1 end -->
                         <div class="search-btn">
-                            <button type="button" class="btn btn-outline-grey me-2" id="searchBtn" onclick="searchOption()">
-                                <i class="bi bi-search me-2"></i>검색</button>
-                            <button type="button" class="btn btn-outline-grey me-2" id="resetBtn" onclick="replacePage('/system/model/list')">
-                                <i class="bi bi-arrow-repeat me-2"></i>초기화</button>
+                            <button type="button" class="btn btn-outline-grey me-2" id="searchBtn"
+                                onclick="searchOption()">
+                                <i class="bi bi-search me-2"></i><span
+                                    th:text="#{modelManagement.buttons.search}"></span></button>
+                            <button type="button" class="btn btn-outline-grey me-2" id="resetBtn"
+                                onclick="replacePage('/system/model/list')">
+                                <i class="bi bi-arrow-repeat me-2"></i><span
+                                    th:text="#{modelManagement.buttons.reset}"></span></button>
                         </div>
                     </form>
                     <!-- form end -->
@@ -60,35 +75,41 @@
                 <!-- card body:3 start -->
                 <div class="card-body btn-page-container">
                     <div class="btn-container" th:if="${menuAuthority.authority == 'SU' or menuAuthority.modYn == 'Y'}">
-                        <button class="btn btn-data-add" id="addBtn" data-bs-toggle="modal" data-bs-target="#dataAddModal">
-                            <i class="bi bi-plus-square"></i>등록</button>
-                        <button class="btn btn-data-edit" id="editBtn" data-bs-toggle="modal" data-bs-target="#dataAddModal" hidden>
-                            <i class="fa-regular fa-pen-to-square"></i>수정</button>
+                        <button class="btn btn-data-add" id="addBtn" data-bs-toggle="modal"
+                            data-bs-target="#dataAddModal">
+                            <i class="bi bi-plus-square"></i><span
+                                th:text="#{modelManagement.buttons.add}"></span></button>
+                        <button class="btn btn-data-edit" id="editBtn" data-bs-toggle="modal"
+                            data-bs-target="#dataAddModal" hidden>
+                            <i class="fa-regular fa-pen-to-square"></i><span
+                                th:text="#{modelManagement.buttons.edit}"></span></button>
                         <button class="btn btn-data-delete" id="deleteBtn" hidden>
-                            <i class="bi bi-trash"></i>삭제</button>
+                            <i class="bi bi-trash"></i><span
+                                th:text="#{modelManagement.buttons.delete}"></span></button>
                     </div>
                     <div class="page-container">
                         <span id="pageInfo">
-                            <span th:text="'Page ' + (${currentPage + 1}) + ' of ' + ${totalPages} + ' [총 ' + ${totalCount} + '건]'"></span>
+                            <span
+                                th:text="'Page ' + (${currentPage + 1}) + ' of ' + ${totalPages} + '[' + ${totalCount} + ']'"></span>
                         </span>
                         <select class="mx-3 page-select" id="size" name="size">
                             <option th:each="data : ${showListCnt}" th:value="${data.commonCode}"
-                                    th:text="${data.commonCodeName}" th:selected="${data.commonCode == size}"></option>
+                                th:text="${data.commonCodeName}" th:selected="${data.commonCode == size}"></option>
                         </select>
                     </div>
-                    <div class="w-100 table-responsive" >
+                    <div class="w-100 table-responsive">
                         <table class="table text-center mt-3 table-bg table-hover" style="min-width: 1020px;">
                             <thead>
                                 <tr class="table-border-top">
                                     <th scope="col"></th>
                                     <th scope="col"></th>
-                                    <th scope="col">사업자</th>
-                                    <th scope="col">제조사</th>
-                                    <th scope="col">모델코드</th>
-                                    <th scope="col">모델명</th>
-                                    <th scope="col">출력(kW)</th>
-                                    <th scope="col">충전기유형</th>
-                                    <th scope="col">등록일시</th>
+                                    <th scope="col"><span th:text="#{modelManagement.tables.company}"></span></th>
+                                    <th scope="col"><span th:text="#{modelManagement.tables.manuf}"></span></th>
+                                    <th scope="col"><span th:text="#{modelManagement.tables.modelCode}"></span></th>
+                                    <th scope="col"><span th:text="#{modelManagement.tables.modelName}"></span></th>
+                                    <th scope="col"><span th:text="#{modelManagement.tables.output}"></span></th>
+                                    <th scope="col"><span th:text="#{modelManagement.tables.chargerType}"></span></th>
+                                    <th scope="col"><span th:text="#{modelManagement.tables.regDateTime}"></span></th>
                                 </tr>
                             </thead>
                             <tbody id="pageList">
@@ -98,7 +119,8 @@
                                         <a th:href="@{/system/model/detail/{modelId}(modelId=${model.modelId}, page=${currentPage}, size=${size},
                                             companyIdSearch=${selectedCompanyId != null ? selectedCompanyId : ''}, 
                                             manfCdSearch=${selectedManfCd != null ? selectedManfCd : ''}, 
-                                            chgSpeedCdSearch=${selectedChgSpeedCd != null ? selectedChgSpeedCd : ''})}" class="no-underline">
+                                            chgSpeedCdSearch=${selectedChgSpeedCd != null ? selectedChgSpeedCd : ''})}"
+                                            class="no-underline">
                                             <i class="bi bi-files detail-files"></i>
                                         </a>
                                     </td>
@@ -111,35 +133,39 @@
                                     <td th:text="${#temporals.format(model.regDt,'yyyy-MM-dd HH:mm:ss')}"></td>
                                 </tr>
                                 <tr th:if="${modelList.size() == 0}">
-                                    <td colspan="9">조회된 데이터가 없습니다.</td>
+                                    <td colspan="9"><span th:text="#{modelManagement.messages.nodata}"></span></td>
                                 </tr>
                             </tbody>
-                        </table>                                
+                        </table>
                     </div>
                     <!-- paging navigation start -->
                     <div th:if="${modelList.size() > 0}">
                         <ul class="pagination justify-content-center">
                             <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled' : ''">
                                 <a class="page-link" th:href="@{/system/model/list(page=0, size=${size}, companyIdSearch=${selectedCompanyId},
-                                manfCdSearch=${selectedManfCd}, chgSpeedCdSearch=${selectedChgSpeedCd})}"><i class="bi bi-chevron-double-left"></i></a>
+                                manfCdSearch=${selectedManfCd}, chgSpeedCdSearch=${selectedChgSpeedCd})}"><i
+                                        class="bi bi-chevron-double-left"></i></a>
                             </li>
                             <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled' : ''">
                                 <a class="page-link" th:href="@{/system/model/list(page=${currentPage-1}, size=${size}, companyIdSearch=${selectedCompanyId},
-                                manfCdSearch=${selectedManfCd}, chgSpeedCdSearch=${selectedChgSpeedCd})}"><i class="bi bi-chevron-left"></i></a>
+                                manfCdSearch=${selectedManfCd}, chgSpeedCdSearch=${selectedChgSpeedCd})}"><i
+                                        class="bi bi-chevron-left"></i></a>
                             </li>
                             <li class="page-item" th:each="i : ${#numbers.sequence(currentPage - 2, currentPage + 2)}"
                                 th:if="${i >= 0 && i < totalPages}">
                                 <a class="page-link" th:href="@{/system/model/list(page=${i}, size=${size}, companyIdSearch=${selectedCompanyId},
                                 manfCdSearch=${selectedManfCd}, chgSpeedCdSearch=${selectedChgSpeedCd})}"
-                                th:text="${i+1}" th:classappend="${i == currentPage} ? 'active' : ''"></a>
+                                    th:text="${i+1}" th:classappend="${i == currentPage} ? 'active' : ''"></a>
                             </li>
                             <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled' : ''">
                                 <a class="page-link" th:href="@{/system/model/list(page=${currentPage+1}, size=${size}, companyIdSearch=${selectedCompanyId},
-                                manfCdSearch=${selectedManfCd}, chgSpeedCdSearch=${selectedChgSpeedCd})}"><i class="bi bi-chevron-right"></i></a>
+                                manfCdSearch=${selectedManfCd}, chgSpeedCdSearch=${selectedChgSpeedCd})}"><i
+                                        class="bi bi-chevron-right"></i></a>
                             </li>
                             <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled' : ''">
                                 <a class="page-link" th:href="@{/system/model/list(page=${totalPages - 1}, size=${size}, companyIdSearch=${selectedCompanyId},
-                                manfCdSearch=${selectedManfCd}, chgSpeedCdSearch=${selectedChgSpeedCd})}"><i class="bi bi-chevron-double-right"></i></a>
+                                manfCdSearch=${selectedManfCd}, chgSpeedCdSearch=${selectedChgSpeedCd})}"><i
+                                        class="bi bi-chevron-double-right"></i></a>
                             </li>
                         </ul>
                     </div>
@@ -162,57 +188,75 @@
                     <!-- modal body start -->
                     <div class="modal-body">
                         <!-- table:1 start -->
-                        <div class="modal-title mb-2"><span class="modal-title-bar"></span><span>모델 정보</span></div>
+                        <div class="modal-title mb-2"><span class="modal-title-bar"></span><span
+                                th:text="#{modelManagement.modal.titles.modelInfo}"></span></div>
                         <table class="table table-bg-v table-fixed w-100 text-center align-middle">
                             <tbody>
                                 <tr class="table-border-top">
-                                    <th class="w-20">제조사<b class="required-data">*</b></th>
+                                    <th class="w-20"><span th:text="#{modelManagement.modal.labels.manuf}"></span><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
-                                        <select id="manufCd" name="manufCd" class="form-control" th:field="*{manufCd}" required>
+                                        <select id="manufCd" name="manufCd" class="form-control" th:field="*{manufCd}"
+                                            required>
                                             <option th:each="data : ${manfCd}" th:value="${data.commonCode}"
-                                                    th:text="${data.commonCodeName}" ></option>
+                                                th:text="${data.commonCodeName}"></option>
                                         </select>
                                     </td>
-                                    <th class="w-20">출력(kW)<b class="required-data">*</b></th>
+                                    <th class="w-20"><span th:text="#{modelManagement.modal.labels.output}"></span><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
-                                        <input type="number" name="powerUnit" id="powerUnit" class="form-control" th:field="*{powerUnit}" required>
+                                        <input type="number" name="powerUnit" id="powerUnit" class="form-control"
+                                            th:field="*{powerUnit}" required>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="w-20">모델명<b class="required-data">*</b></th>
+                                    <th class="w-20"><span th:text="#{modelManagement.modal.labels.modelName}"></span><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
-                                        <input type="text" name="modelName" id="modelName" class="form-control" th:field="*{modelName}"
-                                            placeholder="모델명을 입력해주세요." required>
+                                        <input type="text" name="modelName" id="modelName" class="form-control"
+                                            th:field="*{modelName}"
+                                            th:placeholder="#{modelManagement.placeholders.inputModelName}" required>
                                     </td>
-                                    <th class="w-20">모델코드<b class="required-data">*</b></th>
+                                    <th class="w-20"><span th:text="#{modelManagement.modal.labels.modelCode}"></span><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
-                                        <input type="text" name="modelCode" id="modelCode" class="form-control" th:field="*{modelCode}"
-                                            placeholder="모델코드를 입력해주세요." required>
+                                        <input type="text" name="modelCode" id="modelCode" class="form-control"
+                                            th:field="*{modelCode}"
+                                            th:placeholder="#{modelManagement.placeholders.inputModelCode}" required>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="w-20">충전기유형<b class="required-data">*</b></th>
+                                    <th class="w-20"><span
+                                            th:text="#{modelManagement.modal.labels.chargerType}"></span><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
-                                        <select id="cpType" name="cpType" class="form-control" th:field="*{cpType}" required>
+                                        <select id="cpType" name="cpType" class="form-control" th:field="*{cpType}"
+                                            required>
                                             <option th:each="data : ${chgSpeedCd}" th:value="${data.commonCode}"
-                                                    th:text="${data.commonCodeName}" ></option>
+                                                th:text="${data.commonCodeName}"></option>
                                         </select>
                                     </td>
-                                    <th class="w-20">설치유형<b class="required-data">*</b></th>
+                                    <th class="w-20"><span
+                                            th:text="#{modelManagement.modal.labels.installationType}"></span><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
-                                        <select id="installationType" name="installationType" class="form-control" th:field="*{installationType}" required>
+                                        <select id="installationType" name="installationType" class="form-control"
+                                            th:field="*{installationType}" required>
                                             <option th:each="data : ${chgTypeCd}" th:value="${data.commonCode}"
-                                                    th:text="${data.commonCodeName}" ></option>
+                                                th:text="${data.commonCodeName}"></option>
                                         </select>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="w-20">듀얼채널여부<b class="required-data">*</b></th>
+                                    <th class="w-20"><span th:text="#{modelManagement.modal.labels.dualYn}"></span><b
+                                            class="required-data">*</b></th>
                                     <td colspan="3">
                                         <div class="display-radio">
-                                            <input type="radio" name="dualYn" id="dualYes" class="attr-control" value="Y">
+                                            <input type="radio" name="dualYn" id="dualYes" class="attr-control"
+                                                value="Y">
                                             <label for="dualYes">Y</label>
-                                            <input type="radio" name="dualYn" id="dualNo" class="attr-control" value="N" checked>
+                                            <input type="radio" name="dualYn" id="dualNo" class="attr-control" value="N"
+                                                checked>
                                             <label for="dualNo">N</label>
                                         </div>
                                     </td>
@@ -222,10 +266,13 @@
                         <!-- table:1 end -->
                         <!-- table:2 start -->
                         <div class="modal-title mb-2 position-relative">
-                            <span class="modal-title-bar"></span><span>커넥터 정보</span>
+                            <span class="modal-title-bar"></span><span
+                                th:text="#{modelManagement.modal.titles.connectorInfo}"></span>
                             <span class="ms-5 position-absolute" style="margin-left: 4px; right: 0;">
-                                <button type="button" class="btn btn-outline-grey me-2" onclick="addRow()">+ 추가</button>
-                                <button type="button" class="btn btn-outline-grey" onclick="deleteRow()">- 삭제</button>
+                                <button type="button" class="btn btn-outline-grey me-2" onclick="addRow()"><span
+                                        th:text="#{modelManagement.modal.buttons.add}"></span></button>
+                                <button type="button" class="btn btn-outline-grey" onclick="deleteRow()"><span
+                                        th:text="#{modelManagement.modal.buttons.delete}"></span></button>
                             </span>
                         </div>
                         <table class="table table-bg table-fixed w-100 text-center align-middle" id="connectorTable">
@@ -243,7 +290,7 @@
                                     <td>
                                         <select class="form-control connectorType" required>
                                             <option th:each="data : ${connType}" th:value="${data.commonCode}"
-                                                    th:text="${data.commonCodeName}" ></option>
+                                                th:text="${data.commonCodeName}"></option>
                                         </select>
                                     </td>
                                 </tr>
@@ -251,57 +298,78 @@
                         </table>
                         <!-- table:2 end -->
                         <!-- table:3 start -->
-                        <div class="modal-title mb-2"><span class="modal-title-bar"></span><span>모델상세 정보</span></div>
+                        <div class="modal-title mb-2"><span class="modal-title-bar"></span><span
+                                th:text="#{modelManagement.modal.titles.modelDetailInfo}"></span></div>
                         <table class="table table-bg-v table-fixed w-100 text-center align-middle">
                             <tbody>
                                 <tr class="table-border-top">
-                                    <th class="w-20">AC입력전압(V)</th>
+                                    <th class="w-20"><span
+                                            th:text="#{modelManagement.modal.labels.acinputvoltage}"></span></th>
                                     <td class="w-30">
-                                        <input type="text" name="inputVoltage" id="inputVoltage" class="form-control" th:field="*{inputVoltage}">
+                                        <input type="text" name="inputVoltage" id="inputVoltage" class="form-control"
+                                            th:field="*{inputVoltage}">
                                     </td>
-                                    <th class="w-20">입력주파수(Hz)</th>
+                                    <th class="w-20"><span
+                                            th:text="#{modelManagement.modal.labels.inputfrequency}"></span></th>
                                     <td class="w-30">
-                                        <input type="text" name="inputFrequency" id="inputFrequency" class="form-control" th:field="*{inputFrequency}">
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th class="w-20">입력타입(P)</th>
-                                    <td class="w-30">
-                                        <input type="text" name="inputType" id="inputType" class="form-control" th:field="*{inputType}">
-                                    </td>
-                                    <th class="w-20">입력전류(A)</th>
-                                    <td class="w-30">
-                                        <input type="text" name="inputCurr" id="inputCurr"class="form-control" th:field="*{inputCurr}" >
+                                        <input type="text" name="inputFrequency" id="inputFrequency"
+                                            class="form-control" th:field="*{inputFrequency}">
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="w-20">입력전원(kVA)</th>
+                                    <th class="w-20"><span th:text="#{modelManagement.modal.labels.inputtype}"></span>
+                                    </th>
                                     <td class="w-30">
-                                        <input type="text" name="inputPower" id="inputPower" class="form-control" th:field="*{inputPower}">
+                                        <input type="text" name="inputType" id="inputType" class="form-control"
+                                            th:field="*{inputType}">
                                     </td>
-                                    <th class="w-20">역률(PF)</th>
+                                    <th class="w-20"><span th:text="#{modelManagement.modal.labels.inputcurr}"></span>
+                                    </th>
                                     <td class="w-30">
-                                        <input type="text" name="powerFactor" id="powerFactor" class="form-control" th:field="*{powerFactor}">
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th class="w-20">DC출력전압(V)</th>
-                                    <td class="w-30">
-                                        <input type="text" name="outputVoltage" id="outputVoltage" class="form-control" th:field="*{outputVoltage}">
-                                    </td>
-                                    <th class="w-20">최대출력전류(A)</th>
-                                    <td class="w-30">
-                                        <input type="text" name="maxOutputCurr" id="maxOutputCurr" class="form-control" th:field="*{maxOutputCurr}">
+                                        <input type="text" name="inputCurr" id="inputCurr" class="form-control"
+                                            th:field="*{inputCurr}">
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="w-20">정격출력(kW)</th>
+                                    <th class="w-20"><span th:text="#{modelManagement.modal.labels.inputpower}"></span>
+                                    </th>
                                     <td class="w-30">
-                                        <input type="text" name="ratedPower" id="ratedPower" class="form-control" th:field="*{ratedPower}">
+                                        <input type="text" name="inputPower" id="inputPower" class="form-control"
+                                            th:field="*{inputPower}">
                                     </td>
-                                    <th class="w-20">최고효율(%)</th>
+                                    <th class="w-20"><span th:text="#{modelManagement.modal.labels.powerfactor}"></span>
+                                    </th>
                                     <td class="w-30">
-                                        <input type="number" name="peakEfficiency" id="peakEfficiency" class="form-control" th:field="*{peakEfficiency}">
+                                        <input type="text" name="powerFactor" id="powerFactor" class="form-control"
+                                            th:field="*{powerFactor}">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="w-20"><span
+                                            th:text="#{modelManagement.modal.labels.dcoutputvoltage}"></span></th>
+                                    <td class="w-30">
+                                        <input type="text" name="outputVoltage" id="outputVoltage" class="form-control"
+                                            th:field="*{outputVoltage}">
+                                    </td>
+                                    <th class="w-20"><span
+                                            th:text="#{modelManagement.modal.labels.maxoutputcurr}"></span></th>
+                                    <td class="w-30">
+                                        <input type="text" name="maxOutputCurr" id="maxOutputCurr" class="form-control"
+                                            th:field="*{maxOutputCurr}">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="w-20"><span th:text="#{modelManagement.modal.labels.ratedpower}"></span>
+                                    </th>
+                                    <td class="w-30">
+                                        <input type="text" name="ratedPower" id="ratedPower" class="form-control"
+                                            th:field="*{ratedPower}">
+                                    </td>
+                                    <th class="w-20"><span
+                                            th:text="#{modelManagement.modal.labels.peakefficiency}"></span></th>
+                                    <td class="w-30">
+                                        <input type="number" name="peakEfficiency" id="peakEfficiency"
+                                            class="form-control" th:field="*{peakEfficiency}">
                                     </td>
                                 </tr>
                             </tbody>
@@ -310,143 +378,220 @@
                         <!-- table:4 start -->
                         <div class="accordion" id="accordionModelDetail">
                             <div class="accordion-item position-relative">
-                                <div class="modal-title mb-2"><span class="modal-title-bar"></span><span>모델상세 부가정보</span></div>
-                                <button class="accordion-button-custom" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne"></button>
-                                <div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#accordionModelDetail">
+                                <div class="modal-title mb-2"><span class="modal-title-bar"></span><span
+                                        th:text="#{modelManagement.modal.titles.modelDetailAddInfo}"></span></div>
+                                <button class="accordion-button-custom" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#collapseOne" aria-expanded="true"
+                                    aria-controls="collapseOne"></button>
+                                <div id="collapseOne" class="accordion-collapse collapse"
+                                    data-bs-parent="#accordionModelDetail">
                                     <div class="accordion-body" style="padding: 0 !important;">
                                         <table class="table table-bg-v table-fixed w-100 text-center align-middle">
                                             <tbody>
                                                 <tr class="table-border-top">
-                                                    <th class="w-20">THDi(%)</th>
+                                                    <th class="w-20"><span
+                                                            th:text="#{modelManagement.modal.labels.thdi}"></span></th>
                                                     <td class="w-30">
-                                                        <input type="text" name="thdi" id="thdi" class="form-control" th:field="*{thdi}">
+                                                        <input type="text" name="thdi" id="thdi" class="form-control"
+                                                            th:field="*{thdi}">
                                                     </td>
-                                                    <th class="w-20">접지형</th>
+                                                    <th class="w-20"><span
+                                                            th:text="#{modelManagement.modal.labels.grdtype}"></span>
+                                                    </th>
                                                     <td class="w-30">
-                                                        <input type="text" name="grdType" id="grdType" class="form-control" th:field="*{grdType}">
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <th class="w-20">작동고도(m)</th>
-                                                    <td class="w-30">
-                                                        <input type="text" name="opAltitude" id="opAltitude" class="form-control" th:field="*{opAltitude}">
-                                                    </td>
-                                                    <th class="w-20">작동온도</th>
-                                                    <td class="w-30">
-                                                        <input type="text" name="opTemperature" id="opTemperature" class="form-control" th:field="*{opTemperature}">
+                                                        <input type="text" name="grdType" id="grdType"
+                                                            class="form-control" th:field="*{grdType}">
                                                     </td>
                                                 </tr>
                                                 <tr>
-                                                    <th class="w-20">온도감소율</th>
+                                                    <th class="w-20"><span
+                                                            th:text="#{modelManagement.modal.labels.opaltitude}"></span>
+                                                    </th>
                                                     <td class="w-30">
-                                                        <input type="text" name="temperatureDerating" id="temperatureDerating" class="form-control" th:field="*{temperatureDerating}">
+                                                        <input type="text" name="opAltitude" id="opAltitude"
+                                                            class="form-control" th:field="*{opAltitude}">
                                                     </td>
-                                                    <th class="w-20">보관온도범위(˚C)</th>
+                                                    <th class="w-20"><span
+                                                            th:text="#{modelManagement.modal.labels.optemperature}"></span>
+                                                    </th>
                                                     <td class="w-30">
-                                                        <input type="text" name="storageTemperatureRange" id="storageTemperatureRange" class="form-control" th:field="*{storageTemperatureRange}">
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <th class="w-20">습도(%)</th>
-                                                    <td class="w-30">
-                                                        <input type="text" name="humidity" id="humidity" class="form-control" th:field="*{humidity}">
-                                                    </td>
-                                                    <th class="w-20">치수(mm)</th>
-                                                    <td class="w-30">
-                                                        <input type="text" name="dimensions" id="dimensions" class="form-control" th:field="*{dimensions}">
+                                                        <input type="text" name="opTemperature" id="opTemperature"
+                                                            class="form-control" th:field="*{opTemperature}">
                                                     </td>
                                                 </tr>
                                                 <tr>
-                                                    <th class="w-20">IP & IK 등급</th>
+                                                    <th class="w-20"><span
+                                                            th:text="#{modelManagement.modal.labels.temperaturederating}"></span>
+                                                    </th>
                                                     <td class="w-30">
-                                                        <input type="text" name="ipNIk" id="ipNIk" class="form-control" th:field="*{ipNIk}">
+                                                        <input type="text" name="temperatureDerating"
+                                                            id="temperatureDerating" class="form-control"
+                                                            th:field="*{temperatureDerating}">
                                                     </td>
-                                                    <th class="w-20">무게(kg)</th>
+                                                    <th class="w-20"><span
+                                                            th:text="#{modelManagement.modal.labels.storagetemperaturerange}"></span>
+                                                    </th>
                                                     <td class="w-30">
-                                                        <input type="text" name="weight" id="weight" class="form-control" th:field="*{weight}">
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <th class="w-20">재질</th>
-                                                    <td class="w-30">
-                                                        <input type="text" name="material" id="material" class="form-control" th:field="*{material}">
-                                                    </td>
-                                                    <th class="w-20">케이블 길이(m)</th>
-                                                    <td class="w-30">
-                                                        <input type="text" name="cableLength" id="cableLength" class="form-control" th:field="*{cableLength}">
+                                                        <input type="text" name="storageTemperatureRange"
+                                                            id="storageTemperatureRange" class="form-control"
+                                                            th:field="*{storageTemperatureRange}">
                                                     </td>
                                                 </tr>
                                                 <tr>
-                                                    <th class="w-20">화면</th>
+                                                    <th class="w-20"><span
+                                                            th:text="#{modelManagement.modal.labels.humidity}"></span>
+                                                    </th>
                                                     <td class="w-30">
-                                                        <input type="text" name="screen" id="screen" class="form-control" th:field="*{screen}">
+                                                        <input type="text" name="humidity" id="humidity"
+                                                            class="form-control" th:field="*{humidity}">
                                                     </td>
-                                                    <th class="w-20">RFID Reader</th>
+                                                    <th class="w-20"><span
+                                                            th:text="#{modelManagement.modal.labels.dimensions}"></span>
+                                                    </th>
                                                     <td class="w-30">
-                                                        <input type="text" name="rfid" id="rfid" class="form-control" th:field="*{rfid}">
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <th class="w-20">비상버튼</th>
-                                                    <td class="w-30">
-                                                        <input type="text" name="emergencyBtn" id="emergencyBtn" class="form-control" th:field="*{emergencyBtn}">
-                                                    </td>
-                                                    <th class="w-20">통신인터페이스</th>
-                                                    <td class="w-30">
-                                                        <input type="text" name="communicationInterface" id="communicationInterface" class="form-control" th:field="*{communicationInterface}">
+                                                        <input type="text" name="dimensions" id="dimensions"
+                                                            class="form-control" th:field="*{dimensions}">
                                                     </td>
                                                 </tr>
                                                 <tr>
-                                                    <th class="w-20">언어</th>
+                                                    <th class="w-20"><span
+                                                            th:text="#{modelManagement.modal.labels.ipnik}"></span></th>
                                                     <td class="w-30">
-                                                        <input type="text" name="lang" id="lang" class="form-control" th:field="*{lang}">
+                                                        <input type="text" name="ipNIk" id="ipNIk" class="form-control"
+                                                            th:field="*{ipNIk}">
                                                     </td>
-                                                    <th class="w-20">냉각방식</th>
+                                                    <th class="w-20"><span
+                                                            th:text="#{modelManagement.modal.labels.weight}"></span>
+                                                    </th>
                                                     <td class="w-30">
-                                                        <input type="text" name="coolingMethod" id="coolingMethod" class="form-control" th:field="*{coolingMethod}">
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <th class="w-20">EMC</th>
-                                                    <td class="w-30">
-                                                        <input type="text" name="emc" id="emc" class="form-control" th:field="*{emc}">
-                                                    </td>
-                                                    <th class="w-20">보호장치</th>
-                                                    <td class="w-30">
-                                                        <input type="text" name="protection" id="protection" class="form-control" th:field="*{protection}">
+                                                        <input type="text" name="weight" id="weight"
+                                                            class="form-control" th:field="*{weight}">
                                                     </td>
                                                 </tr>
                                                 <tr>
-                                                    <th class="w-20">옵션기능</th>
+                                                    <th class="w-20"><span
+                                                            th:text="#{modelManagement.modal.labels.material}"></span>
+                                                    </th>
                                                     <td class="w-30">
-                                                        <input type="text" name="opFunc" id="opFunc" class="form-control" th:field="*{opFunc}">
+                                                        <input type="text" name="material" id="material"
+                                                            class="form-control" th:field="*{material}">
                                                     </td>
-                                                    <th class="w-20">표준</th>
+                                                    <th class="w-20"><span
+                                                            th:text="#{modelManagement.modal.labels.cablelength}"></span>
+                                                    </th>
                                                     <td class="w-30">
-                                                        <input type="text" name="standard" id="standard" class="form-control" th:field="*{standard}">
+                                                        <input type="text" name="cableLength" id="cableLength"
+                                                            class="form-control" th:field="*{cableLength}">
                                                     </td>
                                                 </tr>
                                                 <tr>
-                                                    <th class="w-20">전력모듈</th>
+                                                    <th class="w-20"><span
+                                                            th:text="#{modelManagement.modal.labels.screen}"></span>
+                                                    </th>
                                                     <td class="w-30">
-                                                        <input type="text" name="powerModule" id="powerModule" class="form-control" th:field="*{powerModule}">
+                                                        <input type="text" name="screen" id="screen"
+                                                            class="form-control" th:field="*{screen}">
                                                     </td>
-                                                    <th class="w-20">충전기</th>
+                                                    <th class="w-20"><span
+                                                            th:text="#{modelManagement.modal.labels.rfid}"></span></th>
                                                     <td class="w-30">
-                                                        <input type="text" name="charger" id="charger" class="form-control" th:field="*{charger}">
+                                                        <input type="text" name="rfid" id="rfid" class="form-control"
+                                                            th:field="*{rfid}">
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th class="w-20"><span
+                                                            th:text="#{modelManagement.modal.labels.emergencybtn}"></span>
+                                                    </th>
+                                                    <td class="w-30">
+                                                        <input type="text" name="emergencyBtn" id="emergencyBtn"
+                                                            class="form-control" th:field="*{emergencyBtn}">
+                                                    </td>
+                                                    <th class="w-20"><span
+                                                            th:text="#{modelManagement.modal.labels.communicationinterface}"></span>
+                                                    </th>
+                                                    <td class="w-30">
+                                                        <input type="text" name="communicationInterface"
+                                                            id="communicationInterface" class="form-control"
+                                                            th:field="*{communicationInterface}">
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th class="w-20"><span
+                                                            th:text="#{modelManagement.modal.labels.lang}"></span></th>
+                                                    <td class="w-30">
+                                                        <input type="text" name="lang" id="lang" class="form-control"
+                                                            th:field="*{lang}">
+                                                    </td>
+                                                    <th class="w-20"><span
+                                                            th:text="#{modelManagement.modal.labels.coolingmethod}"></span>
+                                                    </th>
+                                                    <td class="w-30">
+                                                        <input type="text" name="coolingMethod" id="coolingMethod"
+                                                            class="form-control" th:field="*{coolingMethod}">
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th class="w-20"><span
+                                                            th:text="#{modelManagement.modal.labels.emc}"></span></th>
+                                                    <td class="w-30">
+                                                        <input type="text" name="emc" id="emc" class="form-control"
+                                                            th:field="*{emc}">
+                                                    </td>
+                                                    <th class="w-20"><span
+                                                            th:text="#{modelManagement.modal.labels.protection}"></span>
+                                                    </th>
+                                                    <td class="w-30">
+                                                        <input type="text" name="protection" id="protection"
+                                                            class="form-control" th:field="*{protection}">
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th class="w-20"><span
+                                                            th:text="#{modelManagement.modal.labels.opfunc}"></span>
+                                                    </th>
+                                                    <td class="w-30">
+                                                        <input type="text" name="opFunc" id="opFunc"
+                                                            class="form-control" th:field="*{opFunc}">
+                                                    </td>
+                                                    <th class="w-20"><span
+                                                            th:text="#{modelManagement.modal.labels.standard}"></span>
+                                                    </th>
+                                                    <td class="w-30">
+                                                        <input type="text" name="standard" id="standard"
+                                                            class="form-control" th:field="*{standard}">
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th class="w-20"><span
+                                                            th:text="#{modelManagement.modal.labels.powermodule}"></span>
+                                                    </th>
+                                                    <td class="w-30">
+                                                        <input type="text" name="powerModule" id="powerModule"
+                                                            class="form-control" th:field="*{powerModule}">
+                                                    </td>
+                                                    <th class="w-20"><span
+                                                            th:text="#{modelManagement.modal.labels.charger}"></span>
+                                                    </th>
+                                                    <td class="w-30">
+                                                        <input type="text" name="charger" id="charger"
+                                                            class="form-control" th:field="*{charger}">
                                                     </td>
                                                 </tr>
                                             </tbody>
                                         </table>
                                     </div>
-                                  </div>
+                                </div>
                             </div>
                         </div>
                         <!-- table:4 end -->
                         <!-- modal body end -->
                         <div class="modal-footer justify-content-center border-top-none">
-                            <button type="button" id="modalCalcelBtn" class="btn btn-outline-grey me-2" data-bs-dismiss="modal">취소</button>
-                            <button type="submit" id="modalBtn" class="btn btn-data-add">등록</button>
+                            <button type="button" id="modalCalcelBtn" class="btn btn-outline-grey me-2"
+                                data-bs-dismiss="modal"><span
+                                    th:text="#{modelManagement.modal.buttons.cancel}"></span></button>
+                            <button type="submit" id="modalBtn" class="btn btn-data-add"><span
+                                    th:text="#{modelManagement.modal.buttons.regist}"></span></button>
                         </div>
                     </div>
                 </form>
@@ -471,7 +616,7 @@
             selectElement.classList.add('form-control', 'connectorType');
             selectElement.required = true;
 
-            connTypeData.forEach(function(data) {
+            connTypeData.forEach(function (data) {
                 const option = document.createElement('option');
                 option.value = data.commonCode;
                 option.textContent = data.commonCodeName;
@@ -513,8 +658,18 @@
         }
     </script>
     <script th:inline="javascript">
-        var connTypeData = /*[[${connType}]]*/ [];
-    </script>    
+        var connTypeData = /*[[${connType}]]*/[];
+
+        var currentLanguage = /*[[${#locale.language}]]*/ 'ko';
+    </script>
+
+    <!-- 공통 i18n 스크립트 포함 -->
+    <div th:replace="~{fragments/i18n/i18n-model-management :: model-management-i18n}"></div>
+
     <script type="text/javascript" th:src="@{/js/system/model_management.js}"></script>
+
+    <!-- 언어 선택기 스크립트 -->
+    <div th:replace="~{fragments/language-selector :: language-script}"></div>
 </div>
+
 </html>

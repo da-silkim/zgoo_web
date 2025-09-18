@@ -9,6 +9,8 @@ import java.security.Principal;
 import java.util.Collections;
 import java.util.List;
 
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -38,6 +40,7 @@ public class ConditionController {
 
     private final ConditionService conditionService;
     private final ComService comService;
+    private final MessageSource messageSource;
 
     // 약관 개정 히스토리 조회
     @GetMapping("/hist/search/{conditionCode}")
@@ -49,10 +52,10 @@ public class ConditionController {
             List<ConditionVersionHistBaseDto> conList = this.conditionService.findHistAllByConditionCode(conditionCode);
 
             if (conList.isEmpty()) {
-                log.info("조회된 개정 히스토리가 없습니다.");
+                log.info("No revision history has been viewed.");
                 return ResponseEntity.ok(Collections.emptyList());
             }
-            log.info("조회된 개정 히스토리: {}", conList);
+            log.info("Viewed revision history: {}", conList);
             return ResponseEntity.ok(conList);
         } catch (Exception e) {
             log.error("[searchConditionHist] error: {}", e.getMessage());
@@ -73,11 +76,13 @@ public class ConditionController {
             }
 
             this.conditionService.saveConditionCode(dto);
-            return ResponseEntity.ok("약관 정보가 정상적으로 등록되었습니다.");
+            return ResponseEntity.ok(messageSource.getMessage("conditionmgmt.api.messages.registSuccess", null,
+                    LocaleContextHolder.getLocale()));
         } catch (Exception e) {
             log.error("[createConditionCode] error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                    .body("약관 등록 중 오류가 발생했습니다.");
+                    .body(messageSource.getMessage("conditionmgmt.api.messages.registError", null,
+                            LocaleContextHolder.getLocale()));
         }
     }
 
@@ -95,11 +100,14 @@ public class ConditionController {
 
             this.conditionService.saveConditionVersionHist(dto);
 
-            return ResponseEntity.ok("약관 개정 정보가 정상적으로 등록되었습니다.");
+            return ResponseEntity
+                    .ok(messageSource.getMessage("conditionmgmt.api.messages.termsrevisionAddSuccess", null,
+                            LocaleContextHolder.getLocale()));
         } catch (Exception e) {
             log.error("[createConditionHist] error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                .body("약관 개정 등록 중 오류가 발생했습니다.");
+                    .body(messageSource.getMessage("conditionmgmt.api.messages.termsrevisionAddError", null,
+                            LocaleContextHolder.getLocale()));
         }
     }
 
@@ -123,11 +131,12 @@ public class ConditionController {
             String originalName = conDto.getOriginalName();
             String filePath = conDto.getFilePath();
             byte[] files = Files.readAllBytes(Paths.get(filePath));
-            
+
             response.setContentType("application/octet-stream");
             response.setContentLength(files.length);
-            response.setHeader("Content-Disposition","attachment; fileName=\""+ URLEncoder.encode(originalName,StandardCharsets.UTF_8)+"\";");
-            response.setHeader("Content-Transfer-Encoding","binary");
+            response.setHeader("Content-Disposition",
+                    "attachment; fileName=\"" + URLEncoder.encode(originalName, StandardCharsets.UTF_8) + "\";");
+            response.setHeader("Content-Transfer-Encoding", "binary");
 
             response.getOutputStream().write(files);
             response.getOutputStream().flush();
@@ -155,17 +164,20 @@ public class ConditionController {
             }
 
             this.conditionService.deleteConditionCode(conditionCode);
-            return ResponseEntity.ok("약관 정보가 정상적으로 삭제되었습니다.");
+            return ResponseEntity.ok(messageSource.getMessage("conditionmgmt.api.messages.termsdeleteSuccess", null,
+                    LocaleContextHolder.getLocale()));
         } catch (Exception e) {
             log.error("[deleteConditionCode] error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                    .body("약관 정보 삭제 중 오류가 발생했습니다.");
+                    .body(messageSource.getMessage("conditionmgmt.api.messages.termsdeleteError", null,
+                            LocaleContextHolder.getLocale()));
         }
     }
 
     // 약관 개정 히스토리 삭제
     @DeleteMapping("/delete/hist/{conditionVersionHistId}")
-    public ResponseEntity<String> deleteConditionHist(@PathVariable("conditionVersionHistId") Long conditionVersionHistId,
+    public ResponseEntity<String> deleteConditionHist(
+            @PathVariable("conditionVersionHistId") Long conditionVersionHistId,
             Principal principal) {
         log.info("=== delete condition version hist info ===");
 
@@ -174,13 +186,16 @@ public class ConditionController {
             if (permissionCheck != null) {
                 return permissionCheck;
             }
-            
+
             this.conditionService.deleteConditionHist(conditionVersionHistId);
-            return ResponseEntity.ok("약관 개정 정보가 정상적으로 삭제되었습니다.");
+            return ResponseEntity
+                    .ok(messageSource.getMessage("conditionmgmt.api.messages.termsrevisiondeleteSuccess", null,
+                            LocaleContextHolder.getLocale()));
         } catch (Exception e) {
             log.error("[deleteConditionHist] error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                    .body("약관 개정 정보 삭제 중 오류가 발생했습니다.");
+                    .body(messageSource.getMessage("conditionmgmt.api.messages.termsrevisiondeleteError", null,
+                            LocaleContextHolder.getLocale()));
         }
     }
 }

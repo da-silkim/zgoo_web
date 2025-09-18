@@ -4,21 +4,25 @@
     <div class="card responsive-content">
         <!-- card body:1 start -->
         <div class="card-body">
-            <div class="content-title"><i class="fa-solid fa-clipboard-list font-ico me-2"></i>이력 > 충전이력</div>
+            <div class="content-title"><i class="fa-solid fa-clipboard-list font-ico me-2"></i><span
+                    th:text="#{charginghist.titles.main}"></span></div>
             <!-- card:2 start -->
             <div class="card card-shadow">
                 <!-- card body:2 start -->
                 <div class="card-body">
-                    <div class="card-title"><span class="card-title-bar"></span><span>검색조건</span></div>
+                    <div class="card-title"><span class="card-title-bar"></span><span
+                            th:text="#{charginghist.titles.search}"></span></div>
                     <!-- form start -->
                     <form id="searchForm" class="position-relative" th:action="@{/history/charging}" method="get">
                         <!-- row:1 start -->
                         <div class="row mb-3 row-cols-2 row-cols-lg-3 g-2">
                             <div class="col d-flex align-items-center">
                                 <label for="companyIdSearch"
-                                    class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">사업자</label>
+                                    class="flex-shrink-0 col-form-label font-weight-bold text-right w-25"><span
+                                        th:text="#{charginghist.labels.company}"></span></label>
                                 <select id="companyIdSearch" class="mx-3 form-control" name="companyIdSearch">
-                                    <option value="" th:text="'(없음)'" th:selected="${selectedCompanyId == null}">
+                                    <option value="" th:text="#{charginghist.selectopt.select}"
+                                        th:selected="${selectedCompanyId == null}">
                                     </option>
                                     <option th:each="company : ${companyList}" th:value="${company.companyId}"
                                         th:text="${company.companyName}"
@@ -27,16 +31,19 @@
                             </div>
                             <div class="col d-flex align-items-center">
                                 <label for="opSearch"
-                                    class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">검색조건</label>
+                                    class="flex-shrink-0 col-form-label font-weight-bold text-right w-25"><span
+                                        th:text="#{charginghist.titles.search}"></span></label>
                                 <select id="opSearch" name="opSearch" class="ms-3 form-control w-40">
-                                    <option value="" th:selected="${selectedOpSearch == null}">(선택)</option>
-                                    <option value="stationName" th:text="충전소명"
+                                    <option value="" th:selected="${selectedOpSearch == null}"><span
+                                            th:text="#{charginghist.selectopt.select}"></span></option>
+                                    <option value="stationName" th:text="#{charginghist.selectopt.stationName}"
                                         th:selected="${selectedOpSearch == 'stationName'}"></option>
-                                    <option value="stationId" th:text="충전소ID"
+                                    <option value="stationId" th:text="#{charginghist.selectopt.stationId}"
                                         th:selected="${selectedOpSearch == 'stationId'}"></option>
-                                    <option value="chargerId" th:text="충전기ID"
+                                    <option value="chargerId" th:text="#{charginghist.selectopt.chargerId}"
                                         th:selected="${selectedOpSearch == 'chargerId'}"></option>
-                                    <option value="idTag" th:text="카드번호" th:selected="${selectedOpSearch == 'idTag'}">
+                                    <option value="idTag" th:text="#{charginghist.selectopt.idtag}"
+                                        th:selected="${selectedOpSearch == 'idTag'}">
                                     </option>
                                 </select>
                                 <input type="text" name="contentSearch" id="contentSearch" class="mx-2 form-control"
@@ -54,8 +61,8 @@
                                 </select>
                             </div> -->
                             <div class="col d-flex align-items-center">
-                                <span
-                                    class="flex-shrink-0 col-form-label font-weight-bold mr-3p text-right w-25">시작시간</span>
+                                <span class="flex-shrink-0 col-form-label font-weight-bold mr-3p text-right w-25"><span
+                                        th:text="#{charginghist.labels.startTime}"></span></span>
                                 <input type="date" min="1970-01-01" max="2199-12-31" th:value="${selectedTimeFrom}"
                                     name="chgStartTimeFrom" id="chgStartTimeFrom" class="mx-3 form-control">
                                 <span class="flex-shrink-0 col-form-label font-weight-bold">~</span>
@@ -66,10 +73,12 @@
                         <div class="search-btn">
                             <button type="button" class="btn btn-outline-grey me-2" id="searchBtn"
                                 onclick="searchOption()">
-                                <i class="bi bi-search me-2"></i>검색</button>
+                                <i class="bi bi-search me-2"></i><span
+                                    th:text="#{charginghist.buttons.search}"></span></button>
                             <button type="button" class="btn btn-outline-grey me-2" id="resetBtn"
                                 onclick="replacePage('/history/charging')">
-                                <i class="bi bi-arrow-repeat me-2"></i>초기화</button>
+                                <i class="bi bi-arrow-repeat me-2"></i><span
+                                    th:text="#{charginghist.buttons.reset}"></span></button>
                         </div>
                         <!-- row:1 end -->
                     </form>
@@ -83,16 +92,17 @@
                 <!-- card body:3 start -->
                 <div class="card-body">
                     <div class="card-title">
-                        <span class="card-title-bar"></span><span>충전이력</span>
+                        <span class="card-title-bar"></span><span th:text="#{charginghist.titles.chargingList}"></span>
                     </div>
                     <div class="mt-3 btn-page-area">
                         <button class="btn btn-excel" onclick="excelDownload()"
                             th:if="${menuAuthority.authority == 'SU' or menuAuthority.excelYn == 'Y'}">
-                            <i class="bi bi-file-earmark-spreadsheet"></i>엑셀다운로드</button>
+                            <i class="bi bi-file-earmark-spreadsheet"></i><span
+                                th:text="#{charginghist.buttons.excel}"></span></button>
                         <span>
                             <span id="pageInfo">
                                 <span
-                                    th:text="'Page ' + (${currentPage + 1}) + ' of ' + ${totalPages} + ' [총 ' + ${totalCount} + '건]'"></span>
+                                    th:text="'Page ' + (${currentPage + 1}) + ' of ' + ${totalPages} + ' [' + ${totalCount} + ']'"></span>
                             </span>
                             <select class="mx-3 page-select" id="size" name="size">
                                 <option th:each="data : ${showListCnt}" th:value="${data.commonCode}"
@@ -106,30 +116,33 @@
                                 <thead>
                                     <tr class="table-border-top">
                                         <th scope="col">No</th>
-                                        <th scope="col">사업자</th>
-                                        <th scope="col">충전소명</th>
-                                        <th scope="col">충전소ID</th>
-                                        <th scope="col">충전기ID</th>
-                                        <th scope="col">커넥터ID</th>
-                                        <th scope="col">충전기구분</th>
-                                        <th scope="col">회원명</th>
-                                        <th scope="col">카드번호</th>
-                                        <th scope="col">회원구분</th> <!-- 개인 or 법인 or 비회원 -->
-                                        <th scope="col">충전시작일시</th>
-                                        <th scope="col">충전종료일시</th>
-                                        <th scope="col">충전시간</th>
-                                        <th scope="col">종료사유</th>
-                                        <th scope="col">SOC(%)</th>
-                                        <th scope="col">충전량(kWh)</th>
-                                        <th scope="col">충전금액(원)</th>
-                                        <th scope="col">적용단가(원)</th>
-                                        <th scope="col">최초결제금액(원)</th>
-                                        <th scope="col">부분취소금액(원)</th>
-                                        <th scope="col">실결제금액(원)</th>
-                                        <th scope="col">승인번호</th>
-                                        <th scope="col">결제여부</th>
-                                        <th scope="col">실패사유</th>
-                                        <th scope="col">TransactionID</th>
+                                        <th scope="col"><span th:text="#{charginghist.labels.company}"></span></th>
+                                        <th scope="col"><span th:text="#{charginghist.labels.stationNm}"></span></th>
+                                        <th scope="col"><span th:text="#{charginghist.labels.stationId}"></span></th>
+                                        <th scope="col"><span th:text="#{charginghist.labels.chargerId}"></span></th>
+                                        <th scope="col"><span th:text="#{charginghist.labels.connectorId}"></span></th>
+                                        <th scope="col"><span th:text="#{charginghist.labels.cptype}"></span></th>
+                                        <th scope="col"><span th:text="#{charginghist.labels.memberNm}"></span></th>
+                                        <th scope="col"><span th:text="#{charginghist.labels.idTag}"></span></th>
+                                        <th scope="col"><span th:text="#{charginghist.labels.memberType}"></span></th>
+                                        <!-- 개인 or 법인 or 비회원 -->
+                                        <th scope="col"><span th:text="#{charginghist.labels.chgStartTime}"></span></th>
+                                        <th scope="col"><span th:text="#{charginghist.labels.chgEndTime}"></span></th>
+                                        <th scope="col"><span th:text="#{charginghist.labels.chgTime}"></span></th>
+                                        <th scope="col"><span th:text="#{charginghist.labels.chgEndReason}"></span></th>
+                                        <th scope="col"><span th:text="#{charginghist.labels.soc}"></span></th>
+                                        <th scope="col"><span th:text="#{charginghist.labels.chgAmount}"></span></th>
+                                        <th scope="col"><span th:text="#{charginghist.labels.chgPrice}"></span></th>
+                                        <th scope="col"><span th:text="#{charginghist.labels.unitCost}"></span></th>
+                                        <th scope="col"><span th:text="#{charginghist.labels.prepayCost}"></span></th>
+                                        <th scope="col"><span th:text="#{charginghist.labels.cancelCost}"></span></th>
+                                        <th scope="col"><span th:text="#{charginghist.labels.realCost}"></span></th>
+                                        <th scope="col"><span th:text="#{charginghist.labels.approvalNum}"></span></th>
+                                        <th scope="col"><span th:text="#{charginghist.labels.paymentYn}"></span></th>
+                                        <th scope="col"><span th:text="#{charginghist.labels.paymentFailReason}"></span>
+                                        </th>
+                                        <th scope="col"><span th:text="#{charginghist.labels.transactionId}"></span>
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody id="pageList">
@@ -175,7 +188,8 @@
                                         <td th:text="${data.transactionId}"></td>
                                     </tr>
                                     <tr th:if="${chargingHistList.size() == 0}">
-                                        <td colspan="23" class="text-center">정보가 없습니다.</td>
+                                        <td colspan="23" class="text-center"><span
+                                                th:text="#{charginghist.messages.nodata}"></span></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -228,6 +242,9 @@
     <!-- card:1 end -->
     <script type="text/javascript" th:src="@{/js/history/charging_history.js}"></script>
     <script type="text/javascript" th:src="@{/js/history/charging_history_excel_download.js}"></script>
+
+    <!-- 언어 선택기 스크립트 -->
+    <div th:replace="~{fragments/language-selector :: language-script}"></div>
 </div>
 
 </html>

@@ -267,7 +267,7 @@ public class ComService {
         for (int year = currentYear; year >= 2024; year--) {
             yearOptions.add(
                     YearOptionDto.builder()
-                            .text(year + "년")
+                            .text(String.valueOf(year))
                             .value(year)
                             .build());
         }

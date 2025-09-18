@@ -1,5 +1,54 @@
+// 다국어 텍스트 로컬 변수
+var messages = {
+    idcheck: 'ID는 영문자로 시작하고 6~20자의 영문자 및 숫자로 구성되어야 합니다.',
+    userProceedCheck: '진행하시겠습니까?',
+    invalidEmailFormat: '유효하지 않은 이메일 형식입니다.',
+    invalidPasswordFormat: '비밀번호는 8~16자의 영문자와 숫자를 최소 하나씩 포함해야 합니다.',
+    invalidPasswordSpecialFormat: '비밀번호는 8~16자의 영문자, 숫자, 특수문자를 최소 하나씩 포함해야 합니다.',
+    edit: '수정',
+    delete: '삭제'
+};
+
+// 현재 언어 감지 및 메시지 업데이트
+function updateMessages() {
+    var isEnglish = false;
+
+    // currentLanguage 변수 확인 (user_management.html에서 정의됨)
+    if (typeof currentLanguage !== 'undefined') {
+        isEnglish = currentLanguage === 'en';
+    } else {
+        // currentLanguage가 없으면 브라우저 언어로 판단
+        var browserLang = navigator.language || navigator.userLanguage;
+        isEnglish = browserLang.startsWith('en');
+    }
+
+    console.log('isEnglish: ', isEnglish);
+
+    if (isEnglish) {
+        messages.idcheck = 'ID must start with a letter and be 6-20 characters of letters and numbers.';
+        messages.userProceedCheck = 'Do you want to proceed?';
+        messages.invalidEmailFormat = 'Invalid email format.';
+        messages.invalidPasswordFormat = 'Password must be 8-16 characters and contain at least one letter and one number.';
+        messages.invalidPasswordSpecialFormat = 'Password must be 8-16 characters and contain at least one letter, one number, and one special character.';
+        messages.edit = 'Edit';
+        messages.delete = 'Delete';
+    } else {
+        // 한국어 (기본값)
+        messages.idcheck = 'ID는 영문자로 시작하고 6~20자의 영문자 및 숫자로 구성되어야 합니다.';
+        messages.userProceedCheck = '진행하시겠습니까?';
+        messages.invalidEmailFormat = '유효하지 않은 이메일 형식입니다.';
+        messages.invalidPasswordFormat = '비밀번호는 8~16자의 영문자와 숫자를 최소 하나씩 포함해야 합니다.';
+        messages.invalidPasswordSpecialFormat = '비밀번호는 8~16자의 영문자, 숫자, 특수문자를 최소 하나씩 포함해야 합니다.';
+        messages.edit = '수정';
+        messages.delete = '삭제';
+    }
+}
+
 // 사이드바 토글
 $(function () {
+    // i18n 객체 업데이트 시도
+    updateMessages();
+
     // $(".side-nav-detail ul .nav-list-detail").hide();
     $(".nav-list-detail").hide();
     $(".nav-list-sub-detail").hide();
@@ -89,7 +138,8 @@ $(function () {
 });
 
 function confirmSubmit(msg) {
-    return confirm("정말로 해당 데이터를 " + msg + "하시겠습니까?");
+    return confirm(msg + " : " + messages.userProceedCheck);
+    // return confirm("정말로 해당 데이터를 " + msg + "하시겠습니까?");
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -293,6 +343,17 @@ function toAddress(lon, lat) {
 
 // 날짜 포맷팅 함수(ex. 2024-10-29 12:13:00)
 function formatDate(date) {
+    // Date 객체가 아닌 경우 Date 객체로 변환
+    if (!(date instanceof Date)) {
+        date = new Date(date);
+    }
+
+    // 유효한 날짜인지 확인
+    if (isNaN(date.getTime())) {
+        console.error('Invalid date:', date);
+        return '';
+    }
+
     // padStart(2, '0'): 2자리 수로 포맷팅
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0'); // 월은 0부터 시작하므로 + 1
@@ -359,7 +420,8 @@ function isEmail(asValue) {
     var result = regExp.test(asValue);
 
     if (!result) {
-        alert('유효하지 않은 이메일 형식입니다.');
+        // alert('유효하지 않은 이메일 형식입니다.');
+        alert(messages.invalidEmailFormat);
     }
 
     return result;
@@ -371,7 +433,9 @@ function isId(asValue) {
     var result = regExp.test(asValue);
 
     if (!result) {
-        alert("아이디는 영문자로 시작하고 6~20자의 영문자 및 숫자로 구성되어야 합니다.");
+        console.log('result: ', result);
+        // alert("아이디는 영문자로 시작하고 6~20자의 영문자 및 숫자로 구성되어야 합니다.");
+        alert(messages.idcheck);
     }
 
     return result;
@@ -383,7 +447,8 @@ function isPassword(asValue) {
     var result = regExp.test(asValue);
 
     if (!result) {
-        alert("비밀번호는 8~16자의 영문자와 숫자를 최소 하나씩 포함해야 합니다.");
+        // alert("비밀번호는 8~16자의 영문자와 숫자를 최소 하나씩 포함해야 합니다.");
+        alert(messages.invalidPasswordFormat);
     }
 
     return result;
@@ -397,7 +462,8 @@ function isPasswordSpecial(asValue) {
     var result = regExp.test(asValue);
 
     if (!result) {
-        alert("비밀번호는 8~16자의 영문자, 숫자, 특수문자를 최소 하나씩 포함해야 합니다.");
+        // alert("비밀번호는 8~16자의 영문자, 숫자, 특수문자를 최소 하나씩 포함해야 합니다.");
+        alert(messages.invalidPasswordSpecialFormat);
     }
 
     return result;
@@ -475,7 +541,7 @@ function excelDownload(baseUrl, paramKeys) {
         }, 1000);
 
     }).catch(error => {
-        console.error("요청 중 오류 발생:", error);
+        console.error("request error:", error);
     });
 
 }
@@ -504,13 +570,16 @@ function buttonControl(row, url) {
             type: 'GET',
             success: function (response) {
                 if (response.btnControl) {
+                    // i18n 객체 업데이트 시도
+                    updateMessages();
+
                     $('#buttonContainer').html(`
                         <button class="btn btn-data-edit" id="editBtn"
                             data-bs-toggle="modal" data-bs-target="#dataAddModal">
-                            <i class="fa-regular fa-pen-to-square"></i>수정
+                            <i class="fa-regular fa-pen-to-square"></i><span>${messages.edit}</span>
                         </button>
                         <button class="btn btn-data-delete" id="deleteBtn">
-                            <i class="bi bi-trash"></i>삭제
+                            <i class="bi bi-trash"></i><span>${messages.delete}</span>
                         </button>
                     `);
                 } else {

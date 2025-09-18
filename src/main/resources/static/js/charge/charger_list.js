@@ -49,7 +49,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const stationId = document.getElementById('modalCsid').value;
 
         if (!stationId) {
-            alert('충전소ID를 입력해주세요.');
+            alert(i18n.cpList.messages.inputCpId);
             return;
         }
 
@@ -68,7 +68,7 @@ document.addEventListener("DOMContentLoaded", function () {
         })
             .then(response => {
                 if (!response.ok) {
-                    throw new Error('충전기ID 정보를 가져오지 못했습니다.');
+                    throw new Error('Cannot get charger ID information.');
                 }
                 return response.json();
             })
@@ -78,7 +78,7 @@ document.addEventListener("DOMContentLoaded", function () {
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('충전기ID 정보를 가져오는데 실패했습니다.');
+                alert(i18n.cpList.messages.getCpIdError);
             });
     }
 
@@ -91,7 +91,7 @@ document.addEventListener("DOMContentLoaded", function () {
         })
             .then(response => {
                 if (!response.ok) {
-                    throw new Error('충전소 정보를 가져오지 못했습니다.');
+                    throw new Error('Cannot get station information.');
                 }
                 return response.json();
             })
@@ -101,7 +101,7 @@ document.addEventListener("DOMContentLoaded", function () {
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('충전소 정보가 존재하지 않습니다.');
+                alert(i18n.cpList.messages.getStationError);
             });
     }
 
@@ -124,7 +124,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // 충전기 모델 관련 초기화
         const modelSelect = document.getElementById("modalCpModelCd");
-        modelSelect.innerHTML = '<option value="%">(선택)</option>';
+        modelSelect.innerHTML = '<option value="%">' + i18n.cpList.titles.select + '</option>';
         document.getElementById("modalCpType").value = "";
         document.getElementById("modalCpManfCd").value = "";
         document.getElementById("modalCpKw").value = "";
@@ -138,7 +138,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // 요금제 초기화
         const planSelect = document.getElementById("modalPlan");
-        planSelect.innerHTML = '<option value="%">(선택)</option>';
+        planSelect.innerHTML = '<option value="%">' + i18n.cpList.titles.select + '</option>';
 
         // 사용 여부 및 위치 정보 초기화
         document.getElementById("modalUseYn").value = "Y";
@@ -175,18 +175,18 @@ document.addEventListener("DOMContentLoaded", function () {
                 if (!response.ok) {
                     if (response.status === 404) {
                         // NOT_FOUND 응답일 경우 기본 옵션만 표시
-                        console.warn('충전기 모델: 해당 사업자의 모델 정보가 없습니다.');
-                        chargeModelSelect.innerHTML = '<option value="%">(선택)</option>'; // 기존 옵션 초기화
+                        console.warn('Cannot get charge model information.');
+                        chargeModelSelect.innerHTML = '<option value="%">' + i18n.cpList.titles.select + '</option>'; // 기존 옵션 초기화
                         initModalModelInfo();
                         return null;
                     }
-                    throw new Error('서버 오류가 발생했습니다.');
+                    throw new Error('Server error occurred.');
                 }
                 return response.json();
             })
             .catch(error => {
                 console.error('Error fetching charge model data:', error);
-                chargeModelSelect.innerHTML = '<option value="%">(선택)</option>'; // 오류 발생 시 기본 옵션으로 초기화
+                chargeModelSelect.innerHTML = '<option value="%">' + i18n.cpList.titles.select + '</option>'; // 오류 발생 시 기본 옵션으로 초기화
                 initModalModelInfo();
                 return null;
             });
@@ -206,17 +206,17 @@ document.addEventListener("DOMContentLoaded", function () {
                 if (!response.ok) {
                     if (response.status === 404) {
                         // NOT_FOUND 응답일 경우 기본 옵션만 표시
-                        console.warn('요금제:등록된 요금제가 없습니다.');
-                        chargerPlanSelect.innerHTML = '<option value="%">(선택)</option>'; // 기존 옵션 초기화
+                        console.warn('Cannot get charge plan information.');
+                        chargerPlanSelect.innerHTML = '<option value="%">' + i18n.cpList.titles.select + '</option>'; // 기존 옵션 초기화
                         return null;
                     }
-                    throw new Error('서버 오류가 발생했습니다.');
+                    throw new Error('Server error occurred.');
                 }
                 return response.json();
             })
             .catch(error => {
                 console.error('Error fetching charge plan data:', error);
-                chargerPlanSelect.innerHTML = '<option value="%">(선택)</option>'; // 오류 발생 시 기본 옵션으로 초기화
+                chargerPlanSelect.innerHTML = '<option value="%">' + i18n.cpList.titles.select + '</option>'; // 오류 발생 시 기본 옵션으로 초기화
                 return null;
             });
     }
@@ -232,8 +232,8 @@ document.addEventListener("DOMContentLoaded", function () {
         const chargerPlanSelect = document.getElementById('modalPlan');
 
         if (!selectedCompanyId) {
-            chargeModelSelect.innerHTML = '<option value="%">(선택)</option>'; // 기본 옵션으로 초기화
-            chargerPlanSelect.innerHTML = '<option value="%">(선택)</option>'; // 기본 옵션으로 초기화
+            chargeModelSelect.innerHTML = '<option value="%">' + i18n.cpList.titles.select + '</option>'; // 기본 옵션으로 초기화
+            chargerPlanSelect.innerHTML = '<option value="%">' + i18n.cpList.titles.select + '</option>'; // 기본 옵션으로 초기화
             initModalModelInfo();
             return;
         }
@@ -242,8 +242,8 @@ document.addEventListener("DOMContentLoaded", function () {
         fetchChargeModelData(selectedCompanyId, chargeModelSelect).then(data => {
             if (!data) return;
 
-            console.log('모델정보:', data);
-            chargeModelSelect.innerHTML = '<option value="%">(선택)</option>'; // 기존 옵션 초기화
+            console.log('Model information:', data);
+            chargeModelSelect.innerHTML = '<option value="%">' + i18n.cpList.titles.select + '</option>'; // 기존 옵션 초기화
             initModalModelInfo();
 
             // 리스트 데이터를 기반으로 옵션 추가
@@ -259,8 +259,8 @@ document.addEventListener("DOMContentLoaded", function () {
         fetchChargerPlanData(selectedCompanyId, chargerPlanSelect).then(data => {
             if (!data) return;
 
-            console.log('요금제정보:', data);
-            chargerPlanSelect.innerHTML = '<option value="%">(선택)</option>'; // 기존 옵션 초기화
+            console.log('Plan information:', data);
+            chargerPlanSelect.innerHTML = '<option value="%">' + i18n.cpList.titles.select + '</option>'; // 기존 옵션 초기화
 
             // 리스트 데이터를 기반으로 옵션 추가
             data.forEach(plan => {
@@ -292,12 +292,12 @@ document.addEventListener("DOMContentLoaded", function () {
         })
             .then(response => {
                 if (!response.ok) {
-                    throw new Error('모델 정보를 가져오지 못했습니다.');
+                    throw new Error('Cannot get model information.');
                 }
                 return response.json();
             })
             .then(data => {
-                console.log("modelID 조회결과: ", data);
+                console.log("modelID search result: ", data);
                 document.getElementById('modalCpType').value = data.cpTypeName || '';
                 document.getElementById('modalCpManfCd').value = data.manufCdName || '';
                 document.getElementById('modalCpKw').value = data.powerUnit || '';
@@ -305,7 +305,7 @@ document.addEventListener("DOMContentLoaded", function () {
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('모델 정보가 존재하지 않습니다.');
+                alert(i18n.cpList.messages.getModelError);
                 initModalModelInfo();
             });
 
@@ -318,7 +318,7 @@ document.addEventListener("DOMContentLoaded", function () {
         var serialNum = document.getElementById('modemSn').value.trim();
 
         if (serialNum === '') {
-            alert('모뎀 시리얼번호를 입력해주세요');
+            alert(i18n.cpList.messages.inputModemSerialNum);
             return;
         }
 
@@ -333,15 +333,15 @@ document.addEventListener("DOMContentLoaded", function () {
             })
             .then(isDuplicate => {
                 if (isDuplicate) {
-                    alert('이미 등록된 시리얼번호 입니다.');
+                    alert(i18n.cpList.messages.alreadyRegisteredModemSerialNum);
                     dupCheckMModemSn = false;
                 } else {
-                    alert('등록록 가능한 시리얼번호 입니다다.');
+                    alert(i18n.cpList.messages.availableModemSerialNum);
                     dupCheckMModemSn = true;
                 }
             })
             .catch(error => {
-                alert('오류: 모뎀 시리얼번호 중복체크');
+                alert(i18n.cpList.messages.errorModemSerialNum);
                 console.error('Error:', error);
             });
 
@@ -354,7 +354,7 @@ document.addEventListener("DOMContentLoaded", function () {
         var modemNum = document.getElementById('modemNum').value.trim().replace(/-/g, '');
 
         if (modemNum === '') {
-            alert('모뎀 전화번호를 입력하세요.');
+            alert(i18n.cpList.messages.inputModemNum);
             return;
         }
 
@@ -369,15 +369,15 @@ document.addEventListener("DOMContentLoaded", function () {
             })
             .then(isDuplicate => {
                 if (isDuplicate) {
-                    alert('이미 등록된 모뎀번호 입니다.');
+                    alert(i18n.cpList.messages.alreadyExistModemNum);
                     dupCheckModemNum = false;
                 } else {
-                    alert('등록록 가능한 모뎀뎀번호 입니다다.');
+                    alert(i18n.cpList.messages.availableModemNum);
                     dupCheckModemNum = true;
                 }
             })
             .catch(error => {
-                alert('오류: 모뎀번호 중복체크');
+                alert(i18n.cpList.messages.errorModemNum);
                 console.error('Error:', error);
             });
     });
@@ -387,7 +387,7 @@ document.addEventListener("DOMContentLoaded", function () {
      */
     document.getElementById('addBtn').addEventListener('click', function () {
         isModalReg = true;
-        btnMsg = "등록";
+        btnMsg = i18n.cpList.buttons.add;
         $('#modalBtn').text(btnMsg);
         initModalForm();
 
@@ -421,7 +421,7 @@ document.addEventListener("DOMContentLoaded", function () {
             modemModelName: document.getElementById('modemModelNm').value,
             modemContractStatus: document.getElementById('modemContStat').value
         };
-        console.log("입력 data: ", bodyData);
+        console.log("data: ", bodyData);
 
         const m_url = '/charger/new';
         const m_method = 'POST';
@@ -434,16 +434,16 @@ document.addEventListener("DOMContentLoaded", function () {
         })
             .then(response => {
                 if (!response.ok) {
-                    throw new Error("충전기 등록 실패: " + response.statusText);
+                    throw new Error("Charger registration failed: " + response.statusText);
                 }
                 return response.text();
             })
             .then(data => {
-                console.log("처리결과:", data);
+                console.log("result: ", data);
                 window.location.replace('/charger/list');
             })
             .catch(error => {
-                console.error("충전기 등록 실패:", error);
+                console.error("Charger registration failed: ", error);
             });
     }
 
@@ -479,7 +479,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // 필수 필드 검증
         if (!bodyData.chargerName || !bodyData.stationId) {
-            alert("충전기 이름과 충전소 ID는 필수 입력 항목입니다.");
+            alert(i18n.cpList.messages.essentailFieldCheckError);
             return;
         }
 
@@ -494,18 +494,18 @@ document.addEventListener("DOMContentLoaded", function () {
             .then(response => {
                 if (!response.ok) {
                     return response.json().then(data => {
-                        throw new Error(data.message || "충전기 정보 수정에 실패했습니다.");
+                        throw new Error(data.message || "Charger information update failed.");
                     });
                 }
                 return response.json();
             })
             .then(data => {
-                alert(data.message || "충전기 정보가 성공적으로 수정되었습니다.");
+                alert(data.message || i18n.cpList.messages.updateChargerSuccess);
                 window.location.replace('/charger/list');
             })
             .catch(error => {
-                console.error("충전기 정보 수정 실패:", error);
-                alert(error.message || "충전기 정보 수정 중 오류가 발생했습니다.");
+                console.error("Charger information update failed: ", error);
+                alert(error.message || i18n.cpList.messages.updateChargerFailed);
             });
     }
 
@@ -515,7 +515,7 @@ document.addEventListener("DOMContentLoaded", function () {
      */
     document.getElementById('editBtn').addEventListener('click', function () {
         isModalReg = false;
-        btnMsg = "수정";
+        btnMsg = i18n.cpList.buttons.edit;
         $('#modalBtn').text(btnMsg);
 
         if (selectedRow) {
@@ -531,12 +531,12 @@ document.addEventListener("DOMContentLoaded", function () {
             })
                 .then(response => {
                     if (!response.ok) {
-                        throw new Error("충전기 정보 조회 실패: " + response.statusText);
+                        throw new Error("Charger information search failed: " + response.statusText);
                     }
                     return response.json();
                 })
                 .then(data => {
-                    console.log("충전기 정보 조회 결과:", data);
+                    console.log("Charger information search result: ", data);
 
                     // 회사 ID 설정
                     const companyId = data.companyId || "";
@@ -580,8 +580,8 @@ document.addEventListener("DOMContentLoaded", function () {
                         return fetchChargeModelData(companyId, chargeModelSelect)
                             .then(modelData => {
                                 if (modelData) {
-                                    console.log('모델정보:', modelData);
-                                    chargeModelSelect.innerHTML = '<option value="%">(선택)</option>'; // 기존 옵션 초기화
+                                    console.log('Model information: ', modelData);
+                                    chargeModelSelect.innerHTML = '<option value="%">' + i18n.cpList.titles.select + '</option>'; // 기존 옵션 초기화
                                     initModalModelInfo();
 
                                     // 리스트 데이터를 기반으로 옵션 추가
@@ -616,8 +616,8 @@ document.addEventListener("DOMContentLoaded", function () {
                             })
                             .then(planData => {
                                 if (planData) {
-                                    console.log('요금제정보:', planData);
-                                    chargerPlanSelect.innerHTML = '<option value="%">(선택)</option>'; // 기존 옵션 초기화
+                                    console.log('Plan information: ', planData);
+                                    chargerPlanSelect.innerHTML = '<option value="%">' + i18n.cpList.titles.select + '</option>'; // 기존 옵션 초기화
 
                                     // 리스트 데이터를 기반으로 옵션 추가
                                     planData.forEach(plan => {
@@ -648,10 +648,10 @@ document.addEventListener("DOMContentLoaded", function () {
                 })
                 .catch(error => {
                     console.error("충전기 정보 조회 실패:", error);
-                    alert("충전기 정보를 불러오는데 실패했습니다.");
+                    alert(i18n.cpList.messages.getChargerInfoError);
                 });
         } else {
-            alert("수정할 충전기를 선택해주세요.");
+            alert(i18n.cpList.messages.editErrorNoSelectedCharger);
         }
     });
 
@@ -678,11 +678,11 @@ document.addEventListener("DOMContentLoaded", function () {
             //등록로직
             registerCharger();
             if (!dupCheckMModemSn) {
-                alert('모뎀시리얼번호 중복체크 확인 필요.');
+                alert(i18n.cpList.messages.errorModemSerialNum);
                 return;
             }
             if (!dupCheckModemNum) {
-                alert('모뎀번호 중복체크 확인 필요.');
+                alert(i18n.cpList.messages.errorModemNum);
                 return;
             }
         } else {
@@ -722,16 +722,16 @@ document.addEventListener("DOMContentLoaded", function () {
             })
                 .then(response => {
                     if (!response.ok) {
-                        throw new Error("[DELETE]충전기 삭제 실패: " + response.statusText);
+                        throw new Error("[DELETE]Charger delete failed: " + response.statusText);
                     }
                     return response.text();
                 })
                 .then(data => {
-                    console.log("처리결과:", data);
+                    console.log("result: ", data);
                     window.location.replace('/charger/list');
                 })
                 .catch(error => {
-                    console.error("충전기 삭제 실패:", error);
+                    console.error("Charger delete failed: ", error);
                 });
         }
     });

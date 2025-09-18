@@ -29,7 +29,12 @@
     <script th:inline="javascript">
         // var stationList = /*[[${stationList != null ? stationList : '{}'}]]*/ {};
         // console.log(stationList);
+
+        var currentLanguage = /*[[${#locale.language}]]*/ 'ko';
     </script>
+
+    <!-- 공통 i18n 스크립트 포함 -->
+    <div th:replace="~{fragments/i18n/i18n-map :: map-i18n}"></div>
 </head>
 
 <body>
@@ -40,7 +45,7 @@
                 <!-- card body:1 start -->
                 <div class="card-body d-flex flex-column">
                     <div class="content-title">
-                        <i class="fa-solid fa-map font-ico me-2"></i>지도
+                        <i class="fa-solid fa-map font-ico me-2"></i><span th:text="#{map.title}">지도</span>
                     </div>
                     <!-- card:2 start -->
                     <div class="card card-shadow flex-grow-1 d-flex position-relative">
@@ -50,8 +55,8 @@
                         <!-- search area: start -->
                         <div class="map-search-container">
                             <div>
-                                <input type="text" id="searchBox" class="form-control" placeholder="충전소 이름을 입력하세요."
-                                    autocomplete="off">
+                                <input type="text" id="searchBox" class="form-control"
+                                    th:placeholder="#{map.search.placeholder}" autocomplete="off">
                                 <button id="searchBtn"><i class="bi bi-search"></i></button>
                             </div>
                             <div id="autocompleteList" class="autocomplete-items"></div>
@@ -65,26 +70,27 @@
                                         </div>
                                         <div id="stationContentContainer" class="overflow-y-auto scrollbar">
                                             <div id="stationContainer">
-                                                <div>충전소 정보</div>
+                                                <div th:text="#{map.station.info}">충전소 정보</div>
                                                 <div class="row row-cols-2 station-info">
-                                                    <div class="col-4">충전소명</div>
+                                                    <div class="col-4" th:text="#{map.station.name}">충전소명</div>
                                                     <div class="col-8" id="stationName"></div>
-                                                    <div class="col-4">사업자명</div>
+                                                    <div class="col-4" th:text="#{map.station.company}">사업자명</div>
                                                     <div class="col-8" id="companyName"></div>
-                                                    <div class="col-4">충전소ID</div>
+                                                    <div class="col-4" th:text="#{map.station.id}">충전소ID</div>
                                                     <div class="col-8" id="stationId"></div>
-                                                    <div class="col-4">주소</div>
+                                                    <div class="col-4" th:text="#{map.station.address}">주소</div>
                                                     <div class="col-8" id="address"></div>
-                                                    <div class="col-4">운영여부</div>
+                                                    <div class="col-4" th:text="#{map.station.operation}">운영여부</div>
                                                     <div class="col-8" id="opStatusName"></div>
-                                                    <div class="col-4">주차정보</div>
+                                                    <div class="col-4" th:text="#{map.station.parking}">주차정보</div>
                                                     <div class="col-8" id="parkingFeeYn"></div>
-                                                    <div class="col-4">고객센터</div>
+                                                    <div class="col-4" th:text="#{map.station.customerCenter}">고객센터
+                                                    </div>
                                                     <div class="col-8" id="asNum"></div>
                                                 </div>
                                             </div>
                                             <div id="chargerContainer">
-                                                <div>충전기 정보</div>
+                                                <div th:text="#{map.charger.info}">충전기 정보</div>
                                                 <div id="chargerList"></div>
                                             </div>
                                         </div>
@@ -105,6 +111,10 @@
             <!-- card:1 end -->
         </div>
     </div>
+
+    <!-- 언어 선택기 스크립트 -->
+    <div th:replace="~{fragments/language-selector :: language-script}"></div>
+
 </body>
 
 </html>

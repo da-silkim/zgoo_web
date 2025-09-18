@@ -5,6 +5,8 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -36,6 +38,7 @@ public class CpMaintainController {
 
     private final CpMaintainService cpMaintainService;
     private final ComService comService;
+    private final MessageSource messageSource;
 
     @GetMapping("/search/{chargerId}")
     public ResponseEntity<Map<String, Object>> searchCsCpInfo(@PathVariable("chargerId") String chargerId,
@@ -48,14 +51,16 @@ public class CpMaintainController {
             CpInfoDto cpInfo = this.cpMaintainService.searchCsCpInfo(chargerId, principal.getName());
 
             if (cpInfo.getChargerId() == null) {
-                response.put("message", "등록된 충전기ID 정보가 없습니다.");
+                response.put("message", messageSource.getMessage("disabilitymgm.api.messages.noChargerIdInfo", null,
+                        LocaleContextHolder.getLocale()));
             }
 
             response.put("cpInfo", cpInfo);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             log.error("[searchCsCpInfo] error: {}", e.getMessage());
-            response.put("message", "충전기ID 조회 중 오류가 발생했습니다.");
+            response.put("message", messageSource.getMessage("disabilitymgm.api.messages.chargerIdSearchError", null,
+                    LocaleContextHolder.getLocale()));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
@@ -72,7 +77,8 @@ public class CpMaintainController {
             CpMaintainRegDto maintainFineOne = this.cpMaintainService.findMaintainOne(cpmaintainId);
 
             if (maintainFineOne == null) {
-                response.put("message", "등록된 충전기 장애 정보가 없습니다.");
+                response.put("message", messageSource.getMessage("disabilitymgm.api.messages.noerrInfoCp", null,
+                        LocaleContextHolder.getLocale()));
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
             }
 
@@ -80,7 +86,8 @@ public class CpMaintainController {
                     principal.getName());
 
             if (cpInfo.getChargerId() == null) {
-                response.put("message", "등록된 충전기ID 정보가 없습니다.");
+                response.put("message", messageSource.getMessage("disabilitymgm.api.messages.noChargerIdInfo", null,
+                        LocaleContextHolder.getLocale()));
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
             }
 
@@ -89,7 +96,8 @@ public class CpMaintainController {
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             log.error("[findMaintainOne] error: {}", e.getMessage());
-            response.put("message", "충전기 장애 정보 조회 중 오류가 발생했습니다.");
+            response.put("message", messageSource.getMessage("disabilitymgm.api.messages.chargerErrInfoSearchErr", null,
+                    LocaleContextHolder.getLocale()));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
@@ -143,11 +151,13 @@ public class CpMaintainController {
             }
 
             this.cpMaintainService.saveMaintain(dto, principal.getName());
-            return ResponseEntity.ok("충전기 장애 정보가 정상적으로 등록되었습니다.");
+            return ResponseEntity.ok(messageSource.getMessage("disabilitymgm.api.messages.disabilityRegSuccess", null,
+                    LocaleContextHolder.getLocale()));
         } catch (Exception e) {
             log.error("[createMaintain] error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("충전기 장애 정보 등록 중 오류가 발생했습니다.");
+                    .body(messageSource.getMessage("disabilitymgm.api.messages.disabilityRegError", null,
+                            LocaleContextHolder.getLocale()));
         }
     }
 
@@ -161,7 +171,8 @@ public class CpMaintainController {
             if (cpmaintainId == null) {
                 log.error("cpmaintainId is null");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body("충전기 장애 정보ID가 없어 수정할 수 없습니다.");
+                        .body(messageSource.getMessage("disabilitymgm.api.messages.noDisabilityId", null,
+                                LocaleContextHolder.getLocale()));
             }
 
             ResponseEntity<String> permissionCheck = this.comService.checkUserPermissions(principal,
@@ -172,11 +183,14 @@ public class CpMaintainController {
 
             this.cpMaintainService.updateMaintain(cpmaintainId, dto, principal.getName());
             log.info("=== maintain info update complete ===");
-            return ResponseEntity.ok("충전기 장애 정보가 정상적으로 수정되었습니다.");
+            return ResponseEntity
+                    .ok(messageSource.getMessage("disabilitymgm.api.messages.disabilityUpdateSuccess", null,
+                            LocaleContextHolder.getLocale()));
         } catch (Exception e) {
             log.error("[updateMaintain] error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("충전기 장애 정보 수정 중 오류가 발생했습니다.");
+                    .body(messageSource.getMessage("disabilitymgm.api.messages.disabilityUpdateError", null,
+                            LocaleContextHolder.getLocale()));
         }
     }
 
@@ -189,7 +203,8 @@ public class CpMaintainController {
             if (cpmaintainId == null) {
                 log.error("cpmaintainId id null");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body("충전기 장애 정보ID가 없어 삭제할 수 없습니다.");
+                        .body(messageSource.getMessage("disabilitymgm.api.messages.deleteErrNoId", null,
+                                LocaleContextHolder.getLocale()));
             }
 
             ResponseEntity<String> permissionCheck = this.comService.checkUserPermissions(principal,
@@ -199,11 +214,13 @@ public class CpMaintainController {
             }
 
             this.cpMaintainService.deleteMaintain(cpmaintainId, principal.getName());
-            return ResponseEntity.ok("충전기 장애 정보가 정상적으로 삭제되었습니다.");
+            return ResponseEntity.ok(messageSource.getMessage("disabilitymgm.api.messages.deleteSuccess", null,
+                    LocaleContextHolder.getLocale()));
         } catch (Exception e) {
             log.error("[deleteMaintain] error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("충전기 장애 정보 삭제 중 오류가 발생했습니다.");
+                    .body(messageSource.getMessage("disabilitymgm.api.messages.deleteError", null,
+                            LocaleContextHolder.getLocale()));
         }
     }
 

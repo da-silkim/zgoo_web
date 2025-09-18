@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Member I18n</title>
+</head>
+
+<body>
+    <script th:fragment="member-i18n" th:inline="javascript">
+        var i18n = {
+            member: {
+                titles: {
+                    main: /*[[#{member.titles.main}]]*/ '회원관리 > 회원리스트',
+                    search: /*[[#{member.titles.search}]]*/ '검색조건'
+                },
+                buttons: {
+                    search: /*[[#{member.buttons.search}]]*/ '검색',
+                    reset: /*[[#{member.buttons.reset}]]*/ '초기화',
+                    excel: /*[[#{member.buttons.excel}]]*/ '엑셀다운로드',
+                    reg: /*[[#{member.buttons.reg}]]*/ '등록',
+                    edit: /*[[#{member.buttons.edit}]]*/ '수정',
+                    del: /*[[#{member.buttons.del}]]*/ '삭제'
+                },
+                labels: {
+                    membercard: /*[[#{member.labels.membercard}]]*/ '회원카드번호',
+                    membername: /*[[#{member.labels.membername}]]*/ '회원이름',
+                },
+                placeholders: {
+                    membercard: /*[[#{member.placeholders.membercard}]]*/ '회원카드번호를 입력해주세요.',
+                    membername: /*[[#{member.placeholders.membername}]]*/ '회원이름을 입력해주세요.',
+                },
+                tables: {
+                    membername: /*[[#{member.tables.membername}]]*/ '회원이름',
+                    memberid: /*[[#{member.tables.memberid}]]*/ '회원ID',
+                    idtag: /*[[#{member.tables.idtag}]]*/ '회원카드번호',
+                    cellnum: /*[[#{member.tables.cellnum}]]*/ '휴대전화',
+                    email: /*[[#{member.tables.email}]]*/ '이메일',
+                    membertype: /*[[#{member.tables.membertype}]]*/ '회원구분',
+                    joindate: /*[[#{member.tables.joindate}]]*/ '가입일',
+                    nodata: /*[[#{member.tables.nodata}]]*/ '조회된 데이터가 없습니다.'
+                },
+                alerts: {
+
+                }
+            }
+        };
+    </script>
+</body>
+
+</html>

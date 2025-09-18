@@ -4,37 +4,45 @@
     <div class="card responsive-content">
         <!-- card body:1 start -->
         <div class="card-body">
-            <div class="content-title"><i class="fa-solid fa-user-tie font-ico me-2"></i>회원관리 > 회원카드관리</div>
+            <div class="content-title" th:text="#{member.idtagManagement.titles.main}"><i
+                    class="fa-solid fa-user-tie font-ico me-2"></i></div>
             <!-- card:2 start -->
             <div class="card card-shadow">
                 <!-- card body:2 start -->
                 <div class="card-body">
-                    <div class="card-title"><span class="card-title-bar"></span><span>검색조건</span></div>
+                    <div class="card-title"><span class="card-title-bar"></span><span
+                            th:text="#{member.idtagManagement.titles.search}"></span></div>
                     <!-- form start -->
                     <form id="searchForm" class="position-relative" th:action="@{/member/tag/list}" method="get">
                         <!-- row: start -->
                         <div class="row mb-3 row-cols-2 row-cols-lg-3 g-2">
                             <div class="col d-flex align-items-center">
                                 <label for="idTagSearch"
-                                    class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">회원카드번호</label>
+                                    class="flex-shrink-0 col-form-label font-weight-bold text-right w-25"
+                                    th:text="#{member.idtagManagement.titles.tagNumber}"></label>
                                 <input type="text" name="idTagSearch" id="idTagSearch" class="mx-3 form-control"
-                                    placeholder="회원카드번호를 입력해주세요." th:value="${selectedIdTag}" autocomplete="off">
+                                    th:placeholder="#{member.idtagManagement.placeholders.tagNumber}"
+                                    th:value="${selectedIdTag}" autocomplete="off">
                             </div>
                             <div class="col d-flex align-items-center">
                                 <label for="nameSearch"
-                                    class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">회원명</label>
+                                    class="flex-shrink-0 col-form-label font-weight-bold text-right w-25"
+                                    th:text="#{member.idtagManagement.titles.memberName}"></label>
                                 <input type="text" name="nameSearch" id="nameSearch" class="mx-3 form-control"
-                                    placeholder="사용자명을 입력해주세요." th:value="${selectedName}" autocomplete="off">
+                                    th:placeholder="#{member.idtagManagement.placeholders.memberName}"
+                                    th:value="${selectedName}" autocomplete="off">
                             </div>
                         </div>
                         <!-- row: end -->
                         <div class="search-btn">
                             <button type="button" class="btn btn-outline-grey me-2" id="searchBtn"
                                 onclick="searchOption()">
-                                <i class="bi bi-search me-2"></i>검색</button>
+                                <i class="bi bi-search me-2"></i><span
+                                    th:text="#{member.idtagManagement.buttons.search}"></span></button>
                             <button type="button" class="btn btn-outline-grey me-2" id="resetBtn"
                                 onclick="replacePage('/member/tag/list')">
-                                <i class="bi bi-arrow-repeat me-2"></i>초기화</button>
+                                <i class="bi bi-arrow-repeat me-2"></i><span
+                                    th:text="#{member.idtagManagement.buttons.reset}"></span></button>
                         </div>
                     </form>
                 </div>
@@ -49,19 +57,22 @@
                         <button class="btn btn-excel" id="excelBtn"
                             onclick="excelDownload('/excel/download/member_tag', ['idTagSearch', 'nameSearch'])"
                             th:if="${menuAuthority.authority == 'SU' or menuAuthority.excelYn == 'Y'}">
-                            <i class="bi bi-file-earmark-spreadsheet"></i>엑셀다운로드</button>
+                            <i class="bi bi-file-earmark-spreadsheet"></i><span
+                                th:text="#{member.idtagManagement.buttons.excel}"></span></button>
                         <div class="btn-mod" th:if="${menuAuthority.authority == 'SU' or menuAuthority.modYn == 'Y'}">
                             <button class="btn btn-data-edit" id="editBtn" data-bs-toggle="modal"
                                 data-bs-target="#dataAddModal" hidden>
-                                <i class="fa-regular fa-pen-to-square"></i>수정</button>
+                                <i class="fa-regular fa-pen-to-square"></i><span
+                                    th:text="#{member.idtagManagement.buttons.edit}"></span></button>
                             <button class="btn btn-data-delete" id="deleteBtn" hidden>
-                                <i class="bi bi-trash"></i>삭제</button>
+                                <i class="bi bi-trash"></i><span
+                                    th:text="#{member.idtagManagement.buttons.del}"></span></button>
                         </div>
                     </div>
                     <div class="page-container">
                         <span id="pageInfo">
                             <span
-                                th:text="'Page ' + (${currentPage + 1}) + ' of ' + ${totalPages} + ' [총 ' + ${totalCount} + '건]'"></span>
+                                th:text="'Page ' + (${currentPage + 1}) + ' of ' + ${totalPages} + ' [' + ${totalCount} + ']'"></span>
                         </span>
                         <select class="mx-3 page-select" id="size" name="size">
                             <option th:each="data : ${showListCnt}" th:value="${data.commonCode}"
@@ -74,15 +85,15 @@
                                 <tr class="table-border-top">
                                     <th scope="col"></th>
                                     <th scope="col">No</th>
-                                    <th scope="col">회원명</th>
-                                    <th scope="col">휴대전화</th>
-                                    <th scope="col">부모IDTAG</th>
-                                    <th scope="col">회원카드번호</th>
-                                    <th scope="col">유효기간</th>
-                                    <th scope="col">사용여부</th>
-                                    <th scope="col">누적충전량(kWh)</th>
-                                    <th scope="col">누적충전금액(원)</th>
-                                    <th scope="col">상태</th>
+                                    <th scope="col" th:text="#{member.idtagManagement.tables.memberName}"></th>
+                                    <th scope="col" th:text="#{member.idtagManagement.tables.phoneNumber}"></th>
+                                    <th scope="col" th:text="#{member.idtagManagement.tables.parentIdTag}"></th>
+                                    <th scope="col" th:text="#{member.idtagManagement.tables.idTag}"></th>
+                                    <th scope="col" th:text="#{member.idtagManagement.tables.expireDate}"></th>
+                                    <th scope="col" th:text="#{member.idtagManagement.tables.useYn}"></th>
+                                    <th scope="col" th:text="#{member.idtagManagement.tables.totalChargingPower}"></th>
+                                    <th scope="col" th:text="#{member.idtagManagement.tables.totalChargingPrice}"></th>
+                                    <th scope="col" th:text="#{member.idtagManagement.tables.status}"></th>
                                 </tr>
                             </thead>
                             <tbody id="pageList">
@@ -102,7 +113,7 @@
                                     <td th:text="${member.status}"></td>
                                 </tr>
                                 <tr th:if="${memberAuthList.size() == 0}">
-                                    <td colspan="10">조회된 데이터가 없습니다.</td>
+                                    <td colspan="10" th:text="#{member.idtagManagement.messages.nodata}"></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -231,6 +242,49 @@
     <!-- Add Modal end -->
 
     <script type="text/javascript" th:src="@{/js/member/member_tag.js}"></script>
+    <script th:inline="javascript">
+        var i18n = {
+            member: {
+                idtagManagement: {
+                    titles: {
+                        main: /*[[#{member.idtagManagement.titles.main}]]*/ '회원관리 > 회원카드관리',
+                        search: /*[[#{member.idtagManagement.titles.search}]]*/ '검색조건',
+                        tagNumber: /*[[#{member.idtagManagement.titles.tagNumber}]]*/ '회원카드번호',
+                        memberName: /*[[#{member.idtagManagement.titles.memberName}]]*/ '회원명'
+                    },
+                    placeholders: {
+                        tagNumber: /*[[#{member.idtagManagement.placeholders.tagNumber}]]*/ '회원카드번호를 입력해주세요.',
+                        memberName: /*[[#{member.idtagManagement.placeholders.memberName}]]*/ '회원명을 입력해주세요.'
+                    },
+                    tables: {
+                        memberName: /*[[#{member.idtagManagement.tables.memberName}]]*/ '회원명',
+                        phoneNumber: /*[[#{member.idtagManagement.tables.phoneNumber}]]*/ '휴대전화',
+                        parentIdTag: /*[[#{member.idtagManagement.tables.parentIdTag}]]*/ '부모IDTAG',
+                        idTag: /*[[#{member.idtagManagement.tables.idTag}]]*/ '회원카드번호',
+                        expireDate: /*[[#{member.idtagManagement.tables.expireDate}]]*/ '유효기간',
+                        useYn: /*[[#{member.idtagManagement.tables.useYn}]]*/ '사용여부',
+                        totalChargingPower: /*[[#{member.idtagManagement.tables.totalChargingPower}]]*/ '누적충전량(kWh)',
+                        totalChargingPrice: /*[[#{member.idtagManagement.tables.totalChargingPrice}]]*/ '누적충전금액(원)',
+                        status: /*[[#{member.idtagManagement.tables.status}]]*/ '상태'
+                    },
+                    buttons: {
+                        search: /*[[#{member.idtagManagement.buttons.search}]]*/ '검색',
+                        reset: /*[[#{member.idtagManagement.buttons.reset}]]*/ '초기화',
+                        excel: /*[[#{member.idtagManagement.buttons.excel}]]*/ '엑셀다운로드',
+                        edit: /*[[#{member.idtagManagement.buttons.edit}]]*/ '수정',
+                        del: /*[[#{member.idtagManagement.buttons.del}]]*/ '삭제'
+                    },
+                    messages: {
+                        nodata: /*[[#{member.idtagManagement.messages.nodata}]]*/ '조회된 데이터가 없습니다.'
+                    }
+                }
+            }
+        };
+
+        var currentLanguage = /*[[${#locale.language}]]*/ 'ko';
+    </script>
+    <!-- 언어 선택기 스크립트 -->
+    <div th:replace="~{fragments/language-selector :: language-script}"></div>
 </div>
 
 </html>

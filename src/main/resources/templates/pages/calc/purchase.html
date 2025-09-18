@@ -4,32 +4,36 @@
     <div class="card responsive-content">
         <!-- card body:1 start -->
         <div class="card-body">
-            <div class="content-title"><i class="fa-solid fa-receipt me-2"></i>정산 > 매입관리</div>
+            <div class="content-title"><i class="fa-solid fa-receipt me-2"></i><span th:text="#{pc.titles.main}"></span>
+            </div>
             <!-- card:2 start -->
             <div class="card card-shadow">
                 <!-- card body:2 start -->
                 <div class="card-body">
-                    <div class="card-title"><span class="card-title-bar"></span><span>검색조건</span></div>
+                    <div class="card-title"><span class="card-title-bar"></span><span
+                            th:text="#{pc.titles.search}"></span></div>
                     <!-- form start -->
                     <form id="searchForm" class="position-relative" th:action="@{/calc/purchase}" method="get">
                         <!-- row:1 start -->
                         <div class="row mb-3 row-cols-2 row-cols-lg-3 g-2">
                             <div class="col d-flex align-items-center">
                                 <label for="opSearch"
-                                    class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">검색조건</label>
+                                    class="flex-shrink-0 col-form-label font-weight-bold text-right w-25"><span
+                                        th:text="#{pc.titles.search}"></span></label>
                                 <select id="opSearch" name="opSearch" class="ms-3 form-control w-40">
-                                    <option th:value="null" th:selected="${selectedOpSearch == null}">선택</option>
-                                    <option th:value="'bizName'" th:text="거래처명"
+                                    <option th:value="null" th:selected="${selectedOpSearch == null}"><span
+                                            th:text="#{pc.labels.select}"></span></option>
+                                    <option th:value="'bizName'" th:text="#{pc.labels.clientnm}"
                                         th:selected="${selectedOpSearch == 'bizName'}"></option>
-                                    <option th:value="'approvalNo'" th:text="승인번호"
+                                    <option th:value="'approvalNo'" th:text="#{pc.labels.appnum}"
                                         th:selected="${selectedOpSearch == 'approvalNo'}"></option>
                                 </select>
                                 <input type="text" name="contentSearch" id="contentSearch" class="mx-2 form-control"
                                     th:value="${selectedContentSearch}" autocomplete="off">
                             </div>
                             <div class="col d-flex align-items-center">
-                                <span
-                                    class="flex-shrink-0 col-form-label font-weight-bold mr-3p text-right w-25">매입일자</span>
+                                <span class="flex-shrink-0 col-form-label font-weight-bold mr-3p text-right w-25"><span
+                                        th:text="#{pc.labels.purchasedate}"></span></span>
                                 <input type="date" min="1970-01-01" max="2199-12-31" th:value="${selectedStartDate}"
                                     name="startDate" id="startDate" class="mx-3 form-control">
                                 <span class="flex-shrink-0 col-form-label font-weight-bold">~</span>
@@ -40,10 +44,11 @@
                         <div class="search-btn">
                             <button type="button" class="btn btn-outline-grey me-2" id="searchBtn"
                                 onclick="searchOption()">
-                                <i class="bi bi-search me-2"></i>검색</button>
+                                <i class="bi bi-search me-2"></i><span th:text="#{pc.buttons.search}"></span></button>
                             <button type="button" class="btn btn-outline-grey me-2" id="resetBtn"
                                 onclick="replacePage('/calc/purchase')">
-                                <i class="bi bi-arrow-repeat me-2"></i>초기화</button>
+                                <i class="bi bi-arrow-repeat me-2"></i><span
+                                    th:text="#{pc.buttons.reset}"></span></button>
                         </div>
                         <!-- row:1 end -->
                     </form>
@@ -56,30 +61,34 @@
             <div class="card card-shadow mt-4">
                 <!-- card body:3 start -->
                 <div class="card-body">
-                    <div class="card-title"><span class="card-title-bar"></span><span>매입관리</span></div>
+                    <div class="card-title"><span class="card-title-bar"></span><span
+                            th:text="#{pc.titles.purchaseList}"></span></div>
                     <div class="mt-3 btn-page-area">
                         <button class="btn btn-excel" id="excelBtn"
                             onclick="excelDownload('/excel/download/purchase', ['opSearch', 'contentSearch', 'startDate', 'endDate'])"
                             th:if="${menuAuthority.authority == 'SU' or menuAuthority.excelYn == 'Y'}">
-                            <i class="bi bi-file-earmark-spreadsheet"></i>엑셀다운로드</button>
+                            <i class="bi bi-file-earmark-spreadsheet"></i><span
+                                th:text="#{pc.buttons.excel}"></span></button>
                         <div class="btn-mod display-inline-block"
                             th:if="${menuAuthority.authority == 'SU' or menuAuthority.modYn == 'Y'}">
                             <button class="btn btn-elec" id="elecBtn" data-bs-toggle="modal"
                                 data-bs-target="#elecModal">
-                                <i class="bi bi bi-file-earmark-arrow-up"></i>한전파일 업로드</button>
+                                <i class="bi bi bi-file-earmark-arrow-up"></i><span
+                                    th:text="#{pc.buttons.kepcofileupload}"></span></button>
                             <button class="btn btn-data-add" id="addBtn" data-bs-toggle="modal"
                                 data-bs-target="#dataAddModal">
-                                <i class="bi bi-plus-square"></i>등록</button>
+                                <i class="bi bi-plus-square"></i><span th:text="#{pc.buttons.add}"></span></button>
                             <button class="btn btn-data-edit" id="editBtn" data-bs-toggle="modal"
                                 data-bs-target="#dataAddModal" hidden>
-                                <i class="fa-regular fa-pen-to-square"></i>수정</button>
+                                <i class="fa-regular fa-pen-to-square"></i><span
+                                    th:text="#{pc.buttons.edit}"></span></button>
                             <button class="btn btn-data-delete" id="deleteBtn" hidden>
-                                <i class="bi bi-trash"></i>삭제</button>
+                                <i class="bi bi-trash"></i><span th:text="#{pc.buttons.delete}"></span></button>
                         </div>
                         <span>
                             <span id="pageInfo">
                                 <span
-                                    th:text="'Page ' + (${currentPage + 1}) + ' of ' + ${totalPages} + ' [총 ' + ${totalCount} + '건]'"></span>
+                                    th:text="'Page ' + (${currentPage + 1}) + ' of ' + ${totalPages} + ' [' + ${totalCount} + ']'"></span>
                             </span>
                             <select class="mx-3 page-select" id="size" name="size">
                                 <option th:each="data : ${showListCnt}" th:value="${data.commonCode}"
@@ -93,16 +102,16 @@
                                 <tr class="table-border-top">
                                     <th scope="col"></th>
                                     <th scope="col"></th>
-                                    <th scope="col">사업자</th>
-                                    <th scope="col">충전소명</th>
-                                    <th scope="col">거래처명</th>
-                                    <th scope="col">계정과목</th>
-                                    <th scope="col">공급가액</th>
-                                    <th scope="col">부가세</th>
-                                    <th scope="col">합계</th>
-                                    <th scope="col">지불방법</th>
-                                    <th scope="col">승인번호</th>
-                                    <th scope="col">매입일자</th>
+                                    <th scope="col"><span th:text="#{pc.labels.company}"></span></th>
+                                    <th scope="col"><span th:text="#{pc.labels.stationnm}"></span></th>
+                                    <th scope="col"><span th:text="#{pc.labels.clientnm}"></span></th>
+                                    <th scope="col"><span th:text="#{pc.labels.category}"></span></th>
+                                    <th scope="col"><span th:text="#{pc.labels.supplyprice}"></span></th>
+                                    <th scope="col"><span th:text="#{pc.labels.vat}"></span></th>
+                                    <th scope="col"><span th:text="#{pc.labels.totamt}"></span></th>
+                                    <th scope="col"><span th:text="#{pc.labels.paymethod}"></span></th>
+                                    <th scope="col"><span th:text="#{pc.labels.appnum}"></span></th>
+                                    <th scope="col"><span th:text="#{pc.labels.purchasedate}"></span></th>
                                 </tr>
                             </thead>
                             <tbody id="pageList">
@@ -130,7 +139,7 @@
                                     <td th:text="${pur.purchaseDate}"></td>
                                 </tr>
                                 <tr th:if="${purList.size() == 0}">
-                                    <td colspan="10">조회된 데이터가 없습니다.</td>
+                                    <td colspan="10"><span th:text="#{pc.messages.nodata}"></span></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -190,120 +199,137 @@
                     <div class="modal-body position-relative">
                         <!-- 모달 내용 -->
                         <div class="modal-title mb-2">
-                            <span class="modal-title-bar"></span><span>매입정보</span>
+                            <span class="modal-title-bar"></span><span th:text="#{pc.titles.purchaseInfo}"></span>
                             <span class="table-row-control-container me-4">
-                                <button type="button" class="btn btn-outline-grey" id="loadBtn" hidden>불러오기</button>
+                                <button type="button" class="btn btn-outline-grey" id="loadBtn" hidden><span
+                                        th:text="#{pc.buttons.load}"></span></button>
                             </span>
                         </div>
                         <!-- table:1 start -->
                         <table class="table table-bg-v table-fixed w-100 text-center align-middle">
                             <tbody>
                                 <tr class="table-border-top">
-                                    <th class="w-20">계정과목<b class="required-data">*</b></th>
+                                    <th class="w-20"><span th:text="#{pc.labels.category}"></span><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <select id="accountCode" class="form-control" required>
                                             <option th:each="data : ${accList}" th:value="${data.commonCode}"
                                                 th:text="${data.commonCodeName}"></option>
                                         </select>
                                     </td>
-                                    <th class="w-20">품목명</th>
+                                    <th class="w-20"><span th:text="#{pc.labels.itemnm}"></span></th>
                                     <td class="w-30">
                                         <input type="text" name="item" id="item" class="form-control"
                                             autocomplete="off">
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="w-20">거래처명<b class="required-data">*</b></th>
+                                    <th class="w-20"><span th:text="#{pc.labels.clientnm}"></span><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <input type="text" name="bizName" id="bizName" class="form-control"
                                             autocomplete="off" required>
                                     </td>
-                                    <th class="w-20">사업자등록번호<b class="required-data">*</b></th>
+                                    <th class="w-20"><span th:text="#{pc.labels.businessnum}"></span><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <input type="text" name="bizNum" id="bizNum" class="form-control"
                                             oninput="addHyphenBizNo(this)" autocomplete="off" required>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="w-20">충전소ID<b class="required-data">*</b></th>
+                                    <th class="w-20"><span th:text="#{pc.labels.stationid}"></span><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <div class="display-input-btn">
                                             <input type="text" name="stationId" id="stationId" class="form-control"
                                                 autocomplete="off" disabled required>
                                             <button type="button" class="btn btn-outline-grey flex-btn m-0"
-                                                id="stationSearchBtn">조회</button>
+                                                id="stationSearchBtn"><span
+                                                    th:text="#{pc.buttons.search}"></span></button>
                                         </div>
                                     </td>
-                                    <th class="w-20">매입거래일자<b class="required-data">*</b></th>
+                                    <th class="w-20"><span th:text="#{pc.labels.purchasedate}"></span><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <input type="date" min="1930-01-01" max="2199-12-31" name="purchaseDate"
                                             id="purchaseDate" class="form-control" required>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="w-20">대금거래방법<b class="required-data">*</b></th>
+                                    <th class="w-20"><span th:text="#{pc.labels.paymethod}"></span><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <select id="paymentMethod" class="form-control" required>
                                             <option th:each="data : ${purchaseList}" th:value="${data.commonCode}"
                                                 th:text="${data.commonCodeName}"></option>
                                         </select>
                                     </td>
-                                    <th class="w-20">승인번호</th>
+                                    <th class="w-20"><span th:text="#{pc.labels.appnum}"></span></th>
                                     <td class="w-30">
                                         <input type="text" name="approvalNo" id="approvalNo" class="form-control"
                                             autocomplete="off">
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="w-20">단가<b class="required-data">*</b></th>
+                                    <th class="w-20"><span th:text="#{pc.labels.unitprice}"></span><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <input type="number" name="unitPrice" id="unitPrice" class="form-control"
                                             value="0" autocomplete="off" required>
                                     </td>
-                                    <th class="w-20">수량<b class="required-data">*</b></th>
+                                    <th class="w-20"><span th:text="#{pc.labels.count}"></span><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <input type="number" name="amount" id="amount" class="form-control"
                                             autocomplete="off" value="1" required>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="w-20">공급가액<b class="required-data">*</b></th>
+                                    <th class="w-20"><span th:text="#{pc.labels.supplyprice}"></span><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <input type="number" name="supplyPrice" id="supplyPrice" class="form-control"
                                             value="0" autocomplete="off" required>
                                     </td>
-                                    <th class="w-20">부가세<b class="required-data">*</b></th>
+                                    <th class="w-20"><span th:text="#{pc.labels.vat}"></span><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <input type="number" name="vat" id="vat" class="form-control" autocomplete="off"
                                             value="0" required>
                                     </td>
                                 </tr>
                                 <tr id="elecContainer" class="elec-content" hidden>
-                                    <th class="w-20">부담금<b class="required-data">*</b></th>
+                                    <th class="w-20"><span th:text="#{pc.labels.contribution}"></span><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <input type="number" name="charge" id="charge" class="form-control"
                                             autocomplete="off" value="0" required>
                                     </td>
-                                    <th class="w-20">가산금<b class="required-data">*</b></th>
+                                    <th class="w-20"><span th:text="#{pc.labels.surcharge}"></span><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <input type="number" name="surcharge" id="surcharge" class="form-control"
                                             autocomplete="off" value="0" required>
                                     </td>
                                 </tr>
                                 <tr id="elecContainerSec" hidden>
-                                    <th class="w-20">절사액<b class="required-data">*</b></th>
+                                    <th class="w-20"><span th:text="#{pc.labels.cutoffamount}"></span><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <input type="number" name="cutoffAmount" id="cutoffAmount" class="form-control"
                                             autocomplete="off" value="0" required>
                                     </td>
-                                    <th class="w-20">미납금액<b class="required-data">*</b></th>
+                                    <th class="w-20"><span th:text="#{pc.labels.notpaidamount}"></span><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <input type="number" name="unpaidAmount" id="unpaidAmount" class="form-control"
                                             autocomplete="off" value="0" required>
                                     </td>
                                 </tr>
                                 <tr id="totalContainer">
-                                    <th class="w-20">합계액<b class="required-data">*</b></th>
+                                    <th class="w-20"><span th:text="#{pc.labels.totamt}"></span><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <input type="number" name="totalAmount" id="totalAmount" class="form-control"
                                             autocomplete="off" value="0" required>
@@ -311,12 +337,14 @@
                                     <td colspan="2"></td>
                                 </tr>
                                 <tr id="totalContainerSec" hidden>
-                                    <th class="w-20">합계액<b class="required-data">*</b></th>
+                                    <th class="w-20"><span th:text="#{pc.labels.totamt}"></span><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <input type="number" name="totalAmountSub" id="totalAmountSub"
                                             class="form-control" autocomplete="off" value="0" required>
                                     </td>
-                                    <th class="w-20">사용량(kWh)<b class="required-data">*</b></th>
+                                    <th class="w-20"><span th:text="#{pc.labels.usagekw}"></span><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <input type="number" name="power" id="power" class="form-control"
                                             autocomplete="off" value="0" required>
@@ -329,8 +357,9 @@
                     <!-- modal body end -->
                     <div class="modal-footer justify-content-center border-top-none">
                         <button type="button" id="cancelBtn" class="btn btn-outline-grey me-2"
-                            data-bs-dismiss="modal">취소</button>
-                        <button type="button" id="modalBtn" class="btn btn-data-add">등록</button>
+                            data-bs-dismiss="modal"><span th:text="#{pc.buttons.cancel}"></span></button>
+                        <button type="button" id="modalBtn" class="btn btn-data-add"><span
+                                th:text="#{pc.buttons.add}"></span></button>
                     </div>
                 </form>
             </div>
@@ -346,36 +375,37 @@
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width: 60vw;">
             <div class="modal-content overflow-y-auto scrollbar station-search-content min-76vh">
                 <div class="modal-body">
-                    <div class="modal-title mb-2"><span class="modal-title-bar"></span><span>충전소 조회</span></div>
+                    <div class="modal-title mb-2"><span class="modal-title-bar"></span><span
+                            th:text="#{pc.titles.stationsearch}"></span></div>
                     <div id="stationSearchContainer">
                         <select class="form-control" id="searchStation">
-                            <option th:value="stationName">충전소명</option>
-                            <option th:value="stationId">충전소ID</option>
+                            <option th:value="stationName"><span th:text="#{pc.labels.stationnm}"></span></option>
+                            <option th:value="stationId"><span th:text="#{pc.labels.stationid}"></span></option>
                         </select>
                         <input type="text" name="stationOpSearch" id="stationOpSearch" class="form-control"
-                            placeholder="검색어를 입력하세요" autocomplete="off" th:value="null">
+                            th:placeholder="#{pc.placeholders.inputsearchcontent}" autocomplete="off" th:value="null">
                         <button type="button" class="btn btn-outline-grey ms-2" id="stationOpSearchBtn">
-                            <i class="bi bi-search"></i>검색</button>
+                            <i class="bi bi-search"></i><span th:text="#{pc.buttons.search}"></span></button>
                     </div>
-                    <span class="font-sw-m">검색결과</span>
+                    <span class="font-sw-m"><span th:text="#{pc.titles.searchresult}"></span></span>
                     <div class="w-100 table-responsive scroll-table-container">
                         <table class="table table-bg table-hover text-center" id="stationTable">
                             <thead>
                                 <tr>
-                                    <th scope="col" class="w-40">충전소명</th>
-                                    <th scope="col" class="w-40">충전소ID</th>
+                                    <th scope="col" class="w-40"><span th:text="#{pc.labels.stationnm}"></span></th>
+                                    <th scope="col" class="w-40"><span th:text="#{pc.labels.stationid}"></span></th>
                                     <th scope="col" class="w-20"></th>
                                 </tr>
                             </thead>
                             <tbody id="stationSearchList" class="vertical-align-middle">
                                 <tr>
-                                    <td colspan="3">조회된 데이터가 없습니다.</td>
+                                    <td colspan="3"><span th:text="#{pc.messages.nodata}"></span></td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
                     <button type="button" class="btn btn-outline-grey close-modal-btn" id="stationModalBtn"
-                        data-bs-dismiss="modal">닫기</button>
+                        data-bs-dismiss="modal"><span th:text="#{pc.buttons.close}"></span></button>
                 </div>
             </div>
         </div>
@@ -389,36 +419,38 @@
             <div class="modal-content overflow-y-auto scrollbar elec-file-content min-76vh">
                 <div class="modal-body" style="padding-bottom: 4rem !important;">
                     <form id="elecForm">
-                        <div class="modal-title mb-2"><span class="modal-title-bar"></span><span>한전전기요금</span></div>
+                        <div class="modal-title mb-2"><span class="modal-title-bar"></span><span
+                                th:text="#{pc.titles.kepcofee}"></span></div>
                         <input type="file" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                             name="excelFile" id="excelFile" class="form-control w-50 mt-2" onchange="excelRead(event)">
                         <div class="mt-3"
                             style="display: flex; justify-content: space-between; align-items: end; margin-bottom: 0.4rem !important;">
-                            <span class="font-sw-m">업로드 데이터</span>
-                            <button type="button" class="btn btn-outline-grey" id="elecSaveBtn" disabled></i>저장</button>
+                            <span class="font-sw-m"><span th:text="#{pc.titles.uploaddata}"></span></span>
+                            <button type="button" class="btn btn-outline-grey" id="elecSaveBtn" disabled></i><span
+                                    th:text="#{pc.buttons.save}"></span></button>
                         </div>
                         <div class="w-100 table-responsive scroll-table-container">
                             <table class="table table-bg table-hover text-center" id="elecTable"
                                 style="min-width: 1260px;">
                                 <thead>
                                     <tr>
-                                        <th scope="col">고객번호</th>
-                                        <th scope="col">사용량(KWH)</th>
-                                        <th scope="col">공급가액</th>
-                                        <th scope="col">부가세</th>
-                                        <th scope="col">부담금</th>
-                                        <th scope="col">가산금</th>
-                                        <th scope="col">절사액</th>
-                                        <th scope="col">미납금액</th>
-                                        <th scope="col">청구요금</th>
-                                        <th scope="col">납부방법</th>
+                                        <th scope="col"><span th:text="#{pc.labels.kepcoCustNo}"></span></th>
+                                        <th scope="col"><span th:text="#{pc.labels.usagekw}"></span></th>
+                                        <th scope="col"><span th:text="#{pc.labels.supplyprice}"></span></th>
+                                        <th scope="col"><span th:text="#{pc.labels.vat}"></span></th>
+                                        <th scope="col"><span th:text="#{pc.labels.contribution}"></span></th>
+                                        <th scope="col"><span th:text="#{pc.labels.surcharge}"></span></th>
+                                        <th scope="col"><span th:text="#{pc.labels.cutoffamount}"></span></th>
+                                        <th scope="col"><span th:text="#{pc.labels.notpaidamount}"></span></th>
+                                        <th scope="col"><span th:text="#{pc.labels.billingcharges}"></span></th>
+                                        <th scope="col"><span th:text="#{pc.labels.paymethod}"></span></th>
                                     </tr>
                                 </thead>
                                 <tbody id="elecList" class="vertical-align-middle"></tbody>
                             </table>
                         </div>
                         <button type="button" class="btn btn-outline-grey close-modal-btn" id="elecModalBtn"
-                            data-bs-dismiss="modal">닫기</button>
+                            data-bs-dismiss="modal"><span th:text="#{pc.buttons.close}"></span></button>
                     </form>
                 </div>
             </div>
@@ -448,7 +480,7 @@
                     rows = rows.filter(row => row.some(cell => cell !== undefined && cell !== ""));
 
                     if (rows.length < 2) {
-                        console.error('데이터가 없습니다.');
+                        console.error('No data');
                         return;
                     }
 
@@ -478,8 +510,10 @@
             tbody.innerHTML = "";
 
             const requiredFields = [
-                "고객번호", "사용량(KWH)", "공급가액", "부가세", "부담금",
-                "가산금", "절사액", "미납금액", "청구요금", "납부방법"
+                i18n.pc.labels.kepcoCustNo, i18n.pc.labels.usagekw, i18n.pc.labels.supplyprice,
+                i18n.pc.labels.vat, i18n.pc.labels.contribution, i18n.pc.labels.surcharge,
+                i18n.pc.labels.cutoffamount, i18n.pc.labels.notpaidamount, i18n.pc.labels.billingcharges,
+                i18n.pc.labels.paymethod
             ];
 
             const allDataEmpty = data.every(row =>
@@ -490,13 +524,13 @@
             const headerMismatch = requiredFields.some(header => !actualHeaders.includes(header));
 
             if (allDataEmpty || headerMismatch) {
-                alert("파일 형식이 일치하지 않습니다.");
+                alert(i18n.pc.messages.fileformaterr);
                 $elecSaveBtn.prop('disabled', true);
 
                 const tr = document.createElement('tr');
                 const td = document.createElement('td');
                 td.colSpan = 10;
-                td.textContent = "업로드된 데이터가 없습니다.";
+                td.textContent = i18n.pc.messages.nouploaddata;
                 tr.appendChild(td);
                 tbody.appendChild(tr);
 
@@ -504,16 +538,16 @@
             }
 
             data.forEach(row => {
-                const kepCustNo = row["고객번호"] ?? "";
-                const power = row["사용량(KWH)"] ?? "";
-                const supplyPrice = row["공급가액"] ?? "";
-                const vat = row["부가세"] ?? "";
-                const charge = row["부담금"] ?? "";
-                const surcharge = row["가산금"] ?? "";
-                const cutoffAmount = row["절사액"] ?? "";
-                const unpaidAmount = row["미납금액"] ?? "";
-                const totalAmount = row["청구요금"] ?? "";
-                const paymentMethod = row["납부방법"] ?? "";
+                const kepCustNo = row[i18n.pc.labels.kepcoCustNo] ?? "";
+                const power = row[i18n.pc.labels.usagekw] ?? "";
+                const supplyPrice = row[i18n.pc.labels.supplyprice] ?? "";
+                const vat = row[i18n.pc.labels.vat] ?? "";
+                const charge = row[i18n.pc.labels.contribution] ?? "";
+                const surcharge = row[i18n.pc.labels.surcharge] ?? "";
+                const cutoffAmount = row[i18n.pc.labels.cutoffamount] ?? "";
+                const unpaidAmount = row[i18n.pc.labels.notpaidamount] ?? "";
+                const totalAmount = row[i18n.pc.labels.billingcharges] ?? "";
+                const paymentMethod = row[i18n.pc.labels.paymethod] ?? "";
 
                 if (!kepCustNo && !power && !supplyPrice && !vat && !charge && !surcharge &&
                     !cutoffAmount && !unpaidAmount && !totalAmount && !paymentMethod) {
@@ -534,6 +568,45 @@
             $elecSaveBtn.prop('disabled', false);
         }
     </script>
+
+    <script th:inline="javascript">
+        var i18n = {
+            pc: {
+                messages: {
+                    fileformaterr: /*[[#{pc.messages.fileformaterr}]]*/ '파일 형식이 일치하지 않습니다.',
+                    nouploaddata: /*[[#{pc.messages.nouploaddata}]]*/ '업로드된 데이터가 없습니다.',
+                    nodata: /*[[#{pc.messages.nodata}]]*/ '조회된 데이터가 없습니다.',
+                    essentialFieldCheckError: /*[[#{pc.messages.essentialFieldCheckError}]]*/ '필수 입력 값이 누락되어 있습니다.',
+                    searchstationid: /*[[#{pc.messages.searchstationid}]]*/ '충전소ID를 조회해 주세요.',
+                    inputitemnm: /*[[#{pc.messages.inputitemnm}]]*/ '품목명을 입력해 주세요.',
+                    inputapprovalno: /*[[#{pc.messages.inputapprovalno}]]*/ '승인번호를 입력해 주세요.'
+                },
+                labels: {
+                    kepcoCustNo: /*[[#{pc.labels.kepcoCustNo}]]*/ '고객번호',
+                    usagekw: /*[[#{pc.labels.usagekw}]]*/ '사용량(KWH)',
+                    supplyprice: /*[[#{pc.labels.supplyprice}]]*/ '공급가액',
+                    vat: /*[[#{pc.labels.vat}]]*/ '부가세',
+                    contribution: /*[[#{pc.labels.contribution}]]*/ '부담금',
+                    surcharge: /*[[#{pc.labels.surcharge}]]*/ '가산금',
+                    cutoffamount: /*[[#{pc.labels.cutoffamount}]]*/ '절사액',
+                    notpaidamount: /*[[#{pc.labels.notpaidamount}]]*/ '미납금액',
+                    billingcharges: /*[[#{pc.labels.billingcharges}]]*/ '청구요금',
+                    paymethod: /*[[#{pc.labels.paymethod}]]*/ '납부방법'
+                },
+                buttons: {
+                    add: /*[[#{pc.buttons.add}]]*/ '등록',
+                    edit: /*[[#{pc.buttons.edit}]]*/ '수정',
+                    delete: /*[[#{pc.buttons.delete}]]*/ '삭제',
+                    select: /*[[#{pc.buttons.select}]]*/ '선택'
+                }
+
+            }
+        };
+
+        var currentLanguage = /*[[${#locale.language}]]*/ 'ko';
+    </script>
+    <!-- 언어 선택기 스크립트 -->
+    <div th:replace="~{fragments/language-selector :: language-script}"></div>
 </div>
 
 </html>

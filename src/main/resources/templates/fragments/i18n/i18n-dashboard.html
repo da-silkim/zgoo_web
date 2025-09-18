@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Dashboard I18n</title>
+</head>
+
+<body>
+    <script th:fragment="dashboard-i18n" th:inline="javascript">
+        var i18n = {
+            testRun: /*[[#{chart.testRun}]]*/ '시운전',
+            operating: /*[[#{chart.operating}]]*/ '운영중',
+            operationStop: /*[[#{chart.operationStop}]]*/ '운영중지',
+            fast: /*[[#{chart.fast}]]*/ '급속',
+            slow: /*[[#{chart.slow}]]*/ '완속',
+            dispenser: /*[[#{chart.dispenser}]]*/ '디스펜서',
+            available: /*[[#{chart.available}]]*/ '사용가능',
+            preparing: /*[[#{chart.preparing}]]*/ '준비중',
+            charging: /*[[#{chart.charging}]]*/ '충전중',
+            chargingError: /*[[#{chart.chargingError}]]*/ '충전오류',
+            chargerError: /*[[#{chart.chargerError}]]*/ '충전기오류',
+            finishing: /*[[#{chart.finishing}]]*/ '종료중',
+            reserved: /*[[#{chart.reserved}]]*/ '예약',
+            unavailable: /*[[#{chart.unavailable}]]*/ '사용불가능',
+            faulted: /*[[#{chart.faulted}]]*/ '고장',
+            disconnected: /*[[#{chart.disconnected}]]*/ '끊김',
+            unit: {
+                count: /*[[#{unit.count}]]*/ '대',
+                won: /*[[#{unit.won}]]*/ '원',
+                kwh: /*[[#{unit.kwh}]]*/ 'kWh'
+            },
+            status: {
+                increase: /*[[#{status.increase}]]*/ '▲ 지난달 대비',
+                decrease: /*[[#{status.decrease}]]*/ '▼ 지난달 대비',
+                noChange: /*[[#{status.no.change}]]*/ '-'
+            }
+        };
+    </script>
+</body>
+
+</html>

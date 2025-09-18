@@ -1,12 +1,12 @@
-$(document).ready(function() {
+$(document).ready(function () {
     let modalCon = false, selectRow;
     var vocId;
 
-    $(document).on('dblclick', '#vocTable tbody tr', function() {
+    $(document).on('dblclick', '#vocTable tbody tr', function () {
         selectRow = $(this);
         modalCon = true;
         vocId = selectRow.find('td').eq(0).attr('id');
-        
+
         $('#vocForm')[0].reset();
         $('#type').prop('disabled', true);
         $('#title').prop('disabled', true);
@@ -21,7 +21,7 @@ $(document).ready(function() {
             url: `/voc/get/${vocId}`,
             contentType: "application/json",
             dataType: 'json',
-            success: function(data) {
+            success: function (data) {
                 if (data.vocInfo && Object.keys(data.vocInfo).length !== 0) {
                     $('#vocId').val(data.vocInfo.vocId || '');
                     $('#channelName').val(data.vocInfo.channelName || '');
@@ -39,11 +39,11 @@ $(document).ready(function() {
         });
     });
 
-    $('#size').on('change', function() {
+    $('#size').on('change', function () {
         updatePageSize(this, "/voc", ["typeSearch", "replyStatSearch", "nameSearch"]);
     });
 
-    $('#addBtn').on('click', function(event) {
+    $('#addBtn').on('click', function (event) {
         event.preventDefault();
         modalCon = false;
 
@@ -54,29 +54,29 @@ $(document).ready(function() {
         $('#memPhone').val('');
         $('#memSearchBtn').show();
         $('#content').removeAttr('readonly');
-        document.getElementById('memSearchList').innerHTML = '<tr><td colspan="4">조회된 데이터가 없습니다.</td></tr>';
+        document.getElementById('memSearchList').innerHTML = '<tr><td colspan="4">' + i18n.voc.messages.nodata + '</td></tr>';
     });
 
-    $('#modalBtn').on('click', function(event) {
+    $('#modalBtn').on('click', function (event) {
         event.preventDefault();
 
 
         const replyContent = $('#replyContent').val();
         if (modalCon) {
             if (!replyContent || replyContent.trim() === "") {
-                alert("답변을 입력해주세요.");
+                alert(i18n.voc.messages.reqreplyContent);
                 return;
             }
         } else {
             const memberId = $('#memberId').val();
             if (!memberId) {
-                alert("회원정보를 검색해주세요.");
+                alert(i18n.voc.messages.reqmemberId);
                 return;
             }
         }
-        
 
-        if(confirmSubmit("저장")) {
+
+        if (confirmSubmit(i18n.voc.buttons.save)) {
             const DATA = {
                 memberId: $('#memberId').val(),
                 type: $('#type').val(),
@@ -93,17 +93,17 @@ $(document).ready(function() {
                 url: URL,
                 data: JSON.stringify(DATA),
                 contentType: "application/json",
-                success: function(response) {
+                success: function (response) {
                     alert(response);
                     window.location.reload();
                 },
-                error: function(xhr, status, error) {
+                error: function (xhr, status, error) {
                     alert(xhr.responseText);
                 }
             });
         }
     });
-    
+
     $('#memSearchModal').on('show.bs.modal', function () {
         $('#dataAddModal .modal-content').addClass('blur-background');
     });
@@ -111,8 +111,8 @@ $(document).ready(function() {
     $('#memSearchModal').on('hidden.bs.modal', function () {
         $('#dataAddModal .modal-content').removeClass('blur-background');
     });
-    
-    $('#memSearchBtn').on('click', function() {
+
+    $('#memSearchBtn').on('click', function () {
         var memSearchModal = new bootstrap.Modal(document.getElementById('memSearchModal'), {
             backdrop: 'static',
             keyboard: false
@@ -120,7 +120,7 @@ $(document).ready(function() {
         memSearchModal.show();
     });
 
-    $('#memInfoSearchBtn').on('click', function() {
+    $('#memInfoSearchBtn').on('click', function () {
         $.ajax({
             url: `/voc/search/member`,
             method: 'GET',
@@ -128,11 +128,11 @@ $(document).ready(function() {
                 memName: $('#memName').val(),
                 memPhone: $('#memPhone').val()
             },
-            success: function(response) {
+            success: function (response) {
                 var memSearchList = document.getElementById('memSearchList');
                 memSearchList.innerHTML = '';
                 if (response.memberList.length === 0) {
-                    memSearchList.innerHTML = '<tr><td colspan="4">조회된 데이터가 없습니다.</td></tr>';
+                    memSearchList.innerHTML = '<tr><td colspan="4">' + i18n.voc.messages.nodata + '</td></tr>';
                     return;
                 }
 
@@ -142,19 +142,19 @@ $(document).ready(function() {
                         <td id='${mem.memberId}'>${mem.name}</td>
                         <td>${mem.phoneNo}</td>
                         <td>${mem.idTag}</td>
-                        <td><button type="button" class="btn btn-outline-grey select-mem-btn" data-member-id="${mem.memberId}">선택</button></td>
+                        <td><button type="button" class="btn btn-outline-grey select-mem-btn" data-member-id="${mem.memberId}">${i18n.voc.selectopt.select}</button></td>
                     `;
                     memSearchList.appendChild(row);
                 });
             },
-            error: function(xhr) {
+            error: function (xhr) {
                 var response = JSON.parse(xhr.responseText);
                 alert(response.message);
             }
         });
     });
 
-    $('#memSearchList').on('click', function(e) {
+    $('#memSearchList').on('click', function (e) {
         if (e.target.classList.contains('select-mem-btn')) {
             var memberId = e.target.getAttribute('data-member-id');
             $.ajax({
@@ -162,12 +162,12 @@ $(document).ready(function() {
                 method: 'GET',
                 contentType: 'application/json',
                 dataType: 'json',
-                success: function(response) {
+                success: function (response) {
                     $('#memberId').val(response.memberInfo.memberId || '');
                     $('#name').val(response.memberInfo.name || '');
                     $('#phoneNo').val(response.memberInfo.phoneNo || '');
                 },
-                error: function(xhr, status, error) {
+                error: function (xhr, status, error) {
                     alert(JSON.parse(xhr.responseText).message);
                 }
             });

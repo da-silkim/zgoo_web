@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.context.MessageSource;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -41,6 +42,7 @@ public class MenuService {
     private final MenuAuthorityRepository menuAuthorityRepository;
     private final CompanyMenuAuthorityRepository companyMenuAuthorityRepository;
     private final ComService comService;
+    private final MessageSource messageSource;
 
     // 메뉴 - 전체 조회
     public List<MenuDto.MenuListDto> findMenuList() {
@@ -51,7 +53,7 @@ public class MenuService {
                 log.info("=== no menu found ===");
                 return new ArrayList<>();
             }
-            List<MenuDto.MenuListDto> menuListDto = MenuMapper.toDtoList(menuList);
+            List<MenuDto.MenuListDto> menuListDto = MenuMapper.toDtoList(menuList, messageSource);
             return menuListDto;
         } catch (Exception e) {
             log.error("[findMenuList] error: {}", e.getMessage());

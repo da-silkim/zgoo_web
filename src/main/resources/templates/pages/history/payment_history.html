@@ -4,21 +4,25 @@
     <div class="card responsive-content">
         <!-- card body:1 start -->
         <div class="card-body">
-            <div class="content-title"><i class="fa-solid fa-clipboard-list font-ico me-2"></i>이력 > 결제이력</div>
+            <div class="content-title"><i class="fa-solid fa-clipboard-list font-ico me-2"></i><span
+                    th:text="#{paymenthist.titles.main}"></span></div>
             <!-- card:2 start -->
             <div class="card card-shadow">
                 <!-- card body:2 start -->
                 <div class="card-body">
-                    <div class="card-title"><span class="card-title-bar"></span><span>검색조건</span></div>
+                    <div class="card-title"><span class="card-title-bar"></span><span
+                            th:text="#{paymenthist.titles.search}"></span></div>
                     <!-- form start -->
                     <form id="searchForm" class="position-relative" th:action="@{/history/payment}" method="get">
                         <!-- row:1 start -->
                         <div class="row mb-3 row-cols-2 row-cols-lg-3 g-2">
                             <div class="col d-flex align-items-center">
                                 <label for="companyIdSearch"
-                                    class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">사업자</label>
+                                    class="flex-shrink-0 col-form-label font-weight-bold text-right w-25"><span
+                                        th:text="#{paymenthist.labels.company}"></span></label>
                                 <select id="companyIdSearch" class="mx-3 form-control" name="companyIdSearch">
-                                    <option value="" th:text="'(없음)'" th:selected="${selectedCompanyId == null}">
+                                    <option value="" th:text="#{paymenthist.selectopt.select}"
+                                        th:selected="${selectedCompanyId == null}">
                                     </option>
                                     <option th:each="company : ${companyList}" th:value="${company.companyId}"
                                         th:text="${company.companyName}"
@@ -27,14 +31,17 @@
                             </div>
                             <div class="col d-flex align-items-center">
                                 <label for="opSearch"
-                                    class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">검색조건</label>
+                                    class="flex-shrink-0 col-form-label font-weight-bold text-right w-25"><span
+                                        th:text="#{paymenthist.titles.search}"></span></label>
                                 <select id="opSearch" name="opSearch" class="ms-3 form-control w-40">
-                                    <option value="" th:selected="${selectedOpSearch == null}">(선택)</option>
-                                    <option value="chargerId" th:text="충전기ID"
+                                    <option value="" th:selected="${selectedOpSearch == null}"><span
+                                            th:text="#{paymenthist.selectopt.select}"></span></option>
+                                    <option value="chargerId" th:text="#{paymenthist.labels.chargerid}"
                                         th:selected="${selectedOpSearch == 'chargerId'}"></option>
-                                    <option value="tid" th:text="TID" th:selected="${selectedOpSearch == 'tid'}">
+                                    <option value="tid" th:text="#{paymenthist.labels.tid}"
+                                        th:selected="${selectedOpSearch == 'tid'}">
                                     </option>
-                                    <option value="approvalNum" th:text="승인번호"
+                                    <option value="approvalNum" th:text="#{paymenthist.labels.approvalnum}"
                                         th:selected="${selectedOpSearch == 'approvalNum'}">
                                     </option>
                                 </select>
@@ -43,19 +50,24 @@
                             </div>
                             <div class="col d-flex align-items-center">
                                 <label for="stateCode"
-                                    class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">결제상태</label>
+                                    class="flex-shrink-0 col-form-label font-weight-bold text-right w-25"><span
+                                        th:text="#{paymenthist.labels.statecode}"></span></label>
                                 <select id="stateCode" name="stateCode" class="mx-3 form-control">
-                                    <option value="" th:selected="${selectedStateCode == null}">선택</option>
-                                    <option value="0" th:text="승인" th:selected="${selectedStateCode == '0'}"></option>
-                                    <option value="1" th:text="매입전취소" th:selected="${selectedStateCode == '1'}">
+                                    <option value="" th:selected="${selectedStateCode == null}"><span
+                                            th:text="#{paymenthist.selectopt.select}"></span></option>
+                                    <option value="0" th:text="#{paymenthist.selectopt.approval}"
+                                        th:selected="${selectedStateCode == '0'}"></option>
+                                    <option value="1" th:text="#{paymenthist.selectopt.cancelall}"
+                                        th:selected="${selectedStateCode == '1'}">
                                     </option>
-                                    <option value="2" th:text="매입후취소" th:selected="${selectedStateCode == '2'}">
+                                    <option value="2" th:text="#{paymenthist.selectopt.partialcancel}"
+                                        th:selected="${selectedStateCode == '2'}">
                                     </option>
                                 </select>
                             </div>
                             <div class="col d-flex align-items-center">
-                                <span
-                                    class="flex-shrink-0 col-form-label font-weight-bold mr-3p text-right w-25">거래일자</span>
+                                <span class="flex-shrink-0 col-form-label font-weight-bold mr-3p text-right w-25"><span
+                                        th:text="#{paymenthist.labels.paymentDate}"></span></span>
                                 <input type="date" min="1970-01-01" max="2199-12-31"
                                     th:value="${selectedTransactionStart}" name="transactionStart" id="transactionStart"
                                     class="mx-3 form-control">
@@ -68,10 +80,12 @@
                         <div class="search-btn">
                             <button type="button" class="btn btn-outline-grey me-2" id="searchBtn"
                                 onclick="searchOption()">
-                                <i class="bi bi-search me-2"></i>검색</button>
+                                <i class="bi bi-search me-2"></i><span
+                                    th:text="#{paymenthist.buttons.search}"></span></button>
                             <button type="button" class="btn btn-outline-grey me-2" id="resetBtn"
                                 onclick="replacePage('/history/payment')">
-                                <i class="bi bi-arrow-repeat me-2"></i>초기화</button>
+                                <i class="bi bi-arrow-repeat me-2"></i><span
+                                    th:text="#{paymenthist.buttons.reset}"></span></button>
                         </div>
                         <!-- row:1 end -->
                     </form>
@@ -84,12 +98,13 @@
             <div class="card card-shadow mt-4">
                 <!-- card body:3 start -->
                 <div class="card-body">
-                    <div class="card-title"><span class="card-title-bar"></span><span>결제이력</span></div>
+                    <div class="card-title"><span class="card-title-bar"></span><span
+                            th:text="#{paymenthist.titles.paymentlist}"></span></div>
                     <div class="mt-3 btn-page-area">
                         <span>
                             <span id="pageInfo">
                                 <span
-                                    th:text="'Page ' + (${currentPage + 1}) + ' of ' + ${totalPages} + ' [총 ' + ${totalCount} + '건]'"></span>
+                                    th:text="'Page ' + (${currentPage + 1}) + ' of ' + ${totalPages} + ' [' + ${totalCount} + ']'"></span>
                             </span>
                             <select class="mx-3 page-select" id="size" name="size">
                                 <option th:each="data : ${showListCnt}" th:value="${data.commonCode}"
@@ -103,19 +118,19 @@
                                 <thead>
                                     <tr class="table-border-top">
                                         <th scope="col">No</th>
-                                        <th scope="col">사업자</th>
-                                        <th scope="col">충전기ID</th>
-                                        <th scope="col">승인일시</th>
-                                        <th scope="col">취소일시</th>
-                                        <th scope="col">상점ID</th>
-                                        <th scope="col">TID</th>
-                                        <th scope="col">OTID</th>
-                                        <th scope="col">결제금액</th>
-                                        <th scope="col">결제상태</th>
-                                        <th scope="col">승인번호</th>
-                                        <th scope="col">카드사</th>
-                                        <th scope="col">카드번호</th>
-                                        <th scope="col">등록일시</th>
+                                        <th scope="col"><span th:text="#{paymenthist.labels.company}"></span></th>
+                                        <th scope="col"><span th:text="#{paymenthist.labels.chargerid}"></span></th>
+                                        <th scope="col"><span th:text="#{paymenthist.labels.approvaltime}"></span></th>
+                                        <th scope="col"><span th:text="#{paymenthist.labels.canceltime}"></span></th>
+                                        <th scope="col"><span th:text="#{paymenthist.labels.mid}"></span></th>
+                                        <th scope="col"><span th:text="#{paymenthist.labels.tid}"></span></th>
+                                        <th scope="col"><span th:text="#{paymenthist.labels.otid}"></span></th>
+                                        <th scope="col"><span th:text="#{paymenthist.labels.goodsamt}"></span></th>
+                                        <th scope="col"><span th:text="#{paymenthist.labels.statecode}"></span></th>
+                                        <th scope="col"><span th:text="#{paymenthist.labels.approvalnum}"></span></th>
+                                        <th scope="col"><span th:text="#{paymenthist.labels.cardcompany}"></span></th>
+                                        <th scope="col"><span th:text="#{paymenthist.labels.cardnum}"></span></th>
+                                        <th scope="col"><span th:text="#{paymenthist.labels.regtime}"></span></th>
                                     </tr>
                                 </thead>
                                 <tbody id="pageList">
@@ -134,7 +149,7 @@
                                         <td th:text="${data.otid}"></td>
                                         <td th:text="${data.goddsAmt != null ? data.goddsAmt.intValue() : '0'}"></td>
                                         <td
-                                            th:text="${data.stateCode == '0' ? '승인' : (data.stateCode == '1' ? '매입전취소' : (data.stateCode == '2' ? '매입후취소' : data.stateCode))}">
+                                            th:text="${data.stateCode == '0' ? #{paymenthist.selectopt.approval} : (data.stateCode == '1' ? #{paymenthist.selectopt.cancelall} : (data.stateCode == '2' ? #{paymenthist.selectopt.partialcancel} : data.stateCode))}">
                                         </td>
                                         <td th:text="${data.approvalNum}"></td>
                                         <td th:text="${@payUtil.getCardCompanyName(data.cardCompany)}"></td>
@@ -191,6 +206,8 @@
     </div>
     <!-- card:1 end -->
     <script type="text/javascript" th:src="@{/js/history/payment_history.js}"></script>
+    <!-- 언어 선택기 스크립트 -->
+    <div th:replace="~{fragments/language-selector :: language-script}"></div>
 </div>
 
 </html>

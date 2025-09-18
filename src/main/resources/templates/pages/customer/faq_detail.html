@@ -4,17 +4,20 @@
     <div class="card responsive-content">
         <!-- card body:1 start -->
         <div class="card-body">
-            <div class="content-title"><i class="fa-solid fa-headset me-2"></i>고객센터 > FAQ 관리</div>
+            <div class="content-title"><i class="fa-solid fa-headset me-2"></i><span
+                    th:text="#{faq.titles.main}"></span></div>
             <!-- card:2 start -->
             <div class="card card-shadow">
                 <!-- card body:2 start -->
                 <div class="card-body">
-                    <div class="card-title"><span class="card-title-bar"></span><span>FAQ</span></div>
+                    <div class="card-title"><span class="card-title-bar"></span><span
+                            th:text="#{faq.titles.faqList}"></span></div>
                     <div class="notice-detail-container">
                         <div>
                             <div th:text="|[${faq.sectionName}] ${faq.title}|"></div>
                             <div>
-                                <span th:text="|작성자: ${faq.userName} &nbsp;&nbsp;&nbsp; 등록일:  ${#temporals.format(faq.regDt, 'yyyy.MM.dd')}|"></span>
+                                <span
+                                    th:text="|#{faq.labels.writer}: ${faq.userName} &nbsp;&nbsp;&nbsp; #{faq.labels.regDt}:  ${#temporals.format(faq.regDt, 'yyyy.MM.dd')}|"></span>
                                 <span th:text="|NO.${faq.id}|"></span>
                             </div>
                         </div>
@@ -26,19 +29,21 @@
                                     sectionSearch=${selectedSection != null ? selectedSection : ''})}"
                                     th:text="|[${nextFaq.sectionName}] ${nextFaq.title}|" class="no-underline"></a>
                             </span>
-                            <span th:if="${nextFaq == null}">다음글이 없습니다.</span>
+                            <span th:if="${nextFaq == null}"><span th:text="#{faq.messages.nextNoData}"></span></span>
                         </div>
                         <div>
                             <i class="bi bi-caret-down me-2"></i>
                             <span th:if="${previousFaq != null}">
                                 <a th:href="@{/faq/detail/{id}(id=${previousFaq.id}, page=${currentPage}, size=${size},
                                     sectionSearch=${selectedSection != null ? selectedSection : ''})}"
-                                    th:text="|[${previousFaq.sectionName}] ${previousFaq.title}|" class="no-underline"></a>
+                                    th:text="|[${previousFaq.sectionName}] ${previousFaq.title}|"
+                                    class="no-underline"></a>
                             </span>
-                            <span th:if="${previousFaq == null}">이전글이 없습니다.</span>
+                            <span th:if="${previousFaq == null}"><span
+                                    th:text="#{faq.messages.previousNoData}"></span></span>
                         </div>
                         <button type="button" class="list-btn" onclick="goToList('/faq',
-                            ['sectionSearch'])"> 목록 </button>
+                            ['sectionSearch'])"> <span th:text="#{common.buttons.list}"></span> </button>
                     </div>
                 </div>
                 <!-- card body:2 end -->
@@ -48,5 +53,8 @@
         <!-- card body:1 end -->
     </div>
     <!-- card:1 end -->
+    <!-- 언어 선택기 스크립트 -->
+    <div th:replace="~{fragments/language-selector :: language-script}"></div>
 </div>
+
 </html>

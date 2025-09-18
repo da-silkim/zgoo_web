@@ -15,6 +15,7 @@ public class GrpCodeMapper {
                 GrpCode grpCode = GrpCode.builder()
                                 .grpCode(dto.getGrpCode())
                                 .grpcdName(dto.getGrpcdName())
+                                .grpcdNameEn(dto.getGrpcdNameEn())
                                 .regUserId(dto.getRegUserId())
                                 .regDt(LocalDateTime.now())
                                 .modUserId(dto.getModUserId())
@@ -29,12 +30,15 @@ public class GrpCodeMapper {
          */
         public static List<GrpCode> toEntityList(List<CodeDto.GrpCodeDto> dtolist) {
                 List<GrpCode> entityList = dtolist.stream()
-                                .map(grp -> new GrpCode(grp.getGrpCode(),
-                                                grp.getGrpcdName(),
-                                                grp.getRegUserId(),
-                                                grp.getRegDt(),
-                                                grp.getModUserId(),
-                                                grp.getModDt()))
+                                .map(grp -> GrpCode.builder()
+                                                .grpCode(grp.getGrpCode())
+                                                .grpcdName(grp.getGrpcdName())
+                                                .grpcdNameEn(grp.getGrpcdNameEn())
+                                                .regUserId(grp.getRegUserId())
+                                                .regDt(grp.getRegDt())
+                                                .modUserId(grp.getModUserId())
+                                                .modDt(grp.getModDt())
+                                                .build())
                                 .collect(Collectors.toList());
 
                 return entityList;
@@ -47,6 +51,7 @@ public class GrpCodeMapper {
                 CodeDto.GrpCodeDto dto = CodeDto.GrpCodeDto.builder()
                                 .grpCode(entity.getGrpCode())
                                 .grpcdName(entity.getGrpcdName())
+                                .grpcdNameEn(entity.getGrpcdNameEn())
                                 .modDt(entity.getModDt())
                                 .modUserId(entity.getModUserId())
                                 .regDt(entity.getRegDt())
@@ -63,6 +68,7 @@ public class GrpCodeMapper {
                 List<CodeDto.GrpCodeDto> dtolist = entitylist.stream()
                                 .map(grpinfo -> CodeDto.GrpCodeDto.builder().grpCode(grpinfo.getGrpCode())
                                                 .grpcdName(grpinfo.getGrpcdName())
+                                                .grpcdNameEn(grpinfo.getGrpcdNameEn())
                                                 .regUserId(grpinfo.getRegUserId())
                                                 .regDt(grpinfo.getRegDt())
                                                 .modUserId(grpinfo.getModUserId())

@@ -22,6 +22,7 @@ import zgoo.cpos.domain.users.QUsers;
 import zgoo.cpos.domain.users.Users;
 import zgoo.cpos.dto.users.NoticeDto.NoticeDetailDto;
 import zgoo.cpos.dto.users.NoticeDto.NoticeListDto;
+import zgoo.cpos.util.LocaleUtil;
 import zgoo.cpos.util.QueryUtils;
 
 @Slf4j
@@ -57,7 +58,7 @@ public class NoticeRepositoryCustomImpl implements NoticeRepositoryCustom {
                 users.name.as("userName"),
                 company.id.as("companyId"),
                 company.companyName.as("companyName"),
-                typeCommonCode.name.as("typeName")))
+                LocaleUtil.isEnglish() ? typeCommonCode.nameEn.as("typeName") : typeCommonCode.name.as("typeName")))
                 .from(notice)
                 .leftJoin(users).on(notice.user.userId.eq(users.userId))
                 .leftJoin(company).on(users.company.id.eq(company.id))
@@ -118,7 +119,7 @@ public class NoticeRepositoryCustomImpl implements NoticeRepositoryCustom {
                 users.name.as("userName"),
                 company.id.as("companyId"),
                 company.companyName.as("companyName"),
-                typeCommonCode.name.as("typeName")))
+                LocaleUtil.isEnglish() ? typeCommonCode.nameEn.as("typeName") : typeCommonCode.name.as("typeName")))
                 .from(notice)
                 .leftJoin(users).on(notice.user.userId.eq(users.userId))
                 .leftJoin(company).on(users.company.id.eq(company.id))
@@ -174,7 +175,7 @@ public class NoticeRepositoryCustomImpl implements NoticeRepositoryCustom {
                 notice.views.as("views"),
                 notice.regDt.as("regDt"),
                 users.name.as("userName"),
-                typeCommonCode.name.as("typeName")))
+                LocaleUtil.isEnglish() ? typeCommonCode.nameEn.as("typeName") : typeCommonCode.name.as("typeName")))
                 .from(notice)
                 .leftJoin(users).on(notice.user.userId.eq(users.userId))
                 .leftJoin(typeCommonCode).on(notice.type.eq(typeCommonCode.commonCode))
@@ -215,7 +216,7 @@ public class NoticeRepositoryCustomImpl implements NoticeRepositoryCustom {
                 notice.type.as("type"),
                 notice.views.as("views"),
                 notice.regDt.as("regDt"),
-                typeCommonCode.name.as("typeName")))
+                LocaleUtil.isEnglish() ? typeCommonCode.nameEn.as("typeName") : typeCommonCode.name.as("typeName")))
                 .from(notice)
                 .leftJoin(users).on(notice.user.userId.eq(users.userId))
                 .leftJoin(company).on(users.company.id.eq(company.id))
@@ -259,7 +260,7 @@ public class NoticeRepositoryCustomImpl implements NoticeRepositoryCustom {
                 notice.type.as("type"),
                 notice.views.as("views"),
                 notice.regDt.as("regDt"),
-                typeCommonCode.name.as("typeName")))
+                LocaleUtil.isEnglish() ? typeCommonCode.nameEn.as("typeName") : typeCommonCode.name.as("typeName")))
                 .from(notice)
                 .leftJoin(users).on(notice.user.userId.eq(users.userId))
                 .leftJoin(company).on(users.company.id.eq(company.id))
@@ -302,7 +303,7 @@ public class NoticeRepositoryCustomImpl implements NoticeRepositoryCustom {
                 users.name.as("userName"),
                 company.id.as("companyId"),
                 company.companyName.as("companyName"),
-                typeCommonCode.name.as("typeName")))
+                LocaleUtil.isEnglish() ? typeCommonCode.nameEn.as("typeName") : typeCommonCode.name.as("typeName")))
                 .from(notice)
                 .leftJoin(users).on(notice.user.userId.eq(users.userId))
                 .leftJoin(company).on(users.company.id.eq(company.id))

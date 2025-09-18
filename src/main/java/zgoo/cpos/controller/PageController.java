@@ -186,6 +186,7 @@ public class PageController {
             model.addAttribute("cpCount", null);
             model.addAttribute("connStatus", null);
             model.addAttribute("opStatus", null);
+            model.addAttribute("saleStatus", null);
             model.addAttribute("chgStatus", null);
             model.addAttribute("chargerCountList", Collections.emptyList());
             model.addAttribute("facilityList", Collections.emptyList());

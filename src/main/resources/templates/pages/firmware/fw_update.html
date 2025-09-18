@@ -4,42 +4,47 @@
     <div class="card responsive-content">
         <!-- card body:1 start -->
         <div class="card-body">
-            <div class="content-title"><i class="fa-solid fa-microchip font-ico me-2"></i>펌웨어 > 펌웨어 업데이트</div>
+            <div class="content-title"><i class="fa-solid fa-microchip font-ico me-2"></i><span
+                    th:text="#{fw.titles.fwupdate}"></span></div>
             <div class="card card-shadow">
                 <div class="card-body">
-                    <div class="card-title"><span class="card-title-bar"></span><span>펌웨어</span></div>
+                    <div class="card-title"><span class="card-title-bar"></span><span th:text="#{fw.titles.fw}"></span>
+                    </div>
                     <form id="fwconfigForm" class="position-relative">
                         <div class="table-responsive">
                             <table class="table table-bg-v align-middle mt-3">
                                 <tbody>
                                     <tr class="table-border-top">
-                                        <th style="width: 16.66%" class="text-center">사업자<b class="required-data">*</b>
+                                        <th style="width: 16.66%" class="text-center"><span
+                                                th:text="#{fw.labels.company}"></span><b class="required-data">*</b>
                                         </th>
                                         <td style="width: 16.66%">
                                             <select id="companyIdFw" class="form-control" name="companyIdFw" required>
-                                                <option th:value="*{null}" th:text="'(선택)'"></option>
+                                                <option th:value="*{null}" th:text="#{fw.labels.select}"></option>
                                                 <option th:each="company : ${companyList}"
                                                     th:value="${company.companyId}" th:text="${company.companyName}"
                                                     th:selected="${company.companyId == selectedCompanyIdFw}"></option>
                                             </select>
                                         </td>
-                                        <th style="width: 16.66%" class="text-center">충전기모델<b
-                                                class="required-data">*</b></th>
+                                        <th style="width: 16.66%" class="text-center"><span
+                                                th:text="#{fw.labels.chgmodel}"></span><b class="required-data">*</b>
+                                        </th>
                                         <td style="width: 16.66%">
                                             <select id="modelSearch" class="form-control" name="modelSearch" required>
-                                                <option th:value="*{null}" th:text="'(선택)'"
+                                                <option th:value="*{null}" th:text="#{fw.labels.select}"
                                                     th:selected="${selectedModelSearch == null}"></option>
                                                 <option th:if="${selectedModelSearch != null}"
                                                     th:value="${selectedModelSearch}" th:text="${selectedModelSearch}"
                                                     th:selected="true"></option>
                                             </select>
                                         </td>
-                                        <th style="width: 16.66%" class="text-center">version<b
-                                                class="required-data">*</b></th>
+                                        <th style="width: 16.66%" class="text-center"><span
+                                                th:text="#{fw.labels.versioninfo}"></span><b class="required-data">*</b>
+                                        </th>
                                         <td style="width: 16.66%">
                                             <select id="versionSearch" class="form-control" name="versionSearch"
                                                 required>
-                                                <option th:value="*{null}" th:text="'(선택)'"
+                                                <option th:value="*{null}" th:text="#{fw.labels.select}"
                                                     th:selected="${selectedVersionSearch == null}"></option>
                                                 <option th:if="${selectedVersionSearch != null}"
                                                     th:value="${selectedVersionSearch}"
@@ -76,7 +81,8 @@
                             </table>
                             <div class="search-btn">
                                 <button type="button" class="btn btn-outline-grey me-2" id="fwconfigResetBtn">
-                                    <i class="bi bi-arrow-repeat me-2"></i>초기화</button>
+                                    <i class="bi bi-arrow-repeat me-2"></i><span
+                                        th:text="#{fw.buttons.reset}"></span></button>
                             </div>
                         </div>
                     </form>
@@ -87,21 +93,24 @@
             <div class="card card-shadow mt-4">
                 <!-- card body:2 start -->
                 <div class="card-body">
-                    <div class="card-title"><span class="card-title-bar"></span><span>충전기 검색</span></div>
+                    <div class="card-title"><span class="card-title-bar"></span><span
+                            th:text="#{fw.titles.searchcharger}"></span></div>
                     <!-- form start -->
                     <form id="searchForm" class="firmware-update" th:action="@{/fw/update/get/cplist}" method="get">
                         <div class="row mb-3 row-cols-2 row-cols-lg-2 g-2">
                             <div class="col search-table">
-                                <label for="companyIdSearch" class="col-form-label">사업자<b>*</b></label>
+                                <label for="companyIdSearch" class="col-form-label"><span
+                                        th:text="#{fw.labels.company}"></span><b>*</b></label>
                                 <select id="companyIdSearch" class="mx-3 form-control" name="companyIdSearch" required>
-                                    <option th:value="*{null}" th:text="'(없음)'"></option>
+                                    <option th:value="*{null}" th:text="#{fw.labels.select}"></option>
                                     <option th:each="company : ${companyList}" th:value="${company.companyId}"
                                         th:text="${company.companyName}"
                                         th:selected="${company.companyId == selectedCompanyId}"></option>
                                 </select>
                             </div>
                             <div class="col search-table">
-                                <label for="stationIdSearch" class="col-form-label">충전소ID<b>*</b></label>
+                                <label for="stationIdSearch" class="col-form-label"><span
+                                        th:text="#{fw.labels.stationid}"></span><b>*</b></label>
                                 <input type="text" name="stationIdSearch" id="stationIdSearch" class="form-control"
                                     th:value="${selectedStationId}" autocomplete="off">
                             </div>
@@ -114,10 +123,11 @@
                         <div>
                             <button type="button" class="btn btn-outline-grey me-2" id="serachBtn"
                                 onclick="searchOption()">
-                                <i class="bi bi-search me-2"></i>검색</button>
+                                <i class="bi bi-search me-2"></i><span th:text="#{fw.buttons.search}"></span></button>
                             <button type="button" class="btn btn-outline-grey me-2" id="resetBtn"
                                 onclick="replacePage('/fw/update/get/cplist')">
-                                <i class="bi bi-arrow-repeat me-2"></i>초기화</button>
+                                <i class="bi bi-arrow-repeat me-2"></i><span
+                                    th:text="#{fw.buttons.reset}"></span></button>
                         </div>
 
                         <!-- 펌웨어 선택 값들을 hidden input으로 추가 -->
@@ -138,16 +148,17 @@
             <div class="card card-shadow mt-4">
                 <!-- card body:3 start -->
                 <div class="card-body">
-                    <div class="card-title"><span class="card-title-bar"></span><span>대상 충전기 목록</span></div>
+                    <div class="card-title"><span class="card-title-bar"></span><span
+                            th:text="#{fw.titles.chargerlist}"></span></div>
                     <div class="mt-3 btn-page-area">
                         <div th:if="${menuAuthority.authority == 'SU' or menuAuthority.authority == 'AD'}">
                             <button class="btn btn-outline-grey" id="updateBtn">
-                                <i class="bi bi-gear"></i>업데이트</button>
+                                <i class="bi bi-gear"></i><span th:text="#{fw.buttons.update}"></span></button>
                         </div>
                         <span>
                             <span id="pageInfo">
                                 <span
-                                    th:text="'Page ' + (${currentPage + 1}) + ' of ' + ${totalPages} + ' [총 ' + ${totalCount} + '건]'"></span>
+                                    th:text="'Page ' + (${currentPage + 1}) + ' of ' + ${totalPages} + ' [' + ${totalCount} + ']'"></span>
                             </span>
                             <select class="mx-3 page-select" id="size" name="size">
                                 <option th:each="data : ${showListCnt}" th:value="${data.commonCode}"
@@ -160,14 +171,14 @@
                             <thead>
                                 <tr class="table-border-top">
                                     <th scope="col"><input type="checkbox" id="selectAll" /></th>
-                                    <th scope="col">사업자</th>
-                                    <th scope="col">제조사</th>
-                                    <th scope="col">충전소명</th>
-                                    <th scope="col">충전소ID</th>
-                                    <th scope="col">충전기ID</th>
-                                    <th scope="col">모델명</th>
-                                    <th scope="col">펌웨어버전</th>
-                                    <th scope="col">마지막업데이트일시</th>
+                                    <th scope="col"><span th:text="#{fw.labels.company}"></span></th>
+                                    <th scope="col"><span th:text="#{fw.labels.manuf}"></span></th>
+                                    <th scope="col"><span th:text="#{fw.labels.stationnm}"></span></th>
+                                    <th scope="col"><span th:text="#{fw.labels.stationid}"></span></th>
+                                    <th scope="col"><span th:text="#{fw.labels.chargerid}"></span></th>
+                                    <th scope="col"><span th:text="#{fw.labels.chgmodel}"></span></th>
+                                    <th scope="col"><span th:text="#{fw.labels.chgfwversion}"></span></th>
+                                    <th scope="col"><span th:text="#{fw.labels.lastupdatedt}"></span></th>
                                 </tr>
                             </thead>
                             <tbody id="pageList">
@@ -183,7 +194,7 @@
                                     <td th:text="${#temporals.format(data.lastUpdateDt, 'yyyy-MM-dd HH:mm:ss')}"></td>
                                 </tr>
                                 <tr th:if="${cpList.size() == 0}">
-                                    <td colspan="9" class="text-center">충전기 정보가 없습니다.</td>
+                                    <td colspan="9" class="text-center" th:text="#{fw.messages.nochargerlist}"></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -267,6 +278,37 @@
     </div>
     <!-- card:1 end -->
     <script type="text/javascript" th:src="@{/js/fw/fw_update.js}"></script>
+    <script th:inline="javascript">
+        var i18n = {
+            fw: {
+                messages: {
+                    selectcompany: /*[[#{fw.messages.selectcompany}]]*/ '사업자정보를 선택해주세요.',
+                    selectchgmodel: /*[[#{fw.messages.selectchgmodel}]]*/ '모델명을 선택해주세요.',
+                    inputversion: /*[[#{fw.messages.inputversion}]]*/ '버전정보를 입력해주세요.',
+                    inputurl: /*[[#{fw.messages.inputurl}]]*/ '파일 경로를 입력해주세요.',
+                    modellistsearchfailed: /*[[#{fw.messages.modellistsearchfailed}]]*/ '모델 리스트 조회에 실패했습니다.',
+                    versionlistsearchfailed: /*[[#{fw.messages.versionlistsearchfailed}]]*/ '버전 리스트 조회에 실패했습니다.',
+                    urlsearchfailed: /*[[#{fw.messages.urlsearchfailed}]]*/ 'url 조회에 실패했습니다.',
+                    maxselect: /*[[#{fw.messages.maxselect}]]*/ '한 번에 최대 10개까지만 선택할 수 있습니다.',
+                    nourlinfo: /*[[#{fw.messages.nourlinfo}]]*/ 'url 정보가 없습니다.',
+                    selectcharger: /*[[#{fw.messages.selectcharger}]]*/ '업데이트할 충전기를 선택해주세요.',
+                    confirmupdate: /*[[#{fw.messages.confirmupdate}]]*/ '업데이트를 진행하시겠습니까?',
+                    selectedchargernum: /*[[#{fw.messages.selectedchargernum}]]*/ '선택된 충전기 수:',
+                    updateresult: /*[[#{fw.messages.updateresult}]]*/ '펌웨어 업데이트 요청 결과:',
+                    success: /*[[#{fw.messages.success}]]*/ '성공:',
+                    fail: /*[[#{fw.messages.fail}]]*/ '실패:',
+                    updatefailed: /*[[#{fw.messages.updatefailed}]]*/ '펌웨어 업데이트 요청 중 오류가 발생했습니다.'
+                },
+                labels: {
+                    select: /*[[#{fw.labels.select}]]*/ '선택'
+                }
+            }
+        };
+
+        var currentLanguage = /*[[${#locale.language}]]*/ 'ko';
+    </script>
+    <!-- 언어 선택기 스크립트 -->
+    <div th:replace="~{fragments/language-selector :: language-script}"></div>
 </div>
 
 </html>

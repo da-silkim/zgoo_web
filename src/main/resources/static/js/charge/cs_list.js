@@ -1,7 +1,7 @@
 $(document).ready(function () {
     let modalCon = false;
     let isDuplicateCheck = false;
-    let selectRow, btnMsg = "등록";
+    let selectRow, btnMsg = i18n.csList.buttons.add;
     var stationId;
 
     $('#size').on('change', function () {
@@ -31,7 +31,7 @@ $(document).ready(function () {
     $('#addBtn').on('click', function (event) {
         event.preventDefault();
         modalCon = false;
-        btnMsg = "등록";
+        btnMsg = i18n.csList.buttons.add;
         $('#csForm')[0].reset();
         $('#modalBtn').show();
         $('#modalCancel').show();
@@ -53,7 +53,7 @@ $(document).ready(function () {
         event.preventDefault();
         isDuplicateCheck = true;
         modalCon = true;
-        btnMsg = "수정";
+        btnMsg = i18n.csList.buttons.edit;
         $('#modalBtn').show();
         $('#modalCancel').show();
         $("#modalClose").attr("hidden", true);
@@ -130,7 +130,7 @@ $(document).ready(function () {
     });
 
     $('#deleteBtn').on('click', function () {
-        btnMsg = "삭제";
+        btnMsg = i18n.csList.buttons.delete;
 
         if (confirmSubmit(btnMsg)) {
 
@@ -153,7 +153,7 @@ $(document).ready(function () {
         event.preventDefault();
 
         if (!isDuplicateCheck) {
-            alert('충전소 이름 중복체크를 해주세요.');
+            alert(i18n.csList.messages.duplicateCheck);
             return;
         }
 
@@ -231,7 +231,7 @@ $(document).ready(function () {
     $('#duplicateBtn').on('click', function () {
         var stationName = $('#stationName').val();
         if (stationName.trim() === '') {
-            alert('충전소 이름을 입력해주세요');
+            alert(i18n.csList.messages.enterStationName);
             return;
         }
 
@@ -241,15 +241,15 @@ $(document).ready(function () {
             data: { stationName: stationName },
             success: function (isDuplicate) {
                 if (isDuplicate) {
-                    alert('이미 사용 중인 충전소 이름입니다.');
+                    alert(i18n.csList.messages.stationNameInUse);
                     isDuplicateCheck = false;
                 } else {
-                    alert('사용 가능한 충전소 이름입니다.');
+                    alert(i18n.csList.messages.stationNameAvailable);
                     isDuplicateCheck = true;
                 }
             },
             error: function () {
-                alert('충전소 이름 중복확인 중 오류가 발생으로 다시 시도해주세요');
+                alert(i18n.csList.messages.duplicateCheckError);
             }
         });
     });
@@ -268,7 +268,7 @@ $(document).ready(function () {
         landUseFeeInput.value = '';
 
         if (selectedValue === 'FIX') {
-            unitElement.innerText = '원';
+            unitElement.innerText = i18n.csList.modal.titles.currency;
         } else if (selectedValue === 'RATE') {
             unitElement.innerText = '%';
         }

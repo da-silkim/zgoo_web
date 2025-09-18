@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Language Selector</title>
+</head>
+
+<body>
+    <!-- 언어 선택 드롭다운 -->
+    <div class="language-selector" th:fragment="language-selector">
+        <div class="dropdown">
+            <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="languageDropdown"
+                data-bs-toggle="dropdown" aria-expanded="false">
+                <span id="currentLanguage">한국어</span>
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="languageDropdown">
+                <li><a class="dropdown-item" href="#" data-lang="ko">
+                        <span th:text="#{language.ko}">한국어</span>
+                    </a></li>
+                <li><a class="dropdown-item" href="#" data-lang="en">
+                        <span th:text="#{language.en}">English</span>
+                    </a></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 언어 선택 JavaScript -->
+    <script th:fragment="language-script">
+        document.addEventListener('DOMContentLoaded', function () {
+            // 현재 언어 가져오기
+            getCurrentLanguage();
+
+            // 언어 변경 이벤트 리스너
+            document.querySelectorAll('[data-lang]').forEach(function (element) {
+                element.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const lang = this.getAttribute('data-lang');
+                    changeLanguage(lang);
+                });
+            });
+        });
+
+        function changeLanguage(lang) {
+            fetch(`/change-locale?lang=${lang}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // 차트 언어 업데이트 (페이지 새로고침 전에)
+                        if (typeof window.updateChartsLanguage === 'function') {
+                            window.updateChartsLanguage(lang);
+                        }
+
+
+
+                        // 페이지 새로고침
+                        window.location.reload();
+                    } else {
+                        alert(data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('언어 변경 오류:', error);
+                    alert('언어 변경에 실패했습니다.');
+                });
+        }
+
+        function getCurrentLanguage() {
+            fetch('/get-current-locale')
+                .then(response => response.json())
+                .then(data => {
+                    const currentLanguageElement = document.getElementById('currentLanguage');
+                    if (currentLanguageElement) {
+                        const langMap = {
+                            'ko': '한국어',
+                            'en': 'English'
+                        };
+                        currentLanguageElement.textContent = langMap[data.locale] || '한국어';
+                    }
+                })
+                .catch(error => {
+                    console.error('현재 언어 가져오기 오류:', error);
+                });
+        }
+    </script>
+</body>
+
+</html>

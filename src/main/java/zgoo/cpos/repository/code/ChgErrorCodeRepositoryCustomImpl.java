@@ -2,6 +2,8 @@ package zgoo.cpos.repository.code;
 
 import java.util.List;
 
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -17,24 +19,34 @@ import zgoo.cpos.domain.code.QChgErrorCode;
 import zgoo.cpos.domain.code.QCommonCode;
 import zgoo.cpos.dto.code.ChgErrorCodeDto.ChgErrorCodeListDto;
 import zgoo.cpos.dto.code.ChgErrorCodeDto.ChgErrorCodeRegDto;
+import zgoo.cpos.util.LocaleUtil;
 
 @Slf4j
 @RequiredArgsConstructor
 public class ChgErrorCodeRepositoryCustomImpl implements ChgErrorCodeRepositoryCustom {
     private final JPAQueryFactory queryFactory;
+    private final MessageSource messageSource;
     QChgErrorCode errorCode = QChgErrorCode.chgErrorCode;
     QCommonCode manufCdName = new QCommonCode("manufCd");
+
+    String getDefaultName() {
+        return messageSource.getMessage("errcdMgmt.searchOptions.common", null,
+                LocaleContextHolder.getLocale());
+    }
 
     @Override
     public Page<ChgErrorCodeListDto> findErrorCodeWithPagination(Pageable pageable, String levelPath,
             boolean isSuperAdmin) {
+
         List<ChgErrorCodeListDto> errcdList = queryFactory.select(Projections.fields(ChgErrorCodeListDto.class,
                 errorCode.id.as("errcdId"),
                 errorCode.errCode.as("errCode"),
                 errorCode.errName.as("errName"),
                 errorCode.menufCode.as("menufCode"),
                 errorCode.regDt.as("regDt"),
-                Expressions.stringTemplate("IF({0} = 'DFT', '없음', {1})", errorCode.menufCode, manufCdName.name)
+                Expressions
+                        .stringTemplate("IF({0} = 'DFT', {1}, {2})", errorCode.menufCode, getDefaultName(),
+                                LocaleUtil.isEnglish() ? manufCdName.nameEn : manufCdName.name)
                         .as("menufCodeName")))
                 .from(errorCode)
                 .leftJoin(manufCdName).on(errorCode.menufCode.eq(manufCdName.commonCode))
@@ -75,7 +87,8 @@ public class ChgErrorCodeRepositoryCustomImpl implements ChgErrorCodeRepositoryC
                 errorCode.errName.as("errName"),
                 errorCode.menufCode.as("menufCode"),
                 errorCode.regDt.as("regDt"),
-                Expressions.stringTemplate("IF({0} = 'DFT', '없음', {1})", errorCode.menufCode, manufCdName.name)
+                Expressions.stringTemplate("IF({0} = 'DFT', {1}, {2})", errorCode.menufCode, getDefaultName(),
+                        LocaleUtil.isEnglish() ? manufCdName.nameEn : manufCdName.name)
                         .as("menufCodeName")))
                 .from(errorCode)
                 .leftJoin(manufCdName).on(errorCode.menufCode.eq(manufCdName.commonCode))

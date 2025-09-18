@@ -4,18 +4,22 @@
     <div class="card responsive-content">
         <!-- card body:1 start -->
         <div class="card-body">
-            <div class="content-title"><i class="fa-solid fa-gear font-ico me-2"></i>시스템 > 약관 관리</div>
+            <div class="content-title"><i class="fa-solid fa-gear font-ico me-2"></i><span
+                    th:text="#{conditionmgmt.titles.main}"></span></div>
             <!-- card:2 start -->
             <div class="card card-shadow mt-4">
                 <!-- card body:2 start -->
                 <div class="card-body">
                     <div class="card-title title-btn-area">
-                        <span class="card-title-bar"></span><span>약관</span>
+                        <span class="card-title-bar"></span><span th:text="#{conditionmgmt.titles.terms}"></span>
                         <div th:if="${menuAuthority.authority == 'SU'}">
-                            <button class="btn btn-data-add" id="addBtn" data-bs-toggle="modal" data-bs-target="#conAddModal">
-                                <i class="bi bi-plus-square me-2"></i>등록</button>
+                            <button class="btn btn-data-add" id="addBtn" data-bs-toggle="modal"
+                                data-bs-target="#conAddModal">
+                                <i class="bi bi-plus-square me-2"></i><span
+                                    th:text="#{conditionmgmt.buttons.add}"></span></button>
                             <button class="btn btn-data-delete" id="deleteBtn" hidden>
-                                <i class="bi bi-trash me-2"></i>삭제</button>
+                                <i class="bi bi-trash me-2"></i><span
+                                    th:text="#{conditionmgmt.buttons.delete}"></span></button>
                         </div>
                     </div>
                     <div class="table-responsive scroll-table-container">
@@ -23,22 +27,23 @@
                             <thead>
                                 <tr>
                                     <th class="w-5"></th>
-                                    <th class="w-15">필수/선택</th>
-                                    <th class="w-30">약관명</th>
-                                    <th class="w-25">약관코드</th>
-                                    <th class="w-25">등록일시</th>
+                                    <th class="w-15"><span th:text="#{conditionmgmt.labels.requiredYn}"></span></th>
+                                    <th class="w-30"><span th:text="#{conditionmgmt.labels.termsName}"></span></th>
+                                    <th class="w-25"><span th:text="#{conditionmgmt.labels.termsCode}"></span></th>
+                                    <th class="w-25"><span th:text="#{conditionmgmt.labels.regDt}"></span></th>
                                 </tr>
                             </thead>
                             <tbody id="pageList">
                                 <tr th:each="con : ${conList}">
-                                    <td th:id="${con.conditionCode}"><input type="checkbox" th:id="'cbox-' + ${con.conditionCode}"/></td>
+                                    <td th:id="${con.conditionCode}"><input type="checkbox"
+                                            th:id="'cbox-' + ${con.conditionCode}" /></td>
                                     <td th:text="${con.section}"></td>
                                     <td th:text="${con.conditionName}" class="text-left"></td>
                                     <td th:text="${con.conditionCode}"></td>
                                     <td th:text="${#temporals.format(con.regDt, 'yyyy-MM-dd HH:mm:ss')}"></td>
                                 </tr>
                                 <tr th:if="${conList.size() == 0}">
-                                    <td colspan="5">등록된 데이터가 없습니다.</td>
+                                    <td colspan="5"><span th:text="#{conditionmgmt.messages.nodata}"></span></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -52,12 +57,15 @@
                 <!-- card body:3 start -->
                 <div class="card-body">
                     <div class="card-title title-btn-area">
-                        <span class="card-title-bar"></span><span>약관 개정 히스토리</span>
+                        <span class="card-title-bar"></span><span th:text="#{conditionmgmt.titles.termsHistory}"></span>
                         <div th:if="${menuAuthority.authority == 'SU'}">
-                            <button class="btn btn-data-add" id="addBtnSub" data-bs-toggle="modal" data-bs-target="#conHistAddModal" hidden>
-                                <i class="bi bi-plus-square me-2"></i>등록</button>
+                            <button class="btn btn-data-add" id="addBtnSub" data-bs-toggle="modal"
+                                data-bs-target="#conHistAddModal" hidden>
+                                <i class="bi bi-plus-square me-2"></i><span
+                                    th:text="#{conditionmgmt.buttons.add}"></span></button>
                             <button class="btn btn-data-delete" id="deleteBtnSub" hidden>
-                                <i class="bi bi-trash me-2"></i>삭제</button>
+                                <i class="bi bi-trash me-2"></i><span
+                                    th:text="#{conditionmgmt.buttons.delete}"></span></button>
                         </div>
                     </div>
                     <div class="table-responsive scroll-table-container">
@@ -65,16 +73,16 @@
                             <thead>
                                 <tr>
                                     <th class="w-5"></th>
-                                    <th class="w-20">적용일시</th>
-                                    <th class="w-10">적용여부</th>
-                                    <th class="w-15">버전</th>
-                                    <th class="w-40">메모</th>
-                                    <th class="w-10">파일</th>
+                                    <th class="w-20"><span th:text="#{conditionmgmt.labels.applyDt}"></span></th>
+                                    <th class="w-10"><span th:text="#{conditionmgmt.labels.applyYn}"></span></th>
+                                    <th class="w-15"><span th:text="#{conditionmgmt.labels.version}"></span></th>
+                                    <th class="w-40"><span th:text="#{conditionmgmt.labels.memo}"></span></th>
+                                    <th class="w-10"><span th:text="#{conditionmgmt.labels.file}"></span></th>
                                 </tr>
                             </thead>
                             <tbody id="pageListSub">
                                 <tr>
-                                    <td colspan="6">약관 선택 시 조회됩니다.</td>
+                                    <td colspan="6"><span th:text="#{conditionmgmt.messages.termsInfoShow}"></span></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -98,38 +106,50 @@
                     <form id="conditionForm">
                         <!-- 모달 내용 -->
                         <!-- table: start -->
-                        <div class="modal-title mb-2"><span class="modal-title-bar"></span><span>약관 정보</span></div>
+                        <div class="modal-title mb-2"><span class="modal-title-bar"></span><span
+                                th:text="#{conditionmgmt.titles.termsInfo}"></span></div>
                         <table class="table table-bg-v table-fixed w-100 text-center align-middle">
                             <tbody>
                                 <tr class="table-border-top">
-                                    <th class="w-20">필수여부<b class="required-data">*</b></th>
+                                    <th class="w-20"><span th:text="#{conditionmgmt.labels.requiredYn}"></span><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <div class="display-radio">
-                                            <input type="radio" name="section" id="sectionYes" class="attr-control" value="Y" checked>
-                                            <label for="sectionYes">필수</label>
-                                            <input type="radio" name="section" id="sectionNo" class="attr-control" value="N">
-                                            <label for="sectionNo">선택</label>
+                                            <input type="radio" name="section" id="sectionYes" class="attr-control"
+                                                value="Y" checked>
+                                            <label for="sectionYes"><span
+                                                    th:text="#{conditionmgmt.labels.requred}"></span></label>
+                                            <input type="radio" name="section" id="sectionNo" class="attr-control"
+                                                value="N">
+                                            <label for="sectionNo"><span
+                                                    th:text="#{conditionmgmt.labels.optional}"></span></label>
                                         </div>
                                     </td>
-                                    <th class="w-20">약관코드<b class="required-data">*</b></th>
+                                    <th class="w-20"><span th:text="#{conditionmgmt.labels.termsCode}"></span><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <input type="text" name="conditionCode" id="conditionCode" class="form-control"
-                                            placeholder="약관코드를 입력해주세요." autocomplete="off" required>
+                                            th:placeholder="#{conditionmgmt.placeholders.inputTermsCode}"
+                                            autocomplete="off" required>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th>약관명<b class="required-data">*</b></th>
+                                    <th><span th:text="#{conditionmgmt.labels.termsName}"></span><b
+                                            class="required-data">*</b></th>
                                     <td colspan="3">
                                         <input type="text" name="conditionName" id="conditionName" class="form-control"
-                                            placeholder="약관명을 입력해주세요." autocomplete="off" required>
+                                            th:placeholder="#{conditionmgmt.placeholders.inputTermsName}"
+                                            autocomplete="off" required>
                                     </td>
                                 </tr>
                             </tbody>
                         </table>
                         <!-- table: end -->
                         <div class="modal-footer justify-content-center border-top-none">
-                            <button type="button" class="btn btn-outline-grey me-2" data-bs-dismiss="modal">취소</button>
-                            <button type="submit" id="modalBtn" class="btn btn-data-add">등록</button>
+                            <button type="button" class="btn btn-outline-grey me-2" data-bs-dismiss="modal"><span
+                                    th:text="#{conditionmgmt.buttons.cancel}"></span></button>
+                            <button type="submit" id="modalBtn" class="btn btn-data-add"><span
+                                    th:text="#{conditionmgmt.buttons.add}"></span></button>
                         </div>
                     </form>
                 </div>
@@ -151,48 +171,55 @@
                 <!-- condition hist body start -->
                 <div class="modal-body">
                     <form id="conHistForm">
-                        <div class="modal-title mb-2"><span class="modal-title-bar"></span><span>약관 개정 히스토리</span></div>
+                        <div class="modal-title mb-2"><span class="modal-title-bar"></span><span
+                                th:text="#{conditionmgmt.titles.termsHistory}"></span></div>
                         <table class="table table-bg-v table-fixed w-100 text-center align-middle">
                             <tbody>
                                 <tr class="table-border-top">
-                                    <th class="w-20">약관코드</th>
+                                    <th class="w-20"><span th:text="#{conditionmgmt.labels.termsCode}"></span></th>
                                     <td class="w-30">
                                         <div name="conditionCodeSub" id="conditionCodeSub" class="text-left ps-2"></div>
                                     </td>
-                                    <th class="w-20">약관명</th>
+                                    <th class="w-20"><span th:text="#{conditionmgmt.labels.termsName}"></span></th>
                                     <td class="w-30">
                                         <div name="conditionNameSub" id="conditionNameSub" class="text-left ps-2"></div>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="w-20">적용일시<b class="required-data">*</b></th>
+                                    <th class="w-20"><span th:text="#{conditionmgmt.labels.applyDt}"></span><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
                                         <input type="date" min="1970-01-01" max="2199-12-31" name="applyDtString"
                                             id="applyDtString" class="form-control attr-control" required>
                                     </td>
-                                    <th class="w-20">버전<b class="required-data">*</b></th>
+                                    <th class="w-20"><span th:text="#{conditionmgmt.labels.version}"></span><b
+                                            class="required-data">*</b></th>
                                     <td class="w-30">
-                                        <input type="text" name="version" id="version"
-                                            class="form-control" autocomplete="off" required>
+                                        <input type="text" name="version" id="version" class="form-control"
+                                            autocomplete="off" required>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="w-20">약관파일<b class="required-data">*</b></th>
+                                    <th class="w-20"><span th:text="#{conditionmgmt.labels.file}"></span><b
+                                            class="required-data">*</b></th>
                                     <td colspan="3" class="text-left">
-                                            <input type="file" name="conditionFile" id="conditionFile" required>
+                                        <input type="file" name="conditionFile" id="conditionFile" required>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="w-20">메모</th>
+                                    <th class="w-20"><span th:text="#{conditionmgmt.labels.memo}"></span></th>
                                     <td colspan="3">
-                                        <input type="text" name="memo" id="memo" class="form-control" autocomplete="off">
+                                        <input type="text" name="memo" id="memo" class="form-control"
+                                            autocomplete="off">
                                     </td>
                                 </tr>
                             </tbody>
                         </table>
                         <div class="modal-footer justify-content-center border-top-none">
-                            <button type="button" class="btn btn-outline-grey me-2" data-bs-dismiss="modal">취소</button>
-                            <button type="button" id="histModalBtn" class="btn btn-data-add">등록</button>
+                            <button type="button" class="btn btn-outline-grey me-2" data-bs-dismiss="modal"><span
+                                    th:text="#{conditionmgmt.buttons.cancel}"></span></button>
+                            <button type="button" id="histModalBtn" class="btn btn-data-add"><span
+                                    th:text="#{conditionmgmt.buttons.add}"></span></button>
                         </div>
                     </form>
                 </div>
@@ -204,5 +231,26 @@
     </div>
     <!-- Condition Hist Add Modal end -->
     <script type="text/javascript" th:src="@{/js/system/condition_management.js}"></script>
+
+    <script th:inline="javascript">
+        var i18n = {
+            conditionmgmt: {
+                messages: {
+                    nodata: /*[[#{conditionmgmt.messages.nodata}]]*/ '조회된 데이터가 없습니다.',
+                    essentialFieldCheckError: /*[[#{conditionmgmt.messages.essentialFieldCheckError}]]*/ '필수 입력 값이 누락되어 있습니다.'
+                },
+                buttons: {
+                    delete: /*[[#{conditionmgmt.buttons.delete}]]*/ '삭제',
+                    save: /*[[#{conditionmgmt.buttons.save}]]*/ '저장'
+                }
+            }
+
+        };
+
+        var currentLanguage = /*[[${#locale.language}]]*/ 'ko';
+    </script>
+    <!-- 언어 선택기 스크립트 -->
+    <div th:replace="~{fragments/language-selector :: language-script}"></div>
 </div>
+
 </html>

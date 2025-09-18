@@ -19,7 +19,7 @@ public class CodeDto {
     public static class GrpCodeBaseDto {
         private String grpCode;
         private String grpcdName;
-
+        private String grpcdNameEn;
     }
 
     /*
@@ -45,6 +45,7 @@ public class CodeDto {
         private String grpCode;
         private String commonCode;
         private String commonCodeName;
+        private String commonCodeNameEn;
     }
 
     /*

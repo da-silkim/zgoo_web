@@ -1,23 +1,23 @@
-$(document).ready(function() {
+$(document).ready(function () {
     let modalCon = false;
-    let btnMsg = "등록", selectRow, selectRowSec;
+    let btnMsg = i18n.menuManagement.modal.buttons.add, selectRow, selectRowSec;
 
-    $('#size').on('change', function() {
+    $('#size').on('change', function () {
         updatePageSize(this, "/system/menu/list", ["companyNameSearch"]);
     });
 
-    $('#pageList').on('click', 'tr', function() {
+    $('#pageList').on('click', 'tr', function () {
         selectRow = $(this).find('td').eq(3).text();
     });
 
-    $('#pageList2').on('click', 'tr', function() {
+    $('#pageList2').on('click', 'tr', function () {
         selectRowSec = $(this).find('td').eq(0).attr('id');
     });
 
     // 메뉴 - 등록
-    $('#addBtn').on('click', function() {
+    $('#addBtn').on('click', function () {
         modalCon = false;
-        btnMsg = "등록";
+        btnMsg = i18n.menuManagement.modal.buttons.add;
         $('#modalBtn').text(btnMsg);
 
         $('#parentCode').prop('disabled', true);
@@ -32,9 +32,9 @@ $(document).ready(function() {
         $('#parentCode').empty();
     });
 
-    $('#addBtnSec').on('click', function() {
+    $('#addBtnSec').on('click', function () {
         modalCon = false;
-        btnMsg = "등록";
+        btnMsg = i18n.menuManagement.modal.buttons.add;
         $('#modalBtnSec').text(btnMsg);
 
         $('#companyId').prop('disabled', false);
@@ -42,33 +42,33 @@ $(document).ready(function() {
             url: '/system/menu/company',
             method: 'GET',
             dataType: 'json',
-            success: function(companyMenuList) {
+            success: function (companyMenuList) {
                 console.log(companyMenuList);
                 renderMenuTable(companyMenuList);
             },
-            error: function(xhr, status, error) {
+            error: function (xhr, status, error) {
                 console.error(error);
             }
         });
     });
 
     // 메뉴 - 수정
-    $('#editBtn').on('click', function() {
+    $('#editBtn').on('click', function () {
         modalCon = true;
-        btnMsg = "수정";
+        btnMsg = i18n.menuManagement.modal.buttons.edit;
         $('#modalBtn').text(btnMsg);
 
         const menuCode = selectRow;
-        console.log("수정할 메뉴코드: " + menuCode);
+        console.log("menuCode for edit: " + menuCode);
 
         $.ajax({
             type: 'GET',
             url: `/system/menu/get/${menuCode}`,
             contentType: "application/json",
             dataType: 'json',
-            success: function(data) {
+            success: function (data) {
                 $('#menuLv').val(data.menuLv || '');
-                $('#menuName').val(data.menuName || '');
+                $('#menuName').val(currentLanguage == 'en' ? (data.menuNameEn || data.menuName) : data.menuName || '');
                 $('#menuCode').val(data.menuCode || '');
                 $('#menuUrl').val(data.menuUrl || '');
                 $('#iconClass').val(data.iconClass || '');
@@ -90,16 +90,16 @@ $(document).ready(function() {
                     $('#useYnNo').prop('checked', true);
                 }
             },
-            error: function(xhr, status, error) {
+            error: function (xhr, status, error) {
                 console.error(error);
             }
         });
     });
 
     // 사업장별 메뉴 권한 - 수정
-    $('#editBtnSec').on('click', function() {
+    $('#editBtnSec').on('click', function () {
         modalCon = true;
-        btnMsg = "수정";
+        btnMsg = i18n.menuManagement.modal.buttons.edit;
         $('#modalBtnSec').text(btnMsg);
 
         const companyId = selectRowSec;
@@ -110,62 +110,62 @@ $(document).ready(function() {
             url: `/system/menu/company/get/${companyId}`,
             contentType: "application/json",
             dataType: 'json',
-            success: function(companyMenuList) {
+            success: function (companyMenuList) {
                 $('#companyId').val(companyId || '');
                 renderMenuTable(companyMenuList);
             },
-            error: function(xhr, status, error) {
+            error: function (xhr, status, error) {
                 console.error(error);
             }
         });
     });
 
-    $('#deleteBtn').on('click', function() {
-        btnMsg = "삭제";
+    $('#deleteBtn').on('click', function () {
+        btnMsg = i18n.menuManagement.modal.buttons.delete;
 
-        if(confirmSubmit(btnMsg)) {
+        if (confirmSubmit(btnMsg)) {
             const menuCode = selectRow;
 
             $.ajax({
                 type: 'DELETE',
                 url: `/system/menu/delete/${menuCode}`,
                 contentType: "application/json",
-                success: function(response) {
+                success: function (response) {
                     alert(response);
                     window.location.reload();
                 },
-                error: function(xhr, status, error) {
+                error: function (xhr, status, error) {
                     console.error(error);
                 }
             });
         }
     });
 
-    $('#deleteBtnSec').on('click', function() {
-        btnMsg = "삭제";
+    $('#deleteBtnSec').on('click', function () {
+        btnMsg = i18n.menuManagement.modal.buttons.delete;
 
-        if(confirmSubmit(btnMsg)) {
+        if (confirmSubmit(btnMsg)) {
             const companyId = selectRowSec;
 
             $.ajax({
                 type: 'DELETE',
                 url: `/system/menu/company/delete/${companyId}`,
                 contentType: "application/json",
-                success: function(response) {
+                success: function (response) {
                     alert(response);
                     window.location.reload();
                 },
-                error: function(xhr, status, error) {
+                error: function (xhr, status, error) {
                     console.error(error);
                 }
             });
         }
     });
 
-    $('#modalBtn').on('click', function(event) {
+    $('#modalBtn').on('click', function (event) {
         event.preventDefault();
 
-        if(confirmSubmit(btnMsg)) {
+        if (confirmSubmit(btnMsg)) {
             const data = {
                 menuLv: $('#menuLv').val(),
                 parentCode: $('#parentCode').val(),
@@ -175,7 +175,7 @@ $(document).ready(function() {
                 iconClass: $('#iconClass').val(),
                 useYn: $('input[name="useYn"]:checked').val()
             };
-    
+
             const URL = modalCon ? `/system/menu/update` : `/system/menu/new`;
             const TYPE = modalCon ? 'PATCH' : 'POST';
 
@@ -184,25 +184,25 @@ $(document).ready(function() {
                 type: TYPE,
                 contentType: 'application/json',
                 data: JSON.stringify(data),
-                success: function(response) {
+                success: function (response) {
                     alert(response);
                     // $('#menuModal').modal('hide');  // 모달 창 닫기
                     window.location.reload();
                 },
-                error: function(xhr, status, error) {
+                error: function (xhr, status, error) {
                     console.error(error);
                 }
             });
         }
     });
 
-    $('#modalBtnSec').on('click', function(event) {
+    $('#modalBtnSec').on('click', function (event) {
         event.preventDefault();
 
-        if(confirmSubmit(btnMsg)) {
+        if (confirmSubmit(btnMsg)) {
 
             var menuAuthorities = [];
-            $('#menuTable tr').each(function(index, tr) {
+            $('#menuTable tr').each(function (index, tr) {
                 var useYn = $('input[name="useYn_' + index + '"]:checked').val();
                 var menuCode = $(tr).attr('id');
 
@@ -221,7 +221,7 @@ $(document).ready(function() {
                 method: TYPE,
                 contentType: 'application/json',
                 data: JSON.stringify(menuAuthorities),
-                success: function(response) {
+                success: function (response) {
                     if (modalCon) {
                         window.location.reload();
                     } else {
@@ -229,14 +229,14 @@ $(document).ready(function() {
                     }
                     alert(response);
                 },
-                error: function(xhr, status, error) {
+                error: function (xhr, status, error) {
                     console.error(error);
                 }
             });
         }
     });
 
-    $('#menuLv').change(function() {
+    $('#menuLv').change(function () {
         var selectedMenuLv = $(this).val();
         var parentCodeSelect = $('#parentCode');
         parentCodeSelect.empty();
@@ -254,11 +254,11 @@ $(document).ready(function() {
         $.ajax({
             url: '/system/menu/parent/' + menuLv,
             method: 'GET',
-            success: function(data) {
-                data.forEach(function(menu) {
-                    $('#parentCode').append('<option value="' + menu.menuCode + '">' + menu.menuName + '</option>');
+            success: function (data) {
+                data.forEach(function (menu) {
+                    $('#parentCode').append('<option value="' + menu.menuCode + '">' + (currentLanguage == 'en' ? (menu.menuNameEn || menu.menuName) : menu.menuName) + '</option>');
                 });
-                
+
                 $('#parentCode').prop('disabled', false);
             }
         });
@@ -268,22 +268,22 @@ $(document).ready(function() {
         $.ajax({
             url: '/system/menu/parent/' + menuLv,
             method: 'GET',
-            success: function(data) {
+            success: function (data) {
                 var parentCodeSelect = $('#parentCode');
                 parentCodeSelect.empty();
-    
-                data.forEach(function(menu) {
-                    parentCodeSelect.append('<option value="' + menu.menuCode + '">' + menu.menuName + '</option>');
+
+                data.forEach(function (menu) {
+                    parentCodeSelect.append('<option value="' + menu.menuCode + '">' + (currentLanguage == 'en' ? (menu.menuNameEn || menu.menuName) : menu.menuName) + '</option>');
                 });
-    
+
                 // 부모 메뉴 코드가 있으면 해당 값으로 셀렉트 박스의 값 설정
                 if (parentCode) {
                     parentCodeSelect.val(parentCode);
                 }
-    
+
                 parentCodeSelect.prop('disabled', false);
             },
-            error: function(xhr, status, error) {
+            error: function (xhr, status, error) {
                 console.log(error);
             }
         });
@@ -293,7 +293,7 @@ $(document).ready(function() {
         var menuTable = $('#menuTable');
         menuTable.empty();
 
-        $.each(menuList, function(index, menu) {
+        $.each(menuList, function (index, menu) {
             var topMenu = "";
             var midMenu = "";
             var lowMenu = "";
@@ -320,11 +320,11 @@ $(document).ready(function() {
             var useYnRadio = `
                 <div>
                     <input type="radio" name="useYn_${index}" value="Y" ${menu.useYn === "Y" ? "checked" : ""}>
-                    <label>사용</label>
+                    <label>${i18n.menuManagement.modal.labels.useYn.yes}</label>
                 </div>
                 <div class="ms-5">
                     <input type="radio" name="useYn_${index}" value="N" ${menu.useYn === "N" ? "checked" : ""}>
-                    <label>사용 안 함</label>
+                    <label>${i18n.menuManagement.modal.labels.useYn.no}</label>
                 </div>
             `;
 
@@ -332,7 +332,7 @@ $(document).ready(function() {
             var disabledClass = '';
             // menuLv이 0이고 menuUrl이 '/'로 시작하지 않는 경우 hidden
             // menuLv이 1이고 menuUrl이 '/'로 시작하지 않는 경우 hidden
-            if ((menu.menuLv == '0' || menu.menuLv == '1') && !menu.menuUrl.startsWith('/') ) {
+            if ((menu.menuLv == '0' || menu.menuLv == '1') && !menu.menuUrl.startsWith('/')) {
                 var row = `<tr id="${menu.menuCode}" hidden>`;
             } else if (menu.useYn === 'N') {
                 disabledClass = 'disabled-row'; // 비활성화 클래스를 추가
@@ -360,12 +360,12 @@ $(document).ready(function() {
                 var allChildMenusAreN = menuList
                     .filter(m => m.parentCode === parentMenu.menuCode)
                     .every(m => m.useYn === 'N');
-    
+
                 parentMenu.useYn = allChildMenusAreN ? 'N' : 'Y';
-    
+
                 // 부모 메뉴의 row를 업데이트 (UI에서 반영)
                 var parentRow = $('#menuTable tr#' + parentMenu.menuCode);
-    
+
                 // 부모 메뉴의 라디오 버튼을 변경
                 var parentRadio = parentRow.find('input[type="radio"][value="Y"]');
                 if (parentMenu.useYn === 'N') {
@@ -375,7 +375,7 @@ $(document).ready(function() {
                     parentRadio.prop('checked', true);
                     parentRow.find('input[type="radio"][value="N"]').prop('checked', false);
                 }
-    
+
                 // 부모 메뉴의 비활성화 여부 UI 반영
                 if (parentMenu.useYn === 'N') {
                     parentRow.addClass('disabled-row');
@@ -385,5 +385,5 @@ $(document).ready(function() {
             }
         }
     }
-    
+
 });

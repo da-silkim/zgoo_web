@@ -4,46 +4,61 @@
     <div class="card responsive-content">
         <!-- card body:1 start -->
         <div class="card-body">
-            <div class="content-title"><i class="fa-solid fa-gear font-ico me-2"></i>시스템 > 사용자 관리</div>
+            <div class="content-title"><i class="fa-solid fa-gear font-ico me-2"></i><span
+                    th:text="#{userManagement.titles.main}"></span></div>
             <!-- card:2 start -->
             <div class="card card-shadow">
                 <!-- card body:2 start -->
                 <div class="card-body">
-                    <div class="card-title"><span class="card-title-bar"></span><span>검색조건</span></div>
+                    <div class="card-title"><span class="card-title-bar"></span><span
+                            th:text="#{userManagement.titles.search}"></span></div>
                     <!-- search start -->
                     <form id="searchForm" class="position-relative" th:action="@{/system/user/list}" method="get">
                         <!-- row: start -->
                         <div class="row mb-3 row-cols-2 row-cols-lg-3 g-2">
                             <div class="col d-flex align-items-center">
-                                <label for="companyIdSearch" class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">사업자</label>
+                                <label for="companyIdSearch"
+                                    class="flex-shrink-0 col-form-label font-weight-bold text-right w-25"><span
+                                        th:text="#{userManagement.labels.company}"></span></label>
                                 <select id="companyIdSearch" name="companyIdSearch" class="mx-3 form-control">
-                                    <option th:value="null">선택</option>
+                                    <option th:value="null"><span th:text="#{userManagement.labels.select}"></span>
+                                    </option>
                                     <option th:each="company : ${companyList}" th:value="${company.companyId}"
-                                                th:text="${company.companyName}"
-                                                th:selected="${company.companyId == selectedCompanyId}"></option>
+                                        th:text="${company.companyName}"
+                                        th:selected="${company.companyId == selectedCompanyId}"></option>
                                 </select>
                             </div>
                             <div class="col d-flex align-items-center">
-                                <label for="companyTypeSearch" class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">사업자 유형</label>
+                                <label for="companyTypeSearch"
+                                    class="flex-shrink-0 col-form-label font-weight-bold text-right w-25"><span
+                                        th:text="#{userManagement.labels.companyKind}"></span></label>
                                 <select id="companyTypeSearch" name="companyTypeSearch" class="mx-3 form-control">
-                                    <option th:value="null">선택</option>
+                                    <option th:value="null"><span th:text="#{userManagement.labels.select}"></span>
+                                    </option>
                                     <option th:each="data : ${coKind}" th:value="${data.commonCode}"
-                                                th:text="${data.commonCodeName}"
-                                                th:selected="${data.commonCode == selectedCompanyType}"></option>
+                                        th:text="${data.commonCodeName}"
+                                        th:selected="${data.commonCode == selectedCompanyType}"></option>
                                 </select>
                             </div>
                             <div class="col d-flex align-items-center">
-                                <label for="nameSearch" class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">사용자명</label>
+                                <label for="nameSearch"
+                                    class="flex-shrink-0 col-form-label font-weight-bold text-right w-25"><span
+                                        th:text="#{userManagement.labels.userName}"></span></label>
                                 <input type="text" name="nameSearch" id="nameSearch" class="mx-3 form-control"
-                                        placeholder="사용자명을 입력해주세요." th:value="${selectedName}" autocomplete="off">
+                                    th:placeholder="#{userManagement.placeholders.inputUserName}"
+                                    th:value="${selectedName}" autocomplete="off">
                             </div>
                         </div>
                         <!-- row: end -->
                         <div class="search-btn">
-                            <button type="button" class="btn btn-outline-grey me-2" id="searchBtn" onclick="searchOption()">
-                                <i class="bi bi-search me-2"></i>검색</button>
-                            <button type="button" class="btn btn-outline-grey me-2" id="resetBtn" onclick="replacePage('/system/user/list')">
-                                <i class="bi bi-arrow-repeat me-2"></i>초기화</button>
+                            <button type="button" class="btn btn-outline-grey me-2" id="searchBtn"
+                                onclick="searchOption()">
+                                <i class="bi bi-search me-2"></i><span
+                                    th:text="#{userManagement.buttons.search}"></span></button>
+                            <button type="button" class="btn btn-outline-grey me-2" id="resetBtn"
+                                onclick="replacePage('/system/user/list')">
+                                <i class="bi bi-arrow-repeat me-2"></i><span
+                                    th:text="#{userManagement.buttons.reset}"></span></button>
                         </div>
                     </form>
                     <!-- search end -->
@@ -56,22 +71,31 @@
                 <!-- card body:3 start -->
                 <div class="card-body">
                     <div class="card-title">
-                        <span class="card-title-bar"></span><span>사용자 리스트</span>
+                        <span class="card-title-bar"></span><span th:text="#{userManagement.titles.userList}"></span>
                     </div>
                     <div class="mt-3 btn-page-area">
                         <div th:if="${menuAuthority.authority == 'SU' or menuAuthority.modYn == 'Y'}">
                             <button class="btn btn-data-add" id="addBtn" data-bs-toggle="modal"
                                 data-bs-target="#dataAddModal">
-                                <i class="bi bi-plus-square"></i>등록</button>
-                            <span id="buttonContainer"></span>
+                                <i class="bi bi-plus-square"></i><span
+                                    th:text="#{userManagement.buttons.add}"></span></button>
+                            <button class="btn btn-data-edit" id="editBtn" data-bs-toggle="modal"
+                                data-bs-target="#dataAddModal" hidden>
+                                <i class="fa-regular fa-pen-to-square me-2"></i><span
+                                    th:text="#{userManagement.buttons.edit}"></span></button>
+                            <button class="btn btn-data-delete" id="deleteBtn" hidden>
+                                <i class="bi bi-trash me-2"></i><span
+                                    th:text="#{userManagement.buttons.delete}"></span></button>
+                            <!-- <span id="buttonContainer"></span> -->
                         </div>
                         <span>
                             <span id="pageInfo">
-                                <span th:text="'Page ' + (${currentPage + 1}) + ' of ' + ${totalPages} + ' [총 ' + ${totalCount} + '건]'"></span>
+                                <span
+                                    th:text="'Page ' + (${currentPage + 1}) + ' of ' + ${totalPages} + ' [' + ${totalCount} + ']'"></span>
                             </span>
                             <select class="mx-3 page-select" id="size" name="size">
                                 <option th:each="data : ${showListCnt}" th:value="${data.commonCode}"
-                                        th:text="${data.commonCodeName}" th:selected="${data.commonCode == size}"></option>
+                                    th:text="${data.commonCodeName}" th:selected="${data.commonCode == size}"></option>
                             </select>
                         </span>
                     </div>
@@ -80,14 +104,22 @@
                             <thead>
                                 <tr class="table-border-top">
                                     <th scope="col" class="w-5"></th>
-                                    <th scope="col" class="w-10">사업자</th>
-                                    <th scope="col" class="w-10">사업자유형</th>
-                                    <th scope="col" class="w-10">사용자ID</th>
-                                    <th scope="col" class="w-10">사용자명</th>
-                                    <th scope="col" class="w-15">핸드폰번호</th>
-                                    <th scope="col" class="w-20">이메일</th>
-                                    <th scope="col" class="w-10">권한</th>
-                                    <th scope="col" class="w-20">등록일시</th>
+                                    <th scope="col" class="w-10"><span
+                                            th:text="#{userManagement.tables.company}"></span></th>
+                                    <th scope="col" class="w-10"><span
+                                            th:text="#{userManagement.tables.companyKind}"></span></th>
+                                    <th scope="col" class="w-10"><span th:text="#{userManagement.tables.userId}"></span>
+                                    </th>
+                                    <th scope="col" class="w-10"><span
+                                            th:text="#{userManagement.tables.userName}"></span></th>
+                                    <th scope="col" class="w-15"><span th:text="#{userManagement.tables.phone}"></span>
+                                    </th>
+                                    <th scope="col" class="w-20"><span th:text="#{userManagement.tables.email}"></span>
+                                    </th>
+                                    <th scope="col" class="w-10"><span
+                                            th:text="#{userManagement.tables.authority}"></span></th>
+                                    <th scope="col" class="w-20"><span th:text="#{userManagement.tables.regDt}"></span>
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody id="pageList">
@@ -103,35 +135,39 @@
                                     <td th:text="${#temporals.format(user.regDt, 'yyyy-MM-dd HH:mm:ss')}"></td>
                                 </tr>
                                 <tr th:if="${ulist.size() == 0}">
-                                    <td colspan="9">조회된 데이터가 없습니다.</td>
+                                    <td colspan="9"><span th:text="#{userManagement.messages.noData}"></span></td>
                                 </tr>
                             </tbody>
-                        </table>                                
+                        </table>
                     </div>
                     <!-- paging navigation start -->
                     <div th:if="${ulist.size() > 0}">
                         <ul class="pagination justify-content-center">
                             <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled' : ''">
                                 <a class="page-link" th:href="@{/system/user/list(page=0, size=${size}, companyIdSearch=${selectedCompanyId},
-                                companyTypeSearch=${selectedCompanyType}, nameSearch=${selectedName})}"><i class="bi bi-chevron-double-left"></i></a>
+                                companyTypeSearch=${selectedCompanyType}, nameSearch=${selectedName})}"><i
+                                        class="bi bi-chevron-double-left"></i></a>
                             </li>
                             <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled' : ''">
                                 <a class="page-link" th:href="@{/system/user/list(page=${currentPage-1}, size=${size}, companyIdSearch=${selectedCompanyId},
-                                companyTypeSearch=${selectedCompanyType}, nameSearch=${selectedName})}"><i class="bi bi-chevron-left"></i></a>
+                                companyTypeSearch=${selectedCompanyType}, nameSearch=${selectedName})}"><i
+                                        class="bi bi-chevron-left"></i></a>
                             </li>
                             <li class="page-item" th:each="i : ${#numbers.sequence(currentPage - 2, currentPage + 2)}"
                                 th:if="${i >= 0 && i < totalPages}">
                                 <a class="page-link" th:href="@{/system/user/list(page=${i}, size=${size}, companyIdSearch=${selectedCompanyId},
                                 companyTypeSearch=${selectedCompanyType}, nameSearch=${selectedName})}"
-                                th:text="${i+1}" th:classappend="${i == currentPage} ? 'active' : ''"></a>
+                                    th:text="${i+1}" th:classappend="${i == currentPage} ? 'active' : ''"></a>
                             </li>
                             <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled' : ''">
                                 <a class="page-link" th:href="@{/system/user/list(page=${currentPage+1}, size=${size}, companyIdSearch=${selectedCompanyId},
-                                companyTypeSearch=${selectedCompanyType}, nameSearch=${selectedName})}"><i class="bi bi-chevron-right"></i></a>
+                                companyTypeSearch=${selectedCompanyType}, nameSearch=${selectedName})}"><i
+                                        class="bi bi-chevron-right"></i></a>
                             </li>
                             <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled' : ''">
                                 <a class="page-link" th:href="@{/system/user/list(page=${totalPages - 1}, size=${size}, companyIdSearch=${selectedCompanyId},
-                                companyTypeSearch=${selectedCompanyType}, nameSearch=${selectedName})}"><i class="bi bi-chevron-double-right"></i></a>
+                                companyTypeSearch=${selectedCompanyType}, nameSearch=${selectedName})}"><i
+                                        class="bi bi-chevron-double-right"></i></a>
                             </li>
                         </ul>
                     </div>
@@ -146,93 +182,106 @@
     <!-- card:1 end -->
 
     <!-- Add Modal start -->
-    <div class="modal fade" id="dataAddModal" tabindex="-1" aria-labelledby="dataAddModalLabel" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal fade" id="dataAddModal" tabindex="-1" aria-labelledby="dataAddModalLabel"
+        data-bs-backdrop="static" data-bs-keyboard="false">
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width: 60vw; height: 90vh;">
             <div class="modal-content mh-100 overflow-y-auto scrollbar">
                 <form id="userForm" th:object="${usersDto}">
-                <!-- modal body start -->
-                <div class="modal-body">
-                    <!-- 모달 내용 -->
-                    <div class="modal-title mb-2 position-relative">
-                        <span class="modal-title-bar"></span><span>사용자 정보</span>
-                        <span class="tooltip-container">
-                            <i class="bi bi-info-circle info-icon"></i>
-                            <div class="tooltip-info" >
-                                - 아이디는 영문자로 시작하고 6~20자의 영문자 및 숫자로 구성되어야 합니다.<br>
-                                - 비밀번호는 8~16자의 영문자, 숫자, 특수문자를 최소 하나씩 포함해야 합니다.<br>
-                                - <b>사업자, 사용자ID, 사용자명, 비밀번호, 권한</b> 항목은 필수 값입니다.
-                            </div>
-                        </span>
-                    </div>
-                    <!-- table:1 start -->
-                    <table class="table table-bg-v table-fixed w-100 text-center align-middle">
-                        <tbody>
-                            <tr class="table-border-top">
-                                <th class="w-20">사업자<b class="required-data">*</b></th>
-                                <td class="w-30">
-                                    <select id="companyId" class="form-control" th:field="*{companyId}" required>
-                                        <option th:each="company : ${companyList}" th:value="${company.companyId}"
+                    <!-- modal body start -->
+                    <div class="modal-body">
+                        <!-- 모달 내용 -->
+                        <div class="modal-title mb-2 position-relative">
+                            <span class="modal-title-bar"></span><span
+                                th:text="#{userManagement.modal.titles.userInfo}"></span>
+                            <span class="tooltip-container">
+                                <i class="bi bi-info-circle info-icon"></i>
+                                <div class="tooltip-info">
+                                    - <span th:text="#{userManagement.modal.tooltip1}"></span><br>
+                                    - <span th:text="#{userManagement.modal.tooltip2}"></span><br>
+                                    - <b><span th:text="#{userManagement.modal.tooltip3}"></span></b>
+                                </div>
+                            </span>
+                        </div>
+                        <!-- table:1 start -->
+                        <table class="table table-bg-v table-fixed w-100 text-center align-middle">
+                            <tbody>
+                                <tr class="table-border-top">
+                                    <th class="w-20"><span th:text="#{userManagement.labels.company}"></span><b
+                                            class="required-data">*</b></th>
+                                    <td class="w-30">
+                                        <select id="companyId" class="form-control" th:field="*{companyId}" required>
+                                            <option th:each="company : ${companyList}" th:value="${company.companyId}"
                                                 th:text="${company.companyName}"></option>
-                                    </select>
-                                </td>
-                                <th class="w-20">사용자ID<b class="required-data">*</b></th>
-                                <td class="w-30">
-                                    <div class="display-input-btn">
-                                        <input type="text" name="userId" id="userId" class="form-control"
+                                        </select>
+                                    </td>
+                                    <th class="w-20"><span th:text="#{userManagement.labels.userId}"></span><b
+                                            class="required-data">*</b></th>
+                                    <td class="w-30">
+                                        <div class="display-input-btn">
+                                            <input type="text" name="userId" id="userId" class="form-control"
                                                 th:field="*{userId}" autocomplete="off" required>
-                                        <button type="button" class="btn btn-outline-grey flex-btn"
-                                                id="duplicateBtn">중복체크</button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th class="w-20">사용자명<b class="required-data">*</b></th>
-                                <td class="w-30">
-                                    <input type="text" name="name" id="name" class="form-control"
-                                            th:field="*{name}" autocomplete="off" required>
-                                </td>
-                                <th class="w-20">비밀번호<b class="required-data">*</b></th>
-                                <td class="w-30">
-                                    <div class="input-info-group" id="passwordContainer">
-                                        <input type="password" name="password" id="password" class="form-control"
+                                            <button type="button" class="btn btn-outline-grey flex-btn"
+                                                id="duplicateBtn"><span
+                                                    th:text="#{userManagement.buttons.dupcheck}"></span></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="w-20"><span th:text="#{userManagement.labels.userName}"></span><b
+                                            class="required-data">*</b></th>
+                                    <td class="w-30">
+                                        <input type="text" name="name" id="name" class="form-control" th:field="*{name}"
+                                            autocomplete="off" required>
+                                    </td>
+                                    <th class="w-20"><span th:text="#{userManagement.labels.password}"></span><b
+                                            class="required-data">*</b></th>
+                                    <td class="w-30">
+                                        <div class="input-info-group" id="passwordContainer">
+                                            <input type="password" name="password" id="password" class="form-control"
                                                 th:field="*{password}" autocomplete="off" required>
-                                        <div class="info-eyes"><i class="bi bi-eye"></i></div>
-                                    </div>
-                                    <button type="button" class="btn btn-outline-grey flex-btn ms-0 w-100" id="passwordEditBtn" hidden>비밀번호 변경</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th class="w-20">이메일</th>
-                                <td class="w-30">
-                                    <input type="text" name="email" id="email" class="form-control"
+                                            <div class="info-eyes"><i class="bi bi-eye"></i></div>
+                                        </div>
+                                        <button type="button" class="btn btn-outline-grey flex-btn ms-0 w-100"
+                                            id="passwordEditBtn" hidden><span
+                                                th:text="#{userManagement.buttons.passwordEdit}"></span></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="w-20"><span th:text="#{userManagement.labels.email}"></span></th>
+                                    <td class="w-30">
+                                        <input type="text" name="email" id="email" class="form-control"
                                             th:field="*{email}" autocomplete="off">
-                                </td>
-                                <th class="w-20">전화번호</th>
-                                <td class="w-30">
-                                    <input type="text" name="phone" id="phone" class="form-control" maxlength="13" oninput="phoneFormat(this)"
-                                            th:field="*{phone}" autocomplete="off">
-                                </td>
-                            </tr>
-                            <tr>
-                                <th class="w-20">권한<b class="required-data">*</b></th>
-                                <td class="w-30">
-                                    <select id="authority" class="form-control" th:field="*{authority}" required>
-                                        <option th:each="data : ${authList}" th:value="${data.commonCode}"
+                                    </td>
+                                    <th class="w-20"><span th:text="#{userManagement.labels.phone}"></span></th>
+                                    <td class="w-30">
+                                        <input type="text" name="phone" id="phone" class="form-control" maxlength="13"
+                                            oninput="phoneFormat(this)" th:field="*{phone}" autocomplete="off">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="w-20"><span th:text="#{userManagement.labels.authority}"></span><b
+                                            class="required-data">*</b></th>
+                                    <td class="w-30">
+                                        <select id="authority" class="form-control" th:field="*{authority}" required>
+                                            <option th:each="data : ${authList}" th:value="${data.commonCode}"
                                                 th:text="${data.commonCodeName}"></option>
-                                    </select>
-                                </td>
-                                <td colspan="2"></td>
-                            </tr>    
-                        </tbody>
-                    </table>
-                    <!-- table:1 end -->
+                                        </select>
+                                    </td>
+                                    <td colspan="2"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <!-- table:1 end -->
                     </div>
                     <!-- modal body end -->
                     <div class="modal-footer justify-content-center" style="border-top: none;">
-                        <button type="button" id="cancelBtn" class="btn btn-outline-grey me-2" data-bs-dismiss="modal">취소</button>
-                        <button type="submit" id="modalBtn" class="btn btn-data-add">등록</button>
+                        <button type="button" id="cancelBtn" class="btn btn-outline-grey me-2"
+                            data-bs-dismiss="modal"><span
+                                th:text="#{userManagement.modal.buttons.cancel}"></span></button>
+                        <button type="submit" id="modalBtn" class="btn btn-data-add"><span
+                                th:text="#{userManagement.buttons.regist}"></span></button>
                     </div>
-                </form>              
+                </form>
             </div>
             <!-- modal content end -->
         </div>
@@ -241,33 +290,71 @@
     <!-- Add Modal end -->
 
     <!-- Edit Password Modal start -->
-    <div class="modal fade" id="editPasswordModal" tabindex="-1" aria-labelledby="editPasswordLabel" style="z-index: 1056;"
-        data-bs-backdrop="static" data-bs-keyboard="false" role="dialog">
+    <div class="modal fade" id="editPasswordModal" tabindex="-1" aria-labelledby="editPasswordLabel"
+        style="z-index: 1056;" data-bs-backdrop="static" data-bs-keyboard="false" role="dialog">
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width: 50vw;">
             <div class="modal-content overflow-y-auto scrollbar password-content">
                 <form id="passwordForm">
                     <div class="modal-body">
-                        <div class="modal-title"><span class="modal-title-bar"></span><span>비밀번호 변경</span></div>
-                        <div>※영문자, 숫자, 특수문자를 최소 하나씩 포함하여 8자 이상 16자 이내로 새 비밀번호를 설정해 주세요.</div>
+                        <div class="modal-title"><span class="modal-title-bar"></span><span
+                                th:text="#{userManagement.buttons.passwordEdit}"></span></div>
+                        <div>※<span th:text="#{userManagement.modal.tooltip4}"></span></div>
                         <div>
-                            <span>현재 비밀번호</span>
-                            <input type="password" name="existPassword" id="existPassword" class="form-control" autocomplete="off" required />
-                            <span>새 비밀번호</span>
-                            <input type="password" name="newPassword" id="newPassword" class="form-control" autocomplete="off" required />
-                            <span>새 비밀번호 확인</span>
-                            <input type="password" name="newPasswordCheck" id="newPasswordCheck" class="form-control" autocomplete="off" required />
+                            <span><span th:text="#{userManagement.labels.password}"></span></span>
+                            <input type="password" name="existPassword" id="existPassword" class="form-control"
+                                autocomplete="off" required />
+                            <span><span th:text="#{userManagement.labels.newPassword}"></span></span>
+                            <input type="password" name="newPassword" id="newPassword" class="form-control"
+                                autocomplete="off" required />
+                            <span><span th:text="#{userManagement.labels.newPasswordCheck}"></span></span>
+                            <input type="password" name="newPasswordCheck" id="newPasswordCheck" class="form-control"
+                                autocomplete="off" required />
                         </div>
                     </div>
                     <div class="modal-footer justify-content-center border-top-none">
-                        <button type="button" class="btn btn-outline-grey me-2" data-bs-dismiss="modal">취소</button>
-                        <button type="button" id="passwordModalBtn" class="btn btn-data-add">변경</button>
+                        <button type="button" class="btn btn-outline-grey me-2" data-bs-dismiss="modal"><span
+                                th:text="#{userManagement.modal.buttons.cancel}"></span></button>
+                        <button type="button" id="passwordModalBtn" class="btn btn-data-add"><span
+                                th:text="#{userManagement.buttons.edit}"></span></button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
     <!-- Edit Password Modal start -->
-     
+
+    <script th:inline="javascript">
+        var i18n = {
+            userManagement: {
+                modal: {
+                    buttons: {
+                        cancel: /*[[#{userManagement.modal.buttons.cancel}]]*/ '취소',
+                        regist: /*[[#{userManagement.modal.buttons.regist}]]*/ '등록',
+                        edit: /*[[#{userManagement.modal.buttons.edit}]]*/ '수정',
+                        delete: /*[[#{userManagement.modal.buttons.delete}]]*/ '삭제'
+                    }
+                },
+                messages: {
+                    noData: /*[[#{userManagement.messages.nodata}]]*/ '조회된 데이터가 없습니다.',
+                    essentialFieldCheckError: /*[[#{userManagement.messages.essentialFieldCheckError}]]*/ '필수 입력 값이 누락되어 있습니다.',
+                    userIdCheckError: /*[[#{userManagement.messages.userIdCheckError}]]*/ '사용자ID를 다시 확인해주세요.',
+                    duplicateCheckError: /*[[#{userManagement.messages.duplicateCheckError}]]*/ '사용자ID 중복체크를 해주세요.',
+                    inputUserId: /*[[#{userManagement.messages.inputUserId}]]*/ '사용자ID를 입력해주세요.',
+                    alreadyRegisteredUserId: /*[[#{userManagement.messages.alreadyRegisteredUserId}]]*/ '이미 사용 중인 사용자ID입니다.',
+                    availableUserId: /*[[#{userManagement.messages.availableUserId}]]*/ '사용 가능한 사용자ID입니다.',
+                    error: /*[[#{userManagement.messages.error}]]*/ '오류 발생: 다시 시도해 주세요.',
+                    checkAllFields: /*[[#{userManagement.messages.checkAllFields}]]*/ '값을 모두 입력해주세요.'
+                }
+            }
+        };
+
+        var currentLanguage = /*[[${#locale.language}]]*/ 'ko';
+    </script>
+
     <script type="text/javascript" th:src="@{/js/system/user_management.js}"></script>
+    <!-- 언어 선택기 스크립트 -->
+    <div th:replace="~{fragments/language-selector :: language-script}"></div>
+
 </div>
+
 </html>

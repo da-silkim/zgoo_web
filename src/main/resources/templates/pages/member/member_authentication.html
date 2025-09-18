@@ -4,12 +4,14 @@
     <div class="card responsive-content">
         <!-- card body:1 start -->
         <div class="card-body">
-            <div class="content-title"><i class="fa-solid fa-user-tie font-ico me-2"></i>회원관리 > 회원인증내역</div>
+            <div class="content-title" th:text="#{member.authlist.titles.main}"><i
+                    class="fa-solid fa-user-tie font-ico me-2"></i></div>
             <!-- card:2 start -->
             <div class="card card-shadow">
                 <!-- card body:2 start -->
                 <div class="card-body">
-                    <div class="card-title"><span class="card-title-bar"></span><span>검색조건</span></div>
+                    <div class="card-title"><span class="card-title-bar"></span><span
+                            th:text="#{member.authlist.titles.search}"></span></div>
                     <!-- form start -->
                     <form id="searchForm" class="position-relative" th:action="@{/member/authentication/list}"
                         method="get">
@@ -17,41 +19,50 @@
                         <div class="row mb-3 row-cols-2 row-cols-lg-3 g-2">
                             <div class="col d-flex align-items-center">
                                 <label for="opSearch"
-                                    class="flex-shrink-0 col-form-label font-weight-bold text-right w-25">검색조건</label>
+                                    class="flex-shrink-0 col-form-label font-weight-bold text-right w-25"
+                                    th:text="#{member.authlist.titles.search}"></label>
                                 <select id="opSearch" class="ms-3 form-control w-40" name="opSearch">
-                                    <option value="" th:selected="${selectedOpSearch == null}">(선택)</option>
-                                    <option value="stationName" th:text="충전소명"
+                                    <option value="" th:selected="${selectedOpSearch == null}"
+                                        th:text="#{member.authlist.searchOptions.select}"></option>
+                                    <option value="stationName" th:text="#{member.authlist.searchOptions.stationName}"
                                         th:selected="${selectedOpSearch == 'stationName'}"></option>
-                                    <option value="stationId" th:text="충전소ID"
+                                    <option value="stationId" th:text="#{member.authlist.searchOptions.stationId}"
                                         th:selected="${selectedOpSearch == 'stationId'}"></option>
-                                    <option value="chargerId" th:text="충전기ID"
+                                    <option value="chargerId" th:text="#{member.authlist.searchOptions.chargerId}"
                                         th:selected="${selectedOpSearch == 'chargerId'}"></option>
-                                    <option value="idTag" th:text="카드번호" th:selected="${selectedOpSearch == 'idTag'}">
+                                    <option value="idTag" th:text="#{member.authlist.searchOptions.idTag}"
+                                        th:selected="${selectedOpSearch == 'idTag'}">
                                     </option>
-                                    <option value="memberName" th:text="회원이름"
+                                    <option value="memberName" th:text="#{member.authlist.searchOptions.memberName}"
                                         th:selected="${selectedOpSearch == 'memberName'}"></option>
                                 </select>
                                 <input type="text" name="contentSearch" id="contentSearch" class="mx-3 form-control"
                                     th:value="${selectedContentSearch}" autocomplete="off">
                             </div>
                             <div class="col d-flex align-items-center">
-                                <span
-                                    class="flex-shrink-0 col-form-label font-weight-bold mr-3p text-right w-25">인증일시</span>
+                                <span class="flex-shrink-0 col-form-label font-weight-bold mr-3p text-right w-25"
+                                    th:text="#{member.authlist.titles.authdate}"></span>
                                 <input type="date" min="1970-01-01" max="2199-12-31" th:value="${selectedTimeFrom}"
-                                    name="fromDate" id="fromDate" class="mx-3 form-control">
+                                    name="fromDate" id="fromDate" class="mx-3 form-control"
+                                    th:title="#{member.authlist.dateFormat.hint}"
+                                    th:placeholder="#{member.authlist.dateFormat.placeholder}">
                                 <span class="flex-shrink-0 col-form-label font-weight-bold">~</span>
                                 <input type="date" min="1970-01-01" max="2199-12-31" th:value="${selectedTimeTo}"
-                                    name="toDate" id="toDate" class="mx-3 form-control">
+                                    name="toDate" id="toDate" class="mx-3 form-control"
+                                    th:title="#{member.authlist.dateFormat.hint}"
+                                    th:placeholder="#{member.authlist.dateFormat.placeholder}">
                             </div>
                         </div>
 
                         <div class="search-btn">
                             <button type="button" class="btn btn-outline-grey me-2" id="searchBtn"
                                 onclick="searchOption()">
-                                <i class="bi bi-search me-2"></i>검색</button>
+                                <i class="bi bi-search me-2"></i><span
+                                    th:text="#{member.authlist.buttons.search}"></span></button>
                             <button type="button" class="btn btn-outline-grey me-2" id="resetBtn"
                                 onclick="replacePage('/member/authentication/list')">
-                                <i class="bi bi-arrow-repeat me-2"></i>초기화</button>
+                                <i class="bi bi-arrow-repeat me-2"></i><span
+                                    th:text="#{member.authlist.buttons.reset}"></span></button>
                         </div>
                         <!-- row:1 end -->
                     </form>
@@ -65,17 +76,18 @@
                 <!-- card body:3 start -->
                 <div class="card-body">
                     <div class="card-title">
-                        <span class="card-title-bar"></span><span>인증이력</span>
+                        <span class="card-title-bar"></span><span th:text="#{member.authlist.titles.authresult}"></span>
                     </div>
                     <div class="mt-3 btn-page-area">
                         <button class="btn btn-excel" id="excelBtn"
                             onclick="excelDownload('/excel/download/member_authentication', ['opSearch', 'contentSearch', 'fromDate', 'toDate'])"
                             th:if="${menuAuthority.authority == 'SU' or menuAuthority.excelYn == 'Y'}">
-                            <i class="bi bi-file-earmark-spreadsheet"></i>엑셀다운로드</button>
+                            <i class="bi bi-file-earmark-spreadsheet"></i><span
+                                th:text="#{member.authlist.buttons.excel}"></span></button>
                         <span>
                             <span id="pageInfo">
                                 <span
-                                    th:text="'Page ' + (${currentPage + 1}) + ' of ' + ${totalPages} + ' [총 ' + ${totalCount} + '건]'"></span>
+                                    th:text="'Page ' + (${currentPage + 1}) + ' of ' + ${totalPages} + ' [' + ${totalCount} + ']'"></span>
                             </span>
                             <select class="mx-3 page-select" id="size" name="size">
                                 <option th:each="data : ${showListCnt}" th:value="${data.commonCode}"
@@ -89,14 +101,14 @@
                                 <thead>
                                     <tr class="table-border-top">
                                         <th scope="col">No</th>
-                                        <th scope="col">충전소명</th>
-                                        <th scope="col">충전기ID</th>
-                                        <th scope="col">충전기구분</th>
-                                        <th scope="col">회원명</th>
-                                        <th scope="col">회원구분</th>
-                                        <th scope="col">회원카드번호</th>
-                                        <th scope="col">인증결과</th>
-                                        <th scope="col">인증일시</th>
+                                        <th scope="col" th:text="#{member.authlist.tables.stationname}"></th>
+                                        <th scope="col" th:text="#{member.authlist.tables.chargerid}"></th>
+                                        <th scope="col" th:text="#{member.authlist.tables.cpType}"></th>
+                                        <th scope="col" th:text="#{member.authlist.tables.membername}"></th>
+                                        <th scope="col" th:text="#{member.authlist.tables.membertype}"></th>
+                                        <th scope="col" th:text="#{member.authlist.tables.idtag}"></th>
+                                        <th scope="col" th:text="#{member.authlist.tables.result}"></th>
+                                        <th scope="col" th:text="#{member.authlist.tables.authdate}"></th>
                                     </tr>
                                 </thead>
                                 <tbody id="pageList">
@@ -110,10 +122,13 @@
                                         <td th:text="${data.memberType}"></td>
                                         <td th:text="${data.idTag}"></td>
                                         <td th:text="${data.result}"></td>
-                                        <td th:text="${#temporals.format(data.authTime,'yyyy-MM-dd HH:mm:ss')}"></td>
+                                        <td
+                                            th:text="${#temporals.format(data.authTime, #locale.language == 'ko' ? 'yyyy-MM-dd HH:mm:ss' : 'MM/dd/yyyy HH:mm:ss')}">
+                                        </td>
                                     </tr>
                                     <tr th:if="${authList.size() == 0}">
-                                        <td colspan="9" class="text-center">정보가 없습니다.</td>
+                                        <td colspan="9" class="text-center"
+                                            th:text="#{member.authlist.messages.nodata}"></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -163,9 +178,58 @@
             <!-- card body:1 end -->
         </div>
         <!-- card:1 end -->
-        <script type="text/javascript" th:src="@{/js/member/member_authentication.js}"></script>
-        <!-- <script type="text/javascript" th:src="@{/js/member/member_authentication_excel_download.js}"></script> -->
+
     </div>
+    <script type="text/javascript" th:src="@{/js/member/member_authentication.js}"></script>
+    <script th:inline="javascript">
+        var i18n = {
+            member: {
+                authlist: {
+                    titles: {
+                        main: /*[[#{member.authlist.titles.main}]]*/ '회원관리 > 인증이력',
+                        search: /*[[#{member.authlist.titles.search}]]*/ '검색조건',
+                        authdate: /*[[#{member.authlist.titles.authdate}]]*/ '인증일시',
+                        authresult: /*[[#{member.authlist.titles.authresult}]]*/ '인증이력'
+                    },
+                    searchOptions: {
+                        select: /*[[#{member.authlist.searchOptions.select}]]*/ '(선택)',
+                        stationName: /*[[#{member.authlist.searchOptions.stationName}]]*/ '충전소명',
+                        stationId: /*[[#{member.authlist.searchOptions.stationId}]]*/ '충전소ID',
+                        chargerId: /*[[#{member.authlist.searchOptions.chargerId}]]*/ '충전기ID',
+                        idTag: /*[[#{member.authlist.searchOptions.idTag}]]*/ '카드번호',
+                        memberName: /*[[#{member.authlist.searchOptions.memberName}]]*/ '회원이름'
+
+                    },
+                    buttons: {
+                        search: /*[[#{member.authlist.buttons.search}]]*/ '검색',
+                        reset: /*[[#{member.authlist.buttons.reset}]]*/ '초기화',
+                        excel: /*[[#{member.authlist.buttons.excel}]]*/ '엑셀다운로드'
+                    },
+                    tables: {
+                        stationname: /*[[#{member.authlist.tables.stationname}]]*/ '충전소명',
+                        chargerid: /*[[#{member.authlist.tables.chargerid}]]*/ '충전기ID',
+                        cpType: /*[[#{member.authlist.tables.cpType}]]*/ '충전기구분',
+                        membername: /*[[#{member.authlist.tables.membername}]]*/ '회원명',
+                        membertype: /*[[#{member.authlist.tables.membertype}]]*/ '회원구분',
+                        idtag: /*[[#{member.authlist.tables.idtag}]]*/ '회원카드번호',
+                        result: /*[[#{member.authlist.tables.result}]]*/ '인증결과',
+                        authdate: /*[[#{member.authlist.tables.authdate}]]*/ '인증일시'
+                    },
+                    dateFormat: {
+                        hint: /*[[#{member.authlist.dateFormat.hint}]]*/ '날짜 형식을 선택해주세요.'
+                    },
+                    messages: {
+                        nodata: /*[[#{member.authlist.messages.nodata}]]*/ '정보가 없습니다.'
+                    }
+                }
+            }
+        };
+
+        var currentLanguage = /*[[${#locale.language}]]*/ 'ko';
+    </script>
+    <!-- <script type="text/javascript" th:src="@{/js/member/member_authentication_excel_download.js}"></script> -->
+    <!-- 언어 선택기 스크립트 -->
+    <div th:replace="~{fragments/language-selector :: language-script}"></div>
 </div>
 
 </html>

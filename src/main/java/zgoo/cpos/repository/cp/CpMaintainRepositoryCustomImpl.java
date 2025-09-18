@@ -23,6 +23,7 @@ import zgoo.cpos.dto.cp.CpMaintainDto.CpInfoDto;
 import zgoo.cpos.dto.cp.CpMaintainDto.CpMaintainDetailDto;
 import zgoo.cpos.dto.cp.CpMaintainDto.CpMaintainListDto;
 import zgoo.cpos.dto.cp.CpMaintainDto.CpMaintainRegDto;
+import zgoo.cpos.util.LocaleUtil;
 import zgoo.cpos.util.QueryUtils;
 
 @Slf4j
@@ -57,15 +58,19 @@ public class CpMaintainRepositoryCustomImpl implements CpMaintainRepositoryCusto
                 cpMaintain.regUserId.as("regUserId"),
                 company.companyName.as("companyName"),
                 csInfo.stationName.as("stationName"),
-                errorTypeName.name.as("errorTypeName"),
-                processStatusName.name.as("processStatusName")))
+                LocaleUtil.isEnglish() ? errorTypeName.nameEn.as("errorTypeName")
+                        : errorTypeName.name.as("errorTypeName"),
+                LocaleUtil.isEnglish() ? processStatusName.nameEn.as("processStatusName")
+                        : processStatusName.name.as("processStatusName")))
                 .from(cpMaintain)
                 .leftJoin(cpInfo).on(cpMaintain.chargerId.eq(cpInfo.id))
                 .leftJoin(csInfo).on(cpInfo.stationId.id.eq(csInfo.id))
                 .leftJoin(company).on(csInfo.company.id.eq(company.id))
                 .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
-                .leftJoin(errorTypeName).on(cpMaintain.errorType.eq(errorTypeName.commonCode))
-                .leftJoin(processStatusName).on(cpMaintain.processStatus.eq(processStatusName.commonCode))
+                .leftJoin(errorTypeName)
+                .on(cpMaintain.errorType.eq(errorTypeName.commonCode))
+                .leftJoin(processStatusName)
+                .on(cpMaintain.processStatus.eq(processStatusName.commonCode))
                 .where(builder)
                 .orderBy(cpMaintain.regDt.desc())
                 .offset(pageable.getOffset())
@@ -145,15 +150,19 @@ public class CpMaintainRepositoryCustomImpl implements CpMaintainRepositoryCusto
                 cpMaintain.regUserId.as("regUserId"),
                 company.companyName.as("companyName"),
                 csInfo.stationName.as("stationName"),
-                errorTypeName.name.as("errorTypeName"),
-                processStatusName.name.as("processStatusName")))
+                LocaleUtil.isEnglish() ? errorTypeName.nameEn.as("errorTypeName")
+                        : errorTypeName.name.as("errorTypeName"),
+                LocaleUtil.isEnglish() ? processStatusName.nameEn.as("processStatusName")
+                        : processStatusName.name.as("processStatusName")))
                 .from(cpMaintain)
                 .leftJoin(cpInfo).on(cpMaintain.chargerId.eq(cpInfo.id))
                 .leftJoin(csInfo).on(cpInfo.stationId.id.eq(csInfo.id))
                 .leftJoin(company).on(csInfo.company.id.eq(company.id))
                 .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
-                .leftJoin(errorTypeName).on(cpMaintain.errorType.eq(errorTypeName.commonCode))
-                .leftJoin(processStatusName).on(cpMaintain.processStatus.eq(processStatusName.commonCode))
+                .leftJoin(errorTypeName)
+                .on(cpMaintain.errorType.eq(errorTypeName.commonCode))
+                .leftJoin(processStatusName)
+                .on(cpMaintain.processStatus.eq(processStatusName.commonCode))
                 .where(builder)
                 .orderBy(cpMaintain.regDt.desc())
                 .offset(pageable.getOffset())
@@ -167,8 +176,10 @@ public class CpMaintainRepositoryCustomImpl implements CpMaintainRepositoryCusto
                 .leftJoin(csInfo).on(cpInfo.stationId.id.eq(csInfo.id))
                 .leftJoin(company).on(csInfo.company.id.eq(company.id))
                 .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
-                .leftJoin(errorTypeName).on(cpMaintain.errorType.eq(errorTypeName.commonCode))
-                .leftJoin(processStatusName).on(cpMaintain.processStatus.eq(processStatusName.commonCode))
+                .leftJoin(errorTypeName)
+                .on(cpMaintain.errorType.eq(errorTypeName.commonCode))
+                .leftJoin(processStatusName)
+                .on(cpMaintain.processStatus.eq(processStatusName.commonCode))
                 .where(builder)
                 .fetchOne();
 
@@ -241,14 +252,18 @@ public class CpMaintainRepositoryCustomImpl implements CpMaintainRepositoryCusto
                 csInfo.zipcode.as("zipCode"),
                 csInfo.address.as("address"),
                 csInfo.addressDetail.as("addressDetail"),
-                errorTypeName.name.as("errorTypeName"),
-                processStatusName.name.as("processStatusName")))
+                LocaleUtil.isEnglish() ? errorTypeName.nameEn.as("errorTypeName")
+                        : errorTypeName.name.as("errorTypeName"),
+                LocaleUtil.isEnglish() ? processStatusName.nameEn.as("processStatusName")
+                        : processStatusName.name.as("processStatusName")))
                 .from(cpMaintain)
                 .leftJoin(cpInfo).on(cpMaintain.chargerId.eq(cpInfo.id))
                 .leftJoin(csInfo).on(cpInfo.stationId.id.eq(csInfo.id))
                 .leftJoin(company).on(csInfo.company.id.eq(company.id))
-                .leftJoin(errorTypeName).on(cpMaintain.errorType.eq(errorTypeName.commonCode))
-                .leftJoin(processStatusName).on(cpMaintain.processStatus.eq(processStatusName.commonCode))
+                .leftJoin(errorTypeName)
+                .on(cpMaintain.errorType.eq(errorTypeName.commonCode))
+                .leftJoin(processStatusName)
+                .on(cpMaintain.processStatus.eq(processStatusName.commonCode))
                 .where(cpMaintain.id.eq(cpmaintainId))
                 .fetchOne();
         return cpDetailOne;

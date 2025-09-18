@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -31,6 +33,7 @@ import zgoo.cpos.service.UsersService;
 public class UsersController {
 
     private final UsersService usersService;
+    private final MessageSource messageSource;
 
     // 사용자 등록
     @PostMapping("/new")
@@ -39,11 +42,13 @@ public class UsersController {
 
         try {
             this.usersService.saveUsers(dto, principal.getName());
-            return ResponseEntity.ok("사용자 정보가 정상적으로 등록되었습니다.");
+            return ResponseEntity.ok(messageSource.getMessage("userManagement.api.registerSuccess", null,
+                    LocaleContextHolder.getLocale()));
         } catch (Exception e) {
             log.error("[createUsers] error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("사용자 정보 등록 중 오류가 발생했습니다.");
+                    .body(messageSource.getMessage("userManagement.api.registerError", null,
+                            LocaleContextHolder.getLocale()));
         }
     }
 
@@ -116,11 +121,13 @@ public class UsersController {
 
         try {
             this.usersService.updateUsers(dto, principal.getName());
-            return ResponseEntity.ok("사용자 정보가 정상적으로 수정되었습니다.");
+            return ResponseEntity.ok(messageSource.getMessage("userManagement.api.updateSuccess", null,
+                    LocaleContextHolder.getLocale()));
         } catch (Exception e) {
             log.error("[updateUsers] error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("사용자 정보 수정 중 오류가 발생했습니다.");
+                    .body(messageSource.getMessage("userManagement.api.updateError", null,
+                            LocaleContextHolder.getLocale()));
         }
     }
 
@@ -131,12 +138,15 @@ public class UsersController {
 
         try {
             this.usersService.deleteUsers(userId, principal.getName());
-            return ResponseEntity.ok("사용자 정보가 정상적으로 삭제되었습니다.");
+            return ResponseEntity.ok(messageSource.getMessage("userManagement.api.deleteSuccess", null,
+                    LocaleContextHolder.getLocale()));
         } catch (EntityNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 사용자 정보를 찾을 수 없습니다.");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                    messageSource.getMessage("userManagement.api.userNotFound", null, LocaleContextHolder.getLocale()));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("사용자 정보 삭제 중 오류가 발생했습니다.");
+                    .body(messageSource.getMessage("userManagement.api.deleteError", null,
+                            LocaleContextHolder.getLocale()));
         }
     }
 
@@ -152,17 +162,22 @@ public class UsersController {
             Integer result = this.usersService.updateUsersPasswordInfo(userId, dto);
 
             switch (result) {
-                case 0 -> response.put("message", "현재 비밀번호와 값이 일치하지 않습니다.");
-                case 1 -> response.put("message", "비밀번호가 변경되었습니다.");
-                case 2 -> response.put("message", "새 비밀번호 값이 일치하지 않습니다.");
-                default -> response.put("message", "비밀번호 변경에 실패했습니다.");
+                case 0 -> response.put("message", messageSource.getMessage("userManagement.api.passwordMismatch", null,
+                        LocaleContextHolder.getLocale()));
+                case 1 -> response.put("message", messageSource.getMessage("userManagement.api.passwordChanged", null,
+                        LocaleContextHolder.getLocale()));
+                case 2 -> response.put("message", messageSource.getMessage("userManagement.api.newPasswordMismatch",
+                        null, LocaleContextHolder.getLocale()));
+                default -> response.put("message", messageSource.getMessage("userManagement.api.passwordChangeFailed",
+                        null, LocaleContextHolder.getLocale()));
             }
 
             response.put("state", result);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             log.error("[updateUsersPassword] error: {}", e.getMessage());
-            response.put("message", "비밀번호 변경 중 오류가 발생했습니다.");
+            response.put("message", messageSource.getMessage("userManagement.api.passwordChangeError", null,
+                    LocaleContextHolder.getLocale()));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
@@ -181,7 +196,8 @@ public class UsersController {
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             log.error("[UsersController >> buttonControl] error: {}", e.getMessage());
-            response.put("message", "버튼 권한 확인 중 오류가 발생했습니다.");
+            response.put("message", messageSource.getMessage("userManagement.api.buttonAuthError", null,
+                    LocaleContextHolder.getLocale()));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }

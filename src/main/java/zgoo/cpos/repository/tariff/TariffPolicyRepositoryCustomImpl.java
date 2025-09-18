@@ -22,6 +22,7 @@ import zgoo.cpos.domain.tariff.QTariffPolicy;
 import zgoo.cpos.domain.tariff.TariffPolicy;
 import zgoo.cpos.dto.tariff.TariffDto.TariffInfoDto;
 import zgoo.cpos.dto.tariff.TariffDto.TariffPolicyDto;
+import zgoo.cpos.util.LocaleUtil;
 import zgoo.cpos.util.QueryUtils;
 
 @RequiredArgsConstructor
@@ -54,12 +55,14 @@ public class TariffPolicyRepositoryCustomImpl implements TariffPolicyRepositoryC
                         company.companyName.as("companyName"),
                         tpolicy.apply_date.as("applyDate"),
                         tpolicy.apply_code.as("applyCode"),
-                        applyCodeName.name.as("applyCodeName")))
+                        LocaleUtil.isEnglish() ? applyCodeName.nameEn.as("applyCodeName")
+                                : applyCodeName.name.as("applyCodeName")))
                 .from(tpolicy)
                 .leftJoin(ppolicy).on(tpolicy.policy.eq(ppolicy))
                 .leftJoin(company).on(ppolicy.company.eq(company))
                 .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
-                .leftJoin(applyCodeName).on(tpolicy.apply_code.eq(applyCodeName.commonCode))
+                .leftJoin(applyCodeName).on(tpolicy.apply_code.eq(applyCodeName.commonCode)
+                        .and(applyCodeName.group.grpCode.eq("TARIFFSTATCD")))
                 .where(builder)
                 .offset(page.getOffset())
                 .limit(page.getPageSize())
@@ -75,6 +78,8 @@ public class TariffPolicyRepositoryCustomImpl implements TariffPolicyRepositoryC
                 .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
                 .where(builder)
                 .fetchOne();
+
+        log.info("== resultList: {}", resultList.toString());
 
         return new PageImpl<>(resultList, page, total);
     }
@@ -99,12 +104,14 @@ public class TariffPolicyRepositoryCustomImpl implements TariffPolicyRepositoryC
                         company.companyName.as("companyName"),
                         tpolicy.apply_date.as("applyDate"),
                         tpolicy.apply_code.as("applyCode"),
-                        applyCodeName.name.as("applyCodeName")))
+                        LocaleUtil.isEnglish() ? applyCodeName.nameEn.as("applyCodeName")
+                                : applyCodeName.name.as("applyCodeName")))
                 .from(tpolicy)
                 .leftJoin(ppolicy).on(tpolicy.policy.eq(ppolicy))
                 .leftJoin(company).on(ppolicy.company.eq(company))
                 .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
-                .leftJoin(applyCodeName).on(tpolicy.apply_code.eq(applyCodeName.commonCode))
+                .leftJoin(applyCodeName).on(tpolicy.apply_code.eq(applyCodeName.commonCode)
+                        .and(applyCodeName.group.grpCode.eq("TARIFFSTATCD")))
                 .where(builder)
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -120,6 +127,8 @@ public class TariffPolicyRepositoryCustomImpl implements TariffPolicyRepositoryC
                 .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
                 .where(builder)
                 .fetchOne();
+
+        log.info("== resultList: {}", resultList.toString());
 
         return new PageImpl<>(resultList, pageable, total);
     }

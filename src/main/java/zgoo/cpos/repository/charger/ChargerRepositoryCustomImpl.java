@@ -31,6 +31,7 @@ import zgoo.cpos.dto.cp.ChargerDto.ChargerCountBySidoDto;
 import zgoo.cpos.dto.cp.ChargerDto.ChargerListDto;
 import zgoo.cpos.dto.cp.ChargerDto.ChargerSearchDto;
 import zgoo.cpos.dto.cp.ChargerDto.FacilityCountDto;
+import zgoo.cpos.util.LocaleUtil;
 import zgoo.cpos.util.QueryUtils;
 
 @RequiredArgsConstructor
@@ -56,7 +57,7 @@ public class ChargerRepositoryCustomImpl implements ChargerRepositoryCustom {
                 model.modelName.as("modelName"),
                 cpplan.name.as("policyName"),
                 cpInfo.installDate.as("installDate"), // LocalDate 타입 그대로 사용
-                manufCdName.name.as("manufCdName"),
+                LocaleUtil.isEnglish() ? manufCdName.nameEn.as("manufCdName") : manufCdName.name.as("manufCdName"),
                 cpInfo.fwVersion.as("fwVersion"),
                 cpStatus.lastFwupdateTime.as("lastUpdateDt")))
                 .from(cpInfo)
@@ -120,7 +121,7 @@ public class ChargerRepositoryCustomImpl implements ChargerRepositoryCustom {
                 model.modelName.as("modelName"),
                 cpplan.name.as("policyName"),
                 cpInfo.installDate.as("installDate"), // LocalDate 타입 그대로 사용
-                manufCdName.name.as("manufCdName"),
+                LocaleUtil.isEnglish() ? manufCdName.nameEn.as("manufCdName") : manufCdName.name.as("manufCdName"),
                 cpInfo.modelCode.as("modelCode"),
                 cpInfo.protocol.as("protocol")))
                 .from(cpInfo)
@@ -200,7 +201,7 @@ public class ChargerRepositoryCustomImpl implements ChargerRepositoryCustom {
                 model.modelName.as("modelName"),
                 cpplan.name.as("policyName"),
                 cpInfo.installDate.as("installDate"),
-                manufCdName.name.as("manufCdName"),
+                LocaleUtil.isEnglish() ? manufCdName.nameEn.as("manufCdName") : manufCdName.name.as("manufCdName"),
                 cpInfo.modelCode.as("modelCode"),
                 cpInfo.protocol.as("protocol")))
                 .from(cpInfo)
@@ -372,7 +373,7 @@ public class ChargerRepositoryCustomImpl implements ChargerRepositoryCustom {
                 model.modelName.as("modelName"),
                 cpplan.name.as("policyName"),
                 cpInfo.installDate.as("installDate"),
-                manufCdName.name.as("manufCdName")))
+                LocaleUtil.isEnglish() ? manufCdName.nameEn.as("manufCdName") : manufCdName.name.as("manufCdName")))
                 .from(cpInfo)
                 .join(csInfo).on(cpInfo.stationId.eq(csInfo))
                 .join(company).on(csInfo.company.eq(company))
@@ -465,8 +466,9 @@ public class ChargerRepositoryCustomImpl implements ChargerRepositoryCustom {
             builder.and(csInfo.sido.eq(sido)).and(cpTypeName.name.eq(type));
         }
 
+        // 현재 언어에 따라 적절한 이름 컬럼 선택
         return queryFactory.select(Projections.fields(FacilityCountDto.class,
-                facilityTypeName.name.as("facility"),
+                LocaleUtil.isEnglish() ? facilityTypeName.nameEn.as("facility") : facilityTypeName.name.as("facility"),
                 cpInfo.count().as("count")))
                 .from(cpInfo)
                 .leftJoin(csInfo).on(csInfo.id.eq(cpInfo.stationId.id))
@@ -476,7 +478,7 @@ public class ChargerRepositoryCustomImpl implements ChargerRepositoryCustom {
                 .leftJoin(company).on(csInfo.company.eq(company))
                 .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
                 .where(builder)
-                .groupBy(facilityTypeName.name)
+                .groupBy(LocaleUtil.isEnglish() ? facilityTypeName.nameEn : facilityTypeName.name)
                 .fetch();
     }
 
@@ -498,7 +500,7 @@ public class ChargerRepositoryCustomImpl implements ChargerRepositoryCustom {
                 model.modelName.as("modelName"),
                 cpplan.name.as("policyName"),
                 cpInfo.installDate.as("installDate"), // LocalDate 타입 그대로 사용
-                manufCdName.name.as("manufCdName"),
+                LocaleUtil.isEnglish() ? manufCdName.nameEn.as("manufCdName") : manufCdName.name.as("manufCdName"),
                 cpInfo.fwVersion.as("fwVersion"),
                 cpStatus.lastFwupdateTime.as("lastUpdateDt")))
                 .from(cpInfo)

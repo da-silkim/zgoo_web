@@ -116,12 +116,12 @@ public class TariffController {
             // Tariff Info 저장
             tariffService.saveTariffInfo(requestDto, tariffId);
 
-            response.put("message", "성공적으로 등록되었습니다.");
+            response.put("message", "Successfully registered.");
             return ResponseEntity.ok(response);
 
         } catch (Exception e) {
             log.error("TariffController >> createPlan Error:{}", e, e.getMessage());
-            response.put("message", "서버 오류");
+            response.put("message", "Server error");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
 
@@ -141,9 +141,9 @@ public class TariffController {
 
             tariffService.updateTariffPolicy(requestDto);
 
-            return ResponseEntity.ok("요금제 수정 성공");
+            return ResponseEntity.ok("Successfully updated.");
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("요금제 수정 오류");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error while updating tariff.");
         }
 
     }

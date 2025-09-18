@@ -1,10 +1,10 @@
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function () {
     // var places = placeList(stationList);
     var places;
 
     // 지도에 출력할 장소 정보 리턴
     function placeList(stationList) {
-        var list = stationList.map(function(station) {
+        var list = stationList.map(function (station) {
             return {
                 content: `<div class="infowindow"><div>${station.stationName}</div><div>${station.address}</div></div>`,
                 stationId: station.stationId,
@@ -26,7 +26,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     var map = new kakao.maps.Map(container, options); // 지도 생성 및 객체 리턴
     var markers = [];                                 // 지도에 표시된 마커의 정보를 저장
-    
+
     // 마커 클러스터 생성
     var clusterer = new kakao.maps.MarkerClusterer({
         map: map,
@@ -38,15 +38,15 @@ document.addEventListener("DOMContentLoaded", function() {
     // custom 마커이미지 정보
     var imgSrc = '../../img/marker.png',
         imgSize = new kakao.maps.Size(36, 50),
-        imgOption = {offset: new kakao.maps.Point(27, 69)};
-    
+        imgOption = { offset: new kakao.maps.Point(27, 69) };
+
     // 마커의 이미지정보를 가지고 있는 마커이미지를 생성
     var markerImg = new kakao.maps.MarkerImage(imgSrc, imgSize, imgOption),
         markerPos = new kakao.maps.LatLng(37.480025, 126.878101);
 
     // 사용자 접속 위치를 초기 중심좌표로 세팅
     if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(function(position) {
+        navigator.geolocation.getCurrentPosition(function (position) {
             var currLat = position.coords.latitude;
             var currLng = position.coords.longitude;
             var currPos = new kakao.maps.LatLng(currLat, currLng);
@@ -70,14 +70,14 @@ document.addEventListener("DOMContentLoaded", function() {
                     latitude: center.getLat(),
                     longitude: center.getLng()
                 },
-                success: function(response) {
+                success: function (response) {
                     console.log('Nearby places:', response.stationsList);
 
                     places = placeList(response.stationsList);
                     nearbyStationList(response.stationsList);
                     mapMarkers();
                 },
-                error: function(error) {
+                error: function (error) {
                     console.log('Error:', error);
                 }
             });
@@ -86,7 +86,7 @@ document.addEventListener("DOMContentLoaded", function() {
             map.setLevel(5);
         });
     } else {
-        alert("현재 위치를 가져올 수 없습니다.");
+        alert(i18n.error.locationUnavailable);
     }
 
     // 마커 생성
@@ -102,29 +102,29 @@ document.addEventListener("DOMContentLoaded", function() {
     // 지도에 마커 표시 함수
     function mapMarkers() {
         for (var i = 0, len = places.length; i < len; i++) {
-            (function(markerPosition) {
+            (function (markerPosition) {
                 // 마커를 생성하고 지도 위에 표시
                 var marker = new kakao.maps.Marker({
                     map: map,
                     position: markerPosition.latlng,
                     image: markerImg
                 });
-        
+
                 // 마커에 표시할 인포윈도우 생성
                 var infowindow = new kakao.maps.InfoWindow({
                     content: markerPosition.content,
                     removable: true
                 });
-        
+
                 marker.stationId = markerPosition.stationId;
                 markers.push(marker);
 
                 // 클러스터리에 마커 추가
                 clusterer.addMarkers(markers);
-    
+
                 kakao.maps.event.addListener(marker, 'mouseover', makeOverListener(map, marker, infowindow));
                 kakao.maps.event.addListener(marker, 'mouseout', makeOutListener(infowindow));
-                kakao.maps.event.addListener(marker, 'click', function() {
+                kakao.maps.event.addListener(marker, 'click', function () {
                     moveMapCenter(marker);
                     infowindow.close();
                     searchStationDetail(marker.stationId);
@@ -135,21 +135,21 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     // 클러스터 클릭 시 현재 지도 레벨에서 1레벨 확대
-    kakao.maps.event.addListener(clusterer, 'clusterclick', function(cluster) {
+    kakao.maps.event.addListener(clusterer, 'clusterclick', function (cluster) {
         var level = map.getLevel() - 1;
-        map.setLevel(level, {anchor: cluster.getCenter()});
+        map.setLevel(level, { anchor: cluster.getCenter() });
     });
 
     // 인포윈도우 지도에 표시
     function makeOverListener(map, marker, infowindow) {
-        return function() {
+        return function () {
             infowindow.open(map, marker);
         };
     }
 
     // 인포윈도우 지도에서 제거
     function makeOutListener(infowindow) {
-        return function() {
+        return function () {
             infowindow.close();
         };
     }
@@ -162,13 +162,13 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     // 검색 버튼 클릭 시 장소 검색 수행
-    document.getElementById('searchBtn').addEventListener('click', function() {
+    document.getElementById('searchBtn').addEventListener('click', function () {
         // searchPlaces();
         searchStationKeyword();
     });
 
     // Enter 키 입력으로도 검색 가능
-    document.getElementById('searchBox').addEventListener('keydown', function(event) {
+    document.getElementById('searchBox').addEventListener('keydown', function (event) {
         if (event.key === 'Enter') {
             searchStationKeyword();
         }
@@ -177,9 +177,9 @@ document.addEventListener("DOMContentLoaded", function() {
     // 사용자 주변 충전소
     function nearbyStationList(list) {
         var searchStationList = $('#searchStationList');
-        searchStationList.empty().append(`<div class="nearby-station">주변충전소</div>`);
+        searchStationList.empty().append(`<div class="nearby-station">${i18n.map.nearbyStation}</div>`);
 
-        list.forEach(function(csList) {
+        list.forEach(function (csList) {
             searchStationList.append(`<div class="search-station" id="${csList.stationId}">
                                         <div>${csList.stationName}</div>
                                         <div>${csList.address}</div>
@@ -193,7 +193,7 @@ document.addEventListener("DOMContentLoaded", function() {
         var searchStationList = $('#searchStationList');
         searchStationList.empty();
 
-        list.forEach(function(csList) {
+        list.forEach(function (csList) {
             searchStationList.append(`<div class="search-station" id="${csList.stationId}">
                                         <div>${csList.stationName}</div>
                                         <div>${csList.address}</div>
@@ -204,8 +204,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
     function stationClickEvent() {
         var stations = document.querySelectorAll('.search-station');
-        stations.forEach(function(station) {
-            station.addEventListener('click', function() {
+        stations.forEach(function (station) {
+            station.addEventListener('click', function () {
                 var stationId = station.id;
                 searchStationDetail(stationId);
                 document.getElementById('stationInfoDetail').style.display = 'block';
@@ -222,7 +222,7 @@ document.addEventListener("DOMContentLoaded", function() {
             type: 'GET',
             contentType: 'application/json',
             dataType: 'json',
-            success: function(response) {
+            success: function (response) {
                 // removeMarkers();
                 // clusterer.clear();
 
@@ -231,7 +231,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     showStationList(response.csList);
                 }
             },
-            error: function(error) {
+            error: function (error) {
                 console.error(error);
             }
         });
@@ -244,7 +244,7 @@ document.addEventListener("DOMContentLoaded", function() {
             type: 'GET',
             contentType: 'application/json',
             dataType: 'json',
-            success: function(response) {
+            success: function (response) {
                 map.setLevel(1);
                 if (response.csInfo) {
                     document.getElementById('stationNameTitle').innerText = response.csInfo.stationName || '';
@@ -267,11 +267,11 @@ document.addEventListener("DOMContentLoaded", function() {
                     var chargerList = $('#chargerList');
                     chargerList.empty();
 
-                    response.cpList.forEach(function(cpList) {
+                    response.cpList.forEach(function (cpList) {
                         let connectorIcons = '-';
                         if (cpList.connector && cpList.connector.length > 0) {
                             connectorIcons = '';
-                            cpList.connector.forEach(function(conn) {
+                            cpList.connector.forEach(function (conn) {
                                 switch (conn.status) {
                                     case 'Available':
                                         connectorIcons += `<i class="fa-solid fa-plug available me-1 fa-lg"></i>`;
@@ -316,7 +316,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     chargerList.append(`<div class="pt-2">${response.message}</div>`);
                 }
             },
-            error: function(error) {
+            error: function (error) {
                 console.error(error);
             }
         });
@@ -324,7 +324,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // 마커 삭제 함수
     function removeMarkers() {
-        for (var i=0; i<markers.length; i++) {
+        for (var i = 0; i < markers.length; i++) {
             markers[i].setMap(null);    // 지도에서 마커 제거
         }
         markers = [];   // 초기화
@@ -333,12 +333,12 @@ document.addEventListener("DOMContentLoaded", function() {
     // 사용자 현재 위치 정보
     var userImgSrc = '../../img/user_marker.png',
         userimgSize = new kakao.maps.Size(36, 50),
-        userimgOption = {offset: new kakao.maps.Point(27, 69)};
+        userimgOption = { offset: new kakao.maps.Point(27, 69) };
     var userMarkerImg = new kakao.maps.MarkerImage(userImgSrc, userimgSize, userimgOption);
 
-    document.getElementById('currentLocationBtn').addEventListener('click', function() {
-        if(navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(function(position) {
+    document.getElementById('currentLocationBtn').addEventListener('click', function () {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function (position) {
                 var currLat = position.coords.latitude;
                 var currLng = position.coords.longitude;
                 var currPos = new kakao.maps.LatLng(currLat, currLng);
@@ -355,18 +355,18 @@ document.addEventListener("DOMContentLoaded", function() {
                 map.panTo(currPos);
                 map.setLevel(3);
             });
-        }else {
-            alert("현재 위치를 가져올 수 없습니다.");
+        } else {
+            alert(i18n.error.locationUnavailable);
         }
     });
 
     // 충전소 상세 내용 닫기
-    document.getElementById('infoCloseBtn').addEventListener('click', function() {
+    document.getElementById('infoCloseBtn').addEventListener('click', function () {
         document.getElementById('stationInfoDetail').style.display = 'none';
     });
 
     // 지도가 이동한 후 발생하는 이벤트 등록
-    kakao.maps.event.addListener(map, 'dragend', function() {
+    kakao.maps.event.addListener(map, 'dragend', function () {
         updateMapInfo();
     });
 
@@ -383,11 +383,11 @@ document.addEventListener("DOMContentLoaded", function() {
                 latitude: center.getLat(),
                 longitude: center.getLng()
             },
-            success: function(response) {
+            success: function (response) {
                 places = placeList(response.stationsList);
                 mapMarkers();
             },
-            error: function(error) {
+            error: function (error) {
                 console.log('Error:', error);
             }
         });

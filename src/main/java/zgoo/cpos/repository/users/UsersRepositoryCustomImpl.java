@@ -18,6 +18,7 @@ import zgoo.cpos.domain.company.QCompanyRelationInfo;
 import zgoo.cpos.domain.users.QUsers;
 import zgoo.cpos.domain.users.Users;
 import zgoo.cpos.dto.users.UsersDto;
+import zgoo.cpos.util.LocaleUtil;
 import zgoo.cpos.util.QueryUtils;
 
 @Slf4j
@@ -164,8 +165,10 @@ public class UsersRepositoryCustomImpl implements UsersRepositoryCustom {
                 company.id.as("companyId"),
                 company.companyName.as("companyName"),
                 company.companyType.as("companyType"),
-                userAuthorityCommonCode.name.as("authorityName"),
-                companyTypeCommonCode.name.as("companyTypeName")))
+                LocaleUtil.isEnglish() ? userAuthorityCommonCode.nameEn.as("authorityName")
+                        : userAuthorityCommonCode.name.as("authorityName"),
+                LocaleUtil.isEnglish() ? companyTypeCommonCode.nameEn.as("companyTypeName")
+                        : companyTypeCommonCode.name.as("companyTypeName")))
                 .from(users)
                 .leftJoin(users.company, company)
                 .leftJoin(relation).on(company.companyRelationInfo.eq(relation))
